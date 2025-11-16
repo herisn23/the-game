@@ -1,0 +1,1 @@
+To package app for windows run `./gradlew compose`
