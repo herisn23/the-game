@@ -2,6 +2,7 @@
 kaml = "0.61.0"
 kotlinx-serialization = "1.7.3"
 kotlin = "2.2.21"
+kotlin-coroutines="1.10.2"
 gdx = "1.14.0"
 graalHelperVersion = "2.0.1"
 construo = "2.1.0"
@@ -10,7 +11,7 @@ construo = "2.1.0"
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-yaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-
+kotlin-coroutines = {module="org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref="kotlin-coroutines"}
 
 #GDX libraries
 gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }

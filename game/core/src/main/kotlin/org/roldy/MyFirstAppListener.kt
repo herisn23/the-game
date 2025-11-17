@@ -1,12 +1,10 @@
 package org.roldy
 
 import com.badlogic.gdx.ApplicationListener
-import com.badlogic.gdx.Files.FileType
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -17,9 +15,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.io.File
+import org.roldy.coroutines.async
+import java.lang.Thread.sleep
 
 
 class Main : ApplicationListener {
@@ -70,19 +67,27 @@ class Main : ApplicationListener {
         logic()
         draw()
     }
+    var processing = false
 
     private fun input() {
         val speed = 4f
-        val delta = Gdx.graphics.getDeltaTime()
+        val delta = Gdx.graphics.deltaTime
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             bucketSprite!!.translateX(speed * delta)
         } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             bucketSprite!!.translateX(-speed * delta)
         }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.R) && !processing) {
+            async { onRender ->
+                onRender {
+                    Gdx.graphics.setTitle("hovinko")
+                }
+            }
+        }
 
-        if (Gdx.input.isTouched()) {
-            touchPos!!.set(Gdx.input.getX().toFloat(), Gdx.input.getY().toFloat())
+        if (Gdx.input.isTouched) {
+            touchPos!!.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
             viewport!!.unproject(touchPos)
             bucketSprite!!.setCenterX(touchPos!!.x)
         }
@@ -96,7 +101,7 @@ class Main : ApplicationListener {
 
         bucketSprite!!.setX(MathUtils.clamp(bucketSprite!!.getX(), 0f, worldWidth - bucketWidth))
 
-        val delta = Gdx.graphics.getDeltaTime()
+        val delta = Gdx.graphics.deltaTime
         bucketRectangle!!.set(bucketSprite!!.getX(), bucketSprite!!.getY(), bucketWidth, bucketHeight)
 
         for (i in dropSprites!!.size - 1 downTo 0) {
@@ -148,7 +153,7 @@ class Main : ApplicationListener {
 
         val dropSprite = Sprite(dropTexture)
         dropSprite.setSize(dropWidth, dropHeight)
-        dropSprite.setX(MathUtils.random(0f, worldWidth - dropWidth))
+        dropSprite.setX(MathUtils.random(0f, worldWidth))
         dropSprite.setY(worldHeight)
         dropSprites!!.add(dropSprite)
     }

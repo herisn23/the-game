@@ -3,6 +3,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include("launcher")
 
+include("game:application")
 include("game:core")
 
 dependencyResolutionManagement {

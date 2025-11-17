@@ -38,7 +38,7 @@ dependencies {
     runtimeOnly(variantOf(libs.gdx.platform) {
         classifier("natives-desktop")
     })
-    implementation(projects.game.core)
+    implementation(projects.game.application)
 
     //exclude assets from compileTime we only need it at runtime
     runtimeOnly(assets.output)
@@ -92,6 +92,7 @@ construo {
     targets {
         create<Target.Windows>("win") {
             architecture.set(Target.Architecture.X86_64)
+            icon.set(project.file("icons/logo.png"))
             jdkUrl.set("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.9%2B10/OpenJDK21U-jdk_x64_windows_hotspot_21.0.9_10.zip")
             // run app with console to see logs
             useConsole.set(true)
