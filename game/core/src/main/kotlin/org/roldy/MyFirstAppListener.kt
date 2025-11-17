@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -17,12 +18,13 @@ import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import org.roldy.coroutines.async
 import java.lang.Thread.sleep
+import kotlin.reflect.KProperty
 
 
 class Main : ApplicationListener {
-    var backgroundTexture: Texture? = null
-    var bucketTexture: Texture? = null
-    var dropTexture: Texture? = null
+    //    var backgroundTexture: Texture? = null
+//    var bucketTexture: Texture? = null
+//    var dropTexture: Texture? = null
     var dropSound: Sound? = null
     var music: Music? = null
     var spriteBatch: SpriteBatch? = null
@@ -33,21 +35,19 @@ class Main : ApplicationListener {
     var dropTimer: Float = 0f
     var bucketRectangle: Rectangle? = null
     var dropRectangle: Rectangle? = null
+    lateinit var atlas: TextureAtlas
 
-    private fun loadAsset(name: String) =
-//        File("assets/$name").let(::FileHandle)
-//        FileHandle(name)
-        Gdx.files.internal(name)
+    val background by { atlas }
+    val drop by { atlas }
+    val bucket by { atlas }
 
     override fun create() {
-        backgroundTexture = Texture(loadAsset("background.png"))
-        bucketTexture = Texture(loadAsset("bucket.png"))
-        dropTexture = Texture(loadAsset("drop.png"))
+        atlas = TextureAtlas(loadAsset("test/atlas.atlas"))
         dropSound = Gdx.audio.newSound(loadAsset("drop.mp3"))
         music = Gdx.audio.newMusic(loadAsset("music.mp3"))
         spriteBatch = SpriteBatch()
         viewport = FitViewport(8f, 5f)
-        bucketSprite = Sprite(bucketTexture)
+        bucketSprite = Sprite(bucket)
         bucketSprite!!.setSize(1f, 1f)
         touchPos = Vector2()
         dropSprites = Array<Sprite>()
@@ -67,6 +67,7 @@ class Main : ApplicationListener {
         logic()
         draw()
     }
+
     var processing = false
 
     private fun input() {
@@ -78,7 +79,7 @@ class Main : ApplicationListener {
         } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             bucketSprite!!.translateX(-speed * delta)
         }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.R) && !processing) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R) && !processing) {
             async { onRender ->
                 onRender {
                     Gdx.graphics.setTitle("hovinko")
@@ -135,12 +136,12 @@ class Main : ApplicationListener {
         val worldWidth = viewport!!.getWorldWidth()
         val worldHeight = viewport!!.getWorldHeight()
 
-        spriteBatch!!.draw(backgroundTexture, 0f, 0f, worldWidth, worldHeight)
-        bucketSprite!!.draw(spriteBatch)
-
-        for (dropSprite in dropSprites!!) {
-            dropSprite.draw(spriteBatch)
-        }
+        spriteBatch!!.draw(background, 0f, 0f, worldWidth, worldHeight)
+//        bucketSprite!!.draw(spriteBatch)
+//
+//        for (dropSprite in dropSprites!!) {
+//            dropSprite.draw(spriteBatch)
+//        }
 
         spriteBatch!!.end()
     }
@@ -151,7 +152,7 @@ class Main : ApplicationListener {
         val worldWidth = viewport!!.getWorldWidth()
         val worldHeight = viewport!!.getWorldHeight()
 
-        val dropSprite = Sprite(dropTexture)
+        val dropSprite = Sprite(drop)
         dropSprite.setSize(dropWidth, dropHeight)
         dropSprite.setX(MathUtils.random(0f, worldWidth))
         dropSprite.setY(worldHeight)

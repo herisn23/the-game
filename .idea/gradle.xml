@@ -25,6 +25,7 @@
             <option value="$PROJECT_DIR$/game/application" />
             <option value="$PROJECT_DIR$/game/core" />
             <option value="$PROJECT_DIR$/launcher" />
+            <option value="$PROJECT_DIR$/unity" />
           </set>
         </option>
       </GradleProjectSettings>

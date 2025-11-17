@@ -1,0 +1,9 @@
+atlas.png
+size:1024,512
+repeat:none
+background
+bounds:2,2,800,500
+bucket
+bounds:804,300,100,100
+drop
+bounds:804,402,100,100
