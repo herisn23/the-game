@@ -1,0 +1,155 @@
+RangerTunic [ShowEars].png
+size:1440,800
+repeat:none
+filter:Linear,Linear
+pma:true
+frontHead
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,480,480
+frontArmRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:80,480,80,160
+frontBody
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:160,480,160,160
+frontArmLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:320,480,80,160
+frontLegRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:160,640,80,160
+frontLegLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:240,640,80,160
+backHead
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:480,0,480,480
+leftHead
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:960,0,480,480
+backArmLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:560,480,80,160
+backBody
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:640,480,160,160
+backArmRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:800,480,80,160
+backLegLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:640,640,80,160
+backLegRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:720,640,80,160
+leftArmRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1040,480,80,160
+leftBody
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1120,480,160,160
+leftLegRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1120,640,80,160
+leftLegLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1200,640,80,160
+leftArmLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1280,480,80,160
+frontHandLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:320,640,80,80
+backHandRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:800,640,80,80
+leftHandLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1280,640,80,80
+leftHandRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1040,640,80,80
+frontSleeveLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:320,720,80,80
+backFingersRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:800,720,80,80
+frontHandRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:80,640,80,80
+frontSleeveRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:80,720,80,80
+backHandLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:560,640,80,80
+backFingersLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:560,720,80,80
+leftSleeveLeft
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1280,720,80,80
+leftFingersRight
+    showEars: 1
+    showHair: 0
+    showBeard: 1
+    bounds:1040,720,80,80

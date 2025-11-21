@@ -1,7 +1,5 @@
 package org.roldy.pawn.skeleton.attribute
 
-import org.roldy.pawn.NamedAttribute
-
 abstract class PawnSkeletonSlot(override val name: String) : NamedAttribute()
 
 abstract class SkinPawnSkeletonSlot(override val name: String) : PawnSkeletonSlot(name) {
@@ -22,6 +20,12 @@ abstract class SkinPawnSkeletonSlot(override val name: String) : PawnSkeletonSlo
 }
 
 abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSkeletonSlot(name) {
+    fun regionName(orientation: PawnSkeletonOrientation): String =
+        when (orientation) {
+            is Left, Right -> "left"
+            else -> orientation.value
+        }
+
     object Head : CustomizablePawnSkinSlot("head")
     object Eyes : CustomizablePawnSkinSlot("eyes")
     object Hair : CustomizablePawnSkinSlot("hair")
@@ -32,43 +36,73 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
         object EarLeft : CustomizablePawnSkinSlot("earLeft")
         object EarRight : CustomizablePawnSkinSlot("earRight")
     }
+
     companion object {
         val allParts: List<CustomizablePawnSkinSlot> by lazy {
             listOf(
                 Head, Hair, Eyes, EyesBrows, Beard, Mouth, Ears.EarLeft, Ears.EarRight
             )
         }
+        val hairSlots by lazy {
+            listOf(Hair, Beard)
+        }
+        val hideableSlotsByArmor: Map<ArmorPawnSlot.Piece, List<CustomizablePawnSkinSlot>> by lazy {
+            mapOf(
+                ArmorPawnSlot.Piece.Helmet to listOf(
+                    Hair, Beard, Ears.EarLeft, Ears.EarRight
+                )
+            )
+        }
     }
 }
 
-abstract class ArmorPawnSlot(override val name: String) : PawnSkeletonSlot(name) {
+abstract class ArmorPawnSlot(override val name: String, protected val stripedRegionName: String) :
+    PawnSkeletonSlot(name) {
+
+    fun regionName(orientation: PawnSkeletonOrientation): String =
+        when (orientation) {
+            is Left, Right -> "left${stripedRegionName}"
+            else -> "${orientation.value}${stripedRegionName}"
+        }
 
     enum class Piece {
         Body, Helmet, Legs
     }
-    object Helmet : ArmorPawnSlot("helmet")
-    object ArmLeft : ArmorPawnSlot("armArmorLeft")
-    object SleeveLeft : ArmorPawnSlot("armSleeveArmorLeft")
-    object HandLeft : ArmorPawnSlot("armHandArmorLeft")
-    object ArmRight : ArmorPawnSlot("armArmorRight")
-    object SleeveRight : ArmorPawnSlot("armSleeveArmorRight")
-    object HandRight : ArmorPawnSlot("armHandArmorRight")
-    object Body : ArmorPawnSlot("bodyArmor")
-    object LegLeft : ArmorPawnSlot("legArmorLeft")
-    object LegRight : ArmorPawnSlot("legArmorRight")
+
+    object Helmet : ArmorPawnSlot("helmet", "Head")
+    object ArmLeft : ArmorPawnSlot("armArmorLeft", "ArmLeft")
+    object SleeveLeft : ArmorPawnSlot("armSleeveArmorLeft", "SleeveLeft")
+    object HandLeft : ArmorPawnSlot("armHandArmorLeft", "HandLeft")
+    object ArmRight : ArmorPawnSlot("armArmorRight", "ArmRight")
+    object SleeveRight : ArmorPawnSlot("armSleeveArmorRight", "SleeveRight")
+    object HandRight : ArmorPawnSlot("armHandArmorRight", "HandRight")
+    object Body : ArmorPawnSlot("bodyArmor", "Body")
+    object LegLeft : ArmorPawnSlot("legArmorLeft", "LegLeft")
+    object LegRight : ArmorPawnSlot("legArmorRight", "LegRight")
 
 
     companion object {
-        val allParts: List<ArmorPawnSlot> = listOf(
-            Helmet, ArmRight, ArmLeft,
-            SleeveRight, SleeveLeft,
-            HandLeft, HandRight,
-            Body, LegLeft, LegRight
-        )
-        val pieces: Map<Piece, List<ArmorPawnSlot>> = mapOf(
-            Piece.Body to listOf(Body, ArmLeft, ArmRight, SleeveLeft, SleeveRight, HandLeft, HandRight),
-            Piece.Helmet to listOf(Helmet),
-            Piece.Legs to listOf(LegLeft, LegRight)
-        )
+        val allParts: List<ArmorPawnSlot> by lazy {
+            listOf(
+                Helmet, ArmRight, ArmLeft,
+                SleeveRight, SleeveLeft,
+                HandLeft, HandRight,
+                Body, LegLeft, LegRight
+            )
+        }
+        val pieces: Map<Piece, List<ArmorPawnSlot>> by lazy {
+            mapOf(
+                Piece.Body to listOf(Body, ArmLeft, ArmRight, SleeveLeft, SleeveRight, HandLeft, HandRight),
+                Piece.Helmet to listOf(Helmet),
+                Piece.Legs to listOf(LegLeft, LegRight)
+            )
+        }
+        val slotPiece: Map<ArmorPawnSlot, Piece> by lazy {
+            pieces.map { (piece, slots) ->
+                slots.map { slot ->
+                    slot to piece
+                }
+            }.flatten().toMap()
+        }
     }
 }

@@ -1,0 +1,15 @@
+Mouth21.png
+size:160,64
+repeat:none
+filter:Linear,Linear
+pma:true
+front
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,96,64
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:96,0,64,64

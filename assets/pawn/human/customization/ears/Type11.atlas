@@ -1,0 +1,35 @@
+Type11.png
+size:768,128
+repeat:none
+filter:Linear,Linear
+pma:true
+frontLeft
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,128,128
+frontRight
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:128,0,128,128
+backLeft
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:256,0,128,128
+backRight
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:384,0,128,128
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:512,0,128,128
+right
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:640,0,128,128

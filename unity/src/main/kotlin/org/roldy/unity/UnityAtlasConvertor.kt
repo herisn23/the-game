@@ -16,7 +16,6 @@ import java.util.Locale.getDefault
 import javax.imageio.ImageIO
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 import kotlin.math.abs
 import kotlin.system.exitProcess
 
@@ -24,6 +23,12 @@ val yaml = Yaml()
 val objectMapper = jacksonObjectMapper()
 const val sourceContext = "/Users/lukastreml/My project/"
 const val spineContext = "spine"
+const val keyWordShowEars = "[ShowEars]"
+const val keyWordFullHair = "[FullHair]"
+
+enum class Flag {
+    ShowEars, ShowHair
+}
 
 data class Paths(
     val relativePath: String
@@ -38,6 +43,13 @@ fun sources(vararg paths: String) =
 
 fun main() {
     val paths = sources(
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Body/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Eyes/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Hair/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Mouth/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Eyebrows/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Ears/Basic",
+        "Assets/HeroEditor4D/Common/Sprites/BodyParts/Beard/Basic",
         "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Armor/Basic"
     )
     paths.forEach(::createAtlas)
@@ -62,9 +74,19 @@ fun createAtlas(path: Paths) {
     }
     atlasList.forEach { (texture, metaConfig) ->
         val image = ImageIO.read(texture.toFile())
-        val atlas = createAtlas(texture.name, metaConfig.toFile(), image.width to image.height)
-        val imagePath = assetsPath.resolve(texture.name)
-        val atlasPath = assetsPath.resolve("${texture.nameWithoutExtension.lowercase()}.atlas")
+        fun String.clean() =
+           this
+        val textureName = texture.name.clean()
+        val flags = texture.name.run {
+            listOfNotNull(
+                Flag.ShowEars.takeIf { contains(keyWordShowEars) },
+                Flag.ShowHair.takeIf { contains(keyWordFullHair) }
+            )
+        }
+        val atlas = createAtlas(texture.name, metaConfig.toFile(), image.width to image.height, flags)
+
+        val imagePath = assetsPath.resolve(textureName)
+        val atlasPath = assetsPath.resolve(textureName.replace("png", "atlas"))
         Files.copy(texture, imagePath)
         Files.writeString(atlasPath, atlas.content)
     }
@@ -95,7 +117,8 @@ fun extractSprites(paths: List<Paths>) {
             }
             exitProcess(0)
         }
-        fun checkPixMap(path:Path) {
+
+        fun checkPixMap(path: Path) {
             val sourcePixmap = Pixmap(Gdx.files.absolute(path.absolutePathString()))
 // Check a pixel that should be transparent
             val color = Color()
@@ -103,6 +126,7 @@ fun extractSprites(paths: List<Paths>) {
             println("Alpha: ${color.a}, RGB: ${color.r}, ${color.g}, ${color.b}")
             sourcePixmap.dispose()
         }
+
         fun cleanPNG(inputPath: Path, outputPath: Path) {
             val pixmap = Pixmap(Gdx.files.absolute(inputPath.absolutePathString()))
             val pixels = pixmap.pixels
@@ -152,7 +176,7 @@ fun List<Path>.findMetaConfig(image: Path) =
     }
 
 
-fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>): Atlas =
+fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>, flags: List<Flag>): Atlas =
     runCatching {
         val data = yaml.load<MutableMap<String, Any>>(sourceMetaFile.inputStream())
         val content = data.getContent()
@@ -170,7 +194,7 @@ fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>)
             val recalcY = abs(height + y - size.second)
             SpriteData(
                 name,
-                atlasBoundariesTemplate(name, x, recalcY, width, height),
+                atlasBoundariesTemplate(name, flags, x, recalcY, width, height),
                 pivot
             )
         }
@@ -239,13 +263,18 @@ ${parts.joinToString("\n")}
 
 fun atlasBoundariesTemplate(
     name: String,
+    flags: List<Flag>,
     vararg dimension: Int,
 ) =
     """
 $name
-bounds:${dimension.joinToString(",")}
+    showEars: ${flags.contains(Flag.ShowEars).toInt()}
+    showHair: ${flags.contains(Flag.ShowHair).toInt()}
+    showBeard: 1
+    bounds:${dimension.joinToString(",")}
 """.trimIndent()
 
+fun Boolean.toInt() = if (this) 1 else 0
 fun normalizeName(name: String) =
     name.replaceFirstChar { it.lowercase(getDefault()) }
         .let(::expandAbbreviation)

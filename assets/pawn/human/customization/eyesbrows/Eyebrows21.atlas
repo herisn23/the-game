@@ -1,0 +1,15 @@
+Eyebrows21.png
+size:384,128
+repeat:none
+filter:Linear,Linear
+pma:true
+front
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,176,128
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:176,0,138,128

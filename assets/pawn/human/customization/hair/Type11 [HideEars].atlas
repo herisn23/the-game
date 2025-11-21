@@ -1,0 +1,20 @@
+Type11 [HideEars].png
+size:1440,640
+repeat:none
+filter:Linear,Linear
+pma:true
+front
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,480,640
+back
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:480,0,480,640
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:960,0,480,640

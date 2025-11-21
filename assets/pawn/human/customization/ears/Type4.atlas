@@ -1,0 +1,20 @@
+Type4.png
+size:384,128
+repeat:none
+filter:Linear,Linear
+pma:true
+frontLeft
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,128,128
+backLeft
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:128,0,128,128
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:256,0,128,128

@@ -1,0 +1,15 @@
+Type1.png
+size:640,320
+repeat:none
+filter:Linear,Linear
+pma:true
+front
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:0,0,320,320
+left
+    showEars: 0
+    showHair: 0
+    showBeard: 1
+    bounds:320,0,320,320
