@@ -1,5 +1,9 @@
 package org.roldy.unity
 
+import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -7,15 +11,42 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale.getDefault
 import javax.imageio.ImageIO
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
 import kotlin.math.abs
+import kotlin.system.exitProcess
 
 val yaml = Yaml()
 val objectMapper = jacksonObjectMapper()
-fun main(args: Array<String>) {
-    val sourcePath = Path.of(args[0]).let(Files::list).toList()
-    val assetsPath = Path.of("assets/${args[1]}")
+const val sourceContext = "/Users/lukastreml/My project/"
+const val spineContext = "spine"
+
+data class Paths(
+    val relativePath: String
+) {
+    val sourcePath = "$sourceContext/$relativePath"
+    val outputPath = "$spineContext/$relativePath"
+    val extractionPath = "$outputPath/extracted"
+}
+
+fun sources(vararg paths: String) =
+    paths.map { Paths(it) }
+
+fun main() {
+    val paths = sources(
+        "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Armor/Basic"
+    )
+    paths.forEach(::createAtlas)
+    extractSprites(paths)
+}
+
+fun createAtlas(path: Paths) {
+    val sourcePath = Path
+        .of(path.sourcePath)
+        .let(Files::list)
+        .toList()
+    val assetsPath = Path.of(path.outputPath)
     val images = sourcePath.filter { it.name.endsWith(".png") }
     val atlasList = images.map {
         it to sourcePath.findMetaConfig(it)
@@ -31,15 +62,31 @@ fun main(args: Array<String>) {
         val atlas = createAtlas(texture.name, metaConfig.toFile(), image.width to image.height)
         val imagePath = assetsPath.resolve(texture.name)
         val atlasPath = assetsPath.resolve("${texture.nameWithoutExtension.lowercase()}.atlas")
-        val partsPath = assetsPath.resolve("${texture.nameWithoutExtension.lowercase()}.parts")
-        val metadataPath = assetsPath.resolve("${texture.nameWithoutExtension}.atlas.meta")
         Files.copy(texture, imagePath)
         Files.writeString(atlasPath, atlas.content)
-        Files.writeString(partsPath, atlas.parts.joinToString("\n"))
-        Files.writeString(metadataPath, atlas.meta)
     }
-
 }
+
+fun extractSprites(paths: List<Paths>) {
+    Lwjgl3Application(object : ApplicationAdapter() {
+        override fun create() {
+            paths.forEach { path ->
+                val atlases = Path
+                    .of(path.outputPath)
+                    .let(Files::list)
+                    .toList()
+                    .filter { it.name.endsWith(".atlas") }
+                atlases.forEach { atlasPath ->
+                    val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
+                    val extractionDir = atlasPath.name.replace(".atlas", "")
+                    AtlasExtractor.extractAtlas(atlas, "${path.extractionPath}/${extractionDir}")
+                }
+            }
+            exitProcess(0)
+        }
+    })
+}
+
 
 fun deleteDirectory(directoryToBeDeleted: File): Boolean {
     val allContents = directoryToBeDeleted.listFiles()
@@ -54,38 +101,42 @@ fun deleteDirectory(directoryToBeDeleted: File): Boolean {
 fun List<Path>.findMetaConfig(image: Path) =
     first { path ->
         path.name.run {
-            this.contains(image.name) && this != image.name
+            this.contains(image.name) && this.endsWith("meta")
         }
     }
 
 
-fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>): Atlas {
-    val data = yaml.load<MutableMap<String, Any>>(sourceMetaFile.inputStream())
-    val content = data.getContent()
-    val spriteSheet = content["spriteSheet"] as Map<String, List<Map<String, Any>>>
-    val parts = spriteSheet["sprites"]!!.map {
-        val name = (it["name"] as String).let(::normalizeName)
-        val rect = it["rect"] as Map<String, Int>
-        val x = rect["x"]!!
-        val y = rect["y"]!!
-        val width = rect["width"]!!
-        val height = rect["height"]!!
-        val pivot = (it["pivot"]!! as HashMap<String, Double>).let {
-            it["x"]!! to it["y"]!!
+fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>): Atlas =
+    runCatching {
+        val data = yaml.load<MutableMap<String, Any>>(sourceMetaFile.inputStream())
+        val content = data.getContent()
+        val spriteSheet = content["spriteSheet"] as Map<String, List<Map<String, Any>>>
+        val parts = spriteSheet["sprites"]!!.map {
+            val name = (it["name"] as String).let(::normalizeName)
+            val rect = it["rect"] as Map<String, Int>
+            val x = rect["x"]!!
+            val y = rect["y"]!!
+            val width = rect["width"]!!
+            val height = rect["height"]!!
+            val pivot = (it["pivot"]!! as HashMap<String, Double>).let {
+                it["x"]!! to it["y"]!!
+            }
+            val recalcY = abs(height + y - size.second)
+            SpriteData(
+                name,
+                atlasBoundariesTemplate(name, x, recalcY, width, height),
+                pivot
+            )
         }
-        val recalcY = abs(height + y - size.second)
-        SpriteData(
-            name,
-            atlasBoundariesTemplate(name, x, recalcY, width, height),
-            pivot
+        Atlas(
+            parts.map { it.name },
+            createAtlasMetaData(parts),
+            atlasTemplate(textureName, parts.map { it.atlasBoundaries }, size)
         )
-    }
-    return Atlas(
-        parts.map { it.name },
-        createAtlasMetaData(parts),
-        atlasTemplate(textureName, parts.map { it.atlasBoundaries }, size)
-    )
-}
+    }.fold(onSuccess = {it}, onFailure = {
+        println("Failed to create atlas for $textureName")
+        throw it
+    })
 
 data class SpriteData(
     val name: String,
@@ -112,7 +163,7 @@ fun createAtlasMetaData(parts: List<SpriteData>): String = objectMapper.writeVal
 
 data class SpriteMetadata(
     val name: String,
-    val metadata:MetaConfig
+    val metadata: MetaConfig
 )
 
 data class Vector(

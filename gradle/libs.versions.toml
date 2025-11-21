@@ -7,6 +7,7 @@ gdx = "1.14.0"
 graalHelperVersion = "2.0.1"
 construo = "2.1.0"
 ashley = "1.7.4"
+gdxSpine="4.2.10"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
@@ -17,10 +18,12 @@ kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", 
 #GDX libraries
 gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
 gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
+gdx-backend-headless={module="com.badlogicgames.gdx:gdx-backend-headless", version.ref="gdx"}
 gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
 gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.ref = "gdx" }
 gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelperVersion" }
 gdx-ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
+gdx-spine = { module="com.esotericsoftware.spine:spine-libgdx", version.ref="gdxSpine"}
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

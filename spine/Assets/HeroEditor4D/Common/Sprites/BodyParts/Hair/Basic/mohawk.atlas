@@ -1,0 +1,9 @@
+Mohawk.png
+size:1440,640
+repeat:none
+front
+bounds:0,0,480,640
+back
+bounds:480,0,480,640
+left
+bounds:960,0,480,640
