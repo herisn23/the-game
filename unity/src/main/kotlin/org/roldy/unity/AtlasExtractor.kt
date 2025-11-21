@@ -53,10 +53,6 @@ object AtlasExtractor {
         val outputFile = Gdx.files.local(outputDir + "/" + fileName)
 
         PixmapIO.writePNG(outputFile, regionPixmap)
-
-        println("Extracted: " + fileName)
-
-
         // Cleanup
         regionPixmap.dispose()
         fullPixmap.dispose()

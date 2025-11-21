@@ -1,6 +1,8 @@
 BanditArmor.png
 size:1440,800
 repeat:none
+filter:Linear,Linear
+pma:true
 frontHead
 bounds:0,0,480,480
 frontArmRight

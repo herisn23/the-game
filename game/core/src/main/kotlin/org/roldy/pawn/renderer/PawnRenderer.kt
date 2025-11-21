@@ -4,16 +4,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.ObjectRenderer
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.attribute.Front
+import org.roldy.pawn.skeleton.attribute.PawnSkeletonOrientation
 
 class PawnRenderer : ObjectRenderer {
-    val skeletons = listOf(
+    val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> = listOf(
         PawnSkeleton(Front)
     ).associateBy(PawnSkeleton::orientation)
-    var currentOrientation = Front
+    var currentOrientation: Front = Front
 
-
-    override fun render(deltaTime: Float, batch: SpriteBatch) {
-        skeletons[currentOrientation]?.render(deltaTime, batch)
+    context(deltaTime: Float, batch: SpriteBatch)
+    override fun render() {
+        skeletons[currentOrientation]?.render()
     }
 
 }

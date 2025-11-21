@@ -3,6 +3,9 @@ package org.roldy.unity
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.yaml.snakeyaml.Yaml
@@ -71,8 +74,9 @@ fun extractSprites(paths: List<Paths>) {
     Lwjgl3Application(object : ApplicationAdapter() {
         override fun create() {
             paths.forEach { path ->
-                val atlases = Path
+                val dir = Path
                     .of(path.outputPath)
+                val atlases = dir
                     .let(Files::list)
                     .toList()
                     .filter { it.name.endsWith(".atlas") }
@@ -81,8 +85,50 @@ fun extractSprites(paths: List<Paths>) {
                     val extractionDir = atlasPath.name.replace(".atlas", "")
                     AtlasExtractor.extractAtlas(atlas, "${path.extractionPath}/${extractionDir}")
                 }
+                val textures = dir
+                    .let(Files::list)
+                    .toList()
+                    .filter { it.name.endsWith(".png") }
+                textures.forEach { texture ->
+                    cleanPNG(texture, texture)
+                }
             }
             exitProcess(0)
+        }
+        fun checkPixMap(path:Path) {
+            val sourcePixmap = Pixmap(Gdx.files.absolute(path.absolutePathString()))
+// Check a pixel that should be transparent
+            val color = Color()
+            Color.rgba8888ToColor(color, sourcePixmap.getPixel(0, 0))
+            println("Alpha: ${color.a}, RGB: ${color.r}, ${color.g}, ${color.b}")
+            sourcePixmap.dispose()
+        }
+        fun cleanPNG(inputPath: Path, outputPath: Path) {
+            val pixmap = Pixmap(Gdx.files.absolute(inputPath.absolutePathString()))
+            val pixels = pixmap.pixels
+
+            // Direct byte buffer manipulation
+            for (i in 0 until pixmap.width * pixmap.height) {
+                val byteIndex = i * 4  // RGBA = 4 bytes per pixel
+
+                val r = pixels.get(byteIndex).toInt() and 0xFF
+                val g = pixels.get(byteIndex + 1).toInt() and 0xFF
+                val b = pixels.get(byteIndex + 2).toInt() and 0xFF
+                val a = pixels.get(byteIndex + 3).toInt() and 0xFF
+
+                // If alpha is 0 or very low, set RGB to 0
+                if (a < 5) {
+                    pixels.put(byteIndex, 0.toByte())      // R
+                    pixels.put(byteIndex + 1, 0.toByte())  // G
+                    pixels.put(byteIndex + 2, 0.toByte())  // B
+                    // Keep alpha as is
+                }
+            }
+
+            pixels.rewind()  // Reset position
+
+            PixmapIO.writePNG(Gdx.files.absolute(outputPath.absolutePathString()), pixmap)
+            pixmap.dispose()
         }
     })
 }
@@ -133,7 +179,7 @@ fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>)
             createAtlasMetaData(parts),
             atlasTemplate(textureName, parts.map { it.atlasBoundaries }, size)
         )
-    }.fold(onSuccess = {it}, onFailure = {
+    }.fold(onSuccess = { it }, onFailure = {
         println("Failed to create atlas for $textureName")
         throw it
     })
@@ -186,6 +232,8 @@ fun atlasTemplate(
 $textureName
 size:${size.first},${size.second}
 repeat:none
+filter:Linear,Linear
+pma:true
 ${parts.joinToString("\n")}
 """.trimIndent()
 
