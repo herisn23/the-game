@@ -1,15 +1,18 @@
 package org.roldy.unity
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Locale.getDefault
 import javax.imageio.ImageIO
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
 import kotlin.math.abs
 
 val yaml = Yaml()
+val objectMapper = jacksonObjectMapper()
 fun main(args: Array<String>) {
     val sourcePath = Path.of(args[0]).let(Files::list).toList()
     val assetsPath = Path.of("assets/${args[1]}")
@@ -17,7 +20,7 @@ fun main(args: Array<String>) {
     val atlasList = images.map {
         it to sourcePath.findMetaConfig(it)
     }
-    if(deleteDirectory(assetsPath.toFile())) {
+    if (deleteDirectory(assetsPath.toFile())) {
         println("Assets destination deleted")
     }
     if (assetsPath.toFile().mkdirs()) {
@@ -29,10 +32,11 @@ fun main(args: Array<String>) {
         val imagePath = assetsPath.resolve(texture.name)
         val atlasPath = assetsPath.resolve("${texture.nameWithoutExtension.lowercase()}.atlas")
         val partsPath = assetsPath.resolve("${texture.nameWithoutExtension.lowercase()}.parts")
-        Files.copy(texture,imagePath)
+        val metadataPath = assetsPath.resolve("${texture.nameWithoutExtension}.atlas.meta")
+        Files.copy(texture, imagePath)
         Files.writeString(atlasPath, atlas.content)
         Files.writeString(partsPath, atlas.parts.joinToString("\n"))
-
+        Files.writeString(metadataPath, atlas.meta)
     }
 
 }
@@ -60,25 +64,68 @@ fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>)
     val content = data.getContent()
     val spriteSheet = content["spriteSheet"] as Map<String, List<Map<String, Any>>>
     val parts = spriteSheet["sprites"]!!.map {
-        val name = it["name"] as String
+        val name = (it["name"] as String).let(::normalizeName)
         val rect = it["rect"] as Map<String, Int>
         val x = rect["x"]!!
         val y = rect["y"]!!
         val width = rect["width"]!!
         val height = rect["height"]!!
+        val pivot = (it["pivot"]!! as HashMap<String, Double>).let {
+            it["x"]!! to it["y"]!!
+        }
         val recalcY = abs(height + y - size.second)
-       name to atlasBoundariesTemplate(name, x, recalcY, width, height)
+        SpriteData(
+            name,
+            atlasBoundariesTemplate(name, x, recalcY, width, height),
+            pivot
+        )
     }
     return Atlas(
-        parts.map { it.first },
-        atlasTemplate(textureName, parts.map { it.second }, size)
+        parts.map { it.name },
+        createAtlasMetaData(parts),
+        atlasTemplate(textureName, parts.map { it.atlasBoundaries }, size)
     )
 }
 
-data class Atlas(
-    val parts:List<String>,
-    val content:String
+data class SpriteData(
+    val name: String,
+    val atlasBoundaries: String,
+    val pivot: Pair<Double, Double>
 )
+
+data class Atlas(
+    val parts: List<String>,
+    val meta: String,
+    val content: String
+)
+
+fun createAtlasMetaData(parts: List<SpriteData>): String = objectMapper.writeValueAsString(
+    parts.map {
+        SpriteMetadata(
+            it.name,
+            MetaConfig(
+                Vector(it.pivot)
+            )
+        )
+    }
+)
+
+data class SpriteMetadata(
+    val name: String,
+    val metadata:MetaConfig
+)
+
+data class Vector(
+    val x: Double,
+    val y: Double,
+) {
+    constructor(vector: Pair<Double, Double>) : this(vector.first, vector.second)
+}
+
+data class MetaConfig(
+    val pivot: Vector
+)
+
 
 fun atlasTemplate(
     textureName: String,
@@ -99,6 +146,18 @@ fun atlasBoundariesTemplate(
 $name
 bounds:${dimension.joinToString(",")}
 """.trimIndent()
+
+fun normalizeName(name: String) =
+    name.replaceFirstChar { it.lowercase(getDefault()) }
+        .let(::expandAbbreviation)
+
+fun expandAbbreviation(text: String): String {
+    return when {
+        text.endsWith("L") -> text.dropLast(1) + "Left"
+        text.endsWith("R") -> text.dropLast(1) + "Right"
+        else -> text
+    }
+}
 
 fun Map<String, Any>.getContent(): Map<String, Any> =
     this["TextureImporter"] as Map<String, Any>

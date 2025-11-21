@@ -1,5 +1,7 @@
 atlas.png
-size:128,128
+size:256,128
 repeat:none
-drop
+blue
 bounds:2,2,100,100
+red
+bounds:104,52,50,50

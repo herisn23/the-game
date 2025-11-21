@@ -4,15 +4,6 @@ import java.util.*
 val javaVersion: String by project
 val os: String = System.getProperty("os.name").lowercase(Locale.ROOT)
 
-buildscript {
-    plugins {
-        alias(libs.plugins.kotlin.serialization)
-    }
-    dependencies {
-        classpath(libs.kotlinx.serialization.json)
-    }
-}
-
 plugins {
     id("Compose")
     alias(libs.plugins.construo) apply true
@@ -20,7 +11,7 @@ plugins {
 }
 
 application {
-    mainClass.set("org.roldy.launcher.Launcher")
+    mainClass.set("org.roldy.launcher.LauncherKt")
 }
 
 java {

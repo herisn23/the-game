@@ -1,4 +1,3 @@
-@file:JvmName("Launcher")
 package org.roldy.launcher
 
 import org.roldy.Game
@@ -7,6 +6,6 @@ import org.roldy.Game
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
     // This handles macOS support and helps on Windows.
-    if (StartupHelper.startNewJvmIfRequired()) return
+//    if (StartupHelper.startNewJvmIfRequired()) return
     Game.start()
 }

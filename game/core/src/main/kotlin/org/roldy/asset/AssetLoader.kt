@@ -1,4 +1,4 @@
-package org.roldy
+package org.roldy.asset
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle

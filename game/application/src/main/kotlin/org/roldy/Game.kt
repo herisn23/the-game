@@ -2,10 +2,11 @@ package org.roldy
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import org.roldy.garbage.TestApp
 
 object Game {
     fun start() {
-        Lwjgl3Application(MainAppListener(), Lwjgl3ApplicationConfiguration().apply {
+        Lwjgl3Application(TestApp(), Lwjgl3ApplicationConfiguration().apply {
             val mode = Lwjgl3ApplicationConfiguration.getDisplayMode()
             setTitle("YourProjectName")
             //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
