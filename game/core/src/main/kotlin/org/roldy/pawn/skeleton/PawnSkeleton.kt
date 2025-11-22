@@ -42,12 +42,12 @@ class PawnSkeleton(
     override var underwearColor = defaultUnderwearColor
 
     private var hiddenSlots: Map<CustomizablePawnSkinSlot, Boolean> = hiddenSlotsDefault
-    private val skeletonPath = "pawn/human/skeleton/${orientation.capitalizedName}"
+    private val skeletonPath = "pawn/human/skeleton"
     private val skeletonAtlas: TextureAtlas =
-        TextureAtlas(loadAsset("$skeletonPath/skeleton.atlas"))
+        TextureAtlas(loadAsset("$skeletonPath/${orientation.name}.atlas"))
     private val binarySkeleton: SkeletonBinary = SkeletonBinary(skeletonAtlas)
     private val skeletonData: SkeletonData = binarySkeleton.readSkeletonData(
-        loadAsset("$skeletonPath/skeleton.skel")
+        loadAsset("$skeletonPath/${orientation.name}.skel")
     )
     private val skeleton: Skeleton = Skeleton(skeletonData)
 
