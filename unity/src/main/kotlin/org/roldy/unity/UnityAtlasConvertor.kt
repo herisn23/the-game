@@ -297,6 +297,7 @@ fun repackShields(paths: List<Path>, output: String) {
                 copyTo.mkdirs()
             }
             deleteDirectory(outputPath.toFile())
+            Files.createDirectories(outputPath)
             val repacked = paths.map { path ->
                 val extractionPath = path.resolve("extracted")
                 val atlases = path
@@ -318,13 +319,16 @@ fun repackShields(paths: List<Path>, output: String) {
                     )
                     repacked
                 }
-            }.flatten()
+            }.flatten().toSet()
             repacked.forEach { repacked ->
                 repacked.toFile().listFiles().forEach { file ->
                     val target = outputPath.resolve(file.name)
                     println("Copy $file to $target")
-                    Files.createDirectories(target.parent)
-                    Files.copy(file.toPath(), target)
+                   runCatching {
+                       Files.copy(file.toPath(), target)
+                   }.onFailure {
+                       println("Failed to copy $file to $target: $it")
+                   }
                 }
             }
             exitProcess(0)

@@ -1,0 +1,20 @@
+
+RoughShield.png
+size: 1024, 512
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+back
+  rotate: false
+  xy: 1, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+front
+  rotate: false
+  xy: 259, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
