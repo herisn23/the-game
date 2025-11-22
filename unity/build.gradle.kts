@@ -4,6 +4,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
     implementation(libs.bundles.gdx)
     implementation(libs.gdx.backend.headless)
+    implementation(libs.gdx.tools)
     runtimeOnly(variantOf(libs.gdx.platform) {
         classifier("natives-desktop")
     })

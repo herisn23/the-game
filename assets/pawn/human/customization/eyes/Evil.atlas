@@ -1,15 +1,20 @@
+
 Evil.png
-size:384,128
-repeat:none
-filter:Linear,Linear
-pma:true
+size: 512, 256
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
 front
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:0,0,176,128
+  rotate: false
+  xy: 1, 1
+  size: 176, 128
+  orig: 176, 128
+  offset: 0, 0
+  index: -1
 left
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:176,0,138,128
+  rotate: false
+  xy: 179, 1
+  size: 138, 128
+  orig: 138, 128
+  offset: 0, 0
+  index: -1

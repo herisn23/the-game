@@ -7,6 +7,7 @@ import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
 interface CustomizablePawn {
 
     fun customize(slot: CustomizablePawnSkinSlot, atlas: TextureAtlas)
+    fun removeCustomization(slot: CustomizablePawnSkinSlot)
     var hairColor: Color
     var skinColor: Color
 }

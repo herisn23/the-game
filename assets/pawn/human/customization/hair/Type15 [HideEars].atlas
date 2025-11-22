@@ -1,20 +1,33 @@
+
 Type15 [HideEars].png
-size:1440,640
-repeat:none
-filter:Linear,Linear
-pma:true
-front
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:0,0,480,640
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
 back
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:480,0,480,640
+  rotate: false
+  xy: 1, 1
+  size: 480, 640
+  orig: 480, 640
+  offset: 0, 0
+  index: -1
+front
+  rotate: false
+  xy: 483, 1
+  size: 480, 640
+  orig: 480, 640
+  offset: 0, 0
+  index: -1
+
+Type15 [HideEars]2.png
+size: 512, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
 left
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:960,0,480,640
+  rotate: false
+  xy: 1, 1
+  size: 480, 640
+  orig: 480, 640
+  offset: 0, 0
+  index: -1

@@ -10,6 +10,7 @@ import org.roldy.asset.loadAsset
 import org.roldy.g2d.sprite.invoke
 import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.Pawn
+import org.roldy.pawn.skeleton.PawnArmorSlotData
 import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
 import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
 
@@ -18,14 +19,25 @@ class TestApp(
 ) : ApplicationListener by default {
     private lateinit var pawn: Pawn
     private lateinit var font: BitmapFont
-    lateinit var testArmor: TextureAtlas
+    lateinit var testArmor: PawnArmorSlotData.TextureAtlasData
     lateinit var testHair: TextureAtlas
     lateinit var testBeard: TextureAtlas
+    lateinit var testEyes: TextureAtlas
+    lateinit var testBody: TextureAtlas
+    lateinit var testEyesBrows: TextureAtlas
+    lateinit var testMouth: TextureAtlas
+    lateinit var testEars: TextureAtlas
 
     override fun create() {
-        testArmor = TextureAtlas(loadAsset("pawn/human/armor/AcornArmor [ShowEars].atlas"))
+        testArmor = PawnArmorSlotData.TextureAtlasData.load("pawn/human/armor/AcornArmor [ShowEars]")
         testHair = TextureAtlas(loadAsset("pawn/human/customization/hair/BroFlow.atlas"))
         testBeard = TextureAtlas(loadAsset("pawn/human/customization/beard/Type10.atlas"))
+        testEyes = TextureAtlas(loadAsset("pawn/human/customization/eyes/Asian.atlas"))
+        testBody = TextureAtlas(loadAsset("pawn/human/customization/body/Type1.atlas"))
+        testEyesBrows = TextureAtlas(loadAsset("pawn/human/customization/eyebrows/Eyebrows2.atlas"))
+        testMouth = TextureAtlas(loadAsset("pawn/human/customization/mouth/Mouth08.atlas"))
+        testEars = TextureAtlas(loadAsset("pawn/human/customization/ears/Elf.atlas"))
+
         default.create()
         pawn = Pawn()
         font = BitmapFont()
@@ -56,10 +68,22 @@ class TestApp(
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             pawn.customize(CustomizablePawnSkinSlot.Hair, testHair)
+            pawn.removeCustomization(CustomizablePawnSkinSlot.Hair)
             pawn.customize(CustomizablePawnSkinSlot.Beard, testBeard)
+            pawn.customize(CustomizablePawnSkinSlot.Eyes, testEyes)
+            pawn.customize(CustomizablePawnSkinSlot.Head, testBody)
+            pawn.customize(CustomizablePawnSkinSlot.EyeBrows, testEyesBrows)
+            pawn.customize(CustomizablePawnSkinSlot.Mouth, testMouth)
+            pawn.customize(CustomizablePawnSkinSlot.EarLeft, testEars)
+            pawn.customize(CustomizablePawnSkinSlot.EarRight, testEars)
+
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            pawn.skinColor = Color.BLUE
+            if (pawn.skinColor == Color.BLUE) {
+                pawn.skinColor = pawn.defaultSkinColor
+            } else {
+                pawn.skinColor = Color.WHITE
+            }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {

@@ -24,6 +24,7 @@ gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.
 gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelperVersion" }
 gdx-ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
 gdx-spine = { module="com.esotericsoftware.spine:spine-libgdx", version.ref="gdxSpine"}
+gdx-tools = {module="com.badlogicgames.gdx:gdx-tools", version.ref="gdx"}
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import org.roldy.ObjectRenderer
+import org.roldy.pawn.skeleton.PawnArmorSlotData
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.StrippablePawn
 import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
@@ -13,19 +14,16 @@ import org.roldy.pawn.skeleton.attribute.PawnSkeletonOrientation
 import kotlin.properties.Delegates
 
 class Pawn : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn {
-    private val defaultSkinColor = Color.valueOf("FFC878")
-    private val defaultHairColor = Color.WHITE
+    val defaultSkinColor: Color = Color.valueOf("FFC878")
+    val defaultHairColor: Color = Color.BROWN
     val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> = listOf(
         PawnSkeleton(Front, defaultSkinColor, defaultHairColor)
     ).associateBy(PawnSkeleton::orientation)
     var currentOrientation: Front = Front
 
-    override fun setArmor(
-        slot: ArmorPawnSlot,
-        atlas: TextureAtlas
-    ) {
+    override fun setArmor(slot: ArmorPawnSlot, atlasData: PawnArmorSlotData.TextureAtlasData) {
         skeletons.forEach { (_, skel) ->
-            skel.setArmor(slot, atlas)
+            skel.setArmor(slot, atlasData)
         }
     }
 
@@ -41,6 +39,12 @@ class Pawn : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn
     ) {
         skeletons.forEach { (_, skel) ->
             skel.customize(slot, atlas)
+        }
+    }
+
+    override fun removeCustomization(slot: CustomizablePawnSkinSlot) {
+        skeletons.forEach { (_, skel) ->
+            skel.removeCustomization(slot)
         }
     }
 

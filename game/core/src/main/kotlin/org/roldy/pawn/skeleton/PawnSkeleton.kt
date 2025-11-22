@@ -7,8 +7,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.esotericsoftware.spine.*
 import com.esotericsoftware.spine.attachments.Attachment
 import com.esotericsoftware.spine.attachments.RegionAttachment
+import kotlinx.serialization.Serializable
 import org.roldy.ObjectRenderer
 import org.roldy.asset.loadAsset
+import org.roldy.asset.loadAtlasWithMeta
 import org.roldy.pawn.ArmorWearablePawn
 import org.roldy.pawn.CustomizablePawn
 import org.roldy.pawn.skeleton.PawnSkeleton.Companion.hiddenSlotsDefault
@@ -23,9 +25,8 @@ class PawnSkeleton(
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSkinSlot.Hair to false,
-            CustomizablePawnSkinSlot.Beard to false,
-            CustomizablePawnSkinSlot.Ears.EarLeft to false,
-            CustomizablePawnSkinSlot.Ears.EarRight to false
+            CustomizablePawnSkinSlot.EarLeft to false,
+            CustomizablePawnSkinSlot.EarRight to false
 
         )
     }
@@ -47,25 +48,25 @@ class PawnSkeleton(
             SkinPawnSkeletonSlot.allParts.associateWith { findSlot(it.value) }
         }
     }
-    private val customizableSlots: Map<CustomizablePawnSkinSlot, PawnSlotData<CustomizablePawnSkinSlot>> by lazy {
+    private val customizableSlots: Map<CustomizablePawnSkinSlot, PawnCustomizationSlotData> by lazy {
         skeleton.run {
             CustomizablePawnSkinSlot.allParts.associateWith {
                 val slot = findSlot(it.value)
-                PawnSlotData(slot, it, slot.attachment as RegionAttachment)
+                PawnCustomizationSlotData(slot, it, slot.attachment as RegionAttachment)
             }
         }
     }
-    private val groupedArmorSlots: Map<ArmorPawnSlot.Piece, List<PawnSlotData<ArmorPawnSlot>>> by lazy {
+    private val groupedArmorSlots: Map<ArmorPawnSlot.Piece, List<PawnArmorSlotData>> by lazy {
         skeleton.run {
             ArmorPawnSlot.pieces.map { (piece, slots) ->
                 piece to slots.map { slotName ->
                     val slot = findSlot(slotName.value)
-                    PawnSlotData(slot, slotName, slot.attachment as RegionAttachment)
+                    PawnArmorSlotData(slot, slotName, slot.attachment as RegionAttachment)
                 }
             }.toMap()
         }
     }
-    private val armorSlots: Map<ArmorPawnSlot, PawnSlotData<ArmorPawnSlot>> by lazy {
+    private val armorSlots: Map<ArmorPawnSlot, PawnArmorSlotData> by lazy {
         groupedArmorSlots.map { (pawnSlot, slots) ->
             slots
         }.flatten().associateBy { it.slotName }
@@ -95,9 +96,12 @@ class PawnSkeleton(
         showHidableSlots()
     }
 
-    override fun setArmor(slot: ArmorPawnSlot, atlas: TextureAtlas) {
+    override fun setArmor(slot: ArmorPawnSlot, atlasData: PawnArmorSlotData.TextureAtlasData) {
         armorSlots[slot]?.let { slotData ->
-            updateAttachment(slotData, atlas.findRegion(slot.regionName(orientation)))
+            val regionName = slot.regionName(orientation)
+            val regionAttachment = RegionAttachment(regionName)
+            regionAttachment.region = atlasData.atlas.findRegion(regionName)
+            slotData.update(regionAttachment, atlasData)
             hiddenSlots = slotData.hiddenSlotsState
             hideHidableSlots(slot)
         }
@@ -133,20 +137,23 @@ class PawnSkeleton(
 
     override fun customize(slot: CustomizablePawnSkinSlot, atlas: TextureAtlas) {
         customizableSlots[slot]?.let { slotData ->
-            updateAttachment(slotData, atlas.findRegion(slot.regionName(orientation)))
+            val currentAttachment = slotData.slot.attachment
+            val regionAttachment = RegionAttachment(slotData.slotName.value)
+            regionAttachment.region = slot.findRegion(orientation, atlas)
+            slotData.update(regionAttachment)
+            //if we customize while wearing armor then hide slot
+            if (currentAttachment == null) {
+                slotData.slot.attachment = null
+            }
+        }
+
+    }
+
+    override fun removeCustomization(slot: CustomizablePawnSkinSlot) {
+        customizableSlots[slot]?.let { data ->
+            data.currentAttachment = null
         }
     }
-
-
-    private fun <T : PawnSkeletonSlot> updateAttachment(
-        pawnSlotData: PawnSlotData<T>,
-        textureRegion: TextureAtlas.AtlasRegion
-    ) {
-        val regionAttachment = RegionAttachment(pawnSlotData.slotName.value)
-        regionAttachment.region = textureRegion
-        pawnSlotData.update(regionAttachment)
-    }
-
 
     private fun drawHairColor() {
         CustomizablePawnSkinSlot.hairSlots.forEach {
@@ -174,20 +181,77 @@ class PawnSkeleton(
         skeleton.update(deltaTime)
         skeletonRenderer.draw(batch, skeleton)
     }
+
+    override fun dispose() {
+        skeletonAtlas.dispose()
+    }
 }
 
-data class PawnSlotData<T : PawnSkeletonSlot>(
+
+class PawnArmorSlotData(slot: Slot, slotName: ArmorPawnSlot, originAttachment: RegionAttachment) :
+    PawnSlotData<ArmorPawnSlot>(slot, slotName, originAttachment) {
+    val hiddenSlotsState = hiddenSlotsDefault.toMutableMap()
+
+    @Serializable
+    data class Metadata(
+        val name: String,
+        val flags: Map<String, Boolean>
+    )
+
+    data class TextureAtlasData(
+        val atlas: TextureAtlas,
+        private val meta: List<Metadata>
+    ) {
+        val map = meta.associateBy { it.name }
+        companion object Companion {
+            fun load(relativePath: String) =
+                loadAtlasWithMeta(relativePath).run {
+                    TextureAtlasData(
+                        first, second
+                    )
+                }
+        }
+        operator fun get(name: String) = map.getValue(name)
+    }
+
+    fun update(attachment: RegionAttachment, data: TextureAtlasData) {
+        preUpdate(attachment, data)
+        super.update(attachment)
+    }
+
+    fun preUpdate(attachment: RegionAttachment, data: TextureAtlasData) {
+        val meta = data[attachment.name]
+        meta.flags.forEach { (key, value) ->
+            when (key) {
+                "showEars" -> {
+                    hiddenSlotsState[CustomizablePawnSkinSlot.EarLeft] = !value
+                    hiddenSlotsState[CustomizablePawnSkinSlot.EarRight] = !value
+                }
+
+                "showHair" -> {
+                    hiddenSlotsState[CustomizablePawnSkinSlot.Hair] = !value
+                }
+            }
+        }
+
+    }
+
+}
+
+class PawnCustomizationSlotData(slot: Slot, slotName: CustomizablePawnSkinSlot, originAttachment: RegionAttachment) :
+    PawnSlotData<CustomizablePawnSkinSlot>(slot, slotName, originAttachment) {
+}
+
+abstract class PawnSlotData<T : PawnSkeletonSlot>(
     val slot: Slot,
     val slotName: T,
     private val originAttachment: RegionAttachment
 ) {
-    val hiddenSlotsState = hiddenSlotsDefault.toMutableMap()
     var currentAttachment: Attachment? by Delegates.observable(originAttachment) { _, _, newValue ->
         slot.attachment = newValue
     }
 
     fun update(attachment: RegionAttachment) {
-        resetRegionAttributes(attachment)
         attachment.x = originAttachment.x
         attachment.y = originAttachment.y
         attachment.rotation = originAttachment.rotation
@@ -198,26 +262,5 @@ data class PawnSlotData<T : PawnSkeletonSlot>(
         attachment.color.set(originAttachment.color)
         attachment.updateRegion()
         this.currentAttachment = attachment
-    }
-
-    fun resetRegionAttributes(attachment: RegionAttachment) {
-        val region = attachment.region as TextureAtlas.AtlasRegion
-        region.names.forEachIndexed { index, name ->
-            val hidden = region.values[index][0] == 0
-            when (name) {
-                "showEars" -> {
-                    hiddenSlotsState[CustomizablePawnSkinSlot.Ears.EarLeft] = hidden
-                    hiddenSlotsState[CustomizablePawnSkinSlot.Ears.EarRight] = hidden
-                }
-
-                "showBeard" -> {
-                    hiddenSlotsState[CustomizablePawnSkinSlot.Beard] = hidden
-                }
-
-                "showHair" -> {
-                    hiddenSlotsState[CustomizablePawnSkinSlot.Hair] = hidden
-                }
-            }
-        }
     }
 }

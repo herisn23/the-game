@@ -1,20 +1,27 @@
+
 Type7.png
-size:384,128
-repeat:none
-filter:Linear,Linear
-pma:true
-frontLeft
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:0,0,128,128
+size: 512, 256
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
 backLeft
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:128,0,128,128
+  rotate: false
+  xy: 1, 1
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+frontLeft
+  rotate: false
+  xy: 131, 1
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
 left
-    showEars: 0
-    showHair: 0
-    showBeard: 1
-    bounds:256,0,128,128
+  rotate: false
+  xy: 261, 1
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
