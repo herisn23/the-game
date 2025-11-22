@@ -12,10 +12,10 @@ import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
-import org.roldy.pawn.ArmorWearablePawn
-import org.roldy.pawn.CustomizablePawn
-import org.roldy.pawn.UnderwearPawn
-import org.roldy.pawn.WeaponWearablePawn
+import org.roldy.pawn.ArmorWearer
+import org.roldy.pawn.Customizable
+import org.roldy.pawn.UnderwearWearer
+import org.roldy.pawn.WeaponWearer
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.pawn.skeleton.slot.PawnArmorSlotData
 import org.roldy.pawn.skeleton.slot.PawnCustomizationSlotData
@@ -27,7 +27,7 @@ class PawnSkeleton(
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
-) : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn, WeaponWearablePawn, UnderwearPawn {
+) : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer, UnderwearWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSkinSlot.Hair to false,
@@ -187,7 +187,7 @@ class PawnSkeleton(
         customizableSlots[slot]?.remove()
     }
 
-    override fun setUnderWear(atlas: UnderWearAtlas) {
+    override fun setUnderwear(atlas: UnderWearAtlas) {
         underwearSlots.forEach { (slot, slotData) ->
             val regionAttachment = RegionAttachment(slotData.slotName.capitalizedName)
             regionAttachment.region = atlas.findRegion(slot.regionName(orientation))

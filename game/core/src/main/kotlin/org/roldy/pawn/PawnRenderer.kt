@@ -12,8 +12,8 @@ import org.roldy.pawn.skeleton.StrippablePawn
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn, WeaponWearablePawn,
-    UnderwearPawn {
+class PawnRenderer : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer,
+    UnderwearWearer {
     val defaultSkinColor: Color = Color.valueOf("FFC878")
     val defaultHairColor: Color = Color.BROWN
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
@@ -64,9 +64,9 @@ class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, Stripp
         }
     }
 
-    override fun setUnderWear(atlas: UnderWearAtlas) {
+    override fun setUnderwear(atlas: UnderWearAtlas) {
         skeletons.forEach { (_, skel) ->
-            skel.setUnderWear(atlas)
+            skel.setUnderwear(atlas)
         }
     }
 

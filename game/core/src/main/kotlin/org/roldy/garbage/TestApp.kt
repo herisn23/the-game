@@ -6,8 +6,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.roldy.equipment.atlas.EquipmentAtlas
+import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
-import org.roldy.equipment.atlas.armor.Armors
 import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
@@ -36,7 +36,7 @@ class TestApp(
     lateinit var underwear: UnderWearAtlas
 
     override fun create() {
-        armors = Armors.all
+        armors = Armor.all
         weapons = Weapons.all
 
         testHair = Hair.Mohawk
@@ -84,7 +84,7 @@ class TestApp(
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, testEars)
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, testEars)
             pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Wand.BlackStick)
-            pawnRenderer.setUnderWear(underwear)
+            pawnRenderer.setUnderwear(underwear)
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             if (pawnRenderer.skinColor == Color.BLUE) {

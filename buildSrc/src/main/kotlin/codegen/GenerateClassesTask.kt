@@ -2,6 +2,7 @@ package codegen
 
 import codegen.gen.Armors
 import codegen.gen.Customization
+import codegen.gen.Shield
 import codegen.gen.Weapons
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -26,6 +27,7 @@ abstract class GenerateClassesTask : DefaultTask() {
         generateKotlinClasses(outputDirectory, Weapons.generate(rootDir))
         generateKotlinClasses(outputDirectory, Armors.generate(rootDir))
         generateKotlinClasses(outputDirectory, Customization.generate(rootDir))
+        generateKotlinClasses(outputDirectory, Shield.generate(rootDir))
 
         logger.lifecycle("Generated classes in: ${outputDirectory.absolutePath}")
     }
@@ -39,7 +41,6 @@ abstract class GenerateClassesTask : DefaultTask() {
 
             logger.lifecycle("Generated: ${kotlinFile.absolutePath}")
         }
-
     }
 }
 

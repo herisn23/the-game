@@ -3,9 +3,9 @@ package org.roldy.pawn
 import com.badlogic.gdx.graphics.Color
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
 
-interface UnderwearPawn {
+interface UnderwearWearer {
     var underwearColor: Color
 
-    fun setUnderWear(atlas: UnderWearAtlas)
+    fun setUnderwear(atlas: UnderWearAtlas)
     fun removeUnderwear()
 }

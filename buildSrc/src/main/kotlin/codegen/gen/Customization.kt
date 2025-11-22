@@ -6,41 +6,22 @@ import java.io.File
 import java.util.Locale.getDefault
 
 object Customization : Generator {
-    const val pack = "org.roldy.equipment.atlas.customization"
-    const val dir = "pawn/human/customization"
+    override val pack = "org.roldy.equipment.atlas.customization"
+    override val dir = "pawn/human/customization"
     val names = listOf("beard", "body", "ears", "eyebrows", "eyes", "hair", "mouth", "underwear")
 
     override fun generate(root: File): List<ClassInfo> =
         names.map { name ->
             ClassNameNormalizer.clean()
             val subnames =
-                root.assets.resolve("$dir/$name").toFile().listFiles().filter { it.extension == "atlas" }.map {
+                root.assets.resolve("$dir/$name").atlases().map {
                     it.nameWithoutExtension
                 }
             val className =
                 name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
-            ClassInfo(
-                className,
-                pack.replace(".", "/"),
-                template(
-                    className, "CustomizationAtlas".takeIf { name != "underwear" } ?: "UnderWearAtlas", subnames.map {
-                        ClassNameNormalizer.normalizeUnique(it) to "$dir/$name/$it.atlas"
-                    }
-                )
-            )
-
-        }
-
-    fun template(name: String, atlas: String, names: List<Pair<String, String>>) =
-        """
-            package $pack
-            object $name {
-                ${
-            names.joinToString("\n\t") {
-                """object ${it.first}: $atlas("${it.second}")"""
+            val objects = subnames.map {
+                ClassNameNormalizer.normalizeUnique(it) to "$dir/$name/$it.atlas"
             }
+            objects.createClassInfo(className, "CustomizationAtlas".takeIf { name != "underwear" } ?: "UnderWearAtlas")
         }
-                val all by lazy { listOf(${names.joinToString(", ") { it.first }}) }
-            }
-        """.trimIndent()
 }
