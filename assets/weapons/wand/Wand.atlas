@@ -1,0 +1,216 @@
+
+Wand.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+BlackStick
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+BoneWand
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+ClericWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand2.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+FireMageWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+HardwoodWand
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+HealerWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand3.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+HermitWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+HonedWand
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+IronPole
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand4.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+NativeWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+NunScepter
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+PilgrimageWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand5.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+PrimitiveWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+RitualCane
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+ShamanWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand6.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+SnakeWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+SpiritWand
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+SunWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand7.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+TempusWand
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+ThunderforgedScepter
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+WarlockWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Wand8.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+WindStaff
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+WoodenStick
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+WoodenWand
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1

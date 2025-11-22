@@ -1,0 +1,324 @@
+
+Dagger.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+AdvancedShortDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+AspenStake
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+BloodMoonDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger2.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+BoneDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+BronzeDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+Commando
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger3.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+CurvedDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+DoomWing
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+EagleWing
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger4.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+EnhancedDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+EvilEye
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+FerocityDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger5.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+ForkedDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+GoldenFender
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+GoldenWingsDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger6.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+GrandeeDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+HunterKnife
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+KissOfDeath
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger7.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+Kunai
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+NobleDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+NoblemanDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger8.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+OrientalDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+PeacekeeperDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+PoisonedDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger9.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+RavenBeak
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+Sai
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+ScoutKnife
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger10.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+ShortDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+SilverDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+Slasher
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger11.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+SoulReaver
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+SteelDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+StolenDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+
+Dagger12.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+ThiefDagger
+  rotate: false
+  xy: 1, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+VolcanicDagger
+  rotate: false
+  xy: 259, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+WideDagger
+  rotate: false
+  xy: 517, 1
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1

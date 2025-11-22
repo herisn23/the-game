@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.esotericsoftware.spine.*
 import com.esotericsoftware.spine.attachments.Attachment
 import com.esotericsoftware.spine.attachments.RegionAttachment
-import kotlinx.serialization.Serializable
 import org.roldy.ObjectRenderer
 import org.roldy.asset.loadAsset
-import org.roldy.asset.loadAtlasWithMeta
+import org.roldy.equipment.atlas.armor.ArmorAtlas
+import org.roldy.equipment.atlas.customization.CustomizationAtlas
+import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.ArmorWearablePawn
 import org.roldy.pawn.CustomizablePawn
+import org.roldy.pawn.WeaponWearablePawn
 import org.roldy.pawn.skeleton.PawnSkeleton.Companion.hiddenSlotsDefault
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
@@ -21,7 +23,7 @@ class PawnSkeleton(
     val orientation: PawnSkeletonOrientation,
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color
-) : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn {
+) : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn, WeaponWearablePawn {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSkinSlot.Hair to false,
@@ -72,6 +74,15 @@ class PawnSkeleton(
         }.flatten().associateBy { it.slotName }
     }
 
+    private val weaponSlots by lazy {
+        skeleton.run {
+            WeaponPawnSlot.allParts.associateWith { slotName ->
+                val slot = findSlot(slotName.value)
+                PawnWeaponSlotData(slot, slotName, slot.attachment as RegionAttachment)
+            }
+        }
+    }
+
     private val skeletonRenderer: SkeletonRenderer = SkeletonRenderer()
     private val animationStateData: AnimationStateData = AnimationStateData(skeletonData)
     private val animationState: AnimationState = AnimationState(animationStateData)
@@ -90,13 +101,11 @@ class PawnSkeleton(
 
 
     override fun strip() {
-        armorSlots.values.forEach { data ->
-            data.currentAttachment = null
-        }
+        armorSlots.values.forEach(PawnArmorSlotData::remove)
         showHidableSlots()
     }
 
-    override fun setArmor(slot: ArmorPawnSlot, atlasData: PawnArmorSlotData.TextureAtlasData) {
+    override fun setArmor(slot: ArmorPawnSlot, atlasData: ArmorAtlas) {
         armorSlots[slot]?.let { slotData ->
             val regionName = slot.regionName(orientation)
             val regionAttachment = RegionAttachment(regionName)
@@ -108,9 +117,19 @@ class PawnSkeleton(
     }
 
     override fun removeArmor(slot: ArmorPawnSlot) {
-        armorSlots[slot]?.let { slotData ->
-            slotData.currentAttachment = null
+        armorSlots[slot]?.remove()
+    }
+
+    override fun setWeapon(slot: WeaponPawnSlot, region: WeaponRegion) {
+        weaponSlots[slot]?.let { slotData ->
+            val regionAttachment = RegionAttachment(region.name)
+            regionAttachment.region = region.region
+            slotData.update(regionAttachment)
         }
+    }
+
+    override fun removeWeapon(slot: WeaponPawnSlot) {
+        weaponSlots[slot]?.remove()
     }
 
     private fun hideHidableSlots(armorSlot: ArmorPawnSlot) {
@@ -135,11 +154,11 @@ class PawnSkeleton(
         }
     }
 
-    override fun customize(slot: CustomizablePawnSkinSlot, atlas: TextureAtlas) {
+    override fun customize(slot: CustomizablePawnSkinSlot, atlasData: CustomizationAtlas) {
         customizableSlots[slot]?.let { slotData ->
             val currentAttachment = slotData.slot.attachment
             val regionAttachment = RegionAttachment(slotData.slotName.value)
-            regionAttachment.region = slot.findRegion(orientation, atlas)
+            regionAttachment.region = slot.findRegion(orientation, atlasData.atlas)
             slotData.update(regionAttachment)
             //if we customize while wearing armor then hide slot
             if (currentAttachment == null) {
@@ -150,9 +169,7 @@ class PawnSkeleton(
     }
 
     override fun removeCustomization(slot: CustomizablePawnSkinSlot) {
-        customizableSlots[slot]?.let { data ->
-            data.currentAttachment = null
-        }
+        customizableSlots[slot]?.remove()
     }
 
     private fun drawHairColor() {
@@ -188,38 +205,22 @@ class PawnSkeleton(
 }
 
 
+class PawnWeaponSlotData(slot: Slot, slotName: WeaponPawnSlot, originAttachment: RegionAttachment) :
+    PawnSlotData<WeaponPawnSlot>(
+        slot, slotName,
+        originAttachment
+    )
+
 class PawnArmorSlotData(slot: Slot, slotName: ArmorPawnSlot, originAttachment: RegionAttachment) :
     PawnSlotData<ArmorPawnSlot>(slot, slotName, originAttachment) {
     val hiddenSlotsState = hiddenSlotsDefault.toMutableMap()
 
-    @Serializable
-    data class Metadata(
-        val name: String,
-        val flags: Map<String, Boolean>
-    )
-
-    data class TextureAtlasData(
-        val atlas: TextureAtlas,
-        private val meta: List<Metadata>
-    ) {
-        val map = meta.associateBy { it.name }
-        companion object Companion {
-            fun load(relativePath: String) =
-                loadAtlasWithMeta(relativePath).run {
-                    TextureAtlasData(
-                        first, second
-                    )
-                }
-        }
-        operator fun get(name: String) = map.getValue(name)
-    }
-
-    fun update(attachment: RegionAttachment, data: TextureAtlasData) {
+    fun update(attachment: RegionAttachment, data: ArmorAtlas) {
         preUpdate(attachment, data)
         super.update(attachment)
     }
 
-    fun preUpdate(attachment: RegionAttachment, data: TextureAtlasData) {
+    fun preUpdate(attachment: RegionAttachment, data: ArmorAtlas) {
         val meta = data[attachment.name]
         meta.flags.forEach { (key, value) ->
             when (key) {
@@ -249,6 +250,10 @@ abstract class PawnSlotData<T : PawnSkeletonSlot>(
 ) {
     var currentAttachment: Attachment? by Delegates.observable(originAttachment) { _, _, newValue ->
         slot.attachment = newValue
+    }
+
+    fun remove() {
+        currentAttachment = null
     }
 
     fun update(attachment: RegionAttachment) {

@@ -1,12 +1,12 @@
 package org.roldy.pawn
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
 
 interface CustomizablePawn {
 
-    fun customize(slot: CustomizablePawnSkinSlot, atlas: TextureAtlas)
+    fun customize(slot: CustomizablePawnSkinSlot, atlasData: CustomizationAtlas)
     fun removeCustomization(slot: CustomizablePawnSkinSlot)
     var hairColor: Color
     var skinColor: Color

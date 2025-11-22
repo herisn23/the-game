@@ -3,9 +3,6 @@ package org.roldy.unity
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
@@ -33,7 +30,7 @@ enum class Flag {
     ShowEars, ShowHair
 }
 
-data class Paths(
+data class PathsBodyPart(
     val relativePath: String,
     val copyTo: String,
     val createMeta: Boolean = false
@@ -43,53 +40,165 @@ data class Paths(
     val extractionPath = "$outputPath/extracted"
 }
 
+data class PathsWeapons(
+    val input: Path,
+    val atlasName: String,
+    val output: String,
+)
+
 fun main() {
+//    repackWeapons()
+    repackBodyParts()
+}
+
+fun repackWeapons() {
+    data class Setting(
+        val sources: List<String>,
+        val output: String,
+        val atlasName: String
+    )
+    val settings = listOf(
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Wand",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Wand"
+            ),
+            "weapons/wand", "Wand"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Lance",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Lance",
+            ),
+            "weapons/lance", "Lance"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Hammer",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Hammer",
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon2H/Basic/Hammer",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon2H/Epic/Hammer",
+            ),
+            "weapons/hammer", "Hammer"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Dagger",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Dagger"
+            ),
+            "weapons/dagger", "Dagger"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Axe",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Axe",
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon2H/Basic/Axe",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon2H/Epic/Axe"
+            ),
+            "weapons/axe", "Axe"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon2H/Epic/Staff"
+            ),
+            "weapons/staff", "Staff"
+        ),
+        Setting(
+            listOf(
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon2H/Epic/Sword",
+                "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/MeleeWeapon1H/Epic/Sword",
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon1H/Basic/Sword",
+                "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/MeleeWeapon2H/Basic/Sword"
+            ),
+            "weapons/sword", "Sword"
+        )
+    )
+    val input = settings.map { setting ->
+        val sourcePaths = setting.sources.map { s ->
+            Path.of("$sourceContext/$s")
+        }
+        val output = Path.of("$spineContext/Assets/${setting.output}")
+        if (deleteDirectory(output.toFile())) {
+            println("Deleted $output")
+        }
+        sourcePaths.forEach { source ->
+            source.toFile().listFiles().forEach { file ->
+                val sourceFile = file.toPath()
+                Files.copy(
+                    sourceFile,
+                    output.run {
+                        val copyTo = toFile()
+                        if (!copyTo.exists()) {
+                            copyTo.mkdirs()
+                        }
+                        resolve(sourceFile.name)
+                    },
+                    StandardCopyOption.REPLACE_EXISTING
+                )
+            }
+        }
+        PathsWeapons(
+            output, setting.atlasName, "assets/${setting.output}"
+        )
+    }
+    repackWeapons(input)
+}
+
+fun repackBodyParts() {
 
     val paths = listOf(
-        Paths(
+        PathsBodyPart(
+            "Assets/HeroEditor4D/Common/Sprites/Equipment/Armor/Underwear",
+            "assets/pawn/human/customization/underwear"
+        ),
+        PathsBodyPart(
+            "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Makeup/Basic",
+            "assets/pawn/human/customization/makeup"
+        ),
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Body/Basic",
             "assets/pawn/human/customization/body"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Eyes/Basic",
             "assets/pawn/human/customization/eyes"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Hair/Basic",
             "assets/pawn/human/customization/hair"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Mouth/Basic",
             "assets/pawn/human/customization/mouth"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Eyebrows/Basic",
             "assets/pawn/human/customization/eyebrows"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Ears/Basic",
             "assets/pawn/human/customization/ears"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Common/Sprites/BodyParts/Beard/Basic",
             "assets/pawn/human/customization/beard"
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Armor/Basic",
             "assets/pawn/human/armor",
             true
         ),
-        Paths(
+        PathsBodyPart(
             "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/Armor/Epic",
-            "assets/pawn/human/armor/epic",
+            "assets/pawn/human/armor",
             true
         )
     )
     paths.forEach(::createAtlas)
-    reprocess(paths)
+    repackBodyParts(paths)
 }
 
-fun createAtlas(path: Paths) {
+fun createAtlas(path: PathsBodyPart) {
     val sourcePath = Path
         .of(path.sourcePath)
         .let(Files::list)
@@ -106,12 +215,12 @@ fun createAtlas(path: Paths) {
         println("Assets destination created")
     }
     atlasList.forEach { (texture, metaConfig) ->
-        val image = ImageIO.read(texture.toFile())
+
         fun String.clean() =
             this
 
         val textureName = texture.name.clean()
-        val atlas = createAtlas(texture.name, metaConfig.toFile(), image.width to image.height)
+        val atlas = createAtlas(texture, metaConfig.toFile())
 
         val imagePath = assetsPath.resolve(textureName)
         val atlasPath = assetsPath.resolve(textureName.replace("png", "atlas"))
@@ -125,7 +234,32 @@ fun createAtlas(path: Paths) {
     }
 }
 
-fun reprocess(paths: List<Paths>) {
+
+fun repackWeapons(paths: List<PathsWeapons>) {
+    Lwjgl3Application(object : ApplicationAdapter() {
+        override fun create() {
+            val settings = TexturePacker.Settings().apply {
+                filterMin = TextureFilter.Linear  // Instead of Linear
+                filterMag = TextureFilter.Linear
+                premultiplyAlpha = true
+                paddingX = 2
+                paddingY = 2
+                duplicatePadding = true
+                edgePadding = true  // Add padding at atlas edges
+            }
+            paths.forEach { paths ->
+                TexturePacker.process(settings, paths.input.absolutePathString(), paths.output, "${paths.atlasName}.atlas")
+                val atlas = TextureAtlas(Gdx.files.absolute("${paths.output}/${paths.atlasName}.atlas"))
+                val names = atlas.regions.joinToString("\n") {it.name}
+                val namesFile = Path.of(paths.output).resolve("${paths.atlasName}.names").toFile()
+                namesFile.writeText(names)
+            }
+            exitProcess(0)
+        }
+    })
+}
+
+fun repackBodyParts(paths: List<PathsBodyPart>) {
     Lwjgl3Application(object : ApplicationAdapter() {
         override fun create() {
             paths.forEach { path ->
@@ -136,6 +270,7 @@ fun reprocess(paths: List<Paths>) {
                     .toList()
                     .filter { it.name.endsWith(".atlas") }
                 atlases.forEach { atlasPath ->
+                    println("start repacking $atlasPath")
                     val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
                     val extractionDir = atlasPath.name.replace(".atlas", "")
                     val spritesDir = "${path.extractionPath}/${extractionDir}"
@@ -144,8 +279,6 @@ fun reprocess(paths: List<Paths>) {
                         filterMin = TextureFilter.Linear  // Instead of Linear
                         filterMag = TextureFilter.Linear
                         premultiplyAlpha = true
-//                        bleed = true  // Important! Extends edge pixels
-//                        bleedIterations = 2  // More iterations = more bleed
                         paddingX = 2
                         paddingY = 2
                         duplicatePadding = true
@@ -153,17 +286,9 @@ fun reprocess(paths: List<Paths>) {
                     }
                     val repacked = atlasPath.parent.resolve("repacked")
                     TexturePacker.process(settings, spritesDir, repacked.absolutePathString(), atlasPath.name)
-//                    addCustomProperties("$output/${atlasPath.name}", customData)
                 }
-//                val textures = dir
-//                    .let(Files::list)
-//                    .toList()
-//                    .filter { it.name.endsWith(".png") }
-//                textures.forEach { texture ->
-//                    cleanPNG(texture, texture)
-//                }
             }
-            paths.forEach { path->
+            paths.forEach { path ->
                 val repacked = Path.of(path.outputPath).resolve("repacked")
                 repacked.toFile().list().forEach { file ->
                     val sourceFile = repacked.resolve(file)
@@ -182,88 +307,6 @@ fun reprocess(paths: List<Paths>) {
 
             }
             exitProcess(0)
-        }
-
-        fun addCustomProperties(atlasPath: String, customData: Map<String, Map<String, String>>) {
-            val atlasFile = Gdx.files.local(atlasPath)
-            val lines = atlasFile.readString().lines().toMutableList()
-
-            var i = 0
-            while (i < lines.size) {
-                val line = lines[i]
-
-                // Find region names (lines that don't start with whitespace and aren't metadata)
-                if (line.isNotEmpty() && !line.startsWith(" ") && !line.contains(":") && !line.endsWith(".png")) {
-                    val regionName = line.trim()
-
-                    // Add custom properties after this region
-                    if (customData.containsKey(regionName)) {
-                        var insertIndex = i + 1
-
-                        // Find where to insert (after existing properties like bounds, rotate, etc.)
-                        while (insertIndex < lines.size && lines[insertIndex].startsWith("  ")) {
-                            insertIndex++
-                        }
-
-                        // Insert custom properties
-                        customData[regionName]?.forEach { (key, value) ->
-                            lines.add(insertIndex, "  $key: $value")
-                            insertIndex++
-                        }
-                    }
-                }
-                i++
-            }
-
-            atlasFile.writeString(lines.joinToString("\n"), false)
-        }
-
-        val customData = mapOf(
-            "left" to mapOf(
-                "showEars" to "false",
-                "armorType" to "helmet"
-            ),
-            "frontArmRight" to mapOf(
-                "showEars" to "true",
-                "armorType" to "sleeve"
-            )
-        )
-
-        fun checkPixMap(path: Path) {
-            val sourcePixmap = Pixmap(Gdx.files.absolute(path.absolutePathString()))
-// Check a pixel that should be transparent
-            val color = Color()
-            Color.rgba8888ToColor(color, sourcePixmap.getPixel(0, 0))
-            println("Alpha: ${color.a}, RGB: ${color.r}, ${color.g}, ${color.b}")
-            sourcePixmap.dispose()
-        }
-
-        fun cleanPNG(inputPath: Path, outputPath: Path) {
-            val pixmap = Pixmap(Gdx.files.absolute(inputPath.absolutePathString()))
-            val pixels = pixmap.pixels
-
-            // Direct byte buffer manipulation
-            for (i in 0 until pixmap.width * pixmap.height) {
-                val byteIndex = i * 4  // RGBA = 4 bytes per pixel
-
-                val r = pixels.get(byteIndex).toInt() and 0xFF
-                val g = pixels.get(byteIndex + 1).toInt() and 0xFF
-                val b = pixels.get(byteIndex + 2).toInt() and 0xFF
-                val a = pixels.get(byteIndex + 3).toInt() and 0xFF
-
-                // If alpha is 0 or very low, set RGB to 0
-                if (a < 5) {
-                    pixels.put(byteIndex, 0.toByte())      // R
-                    pixels.put(byteIndex + 1, 0.toByte())  // G
-                    pixels.put(byteIndex + 2, 0.toByte())  // B
-                    // Keep alpha as is
-                }
-            }
-
-            pixels.rewind()  // Reset position
-
-            PixmapIO.writePNG(Gdx.files.absolute(outputPath.absolutePathString()), pixmap)
-            pixmap.dispose()
         }
     })
 }
@@ -287,18 +330,20 @@ fun List<Path>.findMetaConfig(image: Path) =
     }
 
 
-fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>): Atlas =
-    runCatching {
+fun loadMetaData(texture: Path, sourceMetaFile: File) =
+    run {
+        val image = ImageIO.read(texture.toFile())
+        val size = image.width to image.height
         val data = yaml.load<MutableMap<String, Any>>(sourceMetaFile.inputStream())
         val content = data.getContent()
         val spriteSheet = content["spriteSheet"] as Map<String, List<Map<String, Any>>>
-        val flags = textureName.run {
+        val flags = texture.name.run {
             mapOf(
                 Flag.ShowEars.name.decapitalize() to contains(keyWordShowEars),
                 Flag.ShowHair.name.decapitalize() to contains(keyWordFullHair)
             )
         }
-        val parts = spriteSheet["sprites"]!!.map {
+        size to spriteSheet["sprites"]!!.map {
             val name = (it["name"] as String).let(::normalizeName)
             val rect = it["rect"] as Map<String, Int>
             val x = rect["x"]!!
@@ -306,25 +351,37 @@ fun createAtlas(textureName: String, sourceMetaFile: File, size: Pair<Int, Int>)
             val width = rect["width"]!!
             val height = rect["height"]!!
             val recalcY = abs(height + y - size.second)
+            val pivot = (it["pivot"]!! as HashMap<String, Double>).let {
+                it["x"]!! to it["y"]!!
+            }
             SpriteData(
                 name,
                 atlasBoundariesTemplate(name, x, recalcY, width, height),
+                pivot,
                 flags
             )
         }
+    }
+
+fun createAtlas(texture: Path, sourceMetaFile: File): Atlas =
+    runCatching {
+        val metadata = loadMetaData(texture, sourceMetaFile)
+        val size = metadata.first
+        val parts = metadata.second
         Atlas(
             parts.map { it.name },
             createAtlasMetaData(parts),
-            atlasTemplate(textureName, parts.map { it.boundaries }, size)
+            atlasTemplate(texture.name, parts.map { it.boundaries }, size)
         )
     }.fold(onSuccess = { it }, onFailure = {
-        println("Failed to create atlas for $textureName")
+        println("Failed to create atlas for ${texture.name}")
         throw it
     })
 
 data class SpriteData(
     val name: String,
     val boundaries: String,
+    val pivo: Pair<Double, Double>,
     val flags: Map<String, Boolean>
 )
 
