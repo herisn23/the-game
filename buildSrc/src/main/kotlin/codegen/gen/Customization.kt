@@ -5,23 +5,25 @@ import codegen.ClassNameNormalizer
 import java.io.File
 import java.util.Locale.getDefault
 
-object Customization: Generator {
+object Customization : Generator {
     const val pack = "org.roldy.equipment.atlas.customization"
     const val dir = "pawn/human/customization"
-    val names = listOf("beard", "body", "ears", "eyebrows", "eyes", "hair", "mouth")
+    val names = listOf("beard", "body", "ears", "eyebrows", "eyes", "hair", "mouth", "underwear")
 
     override fun generate(root: File): List<ClassInfo> =
         names.map { name ->
             ClassNameNormalizer.clean()
-            val subnames = root.assets.resolve("$dir/$name").toFile().listFiles().filter { it.extension == "atlas" }.map {
-                it.nameWithoutExtension
-            }
-            val className = name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
+            val subnames =
+                root.assets.resolve("$dir/$name").toFile().listFiles().filter { it.extension == "atlas" }.map {
+                    it.nameWithoutExtension
+                }
+            val className =
+                name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
             ClassInfo(
                 className,
                 pack.replace(".", "/"),
                 template(
-                    className, subnames.map {
+                    className, "CustomizationAtlas".takeIf { name != "underwear" } ?: "UnderWearAtlas", subnames.map {
                         ClassNameNormalizer.normalizeUnique(it) to "$dir/$name/$it.atlas"
                     }
                 )
@@ -29,16 +31,16 @@ object Customization: Generator {
 
         }
 
-    fun template(name: String, names: List<Pair<String, String>>) =
+    fun template(name: String, atlas: String, names: List<Pair<String, String>>) =
         """
             package $pack
             object $name {
                 ${
             names.joinToString("\n\t") {
-                """object ${it.first}: CustomizationAtlas("${it.second}")"""
+                """object ${it.first}: $atlas("${it.second}")"""
             }
         }
-                val all by lazy { listOf(${names.joinToString(", "){it.first}}) }
+                val all by lazy { listOf(${names.joinToString(", ") { it.first }}) }
             }
         """.trimIndent()
 }

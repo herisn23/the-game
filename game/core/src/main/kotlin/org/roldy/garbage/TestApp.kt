@@ -9,7 +9,6 @@ import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.armor.Armors
 import org.roldy.equipment.atlas.customization.*
-import org.roldy.equipment.atlas.underwear.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
 import org.roldy.listener.DefaultApplicationListener
@@ -48,8 +47,7 @@ class TestApp(
         testMouth = Mouth.CreepySmile
         testEars = Ears.Type10
 
-        underwear = object: UnderWearAtlas("pawn/human/customization/underwear/FemaleUnderwearType1.atlas"){}
-
+        underwear = Underwear.FemaleUnderwearType2
         default.create()
         pawnRenderer = PawnRenderer()
         font = BitmapFont()

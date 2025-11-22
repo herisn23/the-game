@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.ObjectRenderer
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
-import org.roldy.equipment.atlas.underwear.UnderWearAtlas
+import org.roldy.equipment.atlas.customization.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.StrippablePawn
