@@ -9,6 +9,8 @@ import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
+import org.roldy.equipment.atlas.weapon.Shield
+import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
 import org.roldy.listener.DefaultApplicationListener
@@ -34,6 +36,7 @@ class TestApp(
     lateinit var armors: List<ArmorAtlas>
 
     lateinit var underwear: UnderWearAtlas
+    lateinit var shield: ShieldAtlas
 
     override fun create() {
         armors = Armor.all
@@ -48,6 +51,7 @@ class TestApp(
         testEars = Ears.Type10
 
         underwear = Underwear.FemaleUnderwearType2
+        shield = Shield.CrusaderShield
         default.create()
         pawnRenderer = PawnRenderer()
         font = BitmapFont()
@@ -84,6 +88,7 @@ class TestApp(
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, testEars)
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, testEars)
             pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Wand.BlackStick)
+            pawnRenderer.setShield(shield)
             pawnRenderer.setUnderwear(underwear)
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {

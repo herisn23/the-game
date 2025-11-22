@@ -11,11 +11,9 @@ import org.roldy.asset.loadAsset
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
+import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
-import org.roldy.pawn.ArmorWearer
-import org.roldy.pawn.Customizable
-import org.roldy.pawn.UnderwearWearer
-import org.roldy.pawn.WeaponWearer
+import org.roldy.pawn.*
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.pawn.skeleton.slot.PawnArmorSlotData
 import org.roldy.pawn.skeleton.slot.PawnCustomizationSlotData
@@ -27,7 +25,7 @@ class PawnSkeleton(
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
-) : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer, UnderwearWearer {
+) : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSkinSlot.Hair to false,
@@ -91,7 +89,7 @@ class PawnSkeleton(
 
     private val weaponSlots by lazy {
         skeleton.run {
-            WeaponPawnSlot.allParts.associateWith { slotName ->
+            WeaponPawnSlot.all.associateWith { slotName ->
                 val slot = findSlot(slotName.capitalizedName)
                 PawnWeaponSlotData(slot, slotName, slot.attachment as RegionAttachment)
             }
@@ -199,6 +197,22 @@ class PawnSkeleton(
         underwearSlots.forEach { (_, data) ->
             data.remove()
         }
+    }
+
+    override fun setShield(atlas: ShieldAtlas) {
+        weaponSlots[WeaponPawnSlot.WeaponLeft]?.run {
+            val regionAttachment = RegionAttachment(slotName.capitalizedName)
+            val regionName = when (orientation) {
+                Right, Front -> "front"
+                else -> "back"
+            }
+            regionAttachment.region = atlas.findRegion(regionName)
+            update(regionAttachment)
+        }
+    }
+
+    override fun removeShield() {
+        weaponSlots[WeaponPawnSlot.WeaponLeft]?.remove()
     }
 
     private fun drawHairColor() {

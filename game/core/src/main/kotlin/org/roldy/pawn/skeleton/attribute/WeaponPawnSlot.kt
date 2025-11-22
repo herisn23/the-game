@@ -1,11 +1,12 @@
 package org.roldy.pawn.skeleton.attribute
 
-abstract class WeaponPawnSlot(name: String) :PawnSkeletonSlot(name) {
-    object WeaponRight: WeaponPawnSlot("weaponRight")
+abstract class WeaponPawnSlot(name: String) : PawnSkeletonSlot(name) {
+    object WeaponRight : WeaponPawnSlot("weaponRight")
+    object WeaponLeft : WeaponPawnSlot("weaponLeft")
 
     companion object {
-        val allParts by lazy {
-            listOf(WeaponRight)
+        val all by lazy {
+            listOf(WeaponRight, WeaponLeft)
         }
     }
 }

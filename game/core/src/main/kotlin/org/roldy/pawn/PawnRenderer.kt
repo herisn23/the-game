@@ -6,14 +6,20 @@ import org.roldy.ObjectRenderer
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
+import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.StrippablePawn
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer,
-    UnderwearWearer {
+class PawnRenderer : ObjectRenderer,
+    ArmorWearer,
+    Customizable,
+    StrippablePawn,
+    WeaponWearer,
+    UnderwearWearer,
+    ShieldWearer {
     val defaultSkinColor: Color = Color.valueOf("FFC878")
     val defaultHairColor: Color = Color.BROWN
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
@@ -73,6 +79,18 @@ class PawnRenderer : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, 
     override fun removeUnderwear() {
         skeletons.forEach { (_, skel) ->
             skel.removeUnderwear()
+        }
+    }
+
+    override fun setShield(atlas: ShieldAtlas) {
+        skeletons.forEach { (_, skel) ->
+            skel.setShield(atlas)
+        }
+    }
+
+    override fun removeShield() {
+        skeletons.forEach { (_, skel) ->
+            skel.removeShield()
         }
     }
 
