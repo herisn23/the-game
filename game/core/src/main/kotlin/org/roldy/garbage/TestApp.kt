@@ -29,7 +29,7 @@ class TestApp(
     lateinit var testEars: TextureAtlas
 
     override fun create() {
-        testArmor = PawnArmorSlotData.TextureAtlasData.load("pawn/human/armor/AcornArmor [ShowEars]")
+        testArmor = PawnArmorSlotData.TextureAtlasData.load("pawn/human/armor/epic/HeavyWolfArmor")
         testHair = TextureAtlas(loadAsset("pawn/human/customization/hair/BroFlow.atlas"))
         testBeard = TextureAtlas(loadAsset("pawn/human/customization/beard/Type10.atlas"))
         testEyes = TextureAtlas(loadAsset("pawn/human/customization/eyes/Asian.atlas"))

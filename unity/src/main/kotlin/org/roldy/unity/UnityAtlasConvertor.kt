@@ -78,6 +78,11 @@ fun main() {
             "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Armor/Basic",
             "assets/pawn/human/armor",
             true
+        ),
+        Paths(
+            "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/Armor/Epic",
+            "assets/pawn/human/armor/epic",
+            true
         )
     )
     paths.forEach(::createAtlas)
