@@ -48,7 +48,50 @@ data class PathsWeapons(
 
 fun main() {
 //    repackWeapons()
-    repackBodyParts()
+    repackShields()
+//    repackBodyParts()
+}
+
+data class ShieldPaths(
+    val source: String,
+    val outputPath: String
+)
+
+fun repackShields() {
+
+    val sources = listOf(
+        "Assets/HeroEditor4D/Extensions/EpicHeroes/Sprites/Equipment/Shield/Epic",
+        "Assets/HeroEditor4D/FantasyHeroes/Sprites/Equipment/Shield/Basic"
+    )
+    val input = sources.map { source ->
+        val sourcePath = Path.of("$sourceContext$source")
+        val output = Path.of("$spineContext/$source")
+        if (deleteDirectory(output.toFile())) {
+            println("Deleted $output")
+        }
+        if (output.toFile().mkdirs()) {
+            println("Assets destination created")
+        }
+        val sources = sourcePath
+            .let(Files::list)
+            .toList()
+        val files = sourcePath.toFile().listFiles()
+        val images = files.filter { it.name.endsWith(".png") }
+        val atlasList = images.map {
+            it.toPath() to sources.findMetaConfig(it.toPath())
+        }
+        atlasList.forEach { (texture, metaConfig) ->
+            val textureName = texture.name
+            val atlas = createAtlas(texture, metaConfig.toFile())
+            val imagePath = output.resolve(textureName)
+            val atlasPath = output.resolve(textureName.replace("png", "atlas"))
+            Files.copy(texture, imagePath)
+            Files.writeString(atlasPath, atlas.content)
+        }
+
+        output
+    }
+    repackShields(input, "assets/weapons/shield")
 }
 
 fun repackWeapons() {
@@ -57,6 +100,7 @@ fun repackWeapons() {
         val output: String,
         val atlasName: String
     )
+
     val settings = listOf(
         Setting(
             listOf(
@@ -234,23 +278,73 @@ fun createAtlas(path: PathsBodyPart) {
     }
 }
 
+val textureSettings = TexturePacker.Settings().apply {
+    filterMin = TextureFilter.Linear  // Instead of Linear
+    filterMag = TextureFilter.Linear
+    premultiplyAlpha = true
+    paddingX = 2
+    paddingY = 2
+    duplicatePadding = true
+    edgePadding = true  // Add padding at atlas edges
+}
+
+fun repackShields(paths: List<Path>, output: String) {
+    Lwjgl3Application(object : ApplicationAdapter() {
+        override fun create() {
+            val outputPath = Path.of(output)
+            val copyTo = outputPath.toFile()
+            if (!copyTo.exists()) {
+                copyTo.mkdirs()
+            }
+            deleteDirectory(outputPath.toFile())
+            val repacked = paths.map { path ->
+                val extractionPath = path.resolve("extracted")
+                val atlases = path
+                    .let(Files::list)
+                    .toList()
+                    .filter { it.name.endsWith(".atlas") }
+                atlases.map { atlasPath ->
+                    println("start repacking $atlasPath")
+                    val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
+                    val extractionDir = atlasPath.name.replace(".atlas", "")
+                    val spritesDir = "${extractionPath}/${extractionDir}"
+                    AtlasExtractor.extractAtlas(atlas, spritesDir)
+                    val repacked = atlasPath.parent.resolve("repacked")
+                    TexturePacker.process(
+                        textureSettings,
+                        spritesDir,
+                        repacked.absolutePathString(),
+                        atlasPath.name
+                    )
+                    repacked
+                }
+            }.flatten()
+            repacked.forEach { repacked ->
+                repacked.toFile().listFiles().forEach { file ->
+                    val target = outputPath.resolve(file.name)
+                    println("Copy $file to $target")
+                    Files.createDirectories(target.parent)
+                    Files.copy(file.toPath(), target)
+                }
+            }
+            exitProcess(0)
+        }
+    })
+}
 
 fun repackWeapons(paths: List<PathsWeapons>) {
     Lwjgl3Application(object : ApplicationAdapter() {
         override fun create() {
-            val settings = TexturePacker.Settings().apply {
-                filterMin = TextureFilter.Linear  // Instead of Linear
-                filterMag = TextureFilter.Linear
-                premultiplyAlpha = true
-                paddingX = 2
-                paddingY = 2
-                duplicatePadding = true
-                edgePadding = true  // Add padding at atlas edges
-            }
+
             paths.forEach { paths ->
-                TexturePacker.process(settings, paths.input.absolutePathString(), paths.output, "${paths.atlasName}.atlas")
+                TexturePacker.process(
+                    textureSettings,
+                    paths.input.absolutePathString(),
+                    paths.output,
+                    "${paths.atlasName}.atlas"
+                )
                 val atlas = TextureAtlas(Gdx.files.absolute("${paths.output}/${paths.atlasName}.atlas"))
-                val names = atlas.regions.joinToString("\n") {it.name}
+                val names = atlas.regions.joinToString("\n") { it.name }
                 val namesFile = Path.of(paths.output).resolve("${paths.atlasName}.names").toFile()
                 namesFile.writeText(names)
             }
@@ -275,33 +369,30 @@ fun repackBodyParts(paths: List<PathsBodyPart>) {
                     val extractionDir = atlasPath.name.replace(".atlas", "")
                     val spritesDir = "${path.extractionPath}/${extractionDir}"
                     AtlasExtractor.extractAtlas(atlas, spritesDir)
-                    val settings = TexturePacker.Settings().apply {
-                        filterMin = TextureFilter.Linear  // Instead of Linear
-                        filterMag = TextureFilter.Linear
-                        premultiplyAlpha = true
-                        paddingX = 2
-                        paddingY = 2
-                        duplicatePadding = true
-                        edgePadding = true  // Add padding at atlas edges
-                    }
                     val repacked = atlasPath.parent.resolve("repacked")
-                    TexturePacker.process(settings, spritesDir, repacked.absolutePathString(), atlasPath.name)
+                    TexturePacker.process(
+                        textureSettings,
+                        spritesDir,
+                        repacked.absolutePathString(),
+                        atlasPath.name
+                    )
                 }
             }
             paths.forEach { path ->
+                val output = Path.of(path.copyTo)
+                deleteDirectory(output.toFile())
                 val repacked = Path.of(path.outputPath).resolve("repacked")
                 repacked.toFile().list().forEach { file ->
                     val sourceFile = repacked.resolve(file)
                     Files.copy(
                         sourceFile,
-                        Path.of(path.copyTo).run {
+                        output.run {
                             val copyTo = toFile()
                             if (!copyTo.exists()) {
                                 copyTo.mkdirs()
                             }
                             resolve(sourceFile.name)
-                        },
-                        StandardCopyOption.REPLACE_EXISTING
+                        }
                     )
                 }
 
