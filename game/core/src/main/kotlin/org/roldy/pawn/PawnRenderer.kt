@@ -5,17 +5,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.ObjectRenderer
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
+import org.roldy.equipment.atlas.underwear.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.StrippablePawn
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn, WeaponWearablePawn {
+class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, StrippablePawn, WeaponWearablePawn,
+    UnderwearPawn {
     val defaultSkinColor: Color = Color.valueOf("FFC878")
     val defaultHairColor: Color = Color.BROWN
+    val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
     val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> = listOf(
-        PawnSkeleton(Front, defaultSkinColor, defaultHairColor)
+        PawnSkeleton(Front, defaultSkinColor, defaultHairColor, defaultUnderWearColor)
     ).associateBy(PawnSkeleton::orientation)
     var currentOrientation: Front = Front
 
@@ -61,6 +64,19 @@ class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, Stripp
         }
     }
 
+    override fun setUnderWear(atlas: UnderWearAtlas) {
+        skeletons.forEach { (_, skel) ->
+            skel.setUnderWear(atlas)
+        }
+    }
+
+    override fun removeUnderwear() {
+        skeletons.forEach { (_, skel) ->
+            skel.removeUnderwear()
+        }
+    }
+
+
     override var hairColor: Color by Delegates.observable(defaultHairColor) { property, oldValue, newValue ->
         skeletons.forEach { (_, skel) ->
             skel.hairColor = newValue
@@ -69,6 +85,12 @@ class PawnRenderer : ObjectRenderer, ArmorWearablePawn, CustomizablePawn, Stripp
     override var skinColor: Color by Delegates.observable(defaultSkinColor) { property, oldValue, newValue ->
         skeletons.forEach { (_, skel) ->
             skel.skinColor = newValue
+        }
+    }
+
+    override var underwearColor: Color by Delegates.observable(defaultSkinColor) { property, oldValue, newValue ->
+        skeletons.forEach { (_, skel) ->
+            skel.underwearColor = newValue
         }
     }
 

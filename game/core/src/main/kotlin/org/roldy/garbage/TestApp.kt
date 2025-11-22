@@ -9,6 +9,7 @@ import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.armor.Armors
 import org.roldy.equipment.atlas.customization.*
+import org.roldy.equipment.atlas.underwear.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
 import org.roldy.listener.DefaultApplicationListener
@@ -33,6 +34,8 @@ class TestApp(
     lateinit var weapons: List<EquipmentAtlas>
     lateinit var armors: List<ArmorAtlas>
 
+    lateinit var underwear: UnderWearAtlas
+
     override fun create() {
         armors = Armors.all
         weapons = Weapons.all
@@ -44,6 +47,8 @@ class TestApp(
         testEyesBrows = Eyebrows.Eyebrows13
         testMouth = Mouth.CreepySmile
         testEars = Ears.Type10
+
+        underwear = object: UnderWearAtlas("pawn/human/customization/underwear/FemaleUnderwearType1.atlas"){}
 
         default.create()
         pawnRenderer = PawnRenderer()
@@ -81,7 +86,7 @@ class TestApp(
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, testEars)
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, testEars)
             pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Wand.BlackStick)
-
+            pawnRenderer.setUnderWear(underwear)
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             if (pawnRenderer.skinColor == Color.BLUE) {
@@ -89,6 +94,7 @@ class TestApp(
             } else {
                 pawnRenderer.skinColor = Color.BLUE
             }
+            pawnRenderer.underwearColor = Color.GREEN
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {

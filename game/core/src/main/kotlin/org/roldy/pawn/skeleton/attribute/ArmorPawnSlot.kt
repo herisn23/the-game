@@ -6,7 +6,7 @@ abstract class ArmorPawnSlot(override val name: String, protected val stripedReg
     fun regionName(orientation: PawnSkeletonOrientation): String =
         when (orientation) {
             is Left, Right -> "left${stripedRegionName}"
-            else -> "${orientation.value}${stripedRegionName}"
+            else -> "${orientation.capitalizedName}${stripedRegionName}"
         }
 
     enum class Piece {

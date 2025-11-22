@@ -4,7 +4,7 @@ import java.util.*
 
 abstract class NamedAttribute {
     abstract val name: String
-    val value by lazy {
+    val capitalizedName by lazy {
         name.replaceFirstChar { it.lowercase(Locale.getDefault()) }
     }
 }

@@ -1,3 +1,4 @@
 package org.roldy.pawn.skeleton.attribute
 
-abstract class PawnSkeletonSlot(override val name: String) : NamedAttribute()
+abstract class PawnSkeletonSlot(override val name: String) : NamedAttribute() {
+}

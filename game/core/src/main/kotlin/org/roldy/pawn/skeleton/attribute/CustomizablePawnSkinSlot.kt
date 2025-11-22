@@ -7,10 +7,10 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
     abstract fun findRegion(orientation: PawnSkeletonOrientation, atlas: TextureAtlas): TextureAtlas.AtlasRegion
 
     abstract class NonPairSlot(override val name: String) : CustomizablePawnSkinSlot(name) {
-        internal open fun regionName(orientation: PawnSkeletonOrientation) =
+        fun regionName(orientation: PawnSkeletonOrientation) =
             when (orientation) {
                 Left, Right -> "left"
-                else -> orientation.value
+                else -> orientation.capitalizedName
             }
 
         override fun findRegion(orientation: PawnSkeletonOrientation, atlas: TextureAtlas): TextureAtlas.AtlasRegion =
@@ -35,7 +35,7 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
         fun regionName(orientation: PawnSkeletonOrientation, direction: String): String =
             when (orientation) {
                 Left, Right -> direction
-                else -> "${orientation.value}${
+                else -> "${orientation.capitalizedName}${
                     direction.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(
                             getDefault()
