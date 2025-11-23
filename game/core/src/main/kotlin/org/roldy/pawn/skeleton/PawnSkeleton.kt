@@ -38,8 +38,10 @@ class PawnSkeletonData private constructor(
         )
     }
     companion object {
-        fun create() =
-            PawnSkeletonOrientation.all.associateWith(::PawnSkeletonData)
+       val instance by lazy {
+           PawnSkeletonOrientation.all.associateWith(::PawnSkeletonData)
+       }
+
     }
 }
 
@@ -49,7 +51,7 @@ class PawnSkeleton(
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
-) : ObjectRenderer, ArmorWearer, Customizable, StrippablePawn, WeaponWearer, UnderwearWearer, ShieldWearer {
+) : ObjectRenderer, ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSkinSlot.Hair to false,
@@ -134,7 +136,7 @@ class PawnSkeleton(
         skeleton.updateWorldTransform(Skeleton.Physics.update)
         skeletonRenderer.setPremultipliedAlpha(true)
         animationState.setAnimation(0, Idle.capitalizedName, true)
-        strip()
+        clean()
     }
 
 
@@ -143,14 +145,19 @@ class PawnSkeleton(
         showHidableSlots()
     }
 
-    override fun setArmor(slot: ArmorPawnSlot, atlasData: ArmorAtlas) {
-        armorSlots[slot]?.let { slotData ->
-            val regionName = slot.regionName(orientation)
+    private fun clean() {
+        strip()
+        weaponSlots.values.forEach(PawnWeaponSlotData::remove)
+    }
+
+    override fun setArmor(piece:ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
+        groupedArmorSlots[piece]?.forEach { slotData ->
+            val regionName = slotData.slotName.regionName(orientation)
             val regionAttachment = RegionAttachment(regionName)
             regionAttachment.region = atlasData.atlas.findRegion(regionName)
             slotData.update(regionAttachment, atlasData)
             hiddenSlots = slotData.hiddenSlotsState
-            hideHidableSlots(slot)
+            hideHidableSlots(slotData.slotName)
         }
     }
 
@@ -225,7 +232,7 @@ class PawnSkeleton(
     }
 
     override fun setShield(atlas: ShieldAtlas) {
-        weaponSlots[WeaponPawnSlot.WeaponLeft]?.run {
+        weaponSlots[WeaponPawnSlot.Shield]?.run {
             val regionAttachment = RegionAttachment(slotName.capitalizedName)
             val regionName = when (orientation) {
                 Right, Front -> "front"
@@ -237,7 +244,7 @@ class PawnSkeleton(
     }
 
     override fun removeShield() {
-        weaponSlots[WeaponPawnSlot.WeaponLeft]?.remove()
+        weaponSlots[WeaponPawnSlot.Shield]?.remove()
     }
 
     private fun drawHairColor() {

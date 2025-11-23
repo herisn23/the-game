@@ -1,0 +1,222 @@
+
+PersianArcherArmor1.png
+size: 1024, 1024
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+backArmLeft
+  rotate: false
+  xy: 645, 163
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+backArmRight
+  rotate: false
+  xy: 807, 325
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+backBody
+  rotate: false
+  xy: 483, 325
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+backHead
+  rotate: false
+  xy: 1, 487
+  size: 480, 480
+  orig: 480, 480
+  offset: 0, 0
+  index: -1
+backLegLeft
+  rotate: false
+  xy: 727, 163
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+backLegRight
+  rotate: false
+  xy: 483, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+frontArmLeft
+  rotate: false
+  xy: 565, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+frontArmRight
+  rotate: false
+  xy: 647, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+frontBody
+  rotate: false
+  xy: 483, 163
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+frontHead
+  rotate: false
+  xy: 1, 5
+  size: 480, 480
+  orig: 480, 480
+  offset: 0, 0
+  index: -1
+frontLegLeft
+  rotate: false
+  xy: 729, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+frontLegRight
+  rotate: false
+  xy: 889, 325
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+leftArmLeft
+  rotate: false
+  xy: 811, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+leftArmRight
+  rotate: false
+  xy: 889, 163
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+leftBody
+  rotate: false
+  xy: 645, 325
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+leftHead
+  rotate: false
+  xy: 483, 487
+  size: 480, 480
+  orig: 480, 480
+  offset: 0, 0
+  index: -1
+leftLegLeft
+  rotate: false
+  xy: 893, 1
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+
+PersianArcherArmor1-2.png
+size: 256, 256
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+backFingersLeft
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+backFingersRight
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+backHandLeft
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+backHandRight
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+frontHandLeft
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+frontHandRight
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+leftFingersRight
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+leftHandLeft
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+leftHandRight
+  rotate: false
+  xy: 1, 1
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+frontSleeveLeft
+  rotate: false
+  xy: 83, 163
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+frontSleeveRight
+  rotate: false
+  xy: 83, 81
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+leftLegRight
+  rotate: false
+  xy: 1, 83
+  size: 80, 160
+  orig: 80, 160
+  offset: 0, 0
+  index: -1
+leftSleeveLeft
+  rotate: false
+  xy: 165, 163
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,20 @@
+
+Mouth27 [Paint]1.png
+size: 256, 128
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+front
+  rotate: false
+  xy: 1, 1
+  size: 96, 64
+  orig: 96, 64
+  offset: 0, 0
+  index: -1
+left
+  rotate: false
+  xy: 99, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

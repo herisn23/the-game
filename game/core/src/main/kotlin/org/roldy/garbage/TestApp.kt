@@ -9,13 +9,12 @@ import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
+import org.roldy.equipment.atlas.weapon.Dagger
 import org.roldy.equipment.atlas.weapon.Shield
 import org.roldy.equipment.atlas.weapon.ShieldAtlas
-import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
 import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.PawnRenderer
-import org.roldy.pawn.skeleton.PawnSkeletonData
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.invoke
 
@@ -24,37 +23,23 @@ class TestApp(
 ) : ApplicationListener by default {
     private lateinit var pawnRenderer: PawnRenderer
     private lateinit var font: BitmapFont
-    lateinit var testHair: CustomizationAtlas
-    lateinit var testBeard: CustomizationAtlas
-    lateinit var testEyes: CustomizationAtlas
-    lateinit var testBody: CustomizationAtlas
-    lateinit var testEyesBrows: CustomizationAtlas
-    lateinit var testMouth: CustomizationAtlas
-    lateinit var testEars: CustomizationAtlas
+
     lateinit var weapons: List<EquipmentAtlas>
     lateinit var armors: List<ArmorAtlas>
-
-    lateinit var underwear: UnderWearAtlas
-    lateinit var shield: ShieldAtlas
+    lateinit var customizations: List<CustomizationAtlas>
+    lateinit var underwears: List<UnderWearAtlas>
+    lateinit var shields: List<ShieldAtlas>
 
     override fun create() {
         default.create()
 
         armors = Armor.all
         weapons = Weapons.all
+        customizations = CustomizationAtlas.all
+        underwears = Underwear.all
+        shields = Shield.all
 
-        testHair = Hair.Mohawk
-        testBeard = Beard.Type4
-        testEyes = Eyes.Evil
-        testBody = Body.Type6
-        testEyesBrows = Eyebrows.Eyebrows13
-        testMouth = Mouth.CreepySmile
-        testEars = Ears.Type6
-
-        underwear = Underwear.FemaleUnderwearType2
-        shield = Shield.CrusaderShield
-
-        pawnRenderer = PawnRenderer(PawnSkeletonData.create())
+        pawnRenderer = PawnRenderer()
 
         font = BitmapFont()
     }
@@ -73,25 +58,33 @@ class TestApp(
             font.draw(default.batch, "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB", 10f, Gdx.graphics.height - 50f)
         }
     }
-
+    var toggle = false
     fun test() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            ArmorPawnSlot.allParts.forEach { slot ->
-                pawnRenderer.setArmor(slot, armors.first())
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Body, Armor.RoyalArcherTunic1)
+//            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Legs, Armor.NordicHunterArmorHeavy1)
+            if(!toggle) {
+                pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.CataphractArmor1)
+            } else {
+                pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
             }
+            toggle = !toggle
+
+//            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Helmet, Armor.BanditArmor2)
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Hair, testHair)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Beard, testBeard)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Eyes, testEyes)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Head, testBody)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EyeBrows, testEyesBrows)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Mouth, testMouth)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, testEars)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, testEars)
-            pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Wand.BlackStick)
-            pawnRenderer.setShield(shield)
-            pawnRenderer.setUnderwear(underwear)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.Hair, Hair.CasualMessy1)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.Beard, Beard.Type13)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.Eyes, Eyes.Girl03)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.Head, Body.Type7)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.EyeBrows, Eyebrows.Eyebrows15)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.Mouth, Mouth.Mouth09)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, Ears.Type2)
+            pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, Ears.Type5)
+            pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Dagger.BronzeDagger)
+//            pawnRenderer.setShield(Shield.Bloodmoon)
+            pawnRenderer.setWeapon(WeaponPawnSlot.WeaponLeft, Dagger.AspenStake)
+            pawnRenderer.setUnderwear(Underwear.FemaleUnderwearType1)
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             if (pawnRenderer.skinColor == Color.BLUE) {
@@ -120,5 +113,9 @@ class TestApp(
     override fun dispose() {
         weapons.forEach(EquipmentAtlas::dispose)
         armors.forEach(EquipmentAtlas::dispose)
+        customizations.forEach(CustomizationAtlas::dispose)
+        underwears.forEach(UnderWearAtlas::dispose)
+        shields.forEach(ShieldAtlas::dispose)
+        pawnRenderer.dispose()
     }
 }

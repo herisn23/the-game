@@ -31,7 +31,7 @@ abstract class ArmorPawnSlot(override val name: String, protected val stripedReg
         val pieces: Map<Piece, List<ArmorPawnSlot>> by lazy {
             mapOf(
                 Piece.Body to listOf(Body, ArmLeft, ArmRight),
-                Piece.Gloves to listOf(SleeveLeft, SleeveRight, HandLeft, HandRight,FingersLeft, FingersRight),
+                Piece.Gloves to listOf(SleeveLeft, SleeveRight, HandLeft, HandRight, FingersLeft, FingersRight),
                 Piece.Helmet to listOf(Helmet),
                 Piece.Legs to listOf(LegLeft, LegRight)
             )

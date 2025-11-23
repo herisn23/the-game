@@ -11,11 +11,11 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 import java.util.Locale.getDefault
 import javax.imageio.ImageIO
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
 import kotlin.math.abs
 import kotlin.system.exitProcess
 
@@ -47,15 +47,16 @@ data class PathsWeapons(
 )
 
 fun main() {
-//    repackWeapons()
-    repackShields()
-//    repackBodyParts()
-}
+    Lwjgl3Application(object : ApplicationAdapter() {
+        override fun create() {
+            repackWeapons()
+            repackShields()
+            repackBodyParts()
+            exitProcess(0)
+        }
+    })
 
-data class ShieldPaths(
-    val source: String,
-    val outputPath: String
-)
+}
 
 fun repackShields() {
 
@@ -85,7 +86,7 @@ fun repackShields() {
             val atlas = createAtlas(texture, metaConfig.toFile())
             val imagePath = output.resolve(textureName)
             val atlasPath = output.resolve(textureName.replace("png", "atlas"))
-            Files.copy(texture, imagePath)
+            copy(texture, imagePath)
             Files.writeString(atlasPath, atlas.content)
         }
 
@@ -168,7 +169,7 @@ fun repackWeapons() {
         sourcePaths.forEach { source ->
             source.toFile().listFiles().forEach { file ->
                 val sourceFile = file.toPath()
-                Files.copy(
+                copy(
                     sourceFile,
                     output.run {
                         val copyTo = toFile()
@@ -176,8 +177,7 @@ fun repackWeapons() {
                             copyTo.mkdirs()
                         }
                         resolve(sourceFile.name)
-                    },
-                    StandardCopyOption.REPLACE_EXISTING
+                    }
                 )
             }
         }
@@ -260,18 +260,17 @@ fun createAtlas(path: PathsBodyPart) {
     }
     atlasList.forEach { (texture, metaConfig) ->
 
-        fun String.clean() =
-            this
+        fun String.clean() = this
 
         val textureName = texture.name.clean()
         val atlas = createAtlas(texture, metaConfig.toFile())
 
         val imagePath = assetsPath.resolve(textureName)
         val atlasPath = assetsPath.resolve(textureName.replace("png", "atlas"))
-        val metaPath = assetsPath.resolve("repacked").apply {
+        val metaPath = assetsPath.resolve("repacked/${texture.nameWithoutExtension}").apply {
             toFile().mkdirs()
-        }.resolve(textureName.replace("png", "meta"))
-        Files.copy(texture, imagePath)
+        }.resolve(texture.nameWithoutExtension.normalizeAssetName() + ".meta")
+        copy(texture, imagePath)
         Files.writeString(atlasPath, atlas.content)
         if (path.createMeta)
             Files.writeString(metaPath, atlas.meta)
@@ -288,124 +287,92 @@ val textureSettings = TexturePacker.Settings().apply {
     edgePadding = true  // Add padding at atlas edges
 }
 
-fun repackShields(paths: List<Path>, output: String) {
-    Lwjgl3Application(object : ApplicationAdapter() {
-        override fun create() {
-            val outputPath = Path.of(output)
-            val copyTo = outputPath.toFile()
-            if (!copyTo.exists()) {
-                copyTo.mkdirs()
-            }
-            deleteDirectory(outputPath.toFile())
-            Files.createDirectories(outputPath)
-            val repacked = paths.map { path ->
-                val extractionPath = path.resolve("extracted")
-                val atlases = path
-                    .let(Files::list)
-                    .toList()
-                    .filter { it.name.endsWith(".atlas") }
-                atlases.map { atlasPath ->
-                    println("start repacking $atlasPath")
-                    val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
-                    val extractionDir = atlasPath.name.replace(".atlas", "")
-                    val spritesDir = "${extractionPath}/${extractionDir}"
-                    AtlasExtractor.extractAtlas(atlas, spritesDir)
-                    val repacked = atlasPath.parent.resolve("repacked")
-                    TexturePacker.process(
-                        textureSettings,
-                        spritesDir,
-                        repacked.absolutePathString(),
-                        atlasPath.name
-                    )
-                    repacked
-                }
-            }.flatten().toSet()
-            repacked.forEach { repacked ->
-                repacked.toFile().listFiles().forEach { file ->
-                    val target = outputPath.resolve(file.name)
-                    println("Copy $file to $target")
-                   runCatching {
-                       Files.copy(file.toPath(), target)
-                   }.onFailure {
-                       println("Failed to copy $file to $target: $it")
-                   }
-                }
-            }
-            exitProcess(0)
+fun repackShields(paths: List<Path>, output: String) = run {
+    val outputPath = Path.of(output)
+    val copyTo = outputPath.toFile()
+    if (!copyTo.exists()) {
+        copyTo.mkdirs()
+    }
+    deleteDirectory(outputPath.toFile())
+    Files.createDirectories(outputPath)
+    val repacked = paths.map { path ->
+        val extractionPath = path.resolve("extracted")
+        val atlases = path
+            .let(Files::list)
+            .toList()
+            .filter { it.name.endsWith(".atlas") }
+        atlases.map { atlasPath ->
+            println("start repacking $atlasPath")
+            val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
+            val extractionDir = atlasPath.name.replace(".atlas", "")
+            val spritesDir = "${extractionPath}/${extractionDir}"
+            AtlasExtractor.extractAtlas(atlas, spritesDir)
+            val repacked = atlasPath.parent.resolve("repacked")
+            TexturePacker.process(
+                textureSettings,
+                spritesDir,
+                repacked.absolutePathString(),
+                atlasPath.name
+            )
+            repacked
         }
-    })
+    }.flatten().toSet()
+    repacked.forEach { repacked ->
+        repacked.toFile().listFiles().forEach { file ->
+            val target = outputPath.resolve(file.name)
+            copy(file.toPath(), target)
+        }
+    }
 }
 
-fun repackWeapons(paths: List<PathsWeapons>) {
-    Lwjgl3Application(object : ApplicationAdapter() {
-        override fun create() {
-
-            paths.forEach { paths ->
-                TexturePacker.process(
-                    textureSettings,
-                    paths.input.absolutePathString(),
-                    paths.output,
-                    "${paths.atlasName}.atlas"
-                )
-                val atlas = TextureAtlas(Gdx.files.absolute("${paths.output}/${paths.atlasName}.atlas"))
-                val names = atlas.regions.joinToString("\n") { it.name }
-                val namesFile = Path.of(paths.output).resolve("${paths.atlasName}.names").toFile()
-                namesFile.writeText(names)
-            }
-            exitProcess(0)
-        }
-    })
+fun repackWeapons(paths: List<PathsWeapons>) = run {
+    paths.forEach { paths ->
+        TexturePacker.process(
+            textureSettings,
+            paths.input.absolutePathString(),
+            paths.output,
+            "${paths.atlasName}.atlas"
+        )
+        val atlas = TextureAtlas(Gdx.files.absolute("${paths.output}/${paths.atlasName}.atlas"))
+        val names = atlas.regions.joinToString("\n") { it.name }
+        val namesFile = Path.of(paths.output).resolve("${paths.atlasName}.names").toFile()
+        namesFile.writeText(names)
+    }
 }
 
-fun repackBodyParts(paths: List<PathsBodyPart>) {
-    Lwjgl3Application(object : ApplicationAdapter() {
-        override fun create() {
-            paths.forEach { path ->
-                val dir = Path
-                    .of(path.outputPath)
-                val atlases = dir
-                    .let(Files::list)
-                    .toList()
-                    .filter { it.name.endsWith(".atlas") }
-                atlases.forEach { atlasPath ->
-                    println("start repacking $atlasPath")
-                    val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
-                    val extractionDir = atlasPath.name.replace(".atlas", "")
-                    val spritesDir = "${path.extractionPath}/${extractionDir}"
-                    AtlasExtractor.extractAtlas(atlas, spritesDir)
-                    val repacked = atlasPath.parent.resolve("repacked")
-                    TexturePacker.process(
-                        textureSettings,
-                        spritesDir,
-                        repacked.absolutePathString(),
-                        atlasPath.name
-                    )
-                }
+fun repackBodyParts(paths: List<PathsBodyPart>) = run {
+    paths.forEach { path->
+        val output = Path.of(path.copyTo)
+        deleteDirectory(output.toFile())
+        output.toFile().mkdirs()
+    }
+    paths.forEach { path ->
+        val output = Path.of(path.copyTo)
+        val dir = Path
+            .of(path.outputPath)
+        val atlases = dir
+            .let(Files::list)
+            .toList()
+            .filter { it.name.endsWith(".atlas") }
+        atlases.forEach { atlasPath ->
+            println("start repacking $atlasPath")
+            val atlas = TextureAtlas(Gdx.files.absolute(atlasPath.absolutePathString()))
+            val extractionDir = atlasPath.name.replace(".atlas", "")
+            val spritesDir = "${path.extractionPath}/${extractionDir}"
+            AtlasExtractor.extractAtlas(atlas, spritesDir)
+            val repacked = atlasPath.parent.resolve("repacked/${extractionDir}")
+            TexturePacker.process(
+                textureSettings,
+                spritesDir,
+                repacked.absolutePathString(),
+                atlasPath.nameWithoutExtension.normalizeAssetName()
+            )
+            repacked.toFile().listFiles().forEach { file ->
+                copy(file.toPath(), output.resolve(file.name))
             }
-            paths.forEach { path ->
-                val output = Path.of(path.copyTo)
-                deleteDirectory(output.toFile())
-                val repacked = Path.of(path.outputPath).resolve("repacked")
-                repacked.toFile().list().forEach { file ->
-                    val sourceFile = repacked.resolve(file)
-                    Files.copy(
-                        sourceFile,
-                        output.run {
-                            val copyTo = toFile()
-                            if (!copyTo.exists()) {
-                                copyTo.mkdirs()
-                            }
-                            resolve(sourceFile.name)
-                        }
-                    )
-                }
-
-            }
-            exitProcess(0)
         }
-    })
+    }
 }
-
 
 fun deleteDirectory(directoryToBeDeleted: File): Boolean {
     val allContents = directoryToBeDeleted.listFiles()
@@ -549,3 +516,22 @@ fun expandAbbreviation(text: String): String {
 
 fun Map<String, Any>.getContent(): Map<String, Any> =
     this["TextureImporter"] as Map<String, Any>
+
+fun copy(from:Path, to:Path) =
+    runCatching {
+        println("Copying $from to $to")
+        Files.copy(
+            from,
+            to
+        )
+    }.onFailure {
+        it.printStackTrace()
+        exitProcess(0)
+    }
+
+fun String.normalizeAssetName() =
+    if(!matches(Regex(".*\\d$"))) {
+        "${this}1"
+    } else {
+        this
+    }

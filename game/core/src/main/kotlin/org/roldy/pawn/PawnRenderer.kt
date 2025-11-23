@@ -10,16 +10,13 @@ import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.PawnSkeletonData
-import org.roldy.pawn.skeleton.StrippablePawn
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer(
-    atlas: Map<PawnSkeletonOrientation, PawnSkeletonData>
-) : ObjectRenderer,
+class PawnRenderer : ObjectRenderer,
     ArmorWearer,
     Customizable,
-    StrippablePawn,
+    Strippable,
     WeaponWearer,
     UnderwearWearer,
     ShieldWearer {
@@ -28,7 +25,13 @@ class PawnRenderer(
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
     val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> =
         PawnSkeletonOrientation.all.map {
-            PawnSkeleton(it, atlas.getValue(it), defaultSkinColor, defaultHairColor, defaultUnderWearColor)
+            PawnSkeleton(
+                it,
+                PawnSkeletonData.instance.getValue(it),
+                defaultSkinColor,
+                defaultHairColor,
+                defaultUnderWearColor
+            )
         }.associateBy(PawnSkeleton::orientation)
     var currentOrientation: PawnSkeletonOrientation = Front
 
@@ -47,9 +50,9 @@ class PawnRenderer(
         }
     }
 
-    override fun setArmor(slot: ArmorPawnSlot, atlasData: ArmorAtlas) {
+    override fun setArmor(piece: ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
         skeletons.forEach { (_, skel) ->
-            skel.setArmor(slot, atlasData)
+            skel.setArmor(piece, atlasData)
         }
     }
 
