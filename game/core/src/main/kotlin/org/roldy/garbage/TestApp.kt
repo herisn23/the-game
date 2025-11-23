@@ -17,6 +17,7 @@ import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.PawnRenderer
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.invoke
+import org.roldy.utils.toggle
 
 class TestApp(
     private val default: DefaultApplicationListener = DefaultApplicationListener()
@@ -40,7 +41,7 @@ class TestApp(
         shields = Shield.all
 
         pawnRenderer = PawnRenderer()
-
+        pawnRenderer.attackRightHand()
         font = BitmapFont()
     }
 
@@ -58,19 +59,22 @@ class TestApp(
             font.draw(default.batch, "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB", 10f, Gdx.graphics.height - 50f)
         }
     }
-    var toggle = false
+
+    var toggleGloves by toggle(
+        onTrue = {
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.NordicHunterArmorHeavy1)
+        },
+        onFalse = {
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
+        }
+    )
+
     fun test() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Body, Armor.RoyalArcherTunic1)
-//            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Legs, Armor.NordicHunterArmorHeavy1)
-            if(!toggle) {
-                pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.CataphractArmor1)
-            } else {
-                pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
-            }
-            toggle = !toggle
-
-//            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Helmet, Armor.BanditArmor2)
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Body, Armor.NordicHunterArmorHeavy1)
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Legs, Armor.NordicHunterArmorHeavy1)
+            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Helmet, Armor.NordicHunterArmorHeavy1)
+            toggleGloves = !toggleGloves
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             pawnRenderer.customize(CustomizablePawnSkinSlot.Hair, Hair.CasualMessy1)

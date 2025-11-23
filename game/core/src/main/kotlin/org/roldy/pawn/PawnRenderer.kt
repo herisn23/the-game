@@ -8,6 +8,7 @@ import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
+import org.roldy.pawn.skeleton.PawnAnimation
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.PawnSkeletonData
 import org.roldy.pawn.skeleton.attribute.*
@@ -19,7 +20,7 @@ class PawnRenderer : ObjectRenderer,
     Strippable,
     WeaponWearer,
     UnderwearWearer,
-    ShieldWearer {
+    ShieldWearer, PawnAnimation {
     val defaultSkinColor: Color = Color.valueOf("FFC878")
     val defaultHairColor: Color = Color.BROWN
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
@@ -127,8 +128,24 @@ class PawnRenderer : ObjectRenderer,
 
     context(deltaTime: Float, batch: SpriteBatch)
     override fun render() {
+        skeletons.values.forEach { skel ->
+            skel.animate() //always process animations to simply preserve states
+        }
         skeletons[currentOrientation]?.run {
             render()
+        }
+    }
+
+    //animations
+    override fun idle() {
+       skeletons.forEach { (_, skel) ->
+           skel.animation.idle()
+       }
+    }
+
+    override fun attackRightHand() {
+        skeletons.forEach { (_, skel) ->
+            skel.animation.attackRightHand()
         }
     }
 }

@@ -21,7 +21,6 @@ import org.roldy.pawn.skeleton.slot.PawnUnderWearSlotData
 import org.roldy.pawn.skeleton.slot.PawnWeaponSlotData
 
 
-
 class PawnSkeletonData private constructor(
     orientation: PawnSkeletonOrientation
 ) {
@@ -37,10 +36,11 @@ class PawnSkeletonData private constructor(
             loadAsset("$skeletonPath/${orientation.name}.skel")
         )
     }
+
     companion object {
-       val instance by lazy {
-           PawnSkeletonOrientation.all.associateWith(::PawnSkeletonData)
-       }
+        val instance by lazy {
+            PawnSkeletonOrientation.all.associateWith(::PawnSkeletonData)
+        }
 
     }
 }
@@ -125,7 +125,9 @@ class PawnSkeleton(
 
     private val skeletonRenderer: SkeletonRenderer = SkeletonRenderer()
     private val animationStateData: AnimationStateData = AnimationStateData(pawnSkeletonData.skeletonData)
-    private val animationState: AnimationState = AnimationState(animationStateData)
+    private val animator: PawnAnimator = PawnAnimator(AnimationState(animationStateData), skeleton)
+
+    val animation: PawnAnimation = animator
 
     init {
         skeleton.setPosition(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2)
@@ -135,8 +137,8 @@ class PawnSkeleton(
         skeleton.setToSetupPose()
         skeleton.updateWorldTransform(Skeleton.Physics.update)
         skeletonRenderer.setPremultipliedAlpha(true)
-        animationState.setAnimation(0, Idle.capitalizedName, true)
         clean()
+        animator.idle()
     }
 
 
@@ -150,7 +152,7 @@ class PawnSkeleton(
         weaponSlots.values.forEach(PawnWeaponSlotData::remove)
     }
 
-    override fun setArmor(piece:ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
+    override fun setArmor(piece: ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
         groupedArmorSlots[piece]?.forEach { slotData ->
             val regionName = slotData.slotName.regionName(orientation)
             val regionAttachment = RegionAttachment(regionName)
@@ -267,15 +269,16 @@ class PawnSkeleton(
         }
     }
 
+    context(deltaTime: Float)
+    fun animate() {
+        animator.update(deltaTime)
+    }
 
     context(deltaTime: Float, batch: SpriteBatch)
     override fun render() {
         drawHairColor()
         drawSkinColor()
         drawUnderWearColor()
-        skeleton.updateWorldTransform(Skeleton.Physics.update)
-        animationState.update(deltaTime)
-        animationState.apply(skeleton)
         skeleton.updateWorldTransform(Skeleton.Physics.update)
         skeleton.update(deltaTime)
         skeletonRenderer.draw(batch, skeleton)
