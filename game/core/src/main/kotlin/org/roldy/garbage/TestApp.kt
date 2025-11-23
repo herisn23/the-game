@@ -15,9 +15,8 @@ import org.roldy.equipment.atlas.weapon.Wand
 import org.roldy.equipment.atlas.weapon.Weapons
 import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.PawnRenderer
-import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
-import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
-import org.roldy.pawn.skeleton.attribute.WeaponPawnSlot
+import org.roldy.pawn.skeleton.PawnSkeletonData
+import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.invoke
 
 class TestApp(
@@ -39,6 +38,8 @@ class TestApp(
     lateinit var shield: ShieldAtlas
 
     override fun create() {
+        default.create()
+
         armors = Armor.all
         weapons = Weapons.all
 
@@ -48,12 +49,13 @@ class TestApp(
         testBody = Body.Type6
         testEyesBrows = Eyebrows.Eyebrows13
         testMouth = Mouth.CreepySmile
-        testEars = Ears.Type10
+        testEars = Ears.Type6
 
         underwear = Underwear.FemaleUnderwearType2
         shield = Shield.CrusaderShield
-        default.create()
-        pawnRenderer = PawnRenderer()
+
+        pawnRenderer = PawnRenderer(PawnSkeletonData.create())
+
         font = BitmapFont()
     }
 
@@ -105,6 +107,13 @@ class TestApp(
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
             pawnRenderer.strip()
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            if (pawnRenderer.currentOrientation == Front) {
+                pawnRenderer.currentOrientation = Back
+            } else {
+                pawnRenderer.currentOrientation = Front
+            }
         }
     }
 

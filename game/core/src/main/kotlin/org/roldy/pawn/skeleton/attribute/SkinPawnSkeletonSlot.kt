@@ -12,8 +12,14 @@ abstract class SkinPawnSkeletonSlot(override val name: String) : PawnSkeletonSlo
     object LegRight : SkinPawnSkeletonSlot("legRight")
     object EarLeft : SkinPawnSkeletonSlot("earLeft")
     object EarRight : SkinPawnSkeletonSlot("earRight")
+    object FingersLeft : SkinPawnSkeletonSlot("fingersLeft")
+    object FingersRight : SkinPawnSkeletonSlot("fingersRight")
     companion object {
         val allParts: List<SkinPawnSkeletonSlot> =
-            listOf(Head, Body, ArmLeft, ArmRight, HandLeft, HandRight, LegLeft, LegRight, EarLeft, EarRight)
+            listOf(
+                Head, Body, ArmLeft, ArmRight, HandLeft,
+                HandRight, LegLeft, LegRight, EarLeft, EarRight,
+                FingersLeft, FingersRight
+            )
     }
 }

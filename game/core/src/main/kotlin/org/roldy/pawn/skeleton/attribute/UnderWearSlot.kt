@@ -2,10 +2,7 @@ package org.roldy.pawn.skeleton.attribute
 
 abstract class UnderWearSlot(name: String, val part: String) : SkinPawnSkeletonSlot("$name$part") {
     fun regionName(orientation: PawnSkeletonOrientation) =
-        when (orientation) {
-            Left, Right -> "left"
-            else -> orientation.name
-        }.let { "$it$part" }
+        "${orientation.name}$part"
 
     object Body : UnderWearSlot("underwear", "Body")
     object LegLeft : UnderWearSlot("underwear", "LegLeft")

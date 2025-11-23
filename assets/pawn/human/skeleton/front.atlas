@@ -84,10 +84,6 @@ front/mouth
 bounds:490,130,23,7
 offsets:36,29,96,64
 rotate:90
-front/shield/front
-bounds:547,441,80,120
-offsets:87,70,256,256
-rotate:90
 front/underwear/body
 bounds:456,155,113,41
 offsets:23,35,160,160
@@ -98,6 +94,10 @@ offsets:14,77,80,160
 front/underwear/legRight
 bounds:603,179,49,47
 offsets:16,77,80,160
+shield/front
+bounds:547,441,80,120
+offsets:87,70,256,256
+rotate:90
 weapon/default
 bounds:225,73,104,188
 offsets:85,75,256,512

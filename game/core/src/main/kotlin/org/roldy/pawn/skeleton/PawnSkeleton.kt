@@ -20,8 +20,32 @@ import org.roldy.pawn.skeleton.slot.PawnCustomizationSlotData
 import org.roldy.pawn.skeleton.slot.PawnUnderWearSlotData
 import org.roldy.pawn.skeleton.slot.PawnWeaponSlotData
 
+
+
+class PawnSkeletonData private constructor(
+    orientation: PawnSkeletonOrientation
+) {
+    val skeletonPath = "pawn/human/skeleton"
+    val textureAtlas by lazy {
+        TextureAtlas(loadAsset("$skeletonPath/${orientation.name}.atlas"))
+    }
+    val binarySkeleton: SkeletonBinary by lazy {
+        SkeletonBinary(textureAtlas)
+    }
+    val skeletonData: SkeletonData by lazy {
+        binarySkeleton.readSkeletonData(
+            loadAsset("$skeletonPath/${orientation.name}.skel")
+        )
+    }
+    companion object {
+        fun create() =
+            PawnSkeletonOrientation.all.associateWith(::PawnSkeletonData)
+    }
+}
+
 class PawnSkeleton(
     val orientation: PawnSkeletonOrientation,
+    private val pawnSkeletonData: PawnSkeletonData,
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
@@ -40,18 +64,17 @@ class PawnSkeleton(
     override var underwearColor = defaultUnderwearColor
 
     private var hiddenSlots: Map<CustomizablePawnSkinSlot, Boolean> = hiddenSlotsDefault
-    private val skeletonPath = "pawn/human/skeleton"
-    private val skeletonAtlas: TextureAtlas =
-        TextureAtlas(loadAsset("$skeletonPath/${orientation.name}.atlas"))
-    private val binarySkeleton: SkeletonBinary = SkeletonBinary(skeletonAtlas)
-    private val skeletonData: SkeletonData = binarySkeleton.readSkeletonData(
-        loadAsset("$skeletonPath/${orientation.name}.skel")
-    )
-    private val skeleton: Skeleton = Skeleton(skeletonData)
+
+
+    private val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData)
 
     private val skinSlots: Map<SkinPawnSkeletonSlot, Slot> by lazy {
         skeleton.run {
-            SkinPawnSkeletonSlot.allParts.associateWith { findSlot(it.capitalizedName) }
+            SkinPawnSkeletonSlot.allParts.mapNotNull {
+                findSlot(it.capitalizedName)?.run {
+                    it to this
+                }
+            }.toMap()
         }
     }
 
@@ -65,18 +88,20 @@ class PawnSkeleton(
     }
     private val customizableSlots: Map<CustomizablePawnSkinSlot, PawnCustomizationSlotData> by lazy {
         skeleton.run {
-            CustomizablePawnSkinSlot.allParts.associateWith {
-                val slot = findSlot(it.capitalizedName)
-                PawnCustomizationSlotData(slot, it, slot.attachment as RegionAttachment)
-            }
+            CustomizablePawnSkinSlot.allParts.mapNotNull {
+                findSlot(it.capitalizedName)?.let { slot ->
+                    it to PawnCustomizationSlotData(slot, it, slot.attachment as RegionAttachment)
+                }
+            }.toMap()
         }
     }
     private val groupedArmorSlots: Map<ArmorPawnSlot.Piece, List<PawnArmorSlotData>> by lazy {
         skeleton.run {
             ArmorPawnSlot.pieces.map { (piece, slots) ->
-                piece to slots.map { slotName ->
-                    val slot = findSlot(slotName.capitalizedName)
-                    PawnArmorSlotData(slot, slotName, slot.attachment as RegionAttachment)
+                piece to slots.mapNotNull { slotName ->
+                    findSlot(slotName.capitalizedName)?.let { slot ->
+                        PawnArmorSlotData(slot, slotName, slot.attachment as RegionAttachment)
+                    }
                 }
             }.toMap()
         }
@@ -97,7 +122,7 @@ class PawnSkeleton(
     }
 
     private val skeletonRenderer: SkeletonRenderer = SkeletonRenderer()
-    private val animationStateData: AnimationStateData = AnimationStateData(skeletonData)
+    private val animationStateData: AnimationStateData = AnimationStateData(pawnSkeletonData.skeletonData)
     private val animationState: AnimationState = AnimationState(animationStateData)
 
     init {
@@ -247,10 +272,6 @@ class PawnSkeleton(
         skeleton.updateWorldTransform(Skeleton.Physics.update)
         skeleton.update(deltaTime)
         skeletonRenderer.draw(batch, skeleton)
-    }
-
-    override fun dispose() {
-        skeletonAtlas.dispose()
     }
 }
 
