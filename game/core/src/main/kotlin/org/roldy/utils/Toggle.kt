@@ -1,5 +1,6 @@
 package org.roldy.utils
 
+import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
 
@@ -11,7 +12,9 @@ class Toggle(
         fun execute()
     }
 
-    private var state = false
+    private var state by Delegates.observable(false) { _, _, _ ->
+        resolve(onTrue, onFalse)
+    }
     val value get() = state
 
     operator fun invoke(onTrue: Executable, onFalse: Executable) {
@@ -27,13 +30,11 @@ class Toggle(
         }
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
-        return state
-    }
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean =
+        state
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) = {
         state = value
-        resolve(onTrue, onFalse)
     }
 
     operator fun invoke() {

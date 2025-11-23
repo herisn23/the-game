@@ -3,20 +3,20 @@ package org.roldy.garbage
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
-import org.roldy.equipment.atlas.weapon.Dagger
-import org.roldy.equipment.atlas.weapon.Shield
-import org.roldy.equipment.atlas.weapon.ShieldAtlas
-import org.roldy.equipment.atlas.weapon.Weapons
+import org.roldy.equipment.atlas.weapon.*
 import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.PawnRenderer
-import org.roldy.pawn.skeleton.attribute.*
+import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
+import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
+import org.roldy.pawn.skeleton.attribute.PawnSkeletonOrientation
+import org.roldy.pawn.skeleton.attribute.WeaponPawnSlot
 import org.roldy.utils.invoke
+import org.roldy.utils.sequencer
 import org.roldy.utils.toggle
 
 class TestApp(
@@ -41,7 +41,6 @@ class TestApp(
         shields = Shield.all
 
         pawnRenderer = PawnRenderer()
-        pawnRenderer.attackRightHand()
         font = BitmapFont()
     }
 
@@ -60,7 +59,7 @@ class TestApp(
         }
     }
 
-    var toggleGloves by toggle(
+    var toggleGloves = toggle(
         onTrue = {
             pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.NordicHunterArmorHeavy1)
         },
@@ -68,15 +67,35 @@ class TestApp(
             pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
         }
     )
-
+    val orientations = sequencer(PawnSkeletonOrientation.all)
+    val armorsSequencer by sequencer { armors }
+    val weaponSequencer by sequencer { Sword.all }
     fun test() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Body, Armor.NordicHunterArmorHeavy1)
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Legs, Armor.NordicHunterArmorHeavy1)
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Helmet, Armor.NordicHunterArmorHeavy1)
-            toggleGloves = !toggleGloves
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            armorsSequencer.next {
+                ArmorPawnSlot.Piece.entries.forEach { slot ->
+                    pawnRenderer.setArmor(slot, this)
+                }
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            armorsSequencer.prev {
+                ArmorPawnSlot.Piece.entries.forEach { slot ->
+                    pawnRenderer.setArmor(slot, this)
+                }
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            weaponSequencer.next {
+                pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            weaponSequencer.prev {
+                pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
             pawnRenderer.customize(CustomizablePawnSkinSlot.Hair, Hair.CasualMessy1)
             pawnRenderer.customize(CustomizablePawnSkinSlot.Beard, Beard.Type13)
             pawnRenderer.customize(CustomizablePawnSkinSlot.Eyes, Eyes.Girl03)
@@ -87,29 +106,14 @@ class TestApp(
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, Ears.Type5)
             pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Dagger.BronzeDagger)
 //            pawnRenderer.setShield(Shield.Bloodmoon)
-            pawnRenderer.setWeapon(WeaponPawnSlot.WeaponLeft, Dagger.AspenStake)
             pawnRenderer.setUnderwear(Underwear.FemaleUnderwearType1)
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            if (pawnRenderer.skinColor == Color.BLUE) {
-                pawnRenderer.skinColor = pawnRenderer.defaultSkinColor
-            } else {
-                pawnRenderer.skinColor = Color.BLUE
-            }
-            pawnRenderer.underwearColor = Color.GREEN
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            pawnRenderer.hairColor = Color.RED
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
             pawnRenderer.strip()
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            if (pawnRenderer.currentOrientation == Front) {
-                pawnRenderer.currentOrientation = Back
-            } else {
-                pawnRenderer.currentOrientation = Front
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+            orientations.next {
+                pawnRenderer.currentOrientation = this
             }
         }
     }
