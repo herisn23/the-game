@@ -38,6 +38,7 @@ class TestApp(
         shields = Shield.all
 
         pawnRenderer = PawnRenderer()
+        pawnRenderer.attackRightHand()
         font = BitmapFont()
     }
 
