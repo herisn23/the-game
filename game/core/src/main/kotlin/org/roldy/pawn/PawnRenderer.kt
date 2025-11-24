@@ -34,7 +34,7 @@ class PawnRenderer : ObjectRenderer,
                 defaultUnderWearColor
             )
         }.associateBy(PawnSkeleton::orientation)
-    var currentOrientation: PawnSkeletonOrientation = Front
+    var currentOrientation: PawnSkeletonOrientation = Left
 
     override fun setWeapon(
         slot: WeaponPawnSlot,

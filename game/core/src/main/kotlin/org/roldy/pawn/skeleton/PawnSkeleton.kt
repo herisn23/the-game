@@ -26,14 +26,14 @@ class PawnSkeletonData private constructor(
 ) {
     val skeletonPath = "pawn/human/skeleton"
     val textureAtlas by lazy {
-        TextureAtlas(loadAsset("$skeletonPath/${orientation.name}.atlas"))
+        TextureAtlas(loadAsset("$skeletonPath/${orientation.skeletonName}.atlas"))
     }
     val binarySkeleton: SkeletonBinary by lazy {
         SkeletonBinary(textureAtlas)
     }
     val skeletonData: SkeletonData by lazy {
         binarySkeleton.readSkeletonData(
-            loadAsset("$skeletonPath/${orientation.name}.skel")
+            loadAsset("$skeletonPath/${orientation.skeletonName}.skel")
         )
     }
 
@@ -68,7 +68,10 @@ class PawnSkeleton(
     private var hiddenSlots: Map<CustomizablePawnSkinSlot, Boolean> = hiddenSlotsDefault
 
 
-    private val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData)
+    private val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData).apply {
+        scaleX = orientation.scaleX
+        scaleY = orientation.scaleY
+    }
 
     private val skinSlots: Map<SkinPawnSkeletonSlot, Slot> by lazy {
         skeleton.run {
@@ -237,7 +240,7 @@ class PawnSkeleton(
         weaponSlots[WeaponPawnSlot.Shield]?.run {
             val regionAttachment = RegionAttachment(slotName.capitalizedName)
             val regionName = when (orientation) {
-                Right, Front -> "front"
+                Left, Front -> "front"
                 else -> "back"
             }
             regionAttachment.region = atlas.findRegion(regionName)

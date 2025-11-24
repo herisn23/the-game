@@ -11,10 +11,7 @@ import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.*
 import org.roldy.listener.DefaultApplicationListener
 import org.roldy.pawn.PawnRenderer
-import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
-import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
-import org.roldy.pawn.skeleton.attribute.PawnSkeletonOrientation
-import org.roldy.pawn.skeleton.attribute.WeaponPawnSlot
+import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.invoke
 import org.roldy.utils.sequencer
 import org.roldy.utils.toggle
@@ -71,26 +68,26 @@ class TestApp(
     val armorsSequencer by sequencer { armors }
     val weaponSequencer by sequencer { Sword.all }
     fun test() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             armorsSequencer.next {
                 ArmorPawnSlot.Piece.entries.forEach { slot ->
                     pawnRenderer.setArmor(slot, this)
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
             armorsSequencer.prev {
                 ArmorPawnSlot.Piece.entries.forEach { slot ->
                     pawnRenderer.setArmor(slot, this)
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             weaponSequencer.next {
                 pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             weaponSequencer.prev {
                 pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
             }
@@ -105,16 +102,23 @@ class TestApp(
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, Ears.Type2)
             pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, Ears.Type5)
             pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Dagger.BronzeDagger)
-//            pawnRenderer.setShield(Shield.Bloodmoon)
+            pawnRenderer.setShield(Shield.Bloodmoon)
             pawnRenderer.setUnderwear(Underwear.FemaleUnderwearType1)
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             pawnRenderer.strip()
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            orientations.next {
-                pawnRenderer.currentOrientation = this
-            }
+            pawnRenderer.currentOrientation = Back
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            pawnRenderer.currentOrientation = Left
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            pawnRenderer.currentOrientation = Right
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+            pawnRenderer.currentOrientation = Front
         }
     }
 
