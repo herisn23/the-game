@@ -4,7 +4,12 @@ import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.utils.viewport.FitViewport
+import org.roldy.asset.loadAsset
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
@@ -28,10 +33,14 @@ class TestApp(
     lateinit var customizations: List<CustomizationAtlas>
     lateinit var underwears: List<UnderWearAtlas>
     lateinit var shields: List<ShieldAtlas>
+    lateinit var bg: Sprite
+
+    lateinit var uiCamera: OrthographicCamera
+    lateinit var uiViewport: FitViewport
 
     class MyInputProcessor(val app: TestApp) : InputAdapter() {
         var lastKeycode: Int = 0
-        val speed = 2f
+        val speed = 5f
         val keyActions = mapOf(
             Input.Keys.W to (
                     {
@@ -77,8 +86,17 @@ class TestApp(
         }
     }
 
+    override fun resize(width: Int, height: Int) {
+        default.resize(width, height)
+        uiViewport.update(width, height, true)
+    }
+
     override fun create() {
         default.create()
+        default.camera.zoom = 3f
+        uiCamera = OrthographicCamera()
+        uiViewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), uiCamera)
+        bg = Sprite(Texture(loadAsset("test-bg.jpg")))
         Gdx.input.inputProcessor = MyInputProcessor(this)
         armors = Armor.all
         weapons = Weapons.all
@@ -95,17 +113,22 @@ class TestApp(
     }
 
     override fun render() {
+        default.camera.position.set(pawnManager.x, pawnManager.y, 0f)
+        default.camera.update()
         val delta = Gdx.graphics.deltaTime
         default.render()
         test()
         default.batch {
             context(delta, this) {
+                bg.draw(this)
                 pawnManager.render()
             }
-
-            font.draw(default.batch, "FPS: ${Gdx.graphics.framesPerSecond}", 10f, Gdx.graphics.height - 10f)
-            font.draw(default.batch, "Delta: ${Gdx.graphics.deltaTime}", 10f, Gdx.graphics.height - 30f)
-            font.draw(default.batch, "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB", 10f, Gdx.graphics.height - 50f)
+        }
+        default.batch.projectionMatrix = uiCamera.combined
+        default.batch {
+            font.draw(this, "FPS: ${Gdx.graphics.framesPerSecond}", 10f, Gdx.graphics.height - 10f)
+            font.draw(this, "Delta: ${Gdx.graphics.deltaTime}", 10f, Gdx.graphics.height - 30f)
+            font.draw(this, "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB", 10f, Gdx.graphics.height - 50f)
         }
     }
 

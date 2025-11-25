@@ -16,7 +16,7 @@ import kotlin.properties.Delegates
 /**
  * Utility object for pawn movement calculations.
  */
-object PawnMath {
+object PawnManagerMath {
     /** Base movement speed in pixels per second when animation speed is 1.0 */
     val baseSpeed = 100f
 
@@ -55,6 +55,14 @@ class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
 
     /** Public read-only access to movement state */
     val isMoving get() = moving
+
+    /** Current X position of all skeletons */
+    val x: Float
+        get() = skeletons[currentOrientation]?.skeleton?.x ?: 0f
+
+    /** Current Y position of all skeletons */
+    val y: Float
+        get() = skeletons[currentOrientation]?.skeleton?.y ?: 0f
 
     /** Current movement speed multiplier (synced with animation speed) */
     private var movementSpeed = 1f
@@ -358,7 +366,7 @@ class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
      */
     context(deltaTime: Float)
     private fun move() {
-        val speed = PawnMath.calcMovementSpeed(movementSpeed) * deltaTime
+        val speed = PawnManagerMath.calcMovementSpeed(movementSpeed) * deltaTime
 
         when (currentOrientation) {
             Back -> {

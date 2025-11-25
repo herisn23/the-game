@@ -3,6 +3,7 @@ package org.roldy.listener
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -10,8 +11,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 class DefaultApplicationListener : ApplicationAdapter() {
     lateinit var viewport: FitViewport
     lateinit var batch: SpriteBatch
+    lateinit var camera: OrthographicCamera
     override fun create() {
-        viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        camera = OrthographicCamera()
+        viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
         batch = SpriteBatch()
     }
 
