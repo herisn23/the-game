@@ -3,18 +3,20 @@ package org.roldy.pawn
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.ObjectRenderer
+import org.roldy.animation.AnimationTypeEventListenerHandler
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
 import org.roldy.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.equipment.atlas.weapon.WeaponRegion
 import org.roldy.pawn.skeleton.PawnAnimation
+import org.roldy.pawn.skeleton.PawnAnimator
 import org.roldy.pawn.skeleton.PawnSkeleton
 import org.roldy.pawn.skeleton.PawnSkeletonData
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer : ObjectRenderer,
+class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRenderer,
     ArmorWearer,
     Customizable,
     Strippable,
@@ -35,6 +37,17 @@ class PawnRenderer : ObjectRenderer,
             )
         }.associateBy(PawnSkeleton::orientation)
     var currentOrientation: PawnSkeletonOrientation = Front
+
+
+    init {
+        skeletons.values.forEach { skel ->
+            skel.animator.addEventListener(Slash1H) { origin, ev ->
+                if (origin.pawn.orientation == currentOrientation) {
+                    this.propagate(origin, ev)
+                }
+            }
+        }
+    }
 
     override fun setWeapon(
         slot: WeaponPawnSlot,
@@ -138,9 +151,9 @@ class PawnRenderer : ObjectRenderer,
 
     //animations
     override fun idle() {
-       skeletons.forEach { (_, skel) ->
-           skel.animation.idle()
-       }
+        skeletons.forEach { (_, skel) ->
+            skel.animation.idle()
+        }
     }
 
     override fun slash1H() {

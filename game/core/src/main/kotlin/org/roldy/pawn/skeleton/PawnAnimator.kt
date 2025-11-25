@@ -2,14 +2,16 @@ package org.roldy.pawn.skeleton
 
 import com.esotericsoftware.spine.AnimationState
 import com.esotericsoftware.spine.AnimationStateData
-import com.esotericsoftware.spine.Skeleton
+import org.roldy.animation.AnimationTypeEventListenerHandler
+import org.roldy.animation.add
+import org.roldy.animation.listener
 import org.roldy.pawn.skeleton.attribute.Idle
 import org.roldy.pawn.skeleton.attribute.Slash1H
 
 class PawnAnimator(
     private val stateData: AnimationStateData,
-    private val skeleton: Skeleton
-) : PawnAnimation {
+    internal val pawn: PawnSkeleton
+) : AnimationTypeEventListenerHandler<PawnAnimator>(), PawnAnimation {
     val state = AnimationState(stateData)
 
     init {
@@ -18,11 +20,16 @@ class PawnAnimator(
         stateData.setMix(Slash1H.name, Idle.name, 0.1f)
         stateData.defaultMix = 0.2f
 
-        state.addListener(onComplete {
-            if (animation.name == Slash1H.name) {
-                idle()
+        state add listener(
+            complete = {
+                if (animation.name == Slash1H.name) {
+                    idle()
+                }
+            },
+            event = { ev ->
+                propagate(this@PawnAnimator, ev)
             }
-        })
+        )
     }
 
     override fun idle() {
@@ -36,14 +43,6 @@ class PawnAnimator(
 
     fun update(deltaTime: Float) {
         state.update(deltaTime)
-        state.apply(skeleton)
+        state.apply(pawn.skeleton)
     }
-
-    private fun onComplete(callback: AnimationState.TrackEntry.() -> Unit) =
-        object : AnimationState.AnimationStateAdapter() {
-            override fun complete(entry: AnimationState.TrackEntry) {
-                entry.callback()
-            }
-        }
-
 }

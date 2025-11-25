@@ -68,7 +68,7 @@ class PawnSkeleton(
     private var hiddenSlots: Map<CustomizablePawnSkinSlot, Boolean> = hiddenSlotsDefault
 
 
-    private val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData).apply {
+    internal val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData).apply {
         scaleX = orientation.scaleX
         scaleY = orientation.scaleY
     }
@@ -128,7 +128,7 @@ class PawnSkeleton(
 
     private val skeletonRenderer: SkeletonRenderer = SkeletonRenderer()
     private val animationStateData: AnimationStateData = AnimationStateData(pawnSkeletonData.skeletonData)
-    private val animator: PawnAnimator = PawnAnimator(animationStateData, skeleton)
+    val animator: PawnAnimator = PawnAnimator(animationStateData, this)
 
     val animation: PawnAnimation = animator
 

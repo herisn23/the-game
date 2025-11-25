@@ -1,6 +1,8 @@
 package org.roldy.pawn.skeleton.attribute
 
-abstract class PawnAnimation(override val name: String) : NamedAttribute()
+import org.roldy.animation.AnimationType
 
-object Idle : PawnAnimation("idle")
-object Slash1H : PawnAnimation("slash1H")
+abstract class PawnAnimationType(override val name: String) : AnimationType(name)
+
+object Idle : PawnAnimationType("idle")
+object Slash1H : PawnAnimationType("slash1H")

@@ -37,7 +37,11 @@ class TestApp(
         underwears = Underwear.all
         shields = Shield.all
 
-        pawnRenderer = PawnRenderer()
+        pawnRenderer = PawnRenderer().apply {
+            addEventListener(Slash1H) {_, _->
+                println("hit")
+            }
+        }
         font = BitmapFont()
     }
 
