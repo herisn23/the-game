@@ -38,7 +38,6 @@ class TestApp(
         shields = Shield.all
 
         pawnRenderer = PawnRenderer()
-        pawnRenderer.attackRightHand()
         font = BitmapFont()
     }
 
@@ -120,6 +119,9 @@ class TestApp(
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
             pawnRenderer.currentOrientation = Front
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            pawnRenderer.slash1H()
         }
     }
 

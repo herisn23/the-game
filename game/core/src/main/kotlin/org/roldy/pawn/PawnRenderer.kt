@@ -34,7 +34,7 @@ class PawnRenderer : ObjectRenderer,
                 defaultUnderWearColor
             )
         }.associateBy(PawnSkeleton::orientation)
-    var currentOrientation: PawnSkeletonOrientation = Left
+    var currentOrientation: PawnSkeletonOrientation = Front
 
     override fun setWeapon(
         slot: WeaponPawnSlot,
@@ -143,9 +143,9 @@ class PawnRenderer : ObjectRenderer,
        }
     }
 
-    override fun attackRightHand() {
+    override fun slash1H() {
         skeletons.forEach { (_, skel) ->
-            skel.animation.attackRightHand()
+            skel.animation.slash1H()
         }
     }
 }

@@ -128,7 +128,7 @@ class PawnSkeleton(
 
     private val skeletonRenderer: SkeletonRenderer = SkeletonRenderer()
     private val animationStateData: AnimationStateData = AnimationStateData(pawnSkeletonData.skeletonData)
-    private val animator: PawnAnimator = PawnAnimator(AnimationState(animationStateData), skeleton)
+    private val animator: PawnAnimator = PawnAnimator(animationStateData, skeleton)
 
     val animation: PawnAnimation = animator
 
