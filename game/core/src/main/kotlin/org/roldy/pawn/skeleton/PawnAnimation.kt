@@ -2,7 +2,7 @@ package org.roldy.pawn.skeleton
 
 interface PawnAnimation {
     fun idle()
-    fun slash1H()
-    fun walk()
+    fun slash1H(speed: Float)
+    fun walk(speed: Float)
     fun stop()
 }

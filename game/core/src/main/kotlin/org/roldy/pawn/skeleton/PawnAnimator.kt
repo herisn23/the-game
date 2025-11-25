@@ -18,6 +18,7 @@ class PawnAnimator(
     val slashTrack = 3       // Slash/attack layer (highest priority)
 
     val state = AnimationState(stateData)
+
     init {
         //init animation blending
         stateData.setMix(Idle.name, WalkU.name, 0.2f);
@@ -48,21 +49,21 @@ class PawnAnimator(
         state.setAnimation(idleTrack, Idle.name, true)
     }
 
-    override fun slash1H() {
+    override fun slash1H(speed:Float) {
         state.setAnimation(slashTrack, Slash1H.name, false).apply {
-            timeScale = 2f
+            timeScale = speed
         }
     }
 
-    override fun walk() {
+    override fun walk(speed: Float) {
         // Clear idle since we're moving
         state.clearTrack(idleTrack)
         // Set both leg and upper body walk animations
         state.setAnimation(walkLTrack, WalkL.name, true).apply {
-            timeScale = 2f
+            timeScale = speed
         }
         state.setAnimation(walkUTrack, WalkU.name, true).apply {
-            timeScale = 2f
+            timeScale = speed
         }
     }
 
@@ -75,7 +76,7 @@ class PawnAnimator(
         pawn.skeleton.findBone(PawnBodySkeletonSlot.LegLeft.name)?.setToSetupPose()  // Use your actual bone names
         pawn.skeleton.findBone(PawnBodySkeletonSlot.LegRight.name)?.setToSetupPose()
         // Switch to idle animation
-       idle()
+        idle()
     }
 
     fun update(deltaTime: Float) {
