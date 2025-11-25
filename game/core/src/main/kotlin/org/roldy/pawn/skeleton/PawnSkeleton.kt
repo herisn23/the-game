@@ -54,9 +54,9 @@ class PawnSkeleton(
 ) : ObjectRenderer, ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
-            CustomizablePawnSkinSlot.Hair to false,
-            CustomizablePawnSkinSlot.EarLeft to false,
-            CustomizablePawnSkinSlot.EarRight to false
+            CustomizablePawnSlotBody.Hair to false,
+            CustomizablePawnSlotBody.EarLeft to false,
+            CustomizablePawnSlotBody.EarRight to false
 
         )
     }
@@ -65,7 +65,7 @@ class PawnSkeleton(
     override var hairColor = defaultHairColor
     override var underwearColor = defaultUnderwearColor
 
-    private var hiddenSlots: Map<CustomizablePawnSkinSlot, Boolean> = hiddenSlotsDefault
+    private var hiddenSlots: Map<CustomizablePawnSlotBody, Boolean> = hiddenSlotsDefault
 
 
     internal val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData).apply {
@@ -73,9 +73,9 @@ class PawnSkeleton(
         scaleY = orientation.scaleY
     }
 
-    private val skinSlots: Map<SkinPawnSkeletonSlot, Slot> by lazy {
+    private val skinSlots: Map<PawnBodySkeletonSlot, Slot> by lazy {
         skeleton.run {
-            SkinPawnSkeletonSlot.allParts.mapNotNull {
+            PawnBodySkeletonSlot.allParts.mapNotNull {
                 findSlot(it.capitalizedName)?.run {
                     it to this
                 }
@@ -83,26 +83,26 @@ class PawnSkeleton(
         }
     }
 
-    private val underwearSlots: Map<UnderWearSlot, PawnUnderWearSlotData> by lazy {
+    private val underwearSlots: Map<UnderWearSlotBody, PawnUnderWearSlotData> by lazy {
         skeleton.run {
-            UnderWearSlot.allParts.associateWith {
+            UnderWearSlotBody.allParts.associateWith {
                 val slot = findSlot(it.capitalizedName)
                 PawnUnderWearSlotData(slot, it, slot.attachment as RegionAttachment)
             }
         }
     }
-    private val customizableSlots: Map<CustomizablePawnSkinSlot, PawnCustomizationSlotData> by lazy {
+    private val customizableSlots: Map<CustomizablePawnSlotBody, PawnCustomizationSlotData> by lazy {
         skeleton.run {
-            CustomizablePawnSkinSlot.allParts.mapNotNull {
+            CustomizablePawnSlotBody.allParts.mapNotNull {
                 findSlot(it.capitalizedName)?.let { slot ->
                     it to PawnCustomizationSlotData(slot, it, slot.attachment as RegionAttachment)
                 }
             }.toMap()
         }
     }
-    private val groupedArmorSlots: Map<ArmorPawnSlot.Piece, List<PawnArmorSlotData>> by lazy {
+    private val groupedArmorSlots: Map<PawnArmorSlot.Piece, List<PawnArmorSlotData>> by lazy {
         skeleton.run {
-            ArmorPawnSlot.pieces.map { (piece, slots) ->
+            PawnArmorSlot.pieces.map { (piece, slots) ->
                 piece to slots.mapNotNull { slotName ->
                     findSlot(slotName.capitalizedName)?.let { slot ->
                         PawnArmorSlotData(slot, slotName, slot.attachment as RegionAttachment)
@@ -111,7 +111,7 @@ class PawnSkeleton(
             }.toMap()
         }
     }
-    private val armorSlots: Map<ArmorPawnSlot, PawnArmorSlotData> by lazy {
+    private val armorSlots: Map<PawnArmorSlot, PawnArmorSlotData> by lazy {
         groupedArmorSlots.map { (pawnSlot, slots) ->
             slots
         }.flatten().associateBy { it.slotName }
@@ -119,7 +119,7 @@ class PawnSkeleton(
 
     private val weaponSlots by lazy {
         skeleton.run {
-            WeaponPawnSlot.all.associateWith { slotName ->
+            PawnWeaponSlot.all.associateWith { slotName ->
                 val slot = findSlot(slotName.capitalizedName)
                 PawnWeaponSlotData(slot, slotName, slot.attachment as RegionAttachment)
             }
@@ -155,7 +155,7 @@ class PawnSkeleton(
         weaponSlots.values.forEach(PawnWeaponSlotData::remove)
     }
 
-    override fun setArmor(piece: ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
+    override fun setArmor(piece: PawnArmorSlot.Piece, atlasData: ArmorAtlas) {
         groupedArmorSlots[piece]?.forEach { slotData ->
             val regionName = slotData.slotName.regionName(orientation)
             val regionAttachment = RegionAttachment(regionName)
@@ -166,11 +166,11 @@ class PawnSkeleton(
         }
     }
 
-    override fun removeArmor(slot: ArmorPawnSlot) {
+    override fun removeArmor(slot: PawnArmorSlot) {
         armorSlots[slot]?.remove()
     }
 
-    override fun setWeapon(slot: WeaponPawnSlot, region: WeaponRegion) {
+    override fun setWeapon(slot: PawnWeaponSlot, region: WeaponRegion) {
         weaponSlots[slot]?.let { slotData ->
             val regionAttachment = RegionAttachment(region.name)
             regionAttachment.region = region.region
@@ -178,13 +178,13 @@ class PawnSkeleton(
         }
     }
 
-    override fun removeWeapon(slot: WeaponPawnSlot) {
+    override fun removeWeapon(slot: PawnWeaponSlot) {
         weaponSlots[slot]?.remove()
     }
 
-    private fun hideHidableSlots(armorSlot: ArmorPawnSlot) {
-        val piece = ArmorPawnSlot.slotPiece.getValue(armorSlot)
-        CustomizablePawnSkinSlot.hideableSlotsByArmor[piece]?.forEach { slot ->
+    private fun hideHidableSlots(armorSlot: PawnArmorSlot) {
+        val piece = PawnArmorSlot.slotPiece.getValue(armorSlot)
+        CustomizablePawnSlotBody.hideableSlotsByArmor[piece]?.forEach { slot ->
             val hidden = hiddenSlots.getValue(slot)
             customizableSlots[slot]?.let { data ->
                 if (hidden) {
@@ -204,7 +204,7 @@ class PawnSkeleton(
         }
     }
 
-    override fun customize(slot: CustomizablePawnSkinSlot, atlasData: CustomizationAtlas) {
+    override fun customize(slot: CustomizablePawnSlotBody, atlasData: CustomizationAtlas) {
         customizableSlots[slot]?.let { slotData ->
             val currentAttachment = slotData.slot.attachment
             val regionAttachment = RegionAttachment(slotData.slotName.capitalizedName)
@@ -218,7 +218,7 @@ class PawnSkeleton(
 
     }
 
-    override fun removeCustomization(slot: CustomizablePawnSkinSlot) {
+    override fun removeCustomization(slot: CustomizablePawnSlotBody) {
         customizableSlots[slot]?.remove()
     }
 
@@ -237,7 +237,7 @@ class PawnSkeleton(
     }
 
     override fun setShield(atlas: ShieldAtlas) {
-        weaponSlots[WeaponPawnSlot.Shield]?.run {
+        weaponSlots[PawnWeaponSlot.Shield]?.run {
             val regionAttachment = RegionAttachment(slotName.capitalizedName)
             val regionName = when (orientation) {
                 Left, Front -> "front"
@@ -249,11 +249,11 @@ class PawnSkeleton(
     }
 
     override fun removeShield() {
-        weaponSlots[WeaponPawnSlot.Shield]?.remove()
+        weaponSlots[PawnWeaponSlot.Shield]?.remove()
     }
 
     private fun drawHairColor() {
-        CustomizablePawnSkinSlot.hairSlots.forEach {
+        CustomizablePawnSlotBody.hairSlots.forEach {
             customizableSlots[it]?.apply {
                 slot.color.set(hairColor)
             }

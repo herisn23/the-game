@@ -3,10 +3,10 @@ package org.roldy.pawn.skeleton.attribute
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import java.util.Locale.getDefault
 
-abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSkeletonSlot(name) {
+abstract class CustomizablePawnSlotBody(override val name: String) : PawnBodySkeletonSlot(name) {
     abstract fun findRegion(orientation: PawnSkeletonOrientation, atlas: TextureAtlas): TextureAtlas.AtlasRegion
 
-    abstract class NonPairSlot(override val name: String) : CustomizablePawnSkinSlot(name) {
+    abstract class NonPairSlotBody(override val name: String) : CustomizablePawnSlotBody(name) {
         fun regionName(orientation: PawnSkeletonOrientation) =
             orientation.capitalizedName
 
@@ -15,20 +15,20 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
     }
 
 
-    object Head : NonPairSlot("head") {
+    object Head : NonPairSlotBody("head") {
         override fun findRegion(orientation: PawnSkeletonOrientation, atlas: TextureAtlas): TextureAtlas.AtlasRegion =
             regionName(orientation).let {
                 atlas.findRegion("${it}Head")
             }
     }
 
-    object Eyes : NonPairSlot("eyes")
-    object Hair : NonPairSlot("hair")
-    object EyeBrows : NonPairSlot("eyebrows")
-    object Beard : NonPairSlot("beard")
-    object Mouth : NonPairSlot("mouth")
+    object Eyes : NonPairSlotBody("eyes")
+    object Hair : NonPairSlotBody("hair")
+    object EyeBrows : NonPairSlotBody("eyebrows")
+    object Beard : NonPairSlotBody("beard")
+    object Mouth : NonPairSlotBody("mouth")
 
-    abstract class Ear(name: String) : CustomizablePawnSkinSlot(name) {
+    abstract class Ear(name: String) : CustomizablePawnSlotBody(name) {
         fun regionName(orientation: PawnSkeletonOrientation, direction: String): String =
             when (orientation) {
                 Left, Right -> direction
@@ -60,7 +60,7 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
     }
 
     companion object {
-        val allParts: List<CustomizablePawnSkinSlot> by lazy {
+        val allParts: List<CustomizablePawnSlotBody> by lazy {
             listOf(
                 Head, Hair, Eyes, EyeBrows, Beard, Mouth, EarLeft, EarRight
             )
@@ -68,9 +68,9 @@ abstract class CustomizablePawnSkinSlot(override val name: String) : SkinPawnSke
         val hairSlots by lazy {
             listOf(Hair, Beard)
         }
-        val hideableSlotsByArmor: Map<ArmorPawnSlot.Piece, List<CustomizablePawnSkinSlot>> by lazy {
+        val hideableSlotsByArmor: Map<PawnArmorSlot.Piece, List<CustomizablePawnSlotBody>> by lazy {
             mapOf(
-                ArmorPawnSlot.Piece.Helmet to listOf(
+                PawnArmorSlot.Piece.Helmet to listOf(
                     Hair, EarLeft, EarRight
                 )
             )

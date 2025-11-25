@@ -4,11 +4,11 @@ import com.esotericsoftware.spine.Slot
 import com.esotericsoftware.spine.attachments.RegionAttachment
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.pawn.skeleton.PawnSkeleton.Companion.hiddenSlotsDefault
-import org.roldy.pawn.skeleton.attribute.ArmorPawnSlot
-import org.roldy.pawn.skeleton.attribute.CustomizablePawnSkinSlot
+import org.roldy.pawn.skeleton.attribute.CustomizablePawnSlotBody
+import org.roldy.pawn.skeleton.attribute.PawnArmorSlot
 
-class PawnArmorSlotData(slot: Slot, slotName: ArmorPawnSlot, originAttachment: RegionAttachment) :
-    PawnSlotData<ArmorPawnSlot>(slot, slotName, originAttachment) {
+class PawnArmorSlotData(slot: Slot, slotName: PawnArmorSlot, originAttachment: RegionAttachment) :
+    PawnSlotData<PawnArmorSlot>(slot, slotName, originAttachment) {
     val hiddenSlotsState = hiddenSlotsDefault.toMutableMap()
 
     fun update(attachment: RegionAttachment, data: ArmorAtlas) {
@@ -21,12 +21,12 @@ class PawnArmorSlotData(slot: Slot, slotName: ArmorPawnSlot, originAttachment: R
         meta.flags.forEach { (key, value) ->
             when (key) {
                 "showEars" -> {
-                    hiddenSlotsState[CustomizablePawnSkinSlot.EarLeft] = !value
-                    hiddenSlotsState[CustomizablePawnSkinSlot.EarRight] = !value
+                    hiddenSlotsState[CustomizablePawnSlotBody.EarLeft] = !value
+                    hiddenSlotsState[CustomizablePawnSlotBody.EarRight] = !value
                 }
 
                 "showHair" -> {
-                    hiddenSlotsState[CustomizablePawnSkinSlot.Hair] = !value
+                    hiddenSlotsState[CustomizablePawnSlotBody.Hair] = !value
                 }
             }
         }

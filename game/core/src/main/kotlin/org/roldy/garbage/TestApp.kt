@@ -11,7 +11,7 @@ import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.*
 import org.roldy.listener.DefaultApplicationListener
-import org.roldy.pawn.PawnRenderer
+import org.roldy.pawn.PawnPresenter
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.invoke
 import org.roldy.utils.sequencer
@@ -20,7 +20,7 @@ import org.roldy.utils.toggle
 class TestApp(
     private val default: DefaultApplicationListener = DefaultApplicationListener()
 ) : ApplicationListener by default {
-    private lateinit var pawnRenderer: PawnRenderer
+    private lateinit var pawnPresenter: PawnPresenter
     private lateinit var font: BitmapFont
 
     lateinit var weapons: List<EquipmentAtlas>
@@ -34,31 +34,31 @@ class TestApp(
         val keyActions = mapOf(
             Input.Keys.W to (
                     {
-                        app.pawnRenderer.currentOrientation = Back
-                        app.pawnRenderer.walk()
+                        app.pawnPresenter.currentOrientation = Back
+                        app.pawnPresenter.walk()
                     } to {
-                        app.pawnRenderer.stop()
+                        app.pawnPresenter.stop()
                     }),
             Input.Keys.A to (
                     {
-                        app.pawnRenderer.currentOrientation = Left
-                        app.pawnRenderer.walk()
+                        app.pawnPresenter.currentOrientation = Left
+                        app.pawnPresenter.walk()
                     } to {
-                        app.pawnRenderer.stop()
+                        app.pawnPresenter.stop()
                     }),
             Input.Keys.S to (
                     {
-                        app.pawnRenderer.currentOrientation = Front
-                        app.pawnRenderer.walk()
+                        app.pawnPresenter.currentOrientation = Front
+                        app.pawnPresenter.walk()
                     } to {
-                        app.pawnRenderer.stop()
+                        app.pawnPresenter.stop()
                     }),
             Input.Keys.D to (
                     {
-                        app.pawnRenderer.currentOrientation = Right
-                        app.pawnRenderer.walk()
+                        app.pawnPresenter.currentOrientation = Right
+                        app.pawnPresenter.walk()
                     } to {
-                        app.pawnRenderer.stop()
+                        app.pawnPresenter.stop()
                     }
                     )
         )
@@ -85,7 +85,7 @@ class TestApp(
         underwears = Underwear.all
         shields = Shield.all
 
-        pawnRenderer = PawnRenderer().apply {
+        pawnPresenter = PawnPresenter().apply {
             addEventListener(Slash1H) { _, _ ->
                 println("hit")
             }
@@ -99,7 +99,7 @@ class TestApp(
         test()
         default.batch {
             context(delta, this) {
-                pawnRenderer.render()
+                pawnPresenter.render()
             }
 
             font.draw(default.batch, "FPS: ${Gdx.graphics.framesPerSecond}", 10f, Gdx.graphics.height - 10f)
@@ -110,10 +110,10 @@ class TestApp(
 
     var toggleGloves = toggle(
         onTrue = {
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.NordicHunterArmorHeavy1)
+            pawnPresenter.setArmor(PawnArmorSlot.Piece.Gloves, Armor.NordicHunterArmorHeavy1)
         },
         onFalse = {
-            pawnRenderer.setArmor(ArmorPawnSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
+            pawnPresenter.setArmor(PawnArmorSlot.Piece.Gloves, Armor.RoyalArcherTunic1)
         }
     )
     val orientations = sequencer(PawnSkeletonOrientation.all)
@@ -122,51 +122,51 @@ class TestApp(
     fun test() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             armorsSequencer.next {
-                ArmorPawnSlot.Piece.entries.forEach { slot ->
-                    pawnRenderer.setArmor(slot, this)
+                PawnArmorSlot.Piece.entries.forEach { slot ->
+                    pawnPresenter.setArmor(slot, this)
                 }
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
             armorsSequencer.prev {
-                ArmorPawnSlot.Piece.entries.forEach { slot ->
-                    pawnRenderer.setArmor(slot, this)
+                PawnArmorSlot.Piece.entries.forEach { slot ->
+                    pawnPresenter.setArmor(slot, this)
                 }
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             weaponSequencer.next {
-                pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
+                pawnPresenter.setWeapon(PawnWeaponSlot.WeaponRight, this)
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             weaponSequencer.prev {
-                pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, this)
+                pawnPresenter.setWeapon(PawnWeaponSlot.WeaponRight, this)
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Hair, Hair.CasualMessy1)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Beard, Beard.Type13)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Eyes, Eyes.Girl03)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Head, Body.Type7)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EyeBrows, Eyebrows.Eyebrows15)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.Mouth, Mouth.Mouth09)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EarLeft, Ears.Type2)
-            pawnRenderer.customize(CustomizablePawnSkinSlot.EarRight, Ears.Type5)
-            pawnRenderer.setWeapon(WeaponPawnSlot.WeaponRight, Dagger.BronzeDagger)
-            pawnRenderer.setShield(Shield.Bloodmoon)
-            pawnRenderer.setUnderwear(Underwear.FemaleUnderwearType1)
+            pawnPresenter.customize(CustomizablePawnSlotBody.Hair, Hair.CasualMessy1)
+            pawnPresenter.customize(CustomizablePawnSlotBody.Beard, Beard.Type13)
+            pawnPresenter.customize(CustomizablePawnSlotBody.Eyes, Eyes.Girl03)
+            pawnPresenter.customize(CustomizablePawnSlotBody.Head, Body.Type7)
+            pawnPresenter.customize(CustomizablePawnSlotBody.EyeBrows, Eyebrows.Eyebrows15)
+            pawnPresenter.customize(CustomizablePawnSlotBody.Mouth, Mouth.Mouth09)
+            pawnPresenter.customize(CustomizablePawnSlotBody.EarLeft, Ears.Type2)
+            pawnPresenter.customize(CustomizablePawnSlotBody.EarRight, Ears.Type5)
+            pawnPresenter.setWeapon(PawnWeaponSlot.WeaponRight, Dagger.BronzeDagger)
+            pawnPresenter.setShield(Shield.Bloodmoon)
+            pawnPresenter.setUnderwear(Underwear.FemaleUnderwearType1)
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            pawnRenderer.strip()
+            pawnPresenter.strip()
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            pawnRenderer.slash1H()
+            pawnPresenter.slash1H()
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            pawnRenderer.strip()
+            pawnPresenter.strip()
         }
     }
 
@@ -176,6 +176,6 @@ class TestApp(
         customizations.forEach(CustomizationAtlas::dispose)
         underwears.forEach(UnderWearAtlas::dispose)
         shields.forEach(ShieldAtlas::dispose)
-        pawnRenderer.dispose()
+        pawnPresenter.dispose()
     }
 }

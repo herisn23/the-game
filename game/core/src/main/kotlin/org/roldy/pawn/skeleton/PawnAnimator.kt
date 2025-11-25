@@ -5,10 +5,7 @@ import com.esotericsoftware.spine.AnimationStateData
 import org.roldy.animation.AnimationTypeEventListenerHandler
 import org.roldy.animation.add
 import org.roldy.animation.listener
-import org.roldy.pawn.skeleton.attribute.Idle
-import org.roldy.pawn.skeleton.attribute.Slash1H
-import org.roldy.pawn.skeleton.attribute.WalkL
-import org.roldy.pawn.skeleton.attribute.WalkU
+import org.roldy.pawn.skeleton.attribute.*
 
 class PawnAnimator(
     private val stateData: AnimationStateData,
@@ -70,9 +67,15 @@ class PawnAnimator(
     }
 
     override fun stop() {
-        state.clearTracks()
-        pawn.skeleton.setBonesToSetupPose()
-        idle()
+        // Clear walk tracks
+        state.clearTrack(walkLTrack)
+        state.clearTrack(walkUTrack)
+
+        // Reset only leg bones to setup pose
+        pawn.skeleton.findBone(PawnBodySkeletonSlot.LegLeft.name)?.setToSetupPose()  // Use your actual bone names
+        pawn.skeleton.findBone(PawnBodySkeletonSlot.LegRight.name)?.setToSetupPose()
+        // Switch to idle animation
+       idle()
     }
 
     fun update(deltaTime: Float) {

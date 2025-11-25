@@ -16,7 +16,7 @@ import org.roldy.pawn.skeleton.PawnSkeletonData
 import org.roldy.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates
 
-class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRenderer,
+class PawnPresenter : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRenderer,
     ArmorWearer,
     Customizable,
     Strippable,
@@ -27,10 +27,10 @@ class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRe
     val defaultHairColor: Color = Color.BROWN
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
     val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> =
-        PawnSkeletonOrientation.all.map {
+        PawnSkeletonOrientation.Companion.all.map {
             PawnSkeleton(
                 it,
-                PawnSkeletonData.instance.getValue(it),
+                PawnSkeletonData.Companion.instance.getValue(it),
                 defaultSkinColor,
                 defaultHairColor,
                 defaultUnderWearColor
@@ -50,7 +50,7 @@ class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRe
     }
 
     override fun setWeapon(
-        slot: WeaponPawnSlot,
+        slot: PawnWeaponSlot,
         region: WeaponRegion
     ) {
         skeletons.forEach { (_, skel) ->
@@ -58,26 +58,26 @@ class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRe
         }
     }
 
-    override fun removeWeapon(slot: WeaponPawnSlot) {
+    override fun removeWeapon(slot: PawnWeaponSlot) {
         skeletons.forEach { (_, skel) ->
             skel.removeWeapon(slot)
         }
     }
 
-    override fun setArmor(piece: ArmorPawnSlot.Piece, atlasData: ArmorAtlas) {
+    override fun setArmor(piece: PawnArmorSlot.Piece, atlasData: ArmorAtlas) {
         skeletons.forEach { (_, skel) ->
             skel.setArmor(piece, atlasData)
         }
     }
 
-    override fun removeArmor(slot: ArmorPawnSlot) {
+    override fun removeArmor(slot: PawnArmorSlot) {
         skeletons.forEach { (_, skel) ->
             skel.removeArmor(slot)
         }
     }
 
     override fun customize(
-        slot: CustomizablePawnSkinSlot,
+        slot: CustomizablePawnSlotBody,
         atlasData: CustomizationAtlas
     ) {
         skeletons.forEach { (_, skel) ->
@@ -85,7 +85,7 @@ class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRe
         }
     }
 
-    override fun removeCustomization(slot: CustomizablePawnSkinSlot) {
+    override fun removeCustomization(slot: CustomizablePawnSlotBody) {
         skeletons.forEach { (_, skel) ->
             skel.removeCustomization(slot)
         }
