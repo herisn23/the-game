@@ -7,23 +7,36 @@ import org.roldy.animation.add
 import org.roldy.animation.listener
 import org.roldy.pawn.skeleton.attribute.Idle
 import org.roldy.pawn.skeleton.attribute.Slash1H
+import org.roldy.pawn.skeleton.attribute.WalkL
+import org.roldy.pawn.skeleton.attribute.WalkU
 
 class PawnAnimator(
     private val stateData: AnimationStateData,
     internal val pawn: PawnSkeleton
 ) : AnimationTypeEventListenerHandler<PawnAnimator>(), PawnAnimation {
-    val state = AnimationState(stateData)
 
+    val idleTrack = 0        // Base idle (full body)
+    val walkLTrack = 1       // Legs layer
+    val walkUTrack = 2       // Upper body layer
+    val slashTrack = 3       // Slash/attack layer (highest priority)
+
+    val state = AnimationState(stateData)
     init {
         //init animation blending
-        stateData.setMix(Idle.name, Slash1H.name, 0.1f)
-        stateData.setMix(Slash1H.name, Idle.name, 0.1f)
+        stateData.setMix(Idle.name, WalkU.name, 0.2f);
+        stateData.setMix(WalkU.name, Idle.name, 0.2f);
+        stateData.setMix(Idle.name, Slash1H.name, 0.1f);
+        stateData.setMix(Slash1H.name, Idle.name, 0.2f);
+        stateData.setMix(WalkU.name, Slash1H.name, 0.1f);
+        stateData.setMix(Slash1H.name, WalkU.name, 0.2f);
+        stateData.setMix(WalkL.name, Idle.name, 0.2f);
+        stateData.setMix(Idle.name, WalkL.name, 0.2f);
         stateData.defaultMix = 0.2f
 
         state add listener(
             complete = {
                 if (animation.name == Slash1H.name) {
-                    idle()
+                    state.clearTrack(slashTrack)
                 }
             },
             event = { ev ->
@@ -33,12 +46,33 @@ class PawnAnimator(
     }
 
     override fun idle() {
-        state.setAnimation(0, Idle.name, true)
+        state.clearTrack(walkLTrack)
+        state.clearTrack(walkUTrack)
+        state.setAnimation(idleTrack, Idle.name, true)
     }
 
     override fun slash1H() {
-        val entry = state.setAnimation(0, Slash1H.name, false)
-        entry.timeScale = 2f
+        state.setAnimation(slashTrack, Slash1H.name, false).apply {
+            timeScale = 2f
+        }
+    }
+
+    override fun walk() {
+        // Clear idle since we're moving
+        state.clearTrack(idleTrack)
+        // Set both leg and upper body walk animations
+        state.setAnimation(walkLTrack, WalkL.name, true).apply {
+            timeScale = 2f
+        }
+        state.setAnimation(walkUTrack, WalkU.name, true).apply {
+            timeScale = 2f
+        }
+    }
+
+    override fun stop() {
+        state.clearTracks()
+        pawn.skeleton.setBonesToSetupPose()
+        idle()
     }
 
     fun update(deltaTime: Float) {

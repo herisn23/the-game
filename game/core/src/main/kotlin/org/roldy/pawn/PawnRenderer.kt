@@ -161,4 +161,16 @@ class PawnRenderer : AnimationTypeEventListenerHandler<PawnAnimator>(), ObjectRe
             skel.animation.slash1H()
         }
     }
+
+    override fun walk() {
+        skeletons.forEach { (_, skel) ->
+            skel.animation.walk()
+        }
+    }
+
+    override fun stop() {
+        skeletons.forEach { (_, skel) ->
+            skel.animation.stop()
+        }
+    }
 }

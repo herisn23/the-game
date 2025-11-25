@@ -3,6 +3,7 @@ package org.roldy.garbage
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
@@ -28,9 +29,56 @@ class TestApp(
     lateinit var underwears: List<UnderWearAtlas>
     lateinit var shields: List<ShieldAtlas>
 
+    class MyInputProcessor(val app: TestApp) : InputAdapter() {
+        var lastKeycode: Int = 0
+        val keyActions = mapOf(
+            Input.Keys.W to (
+                    {
+                        app.pawnRenderer.currentOrientation = Back
+                        app.pawnRenderer.walk()
+                    } to {
+                        app.pawnRenderer.stop()
+                    }),
+            Input.Keys.A to (
+                    {
+                        app.pawnRenderer.currentOrientation = Left
+                        app.pawnRenderer.walk()
+                    } to {
+                        app.pawnRenderer.stop()
+                    }),
+            Input.Keys.S to (
+                    {
+                        app.pawnRenderer.currentOrientation = Front
+                        app.pawnRenderer.walk()
+                    } to {
+                        app.pawnRenderer.stop()
+                    }),
+            Input.Keys.D to (
+                    {
+                        app.pawnRenderer.currentOrientation = Right
+                        app.pawnRenderer.walk()
+                    } to {
+                        app.pawnRenderer.stop()
+                    }
+                    )
+        )
+
+        override fun keyDown(keycode: Int): Boolean {
+            if (keyActions.keys.contains(keycode)) {
+                lastKeycode = keycode
+            }
+            return keyActions[keycode]?.first()?.let { true } ?: false
+        }
+
+        override fun keyUp(keycode: Int): Boolean {
+            if (keycode != lastKeycode) return false
+            return keyActions[keycode]?.second()?.let { true } ?: false
+        }
+    }
+
     override fun create() {
         default.create()
-
+        Gdx.input.inputProcessor = MyInputProcessor(this)
         armors = Armor.all
         weapons = Weapons.all
         customizations = CustomizationAtlas.all
@@ -38,7 +86,7 @@ class TestApp(
         shields = Shield.all
 
         pawnRenderer = PawnRenderer().apply {
-            addEventListener(Slash1H) {_, _->
+            addEventListener(Slash1H) { _, _ ->
                 println("hit")
             }
         }
@@ -109,23 +157,16 @@ class TestApp(
             pawnRenderer.setShield(Shield.Bloodmoon)
             pawnRenderer.setUnderwear(Underwear.FemaleUnderwearType1)
         }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             pawnRenderer.strip()
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            pawnRenderer.currentOrientation = Back
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            pawnRenderer.currentOrientation = Left
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            pawnRenderer.currentOrientation = Right
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-            pawnRenderer.currentOrientation = Front
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             pawnRenderer.slash1H()
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            pawnRenderer.strip()
         }
     }
 
