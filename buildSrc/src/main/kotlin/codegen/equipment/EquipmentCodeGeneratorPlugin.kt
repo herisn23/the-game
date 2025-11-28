@@ -1,4 +1,4 @@
-package codegen
+package codegen.equipment
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -6,7 +6,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 
-class CodeGeneratorPlugin : Plugin<Project> {
+class EquipmentCodeGeneratorPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Register the code generation task
         val generateTask = project.tasks.register<GenerateClassesTask>("generateAssetsClasses") {

@@ -1,6 +1,6 @@
-package codegen.gen
+package codegen.equipment.gen
 
-import codegen.ClassInfo
+import codegen.equipment.ClassInfo
 import java.io.File
 
 

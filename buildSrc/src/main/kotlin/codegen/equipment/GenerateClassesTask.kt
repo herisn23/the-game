@@ -1,9 +1,9 @@
-package codegen
+package codegen.equipment
 
-import codegen.gen.Armors
-import codegen.gen.Customization
-import codegen.gen.Shield
-import codegen.gen.Weapons
+import codegen.equipment.gen.Armors
+import codegen.equipment.gen.Customization
+import codegen.equipment.gen.Shield
+import codegen.equipment.gen.Weapons
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.OutputDirectory

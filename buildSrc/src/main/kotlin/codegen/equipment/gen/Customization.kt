@@ -1,7 +1,7 @@
-package codegen.gen
+package codegen.equipment.gen
 
-import codegen.ClassInfo
-import codegen.ClassNameNormalizer
+import codegen.equipment.ClassInfo
+import codegen.equipment.ClassNameNormalizer
 import java.io.File
 import java.util.Locale.getDefault
 

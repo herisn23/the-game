@@ -1,6 +1,6 @@
-import codegen.CodeGeneratorPlugin
+import codegen.equipment.EquipmentCodeGeneratorPlugin
 
-apply<CodeGeneratorPlugin>()
+apply<EquipmentCodeGeneratorPlugin>()
 
 dependencies {
     implementation(projects.game.core)
