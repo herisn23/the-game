@@ -1,8 +1,4 @@
-import codegen.CodeGeneratorPlugin
-
-apply<CodeGeneratorPlugin>()
-
 dependencies {
-    implementation(libs.kotlin.coroutines)
-    implementation(libs.gdx.spine)
+    api(libs.kotlin.coroutines)
+    api(libs.gdx.spine)
 }

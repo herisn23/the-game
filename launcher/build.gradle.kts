@@ -24,6 +24,10 @@ val assets: SourceSet by sourceSets.creating {
     resources.srcDirs(rootProject.file("assets").path)
 }
 
+val shaders: SourceSet by sourceSets.creating {
+    resources.srcDirs(rootProject.file("shaders").path)
+}
+
 dependencies {
     implementation(libs.bundles.gdx)
     runtimeOnly(variantOf(libs.gdx.platform) {
@@ -33,6 +37,7 @@ dependencies {
 
     //exclude assets from compileTime we only need it at runtime
     runtimeOnly(assets.output)
+    runtimeOnly(shaders.output)
 }
 
 
