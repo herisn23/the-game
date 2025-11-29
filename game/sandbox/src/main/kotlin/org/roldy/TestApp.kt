@@ -2,9 +2,8 @@ package org.roldy
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 
@@ -18,9 +17,10 @@ class TestApp : ApplicationAdapter() {
     override fun create() {
         diagnostic = Diagnostic()
         pawnTest = PawnTest(100f)
-        terrainTest = TerrainTest(10f)
+        terrainTest = TerrainTest(15f)
         camera = OrthographicCamera().apply {
-            zoom = 20f
+            zoom = 0f
+            position.set(Gdx.graphics.width.toFloat()/2, Gdx.graphics.height.toFloat()/2, 1f)
         }
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
     }
@@ -32,7 +32,8 @@ class TestApp : ApplicationAdapter() {
 
 
     override fun render() {
-        ScreenUtils.clear(Color.DARK_GRAY)//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         viewport.apply()
 
         context(Gdx.graphics.deltaTime, camera) {

@@ -6,84 +6,84 @@ filter: Linear, Linear
 repeat: none
 Ancient_Cobblestone
   rotate: false
-  xy: 1, 809
+  xy: 1, 1
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Arctic_Forest_Ground
   rotate: false
-  xy: 1, 607
+  xy: 203, 1
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Bones_Debris
   rotate: false
-  xy: 203, 809
+  xy: 405, 1
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Brick_Wall
   rotate: false
-  xy: 1, 405
+  xy: 607, 1
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Cliff_Rock_Surface
   rotate: false
-  xy: 203, 607
+  xy: 809, 1
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Coal_Surface
   rotate: false
-  xy: 405, 809
+  xy: 1, 203
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Cracked_Asphalt
   rotate: false
-  xy: 1, 203
+  xy: 203, 203
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Cracked_Concrete
   rotate: false
-  xy: 203, 405
+  xy: 405, 203
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Cracked_Ice
   rotate: false
-  xy: 405, 607
+  xy: 607, 203
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Crystal_Surface
   rotate: false
-  xy: 607, 809
+  xy: 809, 203
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Dirty_Snow
   rotate: false
-  xy: 1, 1
+  xy: 1, 405
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Forest_Ground
   rotate: false
-  xy: 203, 203
+  xy: 203, 405
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
@@ -97,84 +97,84 @@ Fur
   index: -1
 Grass
   rotate: false
-  xy: 607, 607
+  xy: 607, 405
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Lava_And_Pavement
   rotate: false
-  xy: 809, 809
+  xy: 809, 405
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Marble_Surface
   rotate: false
-  xy: 203, 1
+  xy: 1, 607
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Muddy_Cracked_Sand
   rotate: false
-  xy: 405, 203
+  xy: 203, 607
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Pavement
   rotate: false
-  xy: 607, 405
+  xy: 405, 607
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Planks_Wood
   rotate: false
-  xy: 809, 607
+  xy: 607, 607
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Rippled_Sand
   rotate: false
-  xy: 405, 1
+  xy: 809, 607
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Rocky_Dirt
   rotate: false
-  xy: 607, 203
+  xy: 1, 809
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Sandy_Rock_Surface
   rotate: false
-  xy: 809, 405
+  xy: 203, 809
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Underwater_Rock_Surface
   rotate: false
-  xy: 607, 1
+  xy: 405, 809
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Water
   rotate: false
-  xy: 809, 203
+  xy: 607, 809
   size: 200, 200
   orig: 200, 200
   offset: 0, 0
   index: -1
 Wood_Wall
   rotate: false
-  xy: 809, 1
+  xy: 809, 809
   size: 200, 200
   orig: 200, 200
   offset: 0, 0

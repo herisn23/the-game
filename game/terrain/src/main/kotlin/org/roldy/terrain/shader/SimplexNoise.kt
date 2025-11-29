@@ -40,7 +40,7 @@ class SimplexNoise(seed: Long = System.currentTimeMillis()) {
         return g[0] * x + g[1] * y
     }
 
-    fun noise(xin: Float, yin: Float): Float {
+    private fun noiseInternal(xin: Float, yin: Float): Float {
         val F2:Float = 0.5f * (sqrt(3.0) - 1.0).toFloat()
         val G2:Float = ((3.0f - sqrt(3.0)) / 6.0f).toFloat()
 
@@ -113,14 +113,14 @@ class SimplexNoise(seed: Long = System.currentTimeMillis()) {
     }
 
     // Octave noise for more natural looking results
-    fun octaveNoise(x: Float, y: Float, octaves: Int = 4, persistence: Float = 0.5f, lacunarity: Float = 2.0f): Float {
+    operator fun invoke(x: Float, y: Float, octaves: Int = 4, persistence: Float = 0.5f, lacunarity: Float = 2.0f): Float {
         var total = 0f
         var frequency = 1f
         var amplitude = 1f
         var maxValue = 0f
 
         for (i in 0 until octaves) {
-            total += noise(x * frequency, y * frequency) * amplitude
+            total += noiseInternal(x * frequency, y * frequency) * amplitude
             maxValue += amplitude
             amplitude *= persistence
             frequency *= lacunarity
