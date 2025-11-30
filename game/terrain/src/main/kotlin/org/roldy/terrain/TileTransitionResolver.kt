@@ -1,225 +1,213 @@
 package org.roldy.terrain
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.terrain.biome.Terrain
 
-/**
- * Resolves tile transitions using bitmask-based auto-tiling.
- *
- * This system creates smooth transitions between different terrain types by:
- * - Analyzing neighboring tiles
- * - Calculating a bitmask based on terrain similarity
- * - Looking up appropriate transition tiles from the atlas
- *
- * Bitmask Layout (for 8 neighbors):
- * ```
- *   1   2   4
- *   8  [X] 16
- *  32  64 128
- * ```
- *
- * For 4-neighbor (cardinal only) transitions:
- * ```
- *       1
- *   2  [X]  4
- *       8
- * ```
- */
 class TileTransitionResolver(
-    private val use8WayTransitions: Boolean = true
+    val width: Int,
+    val height: Int,
+    val terrainCache: Map<Pair<Int, Int>, Terrain>
 ) {
-
     /**
-     * Calculates the appropriate transition for a tile based on its neighbors
-     *
-     * @param currentTerrain The terrain at the current position
-     * @param neighbors List of neighboring terrains in order: N, E, S, W, NE, SE, SW, NW
-     * @return TransitionInfo containing the bitmask and suggested tile name, or null if no transition needed
+     * Data class to hold all transition types for a tile
      */
-    fun calculateTransition(
-        currentTerrain: Terrain,
-        neighbors: List<Terrain?>
-    ): TransitionInfo? {
-        require(neighbors.size == 8) { "Must provide exactly 8 neighbors" }
+    fun calculateTransitionTile(x: Int, y: Int): Terrain? {
+        val currentTerrain = terrainCache[Pair(x, y)] ?: return null
+        val currentPriority = getTerrainPriority(currentTerrain.data.name)
 
-        // Calculate bitmask based on matching neighbors
-        val bitmask = calculateBitmask(currentTerrain, neighbors)
+        // Get neighbors in all 8 directions
+        val northTerrain = if (y + 1 < height) terrainCache[Pair(x, y + 1)] else null
+        val southTerrain = if (y - 1 >= 0) terrainCache[Pair(x, y - 1)] else null
+        val eastTerrain = if (x + 1 < width) terrainCache[Pair(x + 1, y)] else null
+        val westTerrain = if (x - 1 >= 0) terrainCache[Pair(x - 1, y)] else null
+        val neTerrain = if (y + 1 < height && x + 1 < width) terrainCache[Pair(x + 1, y + 1)] else null
+        val seTerrain = if (y - 1 >= 0 && x + 1 < width) terrainCache[Pair(x + 1, y - 1)] else null
+        val swTerrain = if (y - 1 >= 0 && x - 1 >= 0) terrainCache[Pair(x - 1, y - 1)] else null
+        val nwTerrain = if (y + 1 < height && x - 1 >= 0) terrainCache[Pair(x - 1, y + 1)] else null
 
-        // If all neighbors match (bitmask == 255 or all relevant bits set), no transition needed
-        if (isFullyMatchingBitmask(bitmask)) {
-            return null
+        // First check cardinal directions for edge transitions
+        // Edges take priority over corners
+        val edgeRegion = when {
+            northTerrain != null &&
+                    northTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, northTerrain.data.name) -> {
+                // North neighbor should bleed into this tile
+                val edgeName = "${northTerrain.data.name}_Edge_S"
+                northTerrain.biome.atlas?.findRegion(edgeName)
+            }
+
+            southTerrain != null &&
+                    southTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, southTerrain.data.name) -> {
+                // South neighbor should bleed into this tile
+                val edgeName = "${southTerrain.data.name}_Edge_N"
+                southTerrain.biome.atlas?.findRegion(edgeName)
+            }
+
+            eastTerrain != null &&
+                    eastTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, eastTerrain.data.name) -> {
+                // East neighbor should bleed into this tile
+                val edgeName = "${eastTerrain.data.name}_Edge_W"
+                eastTerrain.biome.atlas?.findRegion(edgeName)
+            }
+
+            westTerrain != null &&
+                    westTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, westTerrain.data.name) -> {
+                // West neighbor should bleed into this tile
+                val edgeName = "${westTerrain.data.name}_Edge_E"
+                westTerrain.biome.atlas?.findRegion(edgeName)
+            }
+
+            else -> null
         }
 
-        // Generate transition info
-        val transitionType = determineTransitionType(bitmask)
-        val tileName = generateTransitionTileName(currentTerrain, transitionType, bitmask)
+        // If we found an edge, return it (edges have priority)
+        if (edgeRegion != null) {
+            return Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, edgeRegion)
+        }
 
-        return TransitionInfo(
-            bitmask = bitmask,
-            transitionType = transitionType,
-            suggestedTileName = tileName,
-            baseTerrain = currentTerrain
-        )
-    }
+        // Otherwise check diagonal corners (only when no edges are present)
+        // This ensures corners only appear for isolated diagonal contacts
+        data class CornerCandidate(val region: com.badlogic.gdx.graphics.g2d.TextureRegion, val priority: Int)
 
-    /**
-     * Attempts to find a transition tile region from the terrain's atlas
-     *
-     * @param transitionInfo The transition information
-     * @return TextureRegion for the transition tile, or null if not found
-     */
-    fun findTransitionTile(transitionInfo: TransitionInfo): TextureRegion? {
-        val atlas = transitionInfo.baseTerrain.biome.atlas ?: return null
+        val cornerCandidates = mutableListOf<CornerCandidate>()
 
-        // Try different naming conventions for transition tiles
-        val possibleNames = listOf(
-            // Format: TerrainName_Transition_Bitmask (e.g., "Grass_T_47")
-            "${transitionInfo.baseTerrain.data.name}_T_${transitionInfo.bitmask}",
-
-            // Format: TerrainName_TransitionType (e.g., "Grass_Edge_W")
-            "${transitionInfo.baseTerrain.data.name}_${transitionInfo.transitionType.tileSuffix}",
-
-            // Format: TerrainName_Auto_Bitmask (e.g., "Grass_Auto_47")
-            "${transitionInfo.baseTerrain.data.name}_Auto_${transitionInfo.bitmask}",
-
-            // Direct suggestion
-            transitionInfo.suggestedTileName
-        )
-
-        for (name in possibleNames) {
-            val region = atlas.findRegion(name)
-            if (region != null) {
-                return region
+        // NE corner: only show if N and E neighbors are same terrain
+        if (neTerrain != null &&
+            neTerrain.data.name != currentTerrain.data.name &&
+            northTerrain?.data?.name == currentTerrain.data.name &&
+            eastTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, neTerrain.data.name)
+        ) {
+            val cornerName = "${neTerrain.data.name}_Corner_Outer_SW"
+            neTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(neTerrain.data.name)))
             }
         }
 
-        return null
-    }
-
-    /**
-     * Calculates a bitmask based on which neighbors match the current terrain
-     */
-    private fun calculateBitmask(currentTerrain: Terrain, neighbors: List<Terrain?>): Int {
-        var mask = 0
-
-        // Cardinal directions and diagonals
-        val positions = if (use8WayTransitions) {
-            listOf(0, 1, 2, 3, 4, 5, 6, 7) // All 8 neighbors
-        } else {
-            listOf(0, 1, 2, 3) // Only cardinal directions
-        }
-
-        positions.forEach { index ->
-            val neighbor = neighbors.getOrNull(index)
-            if (neighbor != null && isSameTerrain(currentTerrain, neighbor)) {
-                // Set the corresponding bit
-                mask = mask or getBitForPosition(index)
+        // SE corner: only show if S and E neighbors are same terrain
+        if (seTerrain != null &&
+            seTerrain.data.name != currentTerrain.data.name &&
+            southTerrain?.data?.name == currentTerrain.data.name &&
+            eastTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, seTerrain.data.name)
+        ) {
+            val cornerName = "${seTerrain.data.name}_Corner_Outer_NW"
+            seTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(seTerrain.data.name)))
             }
         }
 
-        return mask
-    }
-
-    /**
-     * Determines if two terrains should be considered the same for transition purposes
-     */
-    private fun isSameTerrain(terrain1: Terrain, terrain2: Terrain): Boolean {
-        // Can be customized based on your needs
-        // For now, exact match on terrain name
-        return terrain1.data.name == terrain2.data.name
-    }
-
-    /**
-     * Gets the bit value for a neighbor position
-     * Positions: N=0, E=1, S=2, W=3, NE=4, SE=5, SW=6, NW=7
-     */
-    private fun getBitForPosition(position: Int): Int {
-        return when (position) {
-            0 -> 1    // North
-            1 -> 2    // East
-            2 -> 4    // South
-            3 -> 8    // West
-            4 -> 16   // NE
-            5 -> 32   // SE
-            6 -> 64   // SW
-            7 -> 128  // NW
-            else -> 0
+        // SW corner: only show if S and W neighbors are same terrain
+        if (swTerrain != null &&
+            swTerrain.data.name != currentTerrain.data.name &&
+            southTerrain?.data?.name == currentTerrain.data.name &&
+            westTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, swTerrain.data.name)
+        ) {
+            val cornerName = "${swTerrain.data.name}_Corner_Outer_NE"
+            swTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(swTerrain.data.name)))
+            }
         }
-    }
 
-    /**
-     * Checks if the bitmask represents a fully matching tile (no transitions needed)
-     */
-    private fun isFullyMatchingBitmask(bitmask: Int): Boolean {
-        return if (use8WayTransitions) {
-            bitmask == 255 // All 8 bits set
+        // NW corner: only show if N and W neighbors are same terrain
+        if (nwTerrain != null &&
+            nwTerrain.data.name != currentTerrain.data.name &&
+            northTerrain?.data?.name == currentTerrain.data.name &&
+            westTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, nwTerrain.data.name)
+        ) {
+            val cornerName = "${nwTerrain.data.name}_Corner_Outer_SE"
+            nwTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(nwTerrain.data.name)))
+            }
+        }
+
+        // Pick the corner with highest priority terrain
+        val cornerRegion = cornerCandidates.maxByOrNull { it.priority }?.region
+
+        return if (cornerRegion != null) {
+            Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, cornerRegion)
         } else {
-            (bitmask and 15) == 15 // All 4 cardinal bits set
+            null
         }
     }
 
     /**
-     * Determines the type of transition based on the bitmask
+     * Determines if a transition should be shown on the current tile based on neighbor
+     * Returns true if neighbor has higher priority, or equal priority with alphabetically higher name
      */
-    private fun determineTransitionType(bitmask: Int): TransitionType {
-        // Check for corners (2 adjacent cardinals missing)
-        if ((bitmask and 3) == 0) return TransitionType.CORNER_OUTER_NE
-        if ((bitmask and 6) == 0) return TransitionType.CORNER_OUTER_SE
-        if ((bitmask and 12) == 0) return TransitionType.CORNER_OUTER_SW
-        if ((bitmask and 9) == 0) return TransitionType.CORNER_OUTER_NW
+    private fun shouldShowTransition(
+        currentName: String,
+        currentPriority: Int,
+        neighborName: String
+    ): Boolean {
+        val neighborPriority = getTerrainPriority(neighborName)
 
-        // Check for edges (1 cardinal missing)
-        if ((bitmask and 1) == 0) return TransitionType.EDGE_NORTH
-        if ((bitmask and 2) == 0) return TransitionType.EDGE_EAST
-        if ((bitmask and 4) == 0) return TransitionType.EDGE_SOUTH
-        if ((bitmask and 8) == 0) return TransitionType.EDGE_WEST
-
-        // Check for inner corners (diagonal missing but cardinals present)
-        if ((bitmask and 16) == 0 && (bitmask and 3) == 3) return TransitionType.CORNER_INNER_NE
-        if ((bitmask and 32) == 0 && (bitmask and 6) == 6) return TransitionType.CORNER_INNER_SE
-        if ((bitmask and 64) == 0 && (bitmask and 12) == 12) return TransitionType.CORNER_INNER_SW
-        if ((bitmask and 128) == 0 && (bitmask and 9) == 9) return TransitionType.CORNER_INNER_NW
-
-        return TransitionType.COMPLEX
+        return when {
+            neighborPriority > currentPriority -> true  // Higher priority always shows
+            neighborPriority < currentPriority -> false // Lower priority never shows
+            else -> neighborName > currentName          // Equal priority: use alphabetical tiebreaker
+        }
     }
 
     /**
-     * Generates a suggested tile name for the transition
+     * Gets the priority of a terrain type for transition rendering
+     * Higher values = higher priority (will show transitions)
+     * Lower values = lower priority (will not show transitions)
      */
-    private fun generateTransitionTileName(
-        terrain: Terrain,
-        type: TransitionType,
-        bitmask: Int
-    ): String {
-        return "${terrain.data.name}_${type.tileSuffix}_$bitmask"
+    private fun getTerrainPriority(biomeName: String): Int {
+        return when {
+            // Water types have lowest priority (0-9)
+            biomeName.startsWith("Water") -> 0
+
+            // Stone/Rock types have highest priority (30+)
+            biomeName.startsWith("Snow") -> 10
+            biomeName.startsWith("Ice") -> 10
+
+            biomeName.startsWith("Desert") -> 20
+            biomeName.startsWith("DeepDesert") -> 20
+            biomeName.startsWith("Savanna") -> 20
+
+
+            // Grass types have higher priority (20-29)
+            biomeName.startsWith("Forest") -> 30
+            biomeName.startsWith("Jungle") -> 30
+            biomeName.startsWith("Swamp") -> 30
+
+            // Default priority
+            else -> 15
+        }
     }
 
     /**
-     * Information about a tile transition
+     * Gets the terrain of all 8 neighboring tiles
+     * Order: N, E, S, W, NE, SE, SW, NW
+     * Returns exactly 8 elements (nulls for out-of-bounds neighbors)
      */
-    data class TransitionInfo(
-        val bitmask: Int,
-        val transitionType: TransitionType,
-        val suggestedTileName: String,
-        val baseTerrain: Terrain
-    )
+    private fun getNeighborTerrains(x: Int, y: Int): List<Terrain?> {
+        val directions = listOf(
+            Pair(0, 1),   // North
+            Pair(1, 0),   // East
+            Pair(0, -1),  // South
+            Pair(-1, 0),  // West
+            Pair(1, 1),   // NE
+            Pair(1, -1),  // SE
+            Pair(-1, -1), // SW
+            Pair(-1, 1)   // NW
+        )
 
-    /**
-     * Types of transitions that can occur
-     */
-    enum class TransitionType(val tileSuffix: String) {
-        EDGE_NORTH("Edge_N"),
-        EDGE_EAST("Edge_E"),
-        EDGE_SOUTH("Edge_S"),
-        EDGE_WEST("Edge_W"),
-        CORNER_OUTER_NE("Corner_Outer_NE"),
-        CORNER_OUTER_SE("Corner_Outer_SE"),
-        CORNER_OUTER_SW("Corner_Outer_SW"),
-        CORNER_OUTER_NW("Corner_Outer_NW"),
-        CORNER_INNER_NE("Corner_Inner_NE"),
-        CORNER_INNER_SE("Corner_Inner_SE"),
-        CORNER_INNER_SW("Corner_Inner_SW"),
-        CORNER_INNER_NW("Corner_Inner_NW"),
-        COMPLEX("Complex")
+        return directions.map { (dx, dy) ->
+            val nx = x + dx
+            val ny = y + dy
+            if (nx in 0 until width && ny in 0 until height) {
+                terrainCache[Pair(nx, ny)]
+            } else {
+                null
+            }
+        }
     }
+
 }

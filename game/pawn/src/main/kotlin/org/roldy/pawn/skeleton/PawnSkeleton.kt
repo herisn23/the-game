@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.esotericsoftware.spine.*
 import com.esotericsoftware.spine.attachments.RegionAttachment
-import org.roldy.core.ObjectRenderer
+import org.roldy.core.RenderedObject
 import org.roldy.core.asset.loadAsset
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
@@ -51,7 +51,8 @@ class PawnSkeleton(
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
-) : ObjectRenderer, ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
+    private val batch: SpriteBatch,
+) : RenderedObject, ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSlotBody.Hair to false,
@@ -68,10 +69,10 @@ class PawnSkeleton(
     private var hiddenSlots: Map<CustomizablePawnSlotBody, Boolean> = hiddenSlotsDefault
 
 
-    internal val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData).apply {
-        scaleX = orientation.scaleX
-        scaleY = orientation.scaleY
-    }
+    internal val skeleton: Skeleton = Skeleton(pawnSkeletonData.skeletonData)
+
+    val height get() = skeleton.data.height
+    val width get() = skeleton.data.width
 
     private val skinSlots: Map<PawnBodySkeletonSlot, Slot> by lazy {
         skeleton.run {
@@ -277,7 +278,7 @@ class PawnSkeleton(
         animator.update(deltaTime)
     }
 
-    context(deltaTime: Float, batch: SpriteBatch)
+    context(deltaTime: Float)
     override fun render() {
         drawHairColor()
         drawSkinColor()

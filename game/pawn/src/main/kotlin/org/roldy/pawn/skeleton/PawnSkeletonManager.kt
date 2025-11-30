@@ -2,8 +2,9 @@ package org.roldy.pawn.skeleton
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import org.roldy.core.ObjectRenderer
+import org.roldy.core.RenderedObject
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
+import org.roldy.core.renderer.LayeredObject
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
@@ -40,15 +41,17 @@ object PawnManagerMath {
  * The manager implements various interfaces to support equipment, customization, and animations,
  * delegating all operations to the underlying skeleton instances.
  */
-class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
-    ObjectRenderer,
+class PawnSkeletonManager(
+    private val batch: SpriteBatch
+) : AnimationTypeEventListenerHandler<PawnAnimator>(),
+    RenderedObject,
     ArmorWearer,
     Customizable,
     Strippable,
     WeaponWearer,
     UnderwearWearer,
     ShieldWearer,
-    PawnAnimation {
+    PawnAnimation, LayeredObject {
 
     /** Indicates whether the pawn is currently moving */
     private var moving = false
@@ -76,20 +79,41 @@ class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
     /** Default underwear color for all pawns */
     val defaultUnderWearColor: Color = Color.valueOf("9DA1FF")
 
+    private val frontSkeleton = createSkeleton(Front)
+
+    private val backSkeleton = createSkeleton(Back)
+
+    private val leftSkeleton = createSkeleton(Left)
+
+    private val rightSkeleton = createSkeleton(Right)
+
+    private val pivotYOrigin = frontSkeleton.height / 2
+    override val pivotX: Float
+        get() = x
+
+    override val pivotY: Float
+        get() = y - pivotYOrigin
+    fun createSkeleton(orientation: PawnSkeletonOrientation) =
+        PawnSkeleton(
+            orientation,
+            PawnSkeletonData.instance.getValue(orientation),
+            defaultSkinColor,
+            defaultHairColor,
+            defaultUnderWearColor,
+            batch
+        )
+
     /**
      * Map of all skeleton instances, one for each orientation.
      * All skeletons are kept in sync but only the current orientation is rendered.
      */
     val skeletons: Map<PawnSkeletonOrientation, PawnSkeleton> =
-        PawnSkeletonOrientation.Companion.all.map {
-            PawnSkeleton(
-                it,
-                PawnSkeletonData.Companion.instance.getValue(it),
-                defaultSkinColor,
-                defaultHairColor,
-                defaultUnderWearColor
-            )
-        }.associateBy(PawnSkeleton::orientation)
+        mapOf(
+            Front to frontSkeleton,
+            Back to backSkeleton,
+            Left to leftSkeleton,
+            Right to rightSkeleton,
+        )
 
     /**
      * The current orientation of the pawn, determines which skeleton is rendered.
@@ -287,7 +311,7 @@ class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
      * @receiver deltaTime The time elapsed since last frame in seconds
      * @receiver batch The sprite batch used for rendering
      */
-    context(deltaTime: Float, batch: SpriteBatch)
+    context(deltaTime: Float)
     override fun render() {
         skeletons.values.forEach { skel ->
             skel.animate() // Always process animations to preserve states between orientations

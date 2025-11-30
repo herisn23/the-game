@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/game" />
             <option value="$PROJECT_DIR$/game/application" />
             <option value="$PROJECT_DIR$/game/core" />
+            <option value="$PROJECT_DIR$/game/environment" />
             <option value="$PROJECT_DIR$/game/equipment" />
             <option value="$PROJECT_DIR$/game/pawn" />
             <option value="$PROJECT_DIR$/game/sandbox" />

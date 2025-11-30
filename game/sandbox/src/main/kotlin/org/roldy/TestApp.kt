@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import org.roldy.core.Logger
 import org.roldy.core.Logger.Level
+import org.roldy.core.renderer.LayeringRenderer
+import org.roldy.environment.EnvironmentalObject
 
 class TestApp : ApplicationAdapter() {
     lateinit var diagnostic: Diagnostic
@@ -15,17 +17,22 @@ class TestApp : ApplicationAdapter() {
     lateinit var terrainTest: TerrainTest
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
+    lateinit var layeringRenderer: LayeringRenderer
+
 
     override fun create() {
         Logger.level = Level.Debug
         diagnostic = Diagnostic()
-        pawnTest = PawnTest(100f)
         terrainTest = TerrainTest(15f)
         camera = OrthographicCamera().apply {
             zoom = 0f
-            position.set(Gdx.graphics.width.toFloat()/2, Gdx.graphics.height.toFloat()/2, 1f)
+            position.set(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2, 1f)
         }
+        pawnTest = PawnTest(10f, camera)
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
+        layeringRenderer = LayeringRenderer(
+            listOf(pawnTest, EnvironmentalObject(camera))
+        )
     }
 
     override fun resize(width: Int, height: Int) {
@@ -41,7 +48,7 @@ class TestApp : ApplicationAdapter() {
 
         context(Gdx.graphics.deltaTime, camera) {
             terrainTest.render()
-            pawnTest.render()
+            layeringRenderer.render()
         }
 
         diagnostic.render()

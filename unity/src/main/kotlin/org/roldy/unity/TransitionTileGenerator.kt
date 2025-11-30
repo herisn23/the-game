@@ -144,10 +144,10 @@ object TransitionTileGenerator {
             TransitionType.CORNER_OUTER_NW -> minOf(ny, nx)
 
             // Inner corners - inverted diagonal for concave corners
-            TransitionType.CORNER_INNER_NE -> 1f - maxOf(1f - ny, nx)
-            TransitionType.CORNER_INNER_SE -> 1f - maxOf(ny, nx)
-            TransitionType.CORNER_INNER_SW -> 1f - maxOf(ny, 1f - nx)
-            TransitionType.CORNER_INNER_NW -> 1f - maxOf(1f - ny, 1f - nx)
+            TransitionType.CORNER_INNER_NE -> maxOf(1f - ny, nx)
+            TransitionType.CORNER_INNER_SE -> maxOf(ny, nx)
+            TransitionType.CORNER_INNER_SW -> maxOf(ny, 1f - nx)
+            TransitionType.CORNER_INNER_NW -> maxOf(1f - ny, 1f - nx)
         }
     }
 

@@ -14,8 +14,8 @@ class TerrainTest(
 ) {
 
     // Map parameters
-    private val width = 1000
-    private val height = 1000
+    private val width = 100
+    private val height = 100
     private val tileSize = 200
 
     // Create procedural generator (this is safe during init, no OpenGL calls)
@@ -30,11 +30,12 @@ class TerrainTest(
         enableTransitions = true,    // Enable transitions
         debugMode = false             // Enable debug mode
     )
-    val tiledMapRenderer = OrthogonalTiledMapRenderer(generator.generate())
+    val tiledMap = generator.generate()
+    val tiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
+    private val debugInfo = generator.getAllDebugInfo()
 
     // Debug renderer
     private val debugRenderer = TerrainDebugRenderer(tileSize)
-    private val debugInfo = generator.getAllDebugInfo()
     private var debugEnabled = false
     private var debugTogglePressed = false
 
@@ -72,7 +73,7 @@ class TerrainTest(
             camera.zoom -= zoomSensitivity * delta
         }
         // Adjusted zoom range for 200×200 tile map
-        camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 50f)
+        camera.zoom = MathUtils.clamp(camera.zoom, 3f, 10f)
 
         // Toggle debug overlay with D key
         val debugKeyPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE)

@@ -8,9 +8,7 @@ abstract class PawnSkeletonOrientation(
      * Atlas contains only front, Back and Left. So left is used for right oriented skeleton.
      */
     override val name: String,
-    val skeletonName:String = name,
-    val scaleX:Float = 1f,
-    val scaleY:Float = 1f,
+    val skeletonName:String = name
 ): NamedAttribute() {
 
     companion object {

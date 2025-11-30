@@ -10,6 +10,7 @@ include("game:pawn")
 include("game:sandbox")
 include("game:core")
 include("game:equipment")
+include("game:environment")
 
 dependencyResolutionManagement {
     repositories {

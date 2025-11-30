@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import org.roldy.core.renderer.LayeredObject
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
@@ -16,15 +17,9 @@ import org.roldy.utils.invoke
 import org.roldy.utils.sequencer
 
 class PawnTest(
-    val speed: Float
-) {
-    private val pawnManager: PawnSkeletonManager by lazy {
-        PawnSkeletonManager().apply {
-            addEventListener(Slash1H) { _, _ ->
-                println("hit")
-            }
-        }
-    }
+    val speed: Float,
+    val camera: Camera
+) : LayeredObject {
 
     private val weapons: List<EquipmentAtlas> by lazy {
         Weapons.all
@@ -44,13 +39,26 @@ class PawnTest(
     private val batch: SpriteBatch by lazy {
         SpriteBatch()
     }
+    private val pawnManager: PawnSkeletonManager by lazy {
+        PawnSkeletonManager(batch).apply {
+            addEventListener(Slash1H) { _, _ ->
+                println("hit")
+            }
+        }
+    }
+
+    override val pivotX: Float
+        get() = pawnManager.pivotX
+
+    override val pivotY: Float
+        get() = pawnManager.pivotY
 
     init {
         Gdx.input.inputProcessor = MyInputProcessor(this)
     }
 
-    context(delta:Float, camera: Camera)
-    fun render() {
+    context(delta: Float)
+    override fun render() {
         camera.position.set(pawnManager.x, pawnManager.y, 0f)
         camera.update()
         test()
@@ -110,7 +118,7 @@ class PawnTest(
         }
     }
 
-    fun dispose() {
+    override fun dispose() {
         weapons.forEach(EquipmentAtlas::dispose)
         armors.forEach(EquipmentAtlas::dispose)
         customizations.forEach(CustomizationAtlas::dispose)
