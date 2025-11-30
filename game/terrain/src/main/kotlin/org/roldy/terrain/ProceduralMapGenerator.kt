@@ -70,7 +70,14 @@ class ProceduralMapGenerator(
                 tiledMap.layers.add(transitionLayer)
             }
         }
-
+        logger.debug {
+            "Add layer with biom colors"
+        }
+        tiledMap.layers.add(generateBiomeLayer())
+        logger.debug {
+            "Clearing terrain cache"
+        }
+        terrainCache.clear()
         return tiledMap
     }
 
@@ -144,6 +151,20 @@ class ProceduralMapGenerator(
         val biomeName: String
     )
 
+    private fun generateBiomeLayer(): TiledMapTileLayer {
+        val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val terrain = terrainCache.getValue(x to y)
+                val cell = TiledMapTileLayer.Cell().apply {
+                    tile = StaticTiledMapTile(terrain.biome.color)
+                }
+                layer.setCell(x, y, cell)
+            }
+        }
+        return layer
+    }
+
     /**
      * Generates the base terrain layer without transitions
      */
@@ -216,55 +237,128 @@ class ProceduralMapGenerator(
      * Uses RimWorld-style edge blending: transitions occur between any different terrains.
      * Priority determines which terrain's edge is shown (higher priority bleeds into lower).
      * For equal priority terrains, uses alphabetical name comparison as tiebreaker.
+     * Supports both edge (cardinal) and corner (diagonal) transitions.
      */
     private fun calculateTransitionTile(x: Int, y: Int): Terrain? {
         val currentTerrain = terrainCache[Pair(x, y)] ?: return null
         val currentPriority = getTerrainPriority(currentTerrain.data.name)
 
-        // Get neighbors in 4 cardinal directions
+        // Get neighbors in all 8 directions
         val northTerrain = if (y + 1 < height) terrainCache[Pair(x, y + 1)] else null
         val southTerrain = if (y - 1 >= 0) terrainCache[Pair(x, y - 1)] else null
         val eastTerrain = if (x + 1 < width) terrainCache[Pair(x + 1, y)] else null
         val westTerrain = if (x - 1 >= 0) terrainCache[Pair(x - 1, y)] else null
+        val neTerrain = if (y + 1 < height && x + 1 < width) terrainCache[Pair(x + 1, y + 1)] else null
+        val seTerrain = if (y - 1 >= 0 && x + 1 < width) terrainCache[Pair(x + 1, y - 1)] else null
+        val swTerrain = if (y - 1 >= 0 && x - 1 >= 0) terrainCache[Pair(x - 1, y - 1)] else null
+        val nwTerrain = if (y + 1 < height && x - 1 >= 0) terrainCache[Pair(x - 1, y + 1)] else null
 
-        // Check each direction for a different terrain
-        // Show transition if neighbor has higher priority, OR equal priority with "higher" name
-        // Priority: N, S, E, W (first matching neighbor found)
-        val transitionRegion = when {
+        // First check cardinal directions for edge transitions
+        // Edges take priority over corners
+        val edgeRegion = when {
             northTerrain != null &&
-            northTerrain.data.name != currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, northTerrain.data.name) -> {
+                    northTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, northTerrain.data.name) -> {
                 // North neighbor should bleed into this tile
                 val edgeName = "${northTerrain.data.name}_Edge_S"
                 northTerrain.biome.atlas?.findRegion(edgeName)
             }
+
             southTerrain != null &&
-            southTerrain.data.name != currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, southTerrain.data.name) -> {
+                    southTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, southTerrain.data.name) -> {
                 // South neighbor should bleed into this tile
                 val edgeName = "${southTerrain.data.name}_Edge_N"
                 southTerrain.biome.atlas?.findRegion(edgeName)
             }
+
             eastTerrain != null &&
-            eastTerrain.data.name != currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, eastTerrain.data.name) -> {
+                    eastTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, eastTerrain.data.name) -> {
                 // East neighbor should bleed into this tile
                 val edgeName = "${eastTerrain.data.name}_Edge_W"
                 eastTerrain.biome.atlas?.findRegion(edgeName)
             }
+
             westTerrain != null &&
-            westTerrain.data.name != currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, westTerrain.data.name) -> {
+                    westTerrain.data.name != currentTerrain.data.name &&
+                    shouldShowTransition(currentTerrain.data.name, currentPriority, westTerrain.data.name) -> {
                 // West neighbor should bleed into this tile
                 val edgeName = "${westTerrain.data.name}_Edge_E"
                 westTerrain.biome.atlas?.findRegion(edgeName)
             }
+
             else -> null
         }
 
-        return if (transitionRegion != null) {
-            // Create a Terrain with the transition texture region
-            Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, transitionRegion)
+        // If we found an edge, return it (edges have priority)
+        if (edgeRegion != null) {
+            return Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, edgeRegion)
+        }
+
+        // Otherwise check diagonal corners (only when no edges are present)
+        // This ensures corners only appear for isolated diagonal contacts
+        data class CornerCandidate(val region: com.badlogic.gdx.graphics.g2d.TextureRegion, val priority: Int)
+
+        val cornerCandidates = mutableListOf<CornerCandidate>()
+
+        // NE corner: only show if N and E neighbors are same terrain
+        if (neTerrain != null &&
+            neTerrain.data.name != currentTerrain.data.name &&
+            northTerrain?.data?.name == currentTerrain.data.name &&
+            eastTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, neTerrain.data.name)
+        ) {
+            val cornerName = "${neTerrain.data.name}_Corner_Outer_SW"
+            neTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(neTerrain.data.name)))
+            }
+        }
+
+        // SE corner: only show if S and E neighbors are same terrain
+        if (seTerrain != null &&
+            seTerrain.data.name != currentTerrain.data.name &&
+            southTerrain?.data?.name == currentTerrain.data.name &&
+            eastTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, seTerrain.data.name)
+        ) {
+            val cornerName = "${seTerrain.data.name}_Corner_Outer_NW"
+            seTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(seTerrain.data.name)))
+            }
+        }
+
+        // SW corner: only show if S and W neighbors are same terrain
+        if (swTerrain != null &&
+            swTerrain.data.name != currentTerrain.data.name &&
+            southTerrain?.data?.name == currentTerrain.data.name &&
+            westTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, swTerrain.data.name)
+        ) {
+            val cornerName = "${swTerrain.data.name}_Corner_Outer_NE"
+            swTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(swTerrain.data.name)))
+            }
+        }
+
+        // NW corner: only show if N and W neighbors are same terrain
+        if (nwTerrain != null &&
+            nwTerrain.data.name != currentTerrain.data.name &&
+            northTerrain?.data?.name == currentTerrain.data.name &&
+            westTerrain?.data?.name == currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, nwTerrain.data.name)
+        ) {
+            val cornerName = "${nwTerrain.data.name}_Corner_Outer_SE"
+            nwTerrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(nwTerrain.data.name)))
+            }
+        }
+
+        // Pick the corner with highest priority terrain
+        val cornerRegion = cornerCandidates.maxByOrNull { it.priority }?.region
+
+        return if (cornerRegion != null) {
+            Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, cornerRegion)
         } else {
             null
         }
@@ -359,18 +453,20 @@ class ProceduralMapGenerator(
         // Find matching biome
         val biome = biomes.find { biome ->
             noiseData.elevation <= biome.data.elevation &&
-            noiseData.temperature <= biome.data.temperature &&
-            noiseData.moisture <= biome.data.moisture
+                    noiseData.temperature <= biome.data.temperature &&
+                    noiseData.moisture <= biome.data.moisture
         }
 
         // Find matching terrain within biome
         val terrain = biome?.terrains?.find { terrain ->
             noiseData.elevation <= terrain.data.elevation &&
-            noiseData.temperature <= terrain.data.temperature &&
-            noiseData.moisture <= terrain.data.moisture
+                    noiseData.temperature <= terrain.data.temperature &&
+                    noiseData.moisture <= terrain.data.moisture
         }
 
-        return terrain ?: fallbackTerrain
+        return terrain ?: fallbackTerrain.also {
+            logger.debug { "No terrain for ${biome?.data?.name} for $noiseData" }
+        }
     }
 
     /**
@@ -430,14 +526,12 @@ class ProceduralMapGenerator(
      */
     private fun createFallbackTerrain(): Terrain {
         return Biome(
-            BiomesSettings(
-                mapOf("default" to com.badlogic.gdx.graphics.Color.MAGENTA)
-            ),
             BiomeData(
                 "Fallback",
                 terrains = listOf(
-                    BiomeData.TerrainData("Fallback", "default")
-                )
+                    BiomeData.TerrainData("Fallback")
+                ),
+                color = MISSING_TILE_COLOR
             ),
             tileSize
         ).terrains.first()

@@ -10,8 +10,9 @@ import kotlinx.serialization.decodeFromString
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.logger
 
+val MISSING_TILE_COLOR = Color.MAGENTA
+
 data class Biome(
-    val settings: BiomesSettings,
     val data: BiomeData,
     val tileSize: Int
 ) {
@@ -28,10 +29,19 @@ data class Biome(
     }
     val terrains by lazy {
         data.terrains.map {
-            Terrain(this, settings.color[it.color] ?: Color.BLACK, it)
+            Terrain(this, data.color, it)
 
         }
     }
+
+    val color by lazy {
+        Pixmap(tileSize, tileSize, Pixmap.Format.RGBA8888).run {
+            setColor(data.color)
+            fill()
+            TextureRegion(Texture(this))
+        }
+    }
+
 }
 
 class Terrain(
@@ -42,16 +52,18 @@ class Terrain(
 ) {
 
     val region: TextureRegion by lazy {
-        initialRegion ?: biome.atlas?.findRegion(data.name) ?: default()
+        initialRegion ?: biome.atlas?.findRegion(data.name) ?: default
     }
 
-    private fun default() =
+    private val default by lazy {
         Pixmap(biome.tileSize, biome.tileSize, Pixmap.Format.RGBA8888).run {
             logger.debug("Region ${data.name} not found in Atlas ${biome.data.name}")
             setColor(color)
             fill()
             TextureRegion(Texture(this))
         }
+    }
+
 }
 
 internal fun loadBiomes(tileSize: Int): List<Biome> =
@@ -65,5 +77,5 @@ internal fun loadBiomes(tileSize: Int): List<Biome> =
 
 internal fun loadBiomes(configuration: BiomesConfiguration, tileSize: Int): List<Biome> =
     configuration.biomes.map {
-        Biome(configuration.settings, it, tileSize)
+        Biome(it, tileSize)
     }

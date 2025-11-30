@@ -21,16 +21,91 @@ private val textureAssets = listOf(
         "Water",
         "Assets/Game Buffs/Stylized Beach & Desert Textures/Textures",
         listOf(
-            "Beach_Sand_2",
-            "Beach_Sand_9",
-            "Beach_Sand_10",
-            "Beach_Sand_31",
-            "Beach_Sand_30",
             "Water_1",
             "Water_8",
             "Water_7",
             "Water_6",
-            "Water_9"
+            "Water_9",
+            "Beach_Sand_10",
+            "Beach_Sand_2"
+        )
+    ),
+    TerrainTextureData(
+        "Savanna",
+        "Assets/Game Buffs/Stylized Beach & Desert Textures/Textures",
+        listOf(
+            "Sandy_Grass_3",
+            "Sandy_Grass_6",
+            "Dry_Soil_1",
+            "Dry_Soil_2",
+            "Dry_Soil_3"
+        )
+    ),
+    TerrainTextureData(
+        "Desert",
+        "Assets/Game Buffs/Stylized Beach & Desert Textures/Textures",
+        listOf(
+            "Desert_Sand_1",
+            "Desert_Sand_8",
+            "Sand_24",
+            "Sand_22"
+        )
+    ),
+    TerrainTextureData(
+        "DeepDesert",
+        "Assets/Game Buffs/Stylized Beach & Desert Textures/Textures",
+        listOf(
+            "Rippled_Sand_1",
+            "Rippled_Sand_5",
+            "Rippled_Sand_10"
+        )
+    ),
+    TerrainTextureData(
+        "Forest",
+        "Assets/Game Buffs/Stylized Forest Textures/Textures",
+        listOf(
+            "Grass_1",
+            "Grass_2",
+            "Grass_3",
+            "Grass_4"
+        )
+    ),
+    TerrainTextureData(
+        "Jungle",
+        "Assets/Game Buffs/Stylized Forest Textures/Textures",
+        listOf(
+            "Jungle_Floor_1",
+            "Jungle_Floor_2",
+            "Jungle_Floor_3",
+            "Jungle_Floor_4"
+        )
+    ),
+    TerrainTextureData(
+        "Swamp",
+        "Assets/Game Buffs/Stylized Forest Textures/Textures",
+        listOf(
+            "Mud_1",
+            "Mud_2",
+            "Mud_3",
+            "Mud_4",
+        )
+    ),
+    TerrainTextureData(
+        "Snow",
+        "Assets/Game Buffs/Stylized Arctic Textures/Textures",
+        listOf(
+            "Dirty_Snow_1",
+            "Snow_2",
+            "Snow_13"
+        )
+    ),
+    TerrainTextureData(
+        "Ice",
+        "Assets/Game Buffs/Stylized Arctic Textures/Textures",
+        listOf(
+            "Ice_10",
+            "Ice_3",
+            "Ice_12"
         )
     )
 )
@@ -92,14 +167,20 @@ private fun copyTextures() {
     textureAssets.forEach { data ->
         val biomeDir = repackSourcepath.resolve(data.biomeName)
         biomeDir.toFile().mkdirs()
-        data.sourceTextures.forEach {
-            it.toFile().listFiles().forEach { sourceFile ->
-                if (sourceFile.extension == "png" && (allowed.any {
-                        sourceFile.name.contains(it)
-                    })) {
-                    val targetFile = biomeDir.resolve("${it.name.replace("_", "")}.png")
-                    copy(sourceFile.toPath(), targetFile)
+        data.sourceTextures.forEach { file->
+            runCatching {
+                file.toFile().listFiles().forEach { sourceFile ->
+                    if (sourceFile.extension == "png" && (allowed.any {
+                            sourceFile.name.contains(it)
+                        })) {
+                        val targetFile = biomeDir.resolve("${file.name.replace("_", "")}.png")
+                        copy(sourceFile.toPath(), targetFile)
+                    }
                 }
+            }.onFailure {
+                println(file.absolutePathString())
+                it.printStackTrace()
+                exitProcess(1)
             }
         }
     }

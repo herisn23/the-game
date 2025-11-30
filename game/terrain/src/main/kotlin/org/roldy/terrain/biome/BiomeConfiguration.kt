@@ -26,7 +26,7 @@ object G2DColorSerializer : KSerializer<Color> {
     }
 }
 
-const val maxValue = 2f
+const val maxValue = 10f
 
 @Serializable
 data class BiomeData(
@@ -35,13 +35,14 @@ data class BiomeData(
     override val elevation: Float = maxValue,
     override val temperature: Float = maxValue,
     override val moisture: Float = maxValue,
+    @Serializable(G2DColorSerializer::class)
+    val color: Color,
     val terrains: List<TerrainData>
 ) : HeightData {
 
     @Serializable
     data class TerrainData(
         val name: String,
-        val color: String,
         override val elevation: Float = maxValue,
         override val temperature: Float = maxValue,
         override val moisture: Float = maxValue
@@ -50,11 +51,5 @@ data class BiomeData(
 
 @Serializable
 data class BiomesConfiguration(
-    val biomes: List<BiomeData>,
-    val settings: BiomesSettings
-)
-
-@Serializable
-data class BiomesSettings(
-    val color: Map<String, @Serializable(G2DColorSerializer::class) Color>
+    val biomes: List<BiomeData>
 )
