@@ -17,7 +17,8 @@ fun main() {
 //            repackWeapons()
 //            repackShields()
 //            repackBodyParts()
-            repackTerrain()
+//            repackTerrain()
+            repackTerrainTextures()
             exitProcess(0)
         }
     })

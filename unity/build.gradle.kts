@@ -1,3 +1,6 @@
+val assets: SourceSet by sourceSets.creating {
+    resources.srcDirs(rootProject.file("assets").path)
+}
 dependencies {
     implementation("org.yaml:snakeyaml:2.2")
     // https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind
@@ -8,4 +11,5 @@ dependencies {
     runtimeOnly(variantOf(libs.gdx.platform) {
         classifier("natives-desktop")
     })
+    runtimeOnly(assets.output)
 }

@@ -1,0 +1,67 @@
+settings:
+  color:
+    beach: e5e168
+    ocean: 002876
+    deepWater: 2658d0
+    shallowWater: 278397
+    shore: 22cccd
+biomes:
+  - name: Water # Atlas name
+    terrains:
+      # Default water
+      - name: Water9
+        elevation: -0.2
+        temperature: 0.4
+        color: ocean
+      - name: Water1
+        elevation: 0.3
+        color: shore
+      - name: BeachSand9
+        elevation: 0.5
+        color: beach
+      - name: BeachSand31
+        elevation: 0.7
+        color: beach
+      - name: Water8
+        color: deepWater
+  - name: Water # Atlas name
+    elevation: 0.05
+    terrains:
+      # Default water
+      - name: Water9
+        elevation: -0.2
+        temperature: 0.4
+        color: ocean
+      - name: Water8
+        elevation: -0.15
+        temperature: 0.4
+        color: deepWater
+      - name: Water1
+        elevation: -0.1
+        temperature: 0.4
+        color: shore
+      - name: BeachSand10
+        elevation: 0
+        temperature: 0.4
+        color: beach
+      - name: BeachSand9
+        temperature: 0.4
+        color: beach
+      # Warm water
+      - name: Water7
+        elevation: -0.25
+        color: ocean
+      - name: Water6
+        elevation: -0.2
+        color: deepWater
+      - name: Water1
+        elevation: -0.15
+        color: shallowWater
+      - name: BeachSand2
+        elevation: -0.1
+        color: beach
+      - name: BeachSand31
+        elevation: 0
+        color: beach
+      - name: BeachSand30
+        color: beach

@@ -1,0 +1,636 @@
+
+Water.png
+size: 4096, 4096
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+BeachSand10
+  rotate: false
+  xy: 805, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Corner_Outer_NE
+  rotate: false
+  xy: 2011, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Corner_Outer_NW
+  rotate: false
+  xy: 2413, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Corner_Outer_SE
+  rotate: false
+  xy: 2815, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Corner_Outer_SW
+  rotate: false
+  xy: 3217, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Edge_E
+  rotate: false
+  xy: 3619, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Edge_N
+  rotate: false
+  xy: 1, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Edge_S
+  rotate: false
+  xy: 403, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand10_Edge_W
+  rotate: false
+  xy: 805, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2
+  rotate: false
+  xy: 1, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Corner_Outer_NE
+  rotate: false
+  xy: 1207, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Corner_Outer_NW
+  rotate: false
+  xy: 1609, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Corner_Outer_SE
+  rotate: false
+  xy: 2011, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Corner_Outer_SW
+  rotate: false
+  xy: 2413, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Edge_E
+  rotate: false
+  xy: 2815, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Edge_N
+  rotate: false
+  xy: 3217, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Edge_S
+  rotate: false
+  xy: 3619, 403
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand2_Edge_W
+  rotate: false
+  xy: 1, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30
+  rotate: false
+  xy: 1207, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Corner_Outer_NE
+  rotate: false
+  xy: 403, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Corner_Outer_NW
+  rotate: false
+  xy: 805, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Corner_Outer_SE
+  rotate: false
+  xy: 1207, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Corner_Outer_SW
+  rotate: false
+  xy: 1609, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Edge_E
+  rotate: false
+  xy: 2011, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Edge_N
+  rotate: false
+  xy: 2413, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Edge_S
+  rotate: false
+  xy: 2815, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand30_Edge_W
+  rotate: false
+  xy: 3217, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31
+  rotate: false
+  xy: 1609, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Corner_Outer_NE
+  rotate: false
+  xy: 3619, 805
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Corner_Outer_NW
+  rotate: false
+  xy: 1, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Corner_Outer_SE
+  rotate: false
+  xy: 403, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Corner_Outer_SW
+  rotate: false
+  xy: 805, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Edge_E
+  rotate: false
+  xy: 1207, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Edge_N
+  rotate: false
+  xy: 1609, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Edge_S
+  rotate: false
+  xy: 2011, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand31_Edge_W
+  rotate: false
+  xy: 2413, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9
+  rotate: false
+  xy: 403, 1
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Corner_Outer_NE
+  rotate: false
+  xy: 2815, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Corner_Outer_NW
+  rotate: false
+  xy: 3217, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Corner_Outer_SE
+  rotate: false
+  xy: 3619, 1207
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Corner_Outer_SW
+  rotate: false
+  xy: 1, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Edge_E
+  rotate: false
+  xy: 403, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Edge_N
+  rotate: false
+  xy: 805, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Edge_S
+  rotate: false
+  xy: 1207, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+BeachSand9_Edge_W
+  rotate: false
+  xy: 1609, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1
+  rotate: false
+  xy: 2011, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Corner_Outer_NE
+  rotate: false
+  xy: 1, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Corner_Outer_NW
+  rotate: false
+  xy: 403, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Corner_Outer_SE
+  rotate: false
+  xy: 805, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Corner_Outer_SW
+  rotate: false
+  xy: 1207, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Edge_E
+  rotate: false
+  xy: 1609, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Edge_N
+  rotate: false
+  xy: 2011, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Edge_S
+  rotate: false
+  xy: 2413, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water1_Edge_W
+  rotate: false
+  xy: 2815, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6
+  rotate: false
+  xy: 2413, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Corner_Outer_NE
+  rotate: false
+  xy: 3217, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Corner_Outer_NW
+  rotate: false
+  xy: 3619, 2011
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Corner_Outer_SE
+  rotate: false
+  xy: 1, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Corner_Outer_SW
+  rotate: false
+  xy: 403, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Edge_E
+  rotate: false
+  xy: 805, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Edge_N
+  rotate: false
+  xy: 1207, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Edge_S
+  rotate: false
+  xy: 1609, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water6_Edge_W
+  rotate: false
+  xy: 2011, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7
+  rotate: false
+  xy: 2815, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Corner_Outer_NE
+  rotate: false
+  xy: 2413, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Corner_Outer_NW
+  rotate: false
+  xy: 2815, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Corner_Outer_SE
+  rotate: false
+  xy: 3217, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Corner_Outer_SW
+  rotate: false
+  xy: 3619, 2413
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Edge_E
+  rotate: false
+  xy: 1, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Edge_N
+  rotate: false
+  xy: 403, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Edge_S
+  rotate: false
+  xy: 805, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water7_Edge_W
+  rotate: false
+  xy: 1207, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8
+  rotate: false
+  xy: 3217, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Corner_Outer_NE
+  rotate: false
+  xy: 1609, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Corner_Outer_NW
+  rotate: false
+  xy: 2011, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Corner_Outer_SE
+  rotate: false
+  xy: 2413, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Corner_Outer_SW
+  rotate: false
+  xy: 2815, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Edge_E
+  rotate: false
+  xy: 3217, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Edge_N
+  rotate: false
+  xy: 3619, 2815
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Edge_S
+  rotate: false
+  xy: 1, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water8_Edge_W
+  rotate: false
+  xy: 403, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9
+  rotate: false
+  xy: 3619, 1609
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Corner_Outer_NE
+  rotate: false
+  xy: 805, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Corner_Outer_NW
+  rotate: false
+  xy: 1207, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Corner_Outer_SE
+  rotate: false
+  xy: 1609, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Corner_Outer_SW
+  rotate: false
+  xy: 2011, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Edge_E
+  rotate: false
+  xy: 2413, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Edge_N
+  rotate: false
+  xy: 2815, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Edge_S
+  rotate: false
+  xy: 3217, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+Water9_Edge_W
+  rotate: false
+  xy: 3619, 3217
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1

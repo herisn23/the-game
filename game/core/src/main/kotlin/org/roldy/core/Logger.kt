@@ -1,0 +1,77 @@
+package org.roldy.core
+
+import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
+import kotlin.reflect.KProperty
+
+class Logger(
+    val tag: String
+) {
+
+    enum class Level(val level: Int) {
+        None(Application.LOG_NONE),
+        Debug(Application.LOG_DEBUG),
+        Info(Application.LOG_INFO),
+        Error(Application.LOG_ERROR)
+    }
+
+    companion object {
+        var level: Level
+            get() = Level.entries.first { it.level == Gdx.app.logLevel }
+            set(value) {
+                Gdx.app.logLevel = value.level
+            }
+        val default = Logger("App")
+    }
+
+
+    fun debug(message: String, ex: Throwable? = null) {
+        when {
+            ex != null -> Gdx.app.debug(tag, message, ex)
+            else -> Gdx.app.debug(tag, message)
+        }
+    }
+
+    fun debug(ex: Throwable, message: () -> String) {
+        Gdx.app.debug(tag, message(), ex)
+    }
+
+    fun error(ex: Throwable, message: () -> String) {
+        Gdx.app.error(tag, message(), ex)
+    }
+
+    fun error(message: String, ex: Throwable? = null) {
+        when {
+            ex != null -> Gdx.app.error(tag, message, ex)
+            else -> Gdx.app.error(tag, message)
+        }
+    }
+
+    fun info(ex: Throwable, message: () -> String) {
+        Gdx.app.log(tag, message(), ex)
+    }
+
+    fun info(message: () -> String) {
+        Gdx.app.log(tag, message())
+    }
+
+    fun info(message: String, ex: Throwable? = null) {
+        when {
+            ex != null -> Gdx.app.log(tag, message, ex)
+            else -> Gdx.app.log(tag, message)
+        }
+    }
+}
+
+val logger by lazy {
+    Logger.default
+}
+
+fun logger(tag: String): Lazy<Logger> = lazy {
+    Logger(tag)
+}
+
+operator fun <T : Loggable> T.getValue(thisRef: Any?, property: KProperty<*>): Logger =
+    Logger(this::class.simpleName ?: property.name)
+
+interface Loggable

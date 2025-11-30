@@ -19,5 +19,5 @@ fun loadShader(vertPath: String, fragPath: String): ShaderProgram {
 }
 
 val terrainShader by lazy {
-    loadShader("shader/vert.glsl", "shader/frag.glsl")
+    loadShader("shader/splatmap/vert.glsl", "shader/splatmap/frag.glsl")
 }

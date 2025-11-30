@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import org.roldy.core.Logger
+import org.roldy.core.Logger.Level
 
 class TestApp : ApplicationAdapter() {
     lateinit var diagnostic: Diagnostic
@@ -15,6 +17,7 @@ class TestApp : ApplicationAdapter() {
     lateinit var viewport: Viewport
 
     override fun create() {
+        Logger.level = Level.Debug
         diagnostic = Diagnostic()
         pawnTest = PawnTest(100f)
         terrainTest = TerrainTest(15f)
