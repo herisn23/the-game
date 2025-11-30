@@ -34,16 +34,16 @@ data class Biome(
     }
 }
 
-data class Terrain(
+class Terrain(
     val biome: Biome,
     val color: Color,
-    val data: BiomeData.TerrainData
+    val data: BiomeData.TerrainData,
+    initialRegion: TextureRegion? = null
 ) {
 
-    val region_: TextureRegion by lazy {
-        biome.atlas?.findRegion(data.name) ?: default()
+    val region: TextureRegion by lazy {
+        initialRegion ?: biome.atlas?.findRegion(data.name) ?: default()
     }
-    var region = region_
 
     private fun default() =
         Pixmap(biome.tileSize, biome.tileSize, Pixmap.Format.RGBA8888).run {

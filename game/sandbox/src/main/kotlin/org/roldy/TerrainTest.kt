@@ -6,50 +6,52 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
 import org.roldy.terrain.ProceduralMapGenerator
+import org.roldy.terrain.TerrainDebugRenderer
 
 class TerrainTest(
     val zoomSensitivity: Float = 1f
 ) {
 
-    // Create generator
-    val generator = ProceduralMapGenerator(
-        seed = 1,
-        width = 1000,
-        height = 1000,
-        tileSize = 400,
+    // Map parameters
+    private val width = 100
+    private val height = 100
+    private val tileSize = 200
+
+    // Create procedural generator (this is safe during init, no OpenGL calls)
+    private val generator = ProceduralMapGenerator(
+        seed = 20,
+        width = width,
+        height = height,
+        tileSize = tileSize,
         elevationScale = 0.001f,    // Lower = smoother elevation changes
         moistureScale = 0.003f,      // Lower = larger moisture zones
         temperatureScale = 0.05f,    // Lower = larger temperature zones
-        enableTransitions = true
+        enableTransitions = true,    // Enable transitions
+        debugMode = true             // Enable debug mode
     )
+    val tiledMapRenderer = OrthogonalTiledMapRenderer(generator.generate())
 
-    // Generate the map
-    val tiledMap = generator.generate()
+    // Debug renderer
+    private val debugRenderer = TerrainDebugRenderer(tileSize)
+    private val debugInfo = generator.getAllDebugInfo()
+    private var debugEnabled = false
+    private var debugTogglePressed = false
 
-    // Create renderer
-    val renderer = OrthogonalTiledMapRenderer(tiledMap)
-
-//    val w = 100
-//    val h = 100
-//    val splatmapGenerator = SplatMapGenerator(w, h, noiseMap)
-//    val splatmaps = splatmapGenerator.generateSplatmaps()
-//    val tr = TerrainRenderer(w, h, 400, splatmaps)
     context(_: Float, camera: OrthographicCamera)
     fun render() {
         // Handle input
         handleInput()
-//        tr.render(camera)
-        renderer.setView(camera)
-//        // Enable blending BEFORE any rendering
-//        Gdx.gl.glEnable(GL20.GL_BLEND)
-//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        tiledMapRenderer.setView(camera)
+        tiledMapRenderer.render()
 
-        renderer.render()
+        // Render debug overlay if enabled
+        if (debugEnabled) {
+            debugRenderer.render(camera, debugInfo)
+        }
     }
 
     context(delta: Float, camera: OrthographicCamera)
     private fun handleInput() {
-
         // Zoom
         if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
             camera.zoom += zoomSensitivity * delta
@@ -57,11 +59,20 @@ class TerrainTest(
         if (Gdx.input.isKeyPressed(Input.Keys.E)) {
             camera.zoom -= zoomSensitivity * delta
         }
-        camera.zoom = MathUtils.clamp(camera.zoom, 3f, 50f)
+        // Adjusted zoom range for 200×200 tile map
+        camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 50f)
+
+        // Toggle debug overlay with D key
+        val debugKeyPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE)
+        if (debugKeyPressed && !debugTogglePressed) {
+            debugEnabled = !debugEnabled
+            println("Debug overlay: ${if (debugEnabled) "enabled" else "disabled"}")
+        }
+        debugTogglePressed = debugKeyPressed
     }
 
     fun dispose() {
-        renderer.dispose()
-        tiledMap.dispose()
+        tiledMapRenderer.dispose()
+        debugRenderer.dispose()
     }
 }

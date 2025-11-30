@@ -21,7 +21,7 @@ private val originalTargetTexturesPath = texturesPath.map {
     it.key to it.value.resolve("original")
 }.toMap()
 
-private const val targetSize = 400f
+private const val targetSize = 200f
 private val scaleDown = targetSize / 2048f
 
 fun repackTerrain() {

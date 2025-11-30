@@ -76,8 +76,8 @@ class TileTransitionResolver(
             // Format: TerrainName_Transition_Bitmask (e.g., "Grass_T_47")
             "${transitionInfo.baseTerrain.data.name}_T_${transitionInfo.bitmask}",
 
-            // Format: TerrainName_TransitionType (e.g., "Grass_Edge_North")
-            "${transitionInfo.baseTerrain.data.name}_${transitionInfo.transitionType.name}",
+            // Format: TerrainName_TransitionType (e.g., "Grass_Edge_W")
+            "${transitionInfo.baseTerrain.data.name}_${transitionInfo.transitionType.tileSuffix}",
 
             // Format: TerrainName_Auto_Bitmask (e.g., "Grass_Auto_47")
             "${transitionInfo.baseTerrain.data.name}_Auto_${transitionInfo.bitmask}",

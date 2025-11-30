@@ -3,6 +3,7 @@ package org.roldy.terrain
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
+import org.roldy.core.logger
 import org.roldy.terrain.biome.*
 import kotlin.math.abs
 
@@ -22,6 +23,7 @@ import kotlin.math.abs
  * @param moistureScale Scale factor for moisture noise (lower = larger moisture zones)
  * @param temperatureScale Scale factor for temperature noise (lower = larger temperature zones)
  * @param enableTransitions Whether to enable tile transitions for smoother terrain blending
+ * @param debugMode Whether to store debug information (position, terrain name) in tile properties
  */
 class ProceduralMapGenerator(
     private val seed: Long,
@@ -31,7 +33,8 @@ class ProceduralMapGenerator(
     private val elevationScale: Float = 0.0025f,
     private val moistureScale: Float = 0.005f,
     private val temperatureScale: Float = 0.1f,
-    private val enableTransitions: Boolean = true
+    private val enableTransitions: Boolean = true,
+    private val debugMode: Boolean = false
 ) {
 
     private val temperatureNoise = SimplexNoise(seed)
@@ -61,12 +64,85 @@ class ProceduralMapGenerator(
         if (enableTransitions) {
             val transitionLayer = generateTransitionLayer()
             if (transitionLayer != null) {
+                logger.debug {
+                    "Add transition layer to tile map"
+                }
                 tiledMap.layers.add(transitionLayer)
             }
         }
 
         return tiledMap
     }
+
+    /**
+     * Gets the terrain data as a 2D array for splatmap generation
+     * This allows external systems (like SplatMapGenerator) to access terrain assignments
+     */
+    fun getTerrainData(): Array<Array<Terrain>> {
+        // Ensure terrain cache is populated by generating the base layer if needed
+        if (terrainCache.isEmpty()) {
+            val biomes = loadBiomes(tileSize)
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    val noiseData = generateNoiseData(x, y)
+                    val terrain = findTerrainForNoise(biomes, noiseData)
+                    terrainCache[Pair(x, y)] = terrain
+                }
+            }
+        }
+
+        // Convert cache to 2D array
+        return Array(width) { x ->
+            Array(height) { y ->
+                terrainCache[Pair(x, y)] ?: fallbackTerrain
+            }
+        }
+    }
+
+    /**
+     * Gets debug information for a specific tile position
+     * Returns a DebugInfo object containing position and terrain details
+     * Useful for rendering debug overlays
+     */
+    fun getDebugInfo(x: Int, y: Int): DebugInfo? {
+        if (!debugMode) return null
+        if (x !in 0 until width || y !in 0 until height) return null
+
+        val terrain = terrainCache[Pair(x, y)] ?: return null
+        return DebugInfo(
+            x = x,
+            y = y,
+            terrainName = terrain.data.name,
+            biomeName = terrain.biome.data.name
+        )
+    }
+
+    /**
+     * Gets debug information for all tiles in the map
+     * Returns a list of DebugInfo objects for rendering debug overlays
+     */
+    fun getAllDebugInfo(): List<DebugInfo> {
+        if (!debugMode) return emptyList()
+
+        return terrainCache.map { (pos, terrain) ->
+            DebugInfo(
+                x = pos.first,
+                y = pos.second,
+                terrainName = terrain.data.name,
+                biomeName = terrain.biome.data.name
+            )
+        }
+    }
+
+    /**
+     * Data class for debug information about a tile
+     */
+    data class DebugInfo(
+        val x: Int,
+        val y: Int,
+        val terrainName: String,
+        val biomeName: String
+    )
 
     /**
      * Generates the base terrain layer without transitions
@@ -86,6 +162,14 @@ class ProceduralMapGenerator(
                 val cell = TiledMapTileLayer.Cell().apply {
                     tile = StaticTiledMapTile(terrain.region)
                 }
+
+                // Add debug properties if debug mode is enabled
+                if (debugMode) {
+                    cell.tile.properties.put("debug_position", "($x, $y)")
+                    cell.tile.properties.put("debug_terrain", terrain.data.name)
+                    cell.tile.properties.put("debug_biome", terrain.biome.data.name)
+                }
+
                 layer.setCell(x, y, cell)
             }
         }
@@ -99,7 +183,7 @@ class ProceduralMapGenerator(
      */
     private fun generateTransitionLayer(): TiledMapTileLayer? {
         val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
-        var hasAnyTransition = false
+        var transitionCount = 0
 
         for (x in 0 until width) {
             for (y in 0 until height) {
@@ -108,45 +192,125 @@ class ProceduralMapGenerator(
                     val cell = TiledMapTileLayer.Cell().apply {
                         tile = StaticTiledMapTile(transitionTile.region)
                     }
+
+                    // Add debug properties if debug mode is enabled
+                    if (debugMode) {
+                        cell.tile.properties.put("debug_transition", "true")
+                        cell.tile.properties.put("debug_position", "($x, $y)")
+                    }
+
                     layer.setCell(x, y, cell)
-                    hasAnyTransition = true
+                    transitionCount++
                 }
             }
         }
 
-        return if (hasAnyTransition) layer else null
+        logger.info { "Generated transition layer with $transitionCount transition tiles" }
+        return if (transitionCount > 0) layer else null
     }
 
     /**
      * Calculates if a transition tile is needed at the given position
-     * Returns a TextureRegion for the transition tile, or null if no transition is needed
+     * Returns a Terrain with edge texture region, or null if no transition is needed
+     *
+     * Uses RimWorld-style edge blending: transitions occur between any different terrains.
+     * Priority determines which terrain's edge is shown (higher priority bleeds into lower).
+     * For equal priority terrains, uses alphabetical name comparison as tiebreaker.
      */
     private fun calculateTransitionTile(x: Int, y: Int): Terrain? {
         val currentTerrain = terrainCache[Pair(x, y)] ?: return null
+        val currentPriority = getTerrainPriority(currentTerrain.data.name)
 
-        // Get all 8 neighbors
-        val neighbors = getNeighborTerrains(x, y)
+        // Get neighbors in 4 cardinal directions
+        val northTerrain = if (y + 1 < height) terrainCache[Pair(x, y + 1)] else null
+        val southTerrain = if (y - 1 >= 0) terrainCache[Pair(x, y - 1)] else null
+        val eastTerrain = if (x + 1 < width) terrainCache[Pair(x + 1, y)] else null
+        val westTerrain = if (x - 1 >= 0) terrainCache[Pair(x - 1, y)] else null
 
-        // Calculate transition using the resolver
-        val transitionInfo = transitionResolver.calculateTransition(currentTerrain, neighbors)
-            ?: return null // No transition needed
-
-        // Try to find the transition tile in the atlas
-        val transitionRegion = transitionResolver.findTransitionTile(transitionInfo)
-
-        // If we found a transition tile, create a Terrain for it
-        return if (transitionRegion != null) {
-            // Create a temporary terrain with the transition tile
-            // This allows the transition to use the existing Terrain infrastructure
-            Terrain(
-                currentTerrain.biome,
-                currentTerrain.color,
-                currentTerrain.data
-            ).apply {
-                region = transitionRegion
+        // Check each direction for a different terrain
+        // Show transition if neighbor has higher priority, OR equal priority with "higher" name
+        // Priority: N, S, E, W (first matching neighbor found)
+        val transitionRegion = when {
+            northTerrain != null &&
+            northTerrain.data.name != currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, northTerrain.data.name) -> {
+                // North neighbor should bleed into this tile
+                val edgeName = "${northTerrain.data.name}_Edge_S"
+                northTerrain.biome.atlas?.findRegion(edgeName)
             }
+            southTerrain != null &&
+            southTerrain.data.name != currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, southTerrain.data.name) -> {
+                // South neighbor should bleed into this tile
+                val edgeName = "${southTerrain.data.name}_Edge_N"
+                southTerrain.biome.atlas?.findRegion(edgeName)
+            }
+            eastTerrain != null &&
+            eastTerrain.data.name != currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, eastTerrain.data.name) -> {
+                // East neighbor should bleed into this tile
+                val edgeName = "${eastTerrain.data.name}_Edge_W"
+                eastTerrain.biome.atlas?.findRegion(edgeName)
+            }
+            westTerrain != null &&
+            westTerrain.data.name != currentTerrain.data.name &&
+            shouldShowTransition(currentTerrain.data.name, currentPriority, westTerrain.data.name) -> {
+                // West neighbor should bleed into this tile
+                val edgeName = "${westTerrain.data.name}_Edge_E"
+                westTerrain.biome.atlas?.findRegion(edgeName)
+            }
+            else -> null
+        }
+
+        return if (transitionRegion != null) {
+            // Create a Terrain with the transition texture region
+            Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, transitionRegion)
         } else {
-            null // No transition tile found in atlas
+            null
+        }
+    }
+
+    /**
+     * Determines if a transition should be shown on the current tile based on neighbor
+     * Returns true if neighbor has higher priority, or equal priority with alphabetically higher name
+     */
+    private fun shouldShowTransition(
+        currentName: String,
+        currentPriority: Int,
+        neighborName: String
+    ): Boolean {
+        val neighborPriority = getTerrainPriority(neighborName)
+
+        return when {
+            neighborPriority > currentPriority -> true  // Higher priority always shows
+            neighborPriority < currentPriority -> false // Lower priority never shows
+            else -> neighborName > currentName          // Equal priority: use alphabetical tiebreaker
+        }
+    }
+
+    /**
+     * Gets the priority of a terrain type for transition rendering
+     * Higher values = higher priority (will show transitions)
+     * Lower values = lower priority (will not show transitions)
+     */
+    private fun getTerrainPriority(terrainName: String): Int {
+        return when {
+            // Water types have lowest priority (0-9)
+            terrainName.startsWith("Water") -> 0
+
+            // Beach/Sand types have medium priority (10-19)
+            terrainName.startsWith("BeachSand") -> 10
+            terrainName.startsWith("Sand") -> 10
+
+            // Grass types have higher priority (20-29)
+            terrainName.startsWith("Grass") -> 20
+
+            // Stone/Rock types have highest priority (30+)
+            terrainName.startsWith("Stone") -> 30
+            terrainName.startsWith("Rock") -> 30
+
+            // Default priority
+            else -> 15
         }
     }
 

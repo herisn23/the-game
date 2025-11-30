@@ -32,12 +32,20 @@ class Logger(
         }
     }
 
+    fun debug(message: () -> String) {
+        Gdx.app.debug(tag, message())
+    }
+
     fun debug(ex: Throwable, message: () -> String) {
         Gdx.app.debug(tag, message(), ex)
     }
 
     fun error(ex: Throwable, message: () -> String) {
         Gdx.app.error(tag, message(), ex)
+    }
+
+    fun error(message: () -> String) {
+        Gdx.app.error(tag, message())
     }
 
     fun error(message: String, ex: Throwable? = null) {
