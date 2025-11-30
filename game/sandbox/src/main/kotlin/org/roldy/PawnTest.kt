@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import org.roldy.core.renderer.LayeredObject
+import com.badlogic.gdx.math.Rectangle
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
@@ -52,6 +52,9 @@ class PawnTest(
 
     override val pivotY: Float
         get() = pawnManager.pivotY
+
+    override fun shouldRender(viewBounds: Rectangle): Boolean =
+        pawnManager.shouldRender(viewBounds)
 
     init {
         Gdx.input.inputProcessor = MyInputProcessor(this)

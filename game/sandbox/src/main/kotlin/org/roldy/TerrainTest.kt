@@ -6,16 +6,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
 import org.roldy.terrain.ProceduralMapGenerator
+import org.roldy.terrain.ProcessTile
 import org.roldy.terrain.TerrainDebugRenderer
 import org.roldy.utils.sequencer
 
 class TerrainTest(
-    val zoomSensitivity: Float = 1f
+    val zoomSensitivity: Float = 1f,
+    processTile: ProcessTile = {}
 ) {
 
     // Map parameters
-    private val width = 100
-    private val height = 100
+    private val width = 1000
+    private val height = 1000
     private val tileSize = 200
 
     // Create procedural generator (this is safe during init, no OpenGL calls)
@@ -30,7 +32,7 @@ class TerrainTest(
         enableTransitions = true,    // Enable transitions
         debugMode = false             // Enable debug mode
     )
-    val tiledMap = generator.generate()
+    val tiledMap = generator.generate(processTile)
     val tiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
     private val debugInfo = generator.getAllDebugInfo()
 

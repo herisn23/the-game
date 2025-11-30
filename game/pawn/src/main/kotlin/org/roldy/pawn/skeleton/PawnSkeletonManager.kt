@@ -2,9 +2,9 @@ package org.roldy.pawn.skeleton
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
 import org.roldy.core.RenderedObject
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
-import org.roldy.core.renderer.LayeredObject
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
@@ -53,6 +53,8 @@ class PawnSkeletonManager(
     ShieldWearer,
     PawnAnimation, LayeredObject {
 
+    override fun shouldRender(viewBounds: Rectangle): Boolean = true
+
     /** Indicates whether the pawn is currently moving */
     private var moving = false
 
@@ -93,6 +95,7 @@ class PawnSkeletonManager(
 
     override val pivotY: Float
         get() = y - pivotYOrigin
+
     fun createSkeleton(orientation: PawnSkeletonOrientation) =
         PawnSkeleton(
             orientation,
@@ -313,6 +316,7 @@ class PawnSkeletonManager(
      */
     context(deltaTime: Float)
     override fun render() {
+//        frontSkeleton.skeleton.bo
         skeletons.values.forEach { skel ->
             skel.animate() // Always process animations to preserve states between orientations
         }

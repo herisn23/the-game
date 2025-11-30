@@ -25,6 +25,9 @@ import kotlin.math.abs
  * @param enableTransitions Whether to enable tile transitions for smoother terrain blending
  * @param debugMode Whether to store debug information (position, terrain name) in tile properties
  */
+
+typealias ProcessTile = (Triple<Terrain, Int, Int>) -> Unit
+
 class ProceduralMapGenerator(
     private val seed: Long,
     private val width: Int,
@@ -48,13 +51,14 @@ class ProceduralMapGenerator(
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
+     * @param postProcess is usefull to generate objects for specific tile by biom, terrain data, etc.
      */
-    fun generate(): TiledMap {
+    fun generate(postProcess: ProcessTile = {}): TiledMap {
         val tiledMap = TiledMap()
         val biomes = loadBiomes(tileSize)
 
         // Generate base terrain layer
-        tiledMap.layers.add(generateBaseLayer(biomes))
+        tiledMap.layers.add(generateBaseLayer(biomes, postProcess))
 
         // Add transition layers if enabled
         if (enableTransitions) {
@@ -113,7 +117,7 @@ class ProceduralMapGenerator(
     /**
      * Generates the base terrain layer without transitions
      */
-    private fun generateBaseLayer(biomes: List<Biome>): TiledMapTileLayer {
+    private fun generateBaseLayer(biomes: List<Biome>, postProcess: ProcessTile): TiledMapTileLayer {
         val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
 
         for (x in 0 until width) {
@@ -135,7 +139,7 @@ class ProceduralMapGenerator(
                     cell.tile.properties.put("debug_terrain", terrain.data.name)
                     cell.tile.properties.put("debug_biome", terrain.biome.data.name)
                 }
-
+                postProcess(Triple(terrain, x, y))
                 layer.setCell(x, y, cell)
             }
         }
