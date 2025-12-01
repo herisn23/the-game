@@ -2,62 +2,75 @@ package org.roldy.core.stream
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Rectangle
+import org.roldy.core.Renderable
+import org.roldy.core.stream.chunk.ChunkDataManager
+import org.roldy.core.stream.chunk.ChunkItemData
+import org.roldy.core.stream.drawable.Drawable
+import org.roldy.core.stream.drawable.DrawablePool
+import org.roldy.utils.invoke
 
 class WorldStreamer(
     private val camera: OrthographicCamera,
-    private val atlas: TextureAtlas,
-    private val chunkManager: ChunkManager
+    private val chunkManager: ChunkDataManager,
+    private val persistentItems: List<Streamable>,
+    instance: () -> Drawable
 ) {
-    private val pool = RenderItemPool(atlas)
-    private val active = mutableListOf<RenderItem>() // currently visible instances
-    private val tmpView = Rectangle()
+    private val pool = DrawablePool(instance)
+    private val poolableItems = mutableListOf<Drawable>() // currently visible instances
+
+    private val active = mutableListOf<Streamable>()
+    private val viewBounds = Rectangle()
 
     private fun computeViewBounds(): Rectangle {
         val w = camera.viewportWidth * camera.zoom
         val h = camera.viewportHeight * camera.zoom
-        tmpView.set(
+        viewBounds.set(
             camera.position.x - w / 2f,
             camera.position.y - h / 2f,
             w, h
         )
-        return tmpView
+        return viewBounds
     }
 
-    fun updateVisible() {
+    fun update() {
         val view = computeViewBounds()
 
         // Collect items in visible chunks
-        val visibleItems = mutableListOf<MapItemData>()
+        val visibleItems = mutableListOf<ChunkItemData>()
         for (chunk in chunkManager.chunksInView(view)) {
-            for (item in chunk.items) {
-                // Item-level culling
-                if (view.contains(item.x, item.y)) {
-                    visibleItems += item
-                }
-            }
+            visibleItems += chunk.items
         }
 
         // Return all active instances to pool
-        active.forEach { pool.free(it) }
+        poolableItems.forEach {
+            pool.free(it)
+        }
+        poolableItems.clear()
         active.clear()
 
         // Create/reuse instances for visible items
         visibleItems.forEach { item ->
             val inst = pool.obtain()
-            inst.bind(item, atlas)
-            active += inst
+            inst.bind(item)
+            poolableItems += inst
         }
-
+        active.addAll(persistentItems)
+        active.addAll(poolableItems)
         // Y-sort for correct overlap
-        active.sortBy { it.sprite.y }
+        active.sortBy { -it.zIndex }
     }
 
+    context(delta: Float)
     fun render(batch: SpriteBatch) {
         batch.projectionMatrix = camera.combined
-        batch.begin()
-        active.forEach { it.sprite.draw(batch) }
-        batch.end()
+        batch {
+            active.forEach {
+                when (it) {
+                    is Drawable -> it.draw(batch)
+                    is Renderable -> it.render()
+                }
+            }
+        }
     }
 }

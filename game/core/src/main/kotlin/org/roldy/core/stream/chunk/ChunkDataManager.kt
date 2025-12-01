@@ -1,10 +1,11 @@
-package org.roldy.core.stream
+package org.roldy.core.stream.chunk
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Rectangle
+import kotlin.math.floor
 
-class ChunkManager(
-    private val chunkSize: Float = 256f,
+class ChunkDataManager(
+    private val chunkSize: Float = 512f, //in future set chunkSize = tileSize × tilesPerChunk
     private val atlas: TextureAtlas
 ) {
     private val chunks = mutableMapOf<ChunkCoord, Chunk>()
@@ -13,21 +14,19 @@ class ChunkManager(
     fun getOrCreateChunk(cx: Int, cy: Int): Chunk {
         val key = ChunkCoord(cx, cy)
         return chunks.getOrPut(key) {
-            val chunk = Chunk(key)
-            // Generate or load items for this chunk here (procedural or from file)
-            // Example: add a few trees
-            repeat(10) {
-                val x = cx * chunkSize + (Math.random() * chunkSize).toFloat()
-                val y = cy * chunkSize + (Math.random() * chunkSize).toFloat()
-                chunk.items += MapItemData(type = atlas.regions.random().name, x = x, y = y)
+            Chunk(key).apply {
+                repeat(1) {
+                    val x = cx * chunkSize + (Math.random() * chunkSize).toFloat()
+                    val y = cy * chunkSize + (Math.random() * chunkSize).toFloat()
+                    items += ChunkItemData(type = atlas.regions.random().name, x = x, y = y)
+                }
             }
-            chunk
         }
     }
 
     fun worldToChunk(x: Float, y: Float): ChunkCoord {
-        val cx = kotlin.math.floor(x / chunkSize).toInt()
-        val cy = kotlin.math.floor(y / chunkSize).toInt()
+        val cx = floor(x / chunkSize).toInt()
+        val cy = floor(y / chunkSize).toInt()
         return ChunkCoord(cx, cy)
     }
 

@@ -12,11 +12,9 @@ import org.roldy.environment.EnvironmentalObject
 
 class TestApp : ApplicationAdapter() {
     lateinit var diagnostic: Diagnostic
-    lateinit var pawnTest: PawnTest
     lateinit var terrainTest: TerrainTest
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
-    lateinit var layeringRenderer: LayeringRenderer
     lateinit var streamTest: StreamTest
 
     override fun create() {
@@ -28,7 +26,6 @@ class TestApp : ApplicationAdapter() {
             position.set(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2, 1f)
         }
         terrainTest = TerrainTest(15f)
-        pawnTest = PawnTest(10f, camera)
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
 //        layeringRenderer = LayeringRenderer(
 //            objects + pawnTest, camera
@@ -54,7 +51,6 @@ class TestApp : ApplicationAdapter() {
         context(Gdx.graphics.deltaTime, camera) {
             terrainTest.render()
             streamTest.render()
-            pawnTest.render()
         }
 
         diagnostic.render()
@@ -62,6 +58,5 @@ class TestApp : ApplicationAdapter() {
 
     override fun dispose() {
         diagnostic.dispose()
-        pawnTest.dispose()
     }
 }

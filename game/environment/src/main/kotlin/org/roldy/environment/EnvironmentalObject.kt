@@ -1,44 +1,45 @@
 package org.roldy.environment
 
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Rectangle
-import org.roldy.utils.invoke
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import org.roldy.core.stream.chunk.ChunkItemData
+import org.roldy.core.stream.drawable.Drawable
 
 class EnvironmentalObject(
-    private val camera: OrthographicCamera,
-    private val tex: Texture,
-    x: Float,
-    y: Float,
-) : LayeredObject {
-    val sprite = Sprite(tex).apply {
-        setCenter(x, y)
-        setSize(500f, 500f)
+    val atlas: TextureAtlas,
+) : Drawable {
+    /**
+     * Create empty sprite
+     * This object is managed by pool and world streamer
+     * Sprite data are provided by bind function
+     * */
+
+    var sprite: Sprite? = null
+
+    context(delta: Float)
+    override fun draw(batch: SpriteBatch) {
+        sprite?.draw(batch)
     }
 
-    private val boundingBox: Rectangle = Rectangle(
-        pivotX,
-        pivotY,
-        sprite.width,
-        sprite.height
-    )
+    override val zIndex: Float
+        get() = sprite?.run {
+            y - height / 2f
+        } ?: 0f
 
-    override fun shouldRender(viewBounds: Rectangle): Boolean =
-        viewBounds.overlaps(boundingBox)
-
-    val batch = SpriteBatch()
-    override val pivotX: Float
-        get() = sprite.x// - sprite.width / 2f
-    override val pivotY: Float
-        get() = sprite.y - sprite.height / 2f
-
-    context(deltaTime: Float)
-    override fun render() {
-        batch.projectionMatrix = camera.combined
-        batch {
-            sprite.draw(this)
+    override fun bind(data: ChunkItemData) {
+        val region = atlas.findRegion(data.type)
+        if(sprite == null) {
+            sprite = Sprite(region)
         }
+        sprite?.run {
+            setSize(300f, 300f)
+            setRegion(region)
+            setCenter(data.x, data.y)
+            setOriginCenter()
+            setScale(1f)
+            setRotation(0f)
+        }
+
     }
 }

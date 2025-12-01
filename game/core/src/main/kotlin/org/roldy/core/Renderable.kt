@@ -1,6 +1,8 @@
 package org.roldy.core
 
-interface RenderedObject {
+import org.roldy.core.stream.Streamable
+
+interface Renderable: Streamable {
     context(deltaTime: Float)
     fun render()
     fun dispose() {}

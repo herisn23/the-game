@@ -2,8 +2,7 @@ package org.roldy.pawn.skeleton
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Rectangle
-import org.roldy.core.RenderedObject
+import org.roldy.core.Renderable
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
@@ -44,16 +43,14 @@ object PawnManagerMath {
 class PawnSkeletonManager(
     private val batch: SpriteBatch
 ) : AnimationTypeEventListenerHandler<PawnAnimator>(),
-    RenderedObject,
+    Renderable,
     ArmorWearer,
     Customizable,
     Strippable,
     WeaponWearer,
     UnderwearWearer,
     ShieldWearer,
-    PawnAnimation, LayeredObject {
-
-    override fun shouldRender(viewBounds: Rectangle): Boolean = true
+    PawnAnimation {
 
     /** Indicates whether the pawn is currently moving */
     private var moving = false
@@ -68,6 +65,9 @@ class PawnSkeletonManager(
     /** Current Y position of all skeletons */
     val y: Float
         get() = skeletons[currentOrientation]?.skeleton?.y ?: 0f
+
+    override val zIndex: Float
+        get() = y - frontSkeleton.height / 2
 
     /** Current movement speed multiplier (synced with animation speed) */
     private var movementSpeed = 1f
@@ -90,11 +90,6 @@ class PawnSkeletonManager(
     private val rightSkeleton = createSkeleton(Right)
 
     private val pivotYOrigin = frontSkeleton.height / 2
-    override val pivotX: Float
-        get() = x
-
-    override val pivotY: Float
-        get() = y - pivotYOrigin
 
     fun createSkeleton(orientation: PawnSkeletonOrientation) =
         PawnSkeleton(

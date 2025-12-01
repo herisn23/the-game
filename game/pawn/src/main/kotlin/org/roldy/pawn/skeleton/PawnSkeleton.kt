@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.esotericsoftware.spine.*
 import com.esotericsoftware.spine.attachments.RegionAttachment
-import org.roldy.core.RenderedObject
 import org.roldy.core.asset.loadAsset
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
@@ -52,7 +51,7 @@ class PawnSkeleton(
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
     private val batch: SpriteBatch,
-) : RenderedObject, ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
+) : ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSlotBody.Hair to false,
@@ -279,7 +278,7 @@ class PawnSkeleton(
     }
 
     context(deltaTime: Float)
-    override fun render() {
+    fun render() {
         drawHairColor()
         drawSkinColor()
         drawUnderWearColor()

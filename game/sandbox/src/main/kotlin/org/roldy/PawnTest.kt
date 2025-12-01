@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Rectangle
+import org.roldy.core.Renderable
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
@@ -13,13 +13,13 @@ import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.*
 import org.roldy.pawn.skeleton.PawnSkeletonManager
 import org.roldy.pawn.skeleton.attribute.*
-import org.roldy.utils.invoke
 import org.roldy.utils.sequencer
 
 class PawnTest(
     val speed: Float,
-    val camera: Camera
-) : LayeredObject {
+    val camera: Camera,
+    val batch: SpriteBatch
+) : Renderable {
 
     private val weapons: List<EquipmentAtlas> by lazy {
         Weapons.all
@@ -36,9 +36,6 @@ class PawnTest(
     private val shields: List<ShieldAtlas> by lazy {
         Shield.all
     }
-    private val batch: SpriteBatch by lazy {
-        SpriteBatch()
-    }
     private val pawnManager: PawnSkeletonManager by lazy {
         PawnSkeletonManager(batch).apply {
             addEventListener(Slash1H) { _, _ ->
@@ -47,29 +44,20 @@ class PawnTest(
         }
     }
 
-    override val pivotX: Float
-        get() = pawnManager.pivotX
-
-    override val pivotY: Float
-        get() = pawnManager.pivotY
-
-    override fun shouldRender(viewBounds: Rectangle): Boolean =
-        pawnManager.shouldRender(viewBounds)
-
     init {
         Gdx.input.inputProcessor = MyInputProcessor(this)
     }
+
+    override val zIndex: Float
+        get() = pawnManager.zIndex
 
     context(delta: Float)
     override fun render() {
         camera.position.set(pawnManager.x, pawnManager.y, 0f)
         camera.update()
         test()
-        batch.projectionMatrix = camera.combined
-        batch {
-            context(delta, this) {
-                pawnManager.render()
-            }
+        context(delta, this) {
+            pawnManager.render()
         }
     }
 
