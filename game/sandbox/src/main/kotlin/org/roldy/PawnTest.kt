@@ -2,7 +2,6 @@ package org.roldy
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.core.Renderable
@@ -11,6 +10,9 @@ import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.*
+import org.roldy.keybind.KeybindProcessor
+import org.roldy.keybind.KeybindSettings
+import org.roldy.keybind.keybinds
 import org.roldy.pawn.skeleton.PawnSkeletonManager
 import org.roldy.pawn.skeleton.attribute.*
 import org.roldy.utils.sequencer
@@ -43,11 +45,7 @@ class PawnTest(
             }
         }
     }
-
-    init {
-        Gdx.input.inputProcessor = MyInputProcessor(this)
-    }
-
+    val inputProcessor = MyInputProcessor(this, keybinds)
     override val zIndex: Float
         get() = pawnManager.zIndex
 
@@ -119,7 +117,7 @@ class PawnTest(
         batch.dispose()
     }
 
-    class MyInputProcessor(val app: PawnTest) : InputAdapter() {
+    class MyInputProcessor(val app: PawnTest, override val settings: KeybindSettings) : KeybindProcessor {
         var lastKeycode: Int = 0
         val keyActions = mapOf(
             Input.Keys.W to (

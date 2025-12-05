@@ -8,11 +8,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import org.roldy.core.Logger
 import org.roldy.core.Logger.Level
-import org.roldy.environment.EnvironmentalObject
+import org.roldy.map.WorldMap
+import org.roldy.map.WorldMapSize
 
 class TestApp : ApplicationAdapter() {
     lateinit var diagnostic: Diagnostic
-    lateinit var terrainTest: TerrainTest
+    lateinit var worldMap: WorldMap
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
     lateinit var streamTest: StreamTest
@@ -20,21 +21,20 @@ class TestApp : ApplicationAdapter() {
     override fun create() {
         Logger.level = Level.Debug
         diagnostic = Diagnostic()
-        val objects = mutableListOf<EnvironmentalObject>()
         camera = OrthographicCamera().apply {
             zoom = 0f
             position.set(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2, 1f)
         }
-        terrainTest = TerrainTest(15f)
+        worldMap = WorldMap(WorldMapSize.Small, 1)
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
-//        layeringRenderer = LayeringRenderer(
-//            objects + pawnTest, camera
-//        )
-        streamTest = StreamTest(camera)
-    }
 
-    private fun generatedObjectsByTerrain() {
-
+        streamTest = StreamTest(worldMap.terrainData, camera)
+        Gdx.input.inputProcessor = InputProcessorDelegate(
+            listOf(
+                streamTest.pawn.inputProcessor,
+                worldMap.inputProcessor
+            )
+        )
     }
 
     override fun resize(width: Int, height: Int) {
@@ -49,7 +49,7 @@ class TestApp : ApplicationAdapter() {
         viewport.apply()
 
         context(Gdx.graphics.deltaTime, camera) {
-            terrainTest.render()
+            worldMap.render()
             streamTest.render()
         }
 

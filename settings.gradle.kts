@@ -5,7 +5,7 @@ include("launcher")
 include("unity")
 
 include("game:application")
-include("game:terrain")
+include("game:world-map")
 include("game:pawn")
 include("game:sandbox")
 include("game:core")

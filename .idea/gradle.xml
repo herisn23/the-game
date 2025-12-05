@@ -28,7 +28,7 @@
             <option value="$PROJECT_DIR$/game/equipment" />
             <option value="$PROJECT_DIR$/game/pawn" />
             <option value="$PROJECT_DIR$/game/sandbox" />
-            <option value="$PROJECT_DIR$/game/terrain" />
+            <option value="$PROJECT_DIR$/game/world-map" />
             <option value="$PROJECT_DIR$/launcher" />
             <option value="$PROJECT_DIR$/unity" />
           </set>

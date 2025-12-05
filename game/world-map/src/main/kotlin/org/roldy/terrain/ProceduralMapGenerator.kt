@@ -51,27 +51,22 @@ class ProceduralMapGenerator(
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
-     * @param postProcess is usefull to generate objects for specific tile by biom, terrain data, etc.
      */
-    fun generate(postProcess: ProcessTile = {}): TiledMap {
+    fun generate(): TiledMap {
         val tiledMap = TiledMap()
         val biomes = loadBiomes(tileSize)
 
         // Generate base terrain layer
-        tiledMap.layers.add(generateBaseLayer(biomes, postProcess))
+        tiledMap.layers.add(generateBaseLayer(biomes))
 
         // Add transition layers if enabled
         if (enableTransitions) {
             tiledMap.layers.add(generateTransitionLayer())
         }
-        logger.debug {
-            "Add layer with biom colors"
-        }
-        tiledMap.layers.add(generateBiomeLayer())
         return tiledMap
     }
 
-    val terrainMap: Map<Pair<Int, Int>, Terrain> get() = terrainCache
+    val terrainData: Map<Pair<Int, Int>, Terrain> get() = terrainCache
 
     /**
      * Gets debug information for all tiles in the map
@@ -117,7 +112,7 @@ class ProceduralMapGenerator(
     /**
      * Generates the base terrain layer without transitions
      */
-    private fun generateBaseLayer(biomes: List<Biome>, postProcess: ProcessTile): TiledMapTileLayer {
+    private fun generateBaseLayer(biomes: List<Biome>): TiledMapTileLayer {
         val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
 
         for (x in 0 until width) {
@@ -139,7 +134,6 @@ class ProceduralMapGenerator(
                     cell.tile.properties.put("debug_terrain", terrain.data.name)
                     cell.tile.properties.put("debug_biome", terrain.biome.data.name)
                 }
-                postProcess(Triple(terrain, x, y))
                 layer.setCell(x, y, cell)
             }
         }
