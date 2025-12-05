@@ -11,6 +11,7 @@ include("game:sandbox")
 include("game:core")
 include("game:equipment")
 include("game:environment")
+include("game:scene")
 
 dependencyResolutionManagement {
     repositories {

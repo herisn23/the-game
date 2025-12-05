@@ -1,4 +1,4 @@
-package org.roldy
+package org.roldy.core
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import org.roldy.utils.invoke
 
-class Diagnostic {
+class Diagnostics {
     private val batch by lazy {
         SpriteBatch()
     }
@@ -39,5 +39,6 @@ class Diagnostic {
 
     fun dispose() {
         batch.dispose()
+        font.dispose()
     }
 }

@@ -9,6 +9,7 @@ abstract class ChunkDataManager(
     private val chunks = mutableMapOf<ChunkCoord, Chunk>()
 
     abstract fun getChunk(coords: ChunkCoord): Chunk
+    abstract fun hasChunk(coords: ChunkCoord): Boolean
 
     // Provide / generate chunk data on demand
     internal fun getOrCreateChunk(coords: ChunkCoord): Chunk {
@@ -23,7 +24,10 @@ abstract class ChunkDataManager(
         val list = mutableListOf<Chunk>()
         for (cy in min.cy..max.cy) {
             for (cx in min.cx..max.cx) {
-                list += getOrCreateChunk(ChunkCoord(cx, cy))
+                val coords = ChunkCoord(cx, cy)
+                if (hasChunk(coords)) {
+                    list += getOrCreateChunk(coords)
+                }
             }
         }
         return list

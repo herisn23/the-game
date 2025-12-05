@@ -1,7 +1,7 @@
 package org.roldy.map.input
 
 import com.badlogic.gdx.Input
-import org.roldy.keybind.KeybindName
+import org.roldy.core.keybind.KeybindName
 import org.roldy.keybind.KeybindProcessor
 import org.roldy.keybind.KeybindSettings
 

@@ -10,13 +10,20 @@ import org.roldy.core.stream.drawable.Drawable
 import org.roldy.core.stream.drawable.DrawablePool
 import org.roldy.utils.invoke
 
+fun interface StaticObjectBuilder {
+    fun build(): Drawable
+}
+
 class WorldStreamer(
     private val camera: OrthographicCamera,
     private val chunkManager: ChunkDataManager,
     private val persistentItems: List<Streamable>,
-    instance: () -> Drawable
+    staticObjectBuilder: StaticObjectBuilder
 ) {
-    private val pool = DrawablePool(instance)
+    private val itemLevelCulling = true
+    private val pool = DrawablePool {
+        staticObjectBuilder.build()
+    }
     private val poolableItems = mutableListOf<Drawable>() // currently visible instances
 
     private val active = mutableListOf<Streamable>()
@@ -38,8 +45,19 @@ class WorldStreamer(
 
         // Collect items in visible chunks
         val visibleItems = mutableListOf<ChunkItemData>()
+
+        // Chunk-level culling
         for (chunk in chunkManager.chunksInView(view)) {
-            visibleItems += chunk.items
+            if (!itemLevelCulling) {
+                visibleItems += chunk.items
+            } else {
+                for (item in chunk.items) {
+                    // Item-level culling
+                    if (view.contains(item.x, item.y)) {
+                        visibleItems += item
+                    }
+                }
+            }
         }
 
         // Return all active instances to pool

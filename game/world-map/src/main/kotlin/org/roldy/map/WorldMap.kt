@@ -37,6 +37,7 @@ class WorldMap(
     // Map parameters
     size: WorldMapSize,
     seed: Long,
+    private val camera: OrthographicCamera,
     generator: ProceduralMapGenerator = ProceduralMapGenerator(
         seed = seed,
         width = size.width,
@@ -55,7 +56,7 @@ class WorldMap(
     private val tiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
     val inputProcessor = WorldMapInputProcessor(keybinds)
 
-    context(_: Float, camera: OrthographicCamera)
+    context(_: Float)
     fun render() {
         // Handle input
         zoomCamera()
@@ -63,7 +64,7 @@ class WorldMap(
         tiledMapRenderer.render()
     }
 
-    context(delta: Float, camera: OrthographicCamera)
+    context(delta: Float)
     private fun zoomCamera() {
         inputProcessor.zoom { zoom ->
             camera.zoom += zoom * delta
