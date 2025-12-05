@@ -10,7 +10,7 @@ import kotlinx.serialization.decodeFromString
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.logger
 
-val MISSING_TILE_COLOR = Color.MAGENTA
+val MISSING_TILE_COLOR: Color = Color.MAGENTA
 
 data class Biome(
     val data: BiomeData,
@@ -52,7 +52,9 @@ class Terrain(
 ) {
 
     val region: TextureRegion by lazy {
-        initialRegion ?: biome.atlas?.findRegion(data.name) ?: default
+        initialRegion ?:
+        biome.atlas?.findRegion(data.name) ?:
+        default
     }
 
     private val default by lazy {

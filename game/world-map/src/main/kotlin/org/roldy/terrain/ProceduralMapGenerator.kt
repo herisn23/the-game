@@ -3,6 +3,7 @@ package org.roldy.terrain
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
+import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.terrain.biome.*
 import kotlin.math.abs
@@ -29,15 +30,15 @@ import kotlin.math.abs
 typealias ProcessTile = (Triple<Terrain, Int, Int>) -> Unit
 
 class ProceduralMapGenerator(
-    private val seed: Long,
-    private val width: Int,
-    private val height: Int,
-    private val tileSize: Int,
-    private val elevationScale: Float = 0.0025f,
-    private val moistureScale: Float = 0.005f,
-    private val temperatureScale: Float = 0.1f,
+    val seed: Long,
+    val width: Int,
+    val height: Int,
+    val tileSize: Int,
+    val elevationScale:Float = 0.001f,    // Lower = smoother elevation changes
+    val moistureScale:Float = 0.003f,      // Lower = larger moisture zones
+    val temperatureScale:Float = 0.05f,    // Lower = larger temperature zones
     private val enableTransitions: Boolean = true,
-    private val debugMode: Boolean = false
+    private val debugMode: Boolean = true
 ) {
 
     private val temperatureNoise = SimplexNoise(seed)
@@ -45,7 +46,7 @@ class ProceduralMapGenerator(
     private val elevationNoise = SimplexNoise(seed + 2)
 
     // Cache for terrain at each position
-    private val terrainCache = mutableMapOf<Pair<Int, Int>, Terrain>()
+    private val terrainCache = mutableMapOf<Vector2Int, Terrain>()
     private val transitionResolver = TileTransitionResolver(width, height, terrainCache)
     private val fallbackTerrain = createFallbackTerrain()
 
@@ -55,7 +56,6 @@ class ProceduralMapGenerator(
     fun generate(): TiledMap {
         val tiledMap = TiledMap()
         val biomes = loadBiomes(tileSize)
-
         // Generate base terrain layer
         tiledMap.layers.add(generateBaseLayer(biomes))
 
@@ -66,7 +66,7 @@ class ProceduralMapGenerator(
         return tiledMap
     }
 
-    val terrainData: Map<Pair<Int, Int>, Terrain> get() = terrainCache
+    val terrainData: Map<Vector2Int, Terrain> get() = terrainCache
 
     /**
      * Gets debug information for all tiles in the map
@@ -77,8 +77,8 @@ class ProceduralMapGenerator(
 
         return terrainCache.map { (pos, terrain) ->
             DebugInfo(
-                x = pos.first,
-                y = pos.second,
+                x = pos.x,
+                y = pos.y,
                 terrainName = terrain.data.name,
                 biomeName = terrain.biome.data.name
             )
@@ -99,7 +99,7 @@ class ProceduralMapGenerator(
         val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
         for (x in 0 until width) {
             for (y in 0 until height) {
-                val terrain = terrainCache.getValue(x to y)
+                val terrain = terrainCache.getValue(Vector2Int(x, y))
                 val cell = TiledMapTileLayer.Cell().apply {
                     tile = StaticTiledMapTile(terrain.biome.color)
                 }
@@ -121,7 +121,7 @@ class ProceduralMapGenerator(
                 val terrain = findTerrainForNoise(biomes, noiseData)
 
                 // Cache the terrain for transition calculations
-                terrainCache[Pair(x, y)] = terrain
+                terrainCache[Vector2Int(x, y)] = terrain
 
                 // Create cell with the selected terrain
                 val cell = TiledMapTileLayer.Cell().apply {

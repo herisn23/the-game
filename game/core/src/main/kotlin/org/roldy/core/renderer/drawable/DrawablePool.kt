@@ -1,4 +1,4 @@
-package org.roldy.core.stream.drawable
+package org.roldy.core.renderer.drawable
 
 import com.badlogic.gdx.utils.Pool
 

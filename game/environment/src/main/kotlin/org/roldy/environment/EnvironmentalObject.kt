@@ -3,8 +3,8 @@ package org.roldy.environment
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import org.roldy.core.stream.chunk.ChunkItemData
-import org.roldy.core.stream.drawable.Drawable
+import org.roldy.core.renderer.chunk.ChunkObjectData
+import org.roldy.core.renderer.drawable.Drawable
 
 class EnvironmentalObject(
     val atlas: TextureAtlas,
@@ -22,24 +22,22 @@ class EnvironmentalObject(
         sprite?.draw(batch)
     }
 
-    override val zIndex: Float
-        get() = sprite?.run {
-            y - height / 2f
-        } ?: 0f
+    override val zIndex: Float get() = sprite?.run { y - height / 2f } ?: 0f
 
-    override fun bind(data: ChunkItemData) {
-        val region = atlas.findRegion(data.type)
-        if(sprite == null) {
-            sprite = Sprite(region)
+    override fun bind(data: ChunkObjectData) {
+        atlas.findRegion(data.region)?.let { region->
+            if (sprite == null) {
+                sprite = Sprite(region)
+            }
+            sprite?.run {
+                val s = 100f
+                setSize(s, s)
+                setRegion(region)
+                setCenter(data.x, data.y)
+                setOriginCenter()
+                setScale(1f)
+                setRotation(0f)
+            }
         }
-        sprite?.run {
-            setSize(300f, 300f)
-            setRegion(region)
-            setCenter(data.x, data.y)
-            setOriginCenter()
-            setScale(1f)
-            setRotation(0f)
-        }
-
     }
 }

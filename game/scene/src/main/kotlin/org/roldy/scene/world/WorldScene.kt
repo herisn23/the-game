@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import org.roldy.InputProcessorDelegate
 import org.roldy.core.asset.loadAsset
-import org.roldy.core.stream.WorldStreamer
-import org.roldy.core.stream.chunk.ChunkItemData
+import org.roldy.core.renderer.ChunkRenderer
 import org.roldy.environment.EnvironmentalObject
 import org.roldy.keybind.keybinds
 import org.roldy.map.WorldMap
@@ -15,34 +14,49 @@ import org.roldy.map.WorldMapChunkDataManager
 import org.roldy.map.WorldMapSize
 import org.roldy.pawn.Pawn
 import org.roldy.pawn.PawnInputProcessor
+import org.roldy.terrain.ProceduralMapGenerator
 
 class WorldScene(
-    camera: OrthographicCamera
+    private val camera: OrthographicCamera
 ) {
-
+    val mapSize = WorldMapSize.Large
     val batch = SpriteBatch()
-    val map = WorldMap(WorldMapSize.Small, 1, camera)
+    val tileSize = 200
+
+    val map = WorldMap(
+        camera, ProceduralMapGenerator(
+            seed = 1,
+            width = mapSize.size,
+            height = mapSize.size,
+            tileSize = tileSize,
+            enableTransitions = true,    // Enable transitions
+            debugMode = false             // Enable debug mode
+        )
+    )
     val atlas = TextureAtlas(loadAsset("Trees.atlas"))
-    val chunkManager = WorldMapChunkDataManager(512f, map.terrainData) { coords, chunkSize ->
-        val items = mutableListOf<ChunkItemData>()
-        repeat(1) {
-            val x = coords.cx * chunkSize + (Math.random() * chunkSize).toFloat()
-            val y = coords.cy * chunkSize + (Math.random() * chunkSize).toFloat()
-            items += ChunkItemData(type = atlas.regions.random().name, x = x, y = y)
-        }
-        items
-    }
-    val playerPawn = Pawn(camera, batch)
-    val streamer = WorldStreamer(camera, chunkManager, listOf(playerPawn)) {
+    val playerPawn = Pawn(batch)
+
+    val currentPawn = playerPawn
+    val chunkRenderer = ChunkRenderer(
+        camera,
+        WorldMapChunkDataManager(
+            tileSize,
+            mapSize,
+            WorldPopulator(atlas, map.terrainData)
+        ),
+        listOf(playerPawn)
+    ) {
         EnvironmentalObject(atlas)
     }
 
 
     context(delta: Float)
     fun render() {
+        camera.position.set(currentPawn.manager.x, currentPawn.manager.y, 0f)
+        camera.update()
         map.render()
-        streamer.update()
-        streamer.render(batch)
+        chunkRenderer.update()
+        chunkRenderer.render(batch)
     }
 
     init {
@@ -50,7 +64,7 @@ class WorldScene(
             listOf(
                 map.inputProcessor,
                 PawnInputProcessor(keybinds) {
-                    playerPawn
+                    currentPawn
                 }
             )
         )

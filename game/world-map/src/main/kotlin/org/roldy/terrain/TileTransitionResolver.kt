@@ -1,28 +1,29 @@
 package org.roldy.terrain
 
+import org.roldy.core.Vector2Int
 import org.roldy.terrain.biome.Terrain
 
 class TileTransitionResolver(
     val width: Int,
     val height: Int,
-    val terrainCache: Map<Pair<Int, Int>, Terrain>
+    val terrainCache: Map<Vector2Int, Terrain>
 ) {
     /**
      * Data class to hold all transition types for a tile
      */
     fun calculateTransitionTile(x: Int, y: Int): Terrain? {
-        val currentTerrain = terrainCache[Pair(x, y)] ?: return null
+        val currentTerrain = terrainCache[Vector2Int(x, y)] ?: return null
         val currentPriority = getTerrainPriority(currentTerrain.data.name)
 
         // Get neighbors in all 8 directions
-        val northTerrain = if (y + 1 < height) terrainCache[Pair(x, y + 1)] else null
-        val southTerrain = if (y - 1 >= 0) terrainCache[Pair(x, y - 1)] else null
-        val eastTerrain = if (x + 1 < width) terrainCache[Pair(x + 1, y)] else null
-        val westTerrain = if (x - 1 >= 0) terrainCache[Pair(x - 1, y)] else null
-        val neTerrain = if (y + 1 < height && x + 1 < width) terrainCache[Pair(x + 1, y + 1)] else null
-        val seTerrain = if (y - 1 >= 0 && x + 1 < width) terrainCache[Pair(x + 1, y - 1)] else null
-        val swTerrain = if (y - 1 >= 0 && x - 1 >= 0) terrainCache[Pair(x - 1, y - 1)] else null
-        val nwTerrain = if (y + 1 < height && x - 1 >= 0) terrainCache[Pair(x - 1, y + 1)] else null
+        val northTerrain = if (y + 1 < height) terrainCache[Vector2Int(x, y + 1)] else null
+        val southTerrain = if (y - 1 >= 0) terrainCache[Vector2Int(x, y - 1)] else null
+        val eastTerrain = if (x + 1 < width) terrainCache[Vector2Int(x + 1, y)] else null
+        val westTerrain = if (x - 1 >= 0) terrainCache[Vector2Int(x - 1, y)] else null
+        val neTerrain = if (y + 1 < height && x + 1 < width) terrainCache[Vector2Int(x + 1, y + 1)] else null
+        val seTerrain = if (y - 1 >= 0 && x + 1 < width) terrainCache[Vector2Int(x + 1, y - 1)] else null
+        val swTerrain = if (y - 1 >= 0 && x - 1 >= 0) terrainCache[Vector2Int(x - 1, y - 1)] else null
+        val nwTerrain = if (y + 1 < height && x - 1 >= 0) terrainCache[Vector2Int(x - 1, y + 1)] else null
 
         // First check cardinal directions for edge transitions
         // Edges take priority over corners
@@ -203,7 +204,7 @@ class TileTransitionResolver(
             val nx = x + dx
             val ny = y + dy
             if (nx in 0 until width && ny in 0 until height) {
-                terrainCache[Pair(nx, ny)]
+                terrainCache[Vector2Int(nx, ny)]
             } else {
                 null
             }
