@@ -1,4 +1,4 @@
-package org.roldy.scene.world
+package org.roldy.scene.world.chunk
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
@@ -7,7 +7,6 @@ import org.roldy.core.asset.loadAsset
 import org.roldy.core.renderer.chunk.ChunkPopulator
 import org.roldy.core.x
 import org.roldy.environment.MapObjectData
-import org.roldy.map.WorldMapChunk
 import org.roldy.map.WorldMapSize
 import org.roldy.terrain.TileData
 import kotlin.math.sqrt

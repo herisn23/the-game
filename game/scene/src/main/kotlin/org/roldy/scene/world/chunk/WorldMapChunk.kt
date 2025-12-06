@@ -1,4 +1,4 @@
-package org.roldy.map
+package org.roldy.scene.world.chunk
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.renderer.chunk.Chunk

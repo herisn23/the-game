@@ -9,13 +9,14 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import org.roldy.core.Diagnostics
 import org.roldy.core.Logger
 import org.roldy.core.Logger.Level
+import org.roldy.scene.Scene
 import org.roldy.scene.world.WorldScene
 
 class TestApp : ApplicationAdapter() {
     lateinit var diagnostic: Diagnostics
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
-    lateinit var worldScene: WorldScene
+    lateinit var currentScene: Scene
 
     override fun create() {
         Logger.level = Level.Debug
@@ -26,7 +27,8 @@ class TestApp : ApplicationAdapter() {
         }
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
 
-        worldScene = WorldScene(camera)
+        currentScene = WorldScene(camera)
+        currentScene.onShow()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -41,7 +43,7 @@ class TestApp : ApplicationAdapter() {
         viewport.apply()
 
         context(Gdx.graphics.deltaTime, camera) {
-            worldScene.render()
+            currentScene.render()
         }
 
         diagnostic.render()
