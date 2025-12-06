@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.InputProcessorDelegate
 import org.roldy.core.renderer.ChunkRenderer
-import org.roldy.environment.MapObject
 import org.roldy.keybind.keybinds
 import org.roldy.map.WorldMap
 import org.roldy.map.WorldMapSize
@@ -14,7 +13,7 @@ import org.roldy.pawn.Pawn
 import org.roldy.pawn.PawnInputProcessor
 import org.roldy.scene.Scene
 import org.roldy.scene.world.chunk.WorldMapChunkManager
-import org.roldy.scene.world.chunk.WorldPopulator
+import org.roldy.scene.world.populator.WorldPopulator
 import org.roldy.terrain.ProceduralMapGenerator
 
 class WorldScene(
@@ -44,14 +43,12 @@ class WorldScene(
     val currentPawn = playerPawn
     val chunkRenderer = ChunkRenderer(
         camera,
+        listOf(playerPawn),
         WorldMapChunkManager(
             tileSize,
             mapSize,
             WorldPopulator(map.terrainData, mapSize, seed)
-        ) {
-            MapObject()
-        },
-        listOf(playerPawn)
+        )
     )
 
 

@@ -1,8 +1,8 @@
 package org.roldy.core
 
-import org.roldy.core.renderer.Sortable
+import org.roldy.core.renderer.Layered
 
-interface Renderable: Sortable {
+interface Renderable: Layered {
     context(deltaTime: Float)
     fun render()
     fun dispose() {}

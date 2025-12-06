@@ -14,11 +14,11 @@ import org.roldy.utils.invoke
 
 class ChunkRenderer<D: ChunkObjectData, T : Chunk<D>>(
     private val camera: OrthographicCamera,
-    private val chunkManager: ChunkManager<D, T>,
-    private val persistentItems: List<Sortable>
+    private val persistentItems: List<Layered>,
+    private val chunkManager: ChunkManager<D, T>
 ) {
     private val itemLevelCulling = false
-    private val active = mutableListOf<Sortable>()
+    private val active = mutableListOf<Layered>()
     private val viewBounds = Rectangle()
     private val visibleDrawables = mutableListOf<Drawable<D>>()
 
@@ -71,7 +71,7 @@ class ChunkRenderer<D: ChunkObjectData, T : Chunk<D>>(
         active.addAll(persistentItems)
         active.addAll(visibleDrawables)
         // Y-sort for correct overlap
-        active.sortWith(compareBy<Sortable> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
+        active.sortWith(compareBy<Layered> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
             .thenByDescending { it.zIndex }  // Secondary: z-index descending
         )
     }

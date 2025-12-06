@@ -9,13 +9,13 @@ import org.roldy.core.repeat
 import org.roldy.core.x
 import kotlin.math.floor
 
-fun interface DrawableBuilder<T: ChunkObjectData> {
-    fun build(): Drawable<T>
+fun interface PoolProvider<T: ChunkObjectData> {
+    fun provide(): Drawable<T>
 }
 
 abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     private val populator: ChunkPopulator<D, T>,
-    drawableBuilder: DrawableBuilder<D>
+    poolProvider: PoolProvider<D>
 ) {
     abstract val minCoords: Int
     abstract val maxCoords: Int
@@ -29,7 +29,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     val preloadRadius = -100f
     val visibleChunks: List<T> get() = visibleChunksCache
     private val pool = DrawablePool {
-        drawableBuilder.build()
+        poolProvider.provide()
     }
 
     abstract fun getChunk(coords: Vector2Int): T

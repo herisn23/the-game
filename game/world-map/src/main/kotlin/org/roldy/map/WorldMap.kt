@@ -9,6 +9,7 @@ import org.roldy.terrain.ProceduralMapGenerator
 interface WorldMapSize {
     val size: Int
     val chunks: Int get() = size / 10
+    val settlements: Int get() = chunks
 
     object Debug : WorldMapSize {
         override val size: Int = 50
