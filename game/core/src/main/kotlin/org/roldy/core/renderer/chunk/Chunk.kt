@@ -5,18 +5,18 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.renderer.drawable.Drawable
 
 
-abstract class Chunk(val coords: Vector2Int, val size: Float) {
-    class ChunkObject(
-        val data: ChunkObjectData,
-        val drawable: Drawable,
+abstract class Chunk<T: ChunkObjectData>(val coords: Vector2Int, val size: Float) {
+    class ChunkObject<T: ChunkObjectData>(
+        val data: T,
+        val drawable: Drawable<T>,
     )
 
-    internal val objects: MutableList<ChunkObject> = mutableListOf()
-    private val visibleObjects: MutableList<ChunkObject> = mutableListOf()
+    internal val objects: MutableList<ChunkObject<T>> = mutableListOf()
+    private val visibleObjects: MutableList<ChunkObject<T>> = mutableListOf()
 
-    val allObjects: List<ChunkObject> get() = objects
+    val allObjects: List<ChunkObject<T>> get() = objects
 
-    fun filterForVisibleObjects(predicate: (ChunkObject) -> Boolean): List<ChunkObject> =
+    fun filterForVisibleObjects(predicate: (ChunkObject<T>) -> Boolean): List<ChunkObject<T>> =
         run {
             this.visibleObjects.clear()
             objects.filterTo(this.visibleObjects, predicate)

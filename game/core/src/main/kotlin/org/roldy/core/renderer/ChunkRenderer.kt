@@ -7,19 +7,20 @@ import org.roldy.core.Diagnostics
 import org.roldy.core.Renderable
 import org.roldy.core.renderer.chunk.Chunk
 import org.roldy.core.renderer.chunk.ChunkManager
+import org.roldy.core.renderer.chunk.ChunkObjectData
 import org.roldy.core.renderer.drawable.Drawable
 import org.roldy.utils.invoke
 
 
-class ChunkRenderer<T : Chunk>(
+class ChunkRenderer<D: ChunkObjectData, T : Chunk<D>>(
     private val camera: OrthographicCamera,
-    private val chunkManager: ChunkManager<T>,
+    private val chunkManager: ChunkManager<D, T>,
     private val persistentItems: List<Sortable>
 ) {
     private val itemLevelCulling = false
     private val active = mutableListOf<Sortable>()
     private val viewBounds = Rectangle()
-    private val visibleDrawables = mutableListOf<Drawable>()
+    private val visibleDrawables = mutableListOf<Drawable<D>>()
 
     init {
         Diagnostics.addProvider {
@@ -82,7 +83,7 @@ class ChunkRenderer<T : Chunk>(
         batch {
             active.forEach {
                 when (it) {
-                    is Drawable -> it.draw(batch)
+                    is Drawable<*> -> it.draw(batch)
                     is Renderable -> it.render()
                 }
             }

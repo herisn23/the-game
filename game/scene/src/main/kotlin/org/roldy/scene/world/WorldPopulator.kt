@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.core.asset.loadAsset
-import org.roldy.core.renderer.chunk.ChunkObjectData
 import org.roldy.core.renderer.chunk.ChunkPopulator
 import org.roldy.core.x
+import org.roldy.environment.MapObjectData
 import org.roldy.map.WorldMapChunk
 import org.roldy.map.WorldMapSize
 import org.roldy.terrain.TileData
@@ -17,7 +17,7 @@ class WorldPopulator(
     private val terrainData: Map<Vector2Int, TileData>,
     private val mapSize: WorldMapSize,
     private val seed: Long
-) : ChunkPopulator<WorldMapChunk> {
+) : ChunkPopulator<MapObjectData, WorldMapChunk> {
     private val biomeSprites = mapOf(
         "Forest" to "tile000",
         "Swamp" to "tile041",
@@ -34,8 +34,8 @@ class WorldPopulator(
 
     override fun populate(
         chunk: WorldMapChunk
-    ): List<ChunkObjectData> =
-        mutableListOf<ChunkObjectData>().apply {
+    ): List<MapObjectData> =
+        mutableListOf<MapObjectData>().apply {
             val data = terrainData.filterBy(chunk)
             val settlementsInChunk = settlements.filter { settlement ->
                 data.contains(settlement.coords)
@@ -46,11 +46,11 @@ class WorldPopulator(
             }
             this += roadsInChunk.map { road ->
                 val position = chunk.objectPosition(road)
-                ChunkObjectData(atlas = trees, name = "road", position = position, isRoad = true)
+                MapObjectData(atlas = trees, name = "road", position = position, isRoad = true)
             }
             this += settlementsInChunk.map { settle ->
                 val position = chunk.objectPosition(settle.coords)
-                ChunkObjectData(atlas = settlementAtlas, name = settle.name, position = position, isRoad = false)
+                MapObjectData(atlas = settlementAtlas, name = settle.name, position = position, isRoad = false)
             }
 //            this += data.map { (position, data) ->
 //                fun rnd() = Math.random().toFloat()

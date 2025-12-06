@@ -1,5 +1,5 @@
 package org.roldy.core.renderer.chunk
 
-interface ChunkItem {
-    fun bind(data: ChunkObjectData)
+interface ChunkItem<D:ChunkObjectData> {
+    fun bind(data: D)
 }

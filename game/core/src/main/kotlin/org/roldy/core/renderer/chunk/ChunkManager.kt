@@ -9,13 +9,13 @@ import org.roldy.core.repeat
 import org.roldy.core.x
 import kotlin.math.floor
 
-fun interface DrawableBuilder {
-    fun build(): Drawable
+fun interface DrawableBuilder<T: ChunkObjectData> {
+    fun build(): Drawable<T>
 }
 
-abstract class ChunkManager<T : Chunk>(
-    private val populator: ChunkPopulator<T>,
-    drawableBuilder: DrawableBuilder
+abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
+    private val populator: ChunkPopulator<D, T>,
+    drawableBuilder: DrawableBuilder<D>
 ) {
     abstract val minCoords: Int
     abstract val maxCoords: Int
@@ -47,7 +47,7 @@ abstract class ChunkManager<T : Chunk>(
         }
     }
 
-    internal val Chunk.visibleObjects
+    internal val Chunk<D>.visibleObjects
         get() =
             filterForVisibleObjects {
                 visibilityViewObjects.contains(it.data.position.x, it.data.position.y)

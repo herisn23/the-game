@@ -3,10 +3,9 @@ package org.roldy.environment
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.core.renderer.Sortable
-import org.roldy.core.renderer.chunk.ChunkObjectData
 import org.roldy.core.renderer.drawable.Drawable
 
-class MapObject : Drawable {
+class MapObject : Drawable<MapObjectData> {
 
     override var layer: Int = 0
     /**
@@ -24,7 +23,7 @@ class MapObject : Drawable {
 
     override val zIndex: Float get() = sprite.run { y - height / 2f }
 
-    override fun bind(data: ChunkObjectData) {
+    override fun bind(data: MapObjectData) {
         if(data.isRoad) {
             data.bindRoad()
         } else
@@ -32,7 +31,7 @@ class MapObject : Drawable {
 
     }
 
-    private fun ChunkObjectData.bindRoad() {
+    private fun MapObjectData.bindRoad() {
         atlas.findRegion("road")?.let { region->
             layer =  Sortable.LAYER_1
             sprite.run {
@@ -47,7 +46,7 @@ class MapObject : Drawable {
         }
     }
 
-    private fun ChunkObjectData.bindSettlement() {
+    private fun MapObjectData.bindSettlement() {
         atlas.findRegion("house")?.let { region->
             layer =  Sortable.LAYER_2
             sprite.run {
