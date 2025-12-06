@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.core.Renderable
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
+import org.roldy.core.renderer.Sortable
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
@@ -51,6 +52,8 @@ class PawnSkeletonManager(
     UnderwearWearer,
     ShieldWearer,
     PawnAnimation {
+
+    override val layer: Int = Sortable.LAYER_2
 
     /** Indicates whether the pawn is currently moving */
     private var moving = false

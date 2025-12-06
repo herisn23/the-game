@@ -8,4 +8,6 @@ class DrawablePool(
     override fun newObject(): Drawable {
         return instance()
     }
+    fun create() =
+        instance()
 }

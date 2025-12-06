@@ -3,17 +3,15 @@ package org.roldy.map
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
-import org.roldy.keybind.keybinds
 import org.roldy.map.input.WorldMapInputProcessor
 import org.roldy.terrain.ProceduralMapGenerator
-import org.roldy.terrain.TerrainDebugRenderer
 
 interface WorldMapSize {
     val size: Int
     val chunks: Int get() = size / 10
 
     object Debug : WorldMapSize {
-        override val size: Int = 20
+        override val size: Int = 50
 //        override val chunks: Int = size
     }
 
@@ -39,6 +37,7 @@ interface WorldMapSize {
 class WorldMap(
     // Map parameters
     private val camera: OrthographicCamera,
+    private val inputProcessor: WorldMapInputProcessor,
     generator: ProceduralMapGenerator
 ) {
 
@@ -46,9 +45,6 @@ class WorldMap(
     private val tiledMap = generator.generate()
 
     private val tiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
-    val inputProcessor = WorldMapInputProcessor(keybinds)
-    val debug = TerrainDebugRenderer(generator.tileSize)
-    private val debugInfo = generator.getAllDebugInfo()
 
     context(_: Float)
     fun render() {
@@ -56,7 +52,6 @@ class WorldMap(
         zoomCamera()
         tiledMapRenderer.setView(camera)
         tiledMapRenderer.render()
-        debug.render(camera, debugInfo)
     }
 
     context(delta: Float)

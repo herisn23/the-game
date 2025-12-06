@@ -1,12 +1,9 @@
 package org.roldy.core.renderer
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
+import org.roldy.core.Diagnostics
 import org.roldy.core.Renderable
 import org.roldy.core.renderer.chunk.Chunk
 import org.roldy.core.renderer.chunk.ChunkDataManager
@@ -18,39 +15,13 @@ import org.roldy.utils.invoke
 fun interface StaticObjectBuilder {
     fun build(): Drawable
 }
-
-class ChunkDebugRenderer(
-    private val camera: OrthographicCamera,
-) {
-    val font = BitmapFont().apply {
-        data.setScale(3f)
-        color = Color.GREEN
-    }
-    val chunks = mutableListOf<Chunk>()
-    val batch = SpriteBatch()
-    fun render() {
-        batch.projectionMatrix = camera.combined
-        batch {
-            chunks.forEach { chunk ->
-                font.draw(
-                    this, "(${chunk.coords.x}, ${chunk.coords.y})",
-                    chunk.bounds.x,
-                    chunk.bounds.y + 50f,
-                )
-            }
-        }
-
-    }
-}
-
 class ChunkRenderer<T : Chunk>(
     private val camera: OrthographicCamera,
     private val chunkManager: ChunkDataManager<T>,
     private val persistentItems: List<Sortable>,
     staticObjectBuilder: StaticObjectBuilder
 ) {
-    private val chunkDebugRenderer = ChunkDebugRenderer(camera)
-    private val itemLevelCulling = true
+    private val itemLevelCulling = false
     private val pool = DrawablePool {
         staticObjectBuilder.build()
     }
@@ -58,6 +29,21 @@ class ChunkRenderer<T : Chunk>(
 
     private val active = mutableListOf<Sortable>()
     private val viewBounds = Rectangle()
+
+    init {
+        Diagnostics.addProvider {
+            "Items rendered: ${active.size}"
+        }
+        Diagnostics.addProvider {
+            "Persistent objects: ${persistentItems.size}"
+        }
+        Diagnostics.addProvider {
+            "Chunks rendered: ${chunkManager.visibleChunksCache.size}"
+        }
+        Diagnostics.addProvider {
+            "Chunks loaded: ${chunkManager.chunks.size}"
+        }
+    }
 
     private fun computeViewBounds(): Rectangle {
         val effectiveViewportWidth = camera.viewportWidth * camera.zoom
@@ -71,22 +57,20 @@ class ChunkRenderer<T : Chunk>(
         return viewBounds
     }
 
-    fun update() {
+    private fun update() {
         val view = computeViewBounds()
 
         // Collect items in visible chunks
         val visibleItems = mutableListOf<ChunkObjectData>()
-        chunkDebugRenderer.chunks.clear()
 
         // Chunk-level culling
         with(chunkManager) {
             updateView(view, camera.zoom)
-            chunksInView.forEach { chunk ->
-                chunkDebugRenderer.chunks.add(chunk)
+            visibleChunks.forEach { chunk ->
                 visibleItems +=
                     when {
-                        itemLevelCulling -> chunk.visibleItems
-                        else -> chunk.allItems
+                        itemLevelCulling -> chunk.visibleObjects
+                        else -> chunk.allObjects
                     }
             }
         }
@@ -109,10 +93,15 @@ class ChunkRenderer<T : Chunk>(
         active.addAll(poolableItems)
         // Y-sort for correct overlap
         active.sortBy { -it.zIndex }
+        active.sortWith(compareBy<Sortable> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
+            .thenByDescending { it.zIndex }  // Secondary: z-index descending
+        )
     }
 
     context(delta: Float)
     fun render(batch: SpriteBatch) {
+        update()
+
         batch.projectionMatrix = camera.combined
         batch {
             active.forEach {
@@ -122,10 +111,7 @@ class ChunkRenderer<T : Chunk>(
                 }
             }
         }
-        chunkDebugRenderer.render()
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            println("Items: ${active.filter { it is Drawable }.size}")
-            println("Chunks: ${chunkDebugRenderer.chunks.size}")
-        }
+
+        chunkManager.unload()
     }
 }

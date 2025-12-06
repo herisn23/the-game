@@ -27,18 +27,20 @@ import kotlin.math.abs
  * @param debugMode Whether to store debug information (position, terrain name) in tile properties
  */
 
-typealias ProcessTile = (Triple<Terrain, Int, Int>) -> Unit
+data class TileData(
+    val terrain: Terrain,
+    val heightData: HeightData
+) : HeightData by heightData
 
 class ProceduralMapGenerator(
     val seed: Long,
     val width: Int,
     val height: Int,
     val tileSize: Int,
-    val elevationScale:Float = 0.001f,    // Lower = smoother elevation changes
-    val moistureScale:Float = 0.003f,      // Lower = larger moisture zones
-    val temperatureScale:Float = 0.05f,    // Lower = larger temperature zones
-    private val enableTransitions: Boolean = true,
-    private val debugMode: Boolean = true
+    val elevationScale: Float = 0.001f,    // Lower = smoother elevation changes
+    val moistureScale: Float = 0.003f,      // Lower = larger moisture zones
+    val temperatureScale: Float = 0.05f,    // Lower = larger temperature zones
+    private val enableTransitions: Boolean = true
 ) {
 
     private val temperatureNoise = SimplexNoise(seed)
@@ -46,7 +48,7 @@ class ProceduralMapGenerator(
     private val elevationNoise = SimplexNoise(seed + 2)
 
     // Cache for terrain at each position
-    private val terrainCache = mutableMapOf<Vector2Int, Terrain>()
+    private val terrainCache = mutableMapOf<Vector2Int, TileData>()
     private val transitionResolver = TileTransitionResolver(width, height, terrainCache)
     private val fallbackTerrain = createFallbackTerrain()
 
@@ -66,48 +68,7 @@ class ProceduralMapGenerator(
         return tiledMap
     }
 
-    val terrainData: Map<Vector2Int, Terrain> get() = terrainCache
-
-    /**
-     * Gets debug information for all tiles in the map
-     * Returns a list of DebugInfo objects for rendering debug overlays
-     */
-    fun getAllDebugInfo(): List<DebugInfo> {
-        if (!debugMode) return emptyList()
-
-        return terrainCache.map { (pos, terrain) ->
-            DebugInfo(
-                x = pos.x,
-                y = pos.y,
-                terrainName = terrain.data.name,
-                biomeName = terrain.biome.data.name
-            )
-        }
-    }
-
-    /**
-     * Data class for debug information about a tile
-     */
-    data class DebugInfo(
-        val x: Int,
-        val y: Int,
-        val terrainName: String,
-        val biomeName: String
-    )
-
-    private fun generateBiomeLayer(): TiledMapTileLayer {
-        val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                val terrain = terrainCache.getValue(Vector2Int(x, y))
-                val cell = TiledMapTileLayer.Cell().apply {
-                    tile = StaticTiledMapTile(terrain.biome.color)
-                }
-                layer.setCell(x, y, cell)
-            }
-        }
-        return layer
-    }
+    val terrainData: Map<Vector2Int, TileData> get() = terrainCache
 
     /**
      * Generates the base terrain layer without transitions
@@ -121,18 +82,14 @@ class ProceduralMapGenerator(
                 val terrain = findTerrainForNoise(biomes, noiseData)
 
                 // Cache the terrain for transition calculations
-                terrainCache[Vector2Int(x, y)] = terrain
+                terrainCache[Vector2Int(x, y)] = TileData(
+                    terrain,
+                    noiseData
+                )
 
                 // Create cell with the selected terrain
                 val cell = TiledMapTileLayer.Cell().apply {
                     tile = StaticTiledMapTile(terrain.region)
-                }
-
-                // Add debug properties if debug mode is enabled
-                if (debugMode) {
-                    cell.tile.properties.put("debug_position", "($x, $y)")
-                    cell.tile.properties.put("debug_terrain", terrain.data.name)
-                    cell.tile.properties.put("debug_biome", terrain.biome.data.name)
                 }
                 layer.setCell(x, y, cell)
             }
@@ -160,12 +117,6 @@ class ProceduralMapGenerator(
                 if (transitionTile != null) {
                     val cell = TiledMapTileLayer.Cell().apply {
                         tile = StaticTiledMapTile(transitionTile.region)
-                    }
-
-                    // Add debug properties if debug mode is enabled
-                    if (debugMode) {
-                        cell.tile.properties.put("debug_transition", "true")
-                        cell.tile.properties.put("debug_position", "($x, $y)")
                     }
 
                     layer.setCell(x, y, cell)

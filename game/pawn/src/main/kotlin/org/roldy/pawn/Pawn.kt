@@ -18,6 +18,7 @@ class Pawn(
             }
         }
     }
+    override val layer: Int = manager.layer
     override val zIndex: Float
         get() = manager.zIndex
 

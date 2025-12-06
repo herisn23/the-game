@@ -6,14 +6,14 @@ import org.roldy.terrain.biome.Terrain
 class TileTransitionResolver(
     val width: Int,
     val height: Int,
-    val terrainCache: Map<Vector2Int, Terrain>
+    val terrainCache: Map<Vector2Int, TileData>
 ) {
     /**
      * Data class to hold all transition types for a tile
      */
     fun calculateTransitionTile(x: Int, y: Int): Terrain? {
         val currentTerrain = terrainCache[Vector2Int(x, y)] ?: return null
-        val currentPriority = getTerrainPriority(currentTerrain.data.name)
+        val currentPriority = getTerrainPriority(currentTerrain.terrain.data.name)
 
         // Get neighbors in all 8 directions
         val northTerrain = if (y + 1 < height) terrainCache[Vector2Int(x, y + 1)] else null
@@ -29,35 +29,35 @@ class TileTransitionResolver(
         // Edges take priority over corners
         val edgeRegion = when {
             northTerrain != null &&
-                    northTerrain.data.name != currentTerrain.data.name &&
-                    shouldShowTransition(currentTerrain.data.name, currentPriority, northTerrain.data.name) -> {
+                    northTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+                    shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, northTerrain.terrain.data.name) -> {
                 // North neighbor should bleed into this tile
-                val edgeName = "${northTerrain.data.name}_Edge_S"
-                northTerrain.biome.atlas?.findRegion(edgeName)
+                val edgeName = "${northTerrain.terrain.data.name}_Edge_S"
+                northTerrain.terrain.biome.atlas?.findRegion(edgeName)
             }
 
             southTerrain != null &&
-                    southTerrain.data.name != currentTerrain.data.name &&
-                    shouldShowTransition(currentTerrain.data.name, currentPriority, southTerrain.data.name) -> {
+                    southTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+                    shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, southTerrain.terrain.data.name) -> {
                 // South neighbor should bleed into this tile
-                val edgeName = "${southTerrain.data.name}_Edge_N"
-                southTerrain.biome.atlas?.findRegion(edgeName)
+                val edgeName = "${southTerrain.terrain.data.name}_Edge_N"
+                southTerrain.terrain.biome.atlas?.findRegion(edgeName)
             }
 
             eastTerrain != null &&
-                    eastTerrain.data.name != currentTerrain.data.name &&
-                    shouldShowTransition(currentTerrain.data.name, currentPriority, eastTerrain.data.name) -> {
+                    eastTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+                    shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, eastTerrain.terrain.data.name) -> {
                 // East neighbor should bleed into this tile
-                val edgeName = "${eastTerrain.data.name}_Edge_W"
-                eastTerrain.biome.atlas?.findRegion(edgeName)
+                val edgeName = "${eastTerrain.terrain.data.name}_Edge_W"
+                eastTerrain.terrain.biome.atlas?.findRegion(edgeName)
             }
 
             westTerrain != null &&
-                    westTerrain.data.name != currentTerrain.data.name &&
-                    shouldShowTransition(currentTerrain.data.name, currentPriority, westTerrain.data.name) -> {
+                    westTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+                    shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, westTerrain.terrain.data.name) -> {
                 // West neighbor should bleed into this tile
-                val edgeName = "${westTerrain.data.name}_Edge_E"
-                westTerrain.biome.atlas?.findRegion(edgeName)
+                val edgeName = "${westTerrain.terrain.data.name}_Edge_E"
+                westTerrain.terrain.biome.atlas?.findRegion(edgeName)
             }
 
             else -> null
@@ -65,7 +65,7 @@ class TileTransitionResolver(
 
         // If we found an edge, return it (edges have priority)
         if (edgeRegion != null) {
-            return Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, edgeRegion)
+            return Terrain(currentTerrain.terrain.biome, currentTerrain.terrain.color, currentTerrain.terrain.data, edgeRegion)
         }
 
         // Otherwise check diagonal corners (only when no edges are present)
@@ -76,53 +76,53 @@ class TileTransitionResolver(
 
         // NE corner: only show if N and E neighbors are same terrain
         if (neTerrain != null &&
-            neTerrain.data.name != currentTerrain.data.name &&
-            northTerrain?.data?.name == currentTerrain.data.name &&
-            eastTerrain?.data?.name == currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, neTerrain.data.name)
+            neTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+            northTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            eastTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, neTerrain.terrain.data.name)
         ) {
-            val cornerName = "${neTerrain.data.name}_Corner_Outer_SW"
-            neTerrain.biome.atlas?.findRegion(cornerName)?.let {
-                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(neTerrain.data.name)))
+            val cornerName = "${neTerrain.terrain.data.name}_Corner_Outer_SW"
+            neTerrain.terrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(neTerrain.terrain.data.name)))
             }
         }
 
         // SE corner: only show if S and E neighbors are same terrain
         if (seTerrain != null &&
-            seTerrain.data.name != currentTerrain.data.name &&
-            southTerrain?.data?.name == currentTerrain.data.name &&
-            eastTerrain?.data?.name == currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, seTerrain.data.name)
+            seTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+            southTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            eastTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, seTerrain.terrain.data.name)
         ) {
-            val cornerName = "${seTerrain.data.name}_Corner_Outer_NW"
-            seTerrain.biome.atlas?.findRegion(cornerName)?.let {
-                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(seTerrain.data.name)))
+            val cornerName = "${seTerrain.terrain.data.name}_Corner_Outer_NW"
+            seTerrain.terrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(seTerrain.terrain.data.name)))
             }
         }
 
         // SW corner: only show if S and W neighbors are same terrain
         if (swTerrain != null &&
-            swTerrain.data.name != currentTerrain.data.name &&
-            southTerrain?.data?.name == currentTerrain.data.name &&
-            westTerrain?.data?.name == currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, swTerrain.data.name)
+            swTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+            southTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            westTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, swTerrain.terrain.data.name)
         ) {
-            val cornerName = "${swTerrain.data.name}_Corner_Outer_NE"
-            swTerrain.biome.atlas?.findRegion(cornerName)?.let {
-                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(swTerrain.data.name)))
+            val cornerName = "${swTerrain.terrain.data.name}_Corner_Outer_NE"
+            swTerrain.terrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(swTerrain.terrain.data.name)))
             }
         }
 
         // NW corner: only show if N and W neighbors are same terrain
         if (nwTerrain != null &&
-            nwTerrain.data.name != currentTerrain.data.name &&
-            northTerrain?.data?.name == currentTerrain.data.name &&
-            westTerrain?.data?.name == currentTerrain.data.name &&
-            shouldShowTransition(currentTerrain.data.name, currentPriority, nwTerrain.data.name)
+            nwTerrain.terrain.data.name != currentTerrain.terrain.data.name &&
+            northTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            westTerrain?.terrain?.data?.name == currentTerrain.terrain.data.name &&
+            shouldShowTransition(currentTerrain.terrain.data.name, currentPriority, nwTerrain.terrain.data.name)
         ) {
-            val cornerName = "${nwTerrain.data.name}_Corner_Outer_SE"
-            nwTerrain.biome.atlas?.findRegion(cornerName)?.let {
-                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(nwTerrain.data.name)))
+            val cornerName = "${nwTerrain.terrain.data.name}_Corner_Outer_SE"
+            nwTerrain.terrain.biome.atlas?.findRegion(cornerName)?.let {
+                cornerCandidates.add(CornerCandidate(it, getTerrainPriority(nwTerrain.terrain.data.name)))
             }
         }
 
@@ -130,7 +130,7 @@ class TileTransitionResolver(
         val cornerRegion = cornerCandidates.maxByOrNull { it.priority }?.region
 
         return if (cornerRegion != null) {
-            Terrain(currentTerrain.biome, currentTerrain.color, currentTerrain.data, cornerRegion)
+            Terrain(currentTerrain.terrain.biome, currentTerrain.terrain.color, currentTerrain.terrain.data, cornerRegion)
         } else {
             null
         }
@@ -204,7 +204,7 @@ class TileTransitionResolver(
             val nx = x + dx
             val ny = y + dy
             if (nx in 0 until width && ny in 0 until height) {
-                terrainCache[Vector2Int(nx, ny)]
+                terrainCache[Vector2Int(nx, ny)]?.terrain
             } else {
                 null
             }

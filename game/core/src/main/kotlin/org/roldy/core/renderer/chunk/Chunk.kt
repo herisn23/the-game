@@ -5,15 +5,15 @@ import org.roldy.core.Vector2Int
 
 
 abstract class Chunk(val coords: Vector2Int, val size: Float) {
-    internal val items: MutableList<ChunkObjectData> = mutableListOf()
-    private val visibleItems: MutableList<ChunkObjectData> = mutableListOf()
+    internal val objects: MutableList<ChunkObjectData> = mutableListOf()
+    private val visibleObjects: MutableList<ChunkObjectData> = mutableListOf()
 
-    val allItems: List<ChunkObjectData> get() = items
+    val allObjects: List<ChunkObjectData> get() = objects
 
-    fun filterForVisibleItems(predicate: (ChunkObjectData) -> Boolean): List<ChunkObjectData> =
+    fun filterForVisibleObjects(predicate: (ChunkObjectData) -> Boolean): List<ChunkObjectData> =
         run {
-            this.visibleItems.clear()
-            items.filterTo(this.visibleItems, predicate)
+            this.visibleObjects.clear()
+            objects.filterTo(this.visibleObjects, predicate)
         }
 
     val x = coords.x * size

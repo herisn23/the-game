@@ -14,8 +14,8 @@ abstract class ChunkDataManager<T : Chunk>(
     abstract val minCoords: Int
     abstract val maxCoords: Int
     protected abstract val chunkSize: Float
-    val defaultMargin = -100f
-    private val chunks = mutableMapOf<Vector2Int, T>()
+    val preloadRadius = -100f
+    internal val chunks = mutableMapOf<Vector2Int, T>()
 
     abstract fun getChunk(coords: Vector2Int): T
 
@@ -23,31 +23,31 @@ abstract class ChunkDataManager<T : Chunk>(
     internal fun getOrCreateChunk(coords: Vector2Int): T {
         return chunks.getOrPut(coords) {
             getChunk(coords).apply {
-                items.addAll(populator.populate(this))
+                objects.addAll(populator.populate(this))
             }
         }
     }
 
-    private val marginChunkView = Rectangle()
-    private val marginItemsView = Rectangle()
-    internal val Chunk.visibleItems
+    private val visibilityViewChunks = Rectangle()
+    private val visibilityViewObjects = Rectangle()
+    internal val Chunk.visibleObjects
         get() =
-            filterForVisibleItems {
-                marginItemsView.contains(it.x, it.y)
+            filterForVisibleObjects {
+                visibilityViewObjects.contains(it.position.x, it.position.y)
             }
 
     fun updateView(view: Rectangle, zoom: Float) {
-        val margin = defaultMargin * zoom
-        marginChunkView.set(
-            view.x + margin,
-            view.y + margin,
-            view.x + view.width - margin,
-            view.y + view.height - margin
+        val radius = preloadRadius * zoom
+        visibilityViewChunks.set(
+            view.x + radius,
+            view.y + radius,
+            view.x + view.width - radius,
+            view.y + view.height - radius
         )
-        val itemMargin = margin * 2
-        marginItemsView.set(
-            view.x + margin,
-            view.y + margin,
+        val itemMargin = radius * 2
+        visibilityViewObjects.set(
+            view.x + radius,
+            view.y + radius,
             view.width - itemMargin,
             view.height - itemMargin,
         )
@@ -56,22 +56,31 @@ abstract class ChunkDataManager<T : Chunk>(
 
     val min = MutableVector2Int(0, 0)
     val max = MutableVector2Int(0, 0)
-    val visibleChunks = mutableListOf<T>()
-    internal val chunksInView: List<T>
+    val visibleChunksCache = mutableListOf<T>()
+    internal val visibleChunks: List<T>
         get() {
-            visibleChunks.clear()
-            min.worldToChunk(marginChunkView.x, marginChunkView.y)
-            max.worldToChunk(marginChunkView.width, marginChunkView.height)
+            visibleChunksCache.clear()
+            min.worldToChunk(visibilityViewChunks.x, visibilityViewChunks.y)
+            max.worldToChunk(visibilityViewChunks.width, visibilityViewChunks.height)
 
 
             repeat(
                 maxOf(minCoords, min.x)..minOf(maxCoords, max.x),
                 maxOf(minCoords, min.y)..minOf(maxCoords, max.y)
             ) { x, y ->
-                visibleChunks += getOrCreateChunk(x x y)
+                visibleChunksCache += getOrCreateChunk(x x y)
             }
-            return visibleChunks
+            return visibleChunksCache
         }
+
+    fun unload() {
+        val toUnload = chunks.filter {
+            !visibleChunks.contains(it.value)
+        }
+        toUnload.forEach {
+            chunks.remove(it.key)?.objects?.clear()
+        }
+    }
 
     private fun MutableVector2Int.worldToChunk(
         x: Float,

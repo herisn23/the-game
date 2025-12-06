@@ -23,6 +23,9 @@ class PawnTest(
     val batch: SpriteBatch
 ) : Renderable {
 
+    override val layer: Int
+        get() = -1
+
     private val weapons: List<EquipmentAtlas> by lazy {
         Weapons.all
     }
