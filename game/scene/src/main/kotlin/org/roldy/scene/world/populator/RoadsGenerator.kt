@@ -1,13 +1,15 @@
-package org.roldy.scene.world.populator.environment
+package org.roldy.scene.world.populator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.x
 import org.roldy.map.WorldMapSize
-import org.roldy.scene.world.populator.distance
+import org.roldy.scene.distance
 import org.roldy.terrain.TileData
 
 object RoadsGenerator {
-
+    data class Node(val x: Int, val y: Int, val cost: Float, val heuristic: Float) {
+        val total = cost + heuristic
+    }
     fun generate(
         settlements: List<SettlementData>,
         terrainData: Map<Vector2Int, TileData>,
@@ -36,7 +38,8 @@ object RoadsGenerator {
     }
 
     private fun MutableList<Vector2Int>.createRoad(
-        start: Vector2Int, end: Vector2Int,
+        start: Vector2Int,
+        end: Vector2Int,
         mapSize: WorldMapSize,
         terrainData: Map<Vector2Int, TileData>
     ) {
@@ -45,9 +48,7 @@ object RoadsGenerator {
         val endX = end.x
         val endY = end.y
 
-        data class Node(val x: Int, val y: Int, val cost: Float, val heuristic: Float) {
-            val total = cost + heuristic
-        }
+
 
         val openSet = mutableListOf(Node(startX, startY, 0f, distance(startX, startY, endX, endY)))
         val cameFrom = mutableMapOf<Pair<Int, Int>, Pair<Int, Int>>()

@@ -10,8 +10,7 @@ import org.roldy.environment.item.Settlement
 import org.roldy.map.WorldMapSize
 import org.roldy.scene.world.chunk.WorldMapChunk
 import org.roldy.scene.world.populator.environment.FoliagePopulator
-import org.roldy.scene.world.populator.environment.RoadsGenerator
-import org.roldy.scene.world.populator.environment.SettlementsGenerator
+import org.roldy.scene.worldPosition
 import org.roldy.terrain.TileData
 
 class WorldPopulator(
@@ -23,7 +22,9 @@ class WorldPopulator(
     val trees = TextureAtlas(loadAsset("Road.atlas"))
     val houseAtlas = TextureAtlas(loadAsset("House.atlas"))
     val settlements = SettlementsGenerator.generate(terrainData, mapSize, seed)
-    val roads = RoadsGenerator.generate(settlements, terrainData, mapSize)
+    val roads = RoadsGenerator.generate(settlements, terrainData, mapSize).apply {
+        println(this)
+    }
 
     val populators: List<WorldChunkPopulator> = listOf(
         FoliagePopulator(seed)
@@ -41,13 +42,13 @@ class WorldPopulator(
                 data.contains(it)
             }
             this += roadsInChunk.map { road ->
-                val position = chunk.objectPosition(road)
+                val position = chunk.worldPosition(road)
                 MapObjectData(name = "road", position = position, road) {
                     Road(it, trees, chunk.tileSize)
                 }
             }
             this += settlementsInChunk.map { settle ->
-                val position = chunk.objectPosition(settle.coords)
+                val position = chunk.worldPosition(settle.coords)
                 MapObjectData(name = settle.name, position = position, settle.coords) {
                     Settlement(it, houseAtlas)
                 }

@@ -1,4 +1,4 @@
-package org.roldy.scene.world.populator
+package org.roldy.scene
 
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
@@ -13,7 +13,7 @@ fun distance(x1: Int, y1: Int, x2: Int, y2: Int): Float {
     return sqrt(dx * dx + dy * dy)
 }
 
-fun WorldMapChunk.objectPosition(coords: Vector2Int): Vector2 {
+fun WorldMapChunk.worldPosition(coords: Vector2Int): Vector2 {
     val x = coords.x * tileSize + (tileSize / 2).toFloat()
     val y = coords.y * tileSize + (tileSize / 2).toFloat()
     return x x y
