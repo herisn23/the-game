@@ -22,9 +22,7 @@ class WorldPopulator(
     val trees = TextureAtlas(loadAsset("Road.atlas"))
     val houseAtlas = TextureAtlas(loadAsset("House.atlas"))
     val settlements = SettlementsGenerator.generate(terrainData, mapSize, seed)
-    val roads = RoadsGenerator.generate(settlements, terrainData, mapSize).apply {
-        println(this)
-    }
+    val roads = RoadsGenerator.generate(settlements, terrainData, mapSize)
 
     val populators: List<WorldChunkPopulator> = listOf(
         FoliagePopulator(seed)
@@ -39,11 +37,11 @@ class WorldPopulator(
                 data.contains(settlement.coords)
             }
             val roadsInChunk = roads.filter {
-                data.contains(it)
+                data.contains(it.position)
             }
             this += roadsInChunk.map { road ->
-                val position = chunk.worldPosition(road)
-                MapObjectData(name = "road", position = position, road) {
+                val position = chunk.worldPosition(road.position)
+                MapObjectData(name = "road", position = position, road.position) {
                     Road(it, trees, chunk.tileSize)
                 }
             }

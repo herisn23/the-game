@@ -19,7 +19,7 @@ import org.roldy.terrain.ProceduralMapGenerator
 class WorldScene(
     private val camera: OrthographicCamera
 ) : Scene {
-    val mapSize = WorldMapSize.Debug
+    val mapSize = WorldMapSize.Small
     val batch = SpriteBatch()
     val tileSize = 200
 

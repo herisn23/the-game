@@ -117,6 +117,7 @@ class ProceduralMapGenerator(
                 if (transitionTile != null) {
                     val cell = TiledMapTileLayer.Cell().apply {
                         tile = StaticTiledMapTile(transitionTile.region)
+
                     }
 
                     layer.setCell(x, y, cell)

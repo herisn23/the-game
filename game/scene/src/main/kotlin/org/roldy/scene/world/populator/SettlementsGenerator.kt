@@ -33,8 +33,8 @@ object SettlementsGenerator {
             val tile = terrainData.getValue(coords)
 
             // Check if location is suitable
-            val isSuitable = tile.elevation in 0.35f..0.65f &&  // Not too high/low
-                    tile.moisture > 0.3f &&           // Not desert
+            val isSuitable = tile.elevation in 0.1f..0.65f &&  // Not too high/low
+//                    tile.moisture > 0.3f &&           // Not desert
                     tile.temperature in 0.3f..0.7f &&        // Temperate
                     settlements.none {
                         distance(x, y, it.coords.x, it.coords.y) < 15  // Min distance from others
