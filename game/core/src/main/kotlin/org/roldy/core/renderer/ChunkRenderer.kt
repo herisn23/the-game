@@ -12,7 +12,7 @@ import org.roldy.core.renderer.drawable.Drawable
 import org.roldy.utils.invoke
 
 
-class ChunkRenderer<D: ChunkObjectData, T : Chunk<D>>(
+class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
     private val camera: OrthographicCamera,
     private val persistentItems: List<Layered>,
     private val chunkManager: ChunkManager<D, T>
@@ -81,10 +81,12 @@ class ChunkRenderer<D: ChunkObjectData, T : Chunk<D>>(
         update()
         batch.projectionMatrix = camera.combined
         batch {
-            active.forEach {
-                when (it) {
-                    is Drawable<*> -> it.draw(batch)
-                    is Renderable -> it.render()
+            with(camera) {
+                active.forEach {
+                    when (it) {
+                        is Drawable<*> -> it.draw(batch)
+                        is Renderable -> it.render()
+                    }
                 }
             }
         }

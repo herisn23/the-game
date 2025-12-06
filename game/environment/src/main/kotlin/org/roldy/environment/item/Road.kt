@@ -10,6 +10,7 @@ class Road(
     tileSize: Int
 ) : SimpleSpriteObject(data, atlas.findRegion("road"), {
     setSize(tileSize.toFloat(), tileSize.toFloat())
+    setPosition(data.position.x, data.position.y)
 }) {
     override val layer: Int = Layered.LAYER_1
 
