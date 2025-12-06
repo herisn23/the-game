@@ -2,15 +2,21 @@ package org.roldy.core.renderer.chunk
 
 import com.badlogic.gdx.math.Rectangle
 import org.roldy.core.Vector2Int
+import org.roldy.core.renderer.drawable.Drawable
 
 
 abstract class Chunk(val coords: Vector2Int, val size: Float) {
-    internal val objects: MutableList<ChunkObjectData> = mutableListOf()
-    private val visibleObjects: MutableList<ChunkObjectData> = mutableListOf()
+    class ChunkObject(
+        val data: ChunkObjectData,
+        val drawable: Drawable,
+    )
 
-    val allObjects: List<ChunkObjectData> get() = objects
+    internal val objects: MutableList<ChunkObject> = mutableListOf()
+    private val visibleObjects: MutableList<ChunkObject> = mutableListOf()
 
-    fun filterForVisibleObjects(predicate: (ChunkObjectData) -> Boolean): List<ChunkObjectData> =
+    val allObjects: List<ChunkObject> get() = objects
+
+    fun filterForVisibleObjects(predicate: (ChunkObject) -> Boolean): List<ChunkObject> =
         run {
             this.visibleObjects.clear()
             objects.filterTo(this.visibleObjects, predicate)

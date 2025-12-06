@@ -8,7 +8,7 @@ import org.roldy.core.renderer.ChunkRenderer
 import org.roldy.environment.MapObject
 import org.roldy.keybind.keybinds
 import org.roldy.map.WorldMap
-import org.roldy.map.WorldMapChunkDataManager
+import org.roldy.map.WorldMapChunkManager
 import org.roldy.map.WorldMapSize
 import org.roldy.map.input.WorldMapInputProcessor
 import org.roldy.pawn.Pawn
@@ -42,15 +42,15 @@ class WorldScene(
     val currentPawn = playerPawn
     val chunkRenderer = ChunkRenderer(
         camera,
-        WorldMapChunkDataManager(
+        WorldMapChunkManager(
             tileSize,
             mapSize,
             WorldPopulator(map.terrainData, mapSize, seed)
-        ),
+        ) {
+            MapObject()
+        },
         listOf(playerPawn)
-    ) {
-        MapObject()
-    }
+    )
 
 
     context(delta: Float)

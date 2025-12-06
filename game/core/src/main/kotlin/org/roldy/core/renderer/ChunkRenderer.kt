@@ -6,29 +6,20 @@ import com.badlogic.gdx.math.Rectangle
 import org.roldy.core.Diagnostics
 import org.roldy.core.Renderable
 import org.roldy.core.renderer.chunk.Chunk
-import org.roldy.core.renderer.chunk.ChunkDataManager
-import org.roldy.core.renderer.chunk.ChunkObjectData
+import org.roldy.core.renderer.chunk.ChunkManager
 import org.roldy.core.renderer.drawable.Drawable
-import org.roldy.core.renderer.drawable.DrawablePool
 import org.roldy.utils.invoke
 
-fun interface StaticObjectBuilder {
-    fun build(): Drawable
-}
+
 class ChunkRenderer<T : Chunk>(
     private val camera: OrthographicCamera,
-    private val chunkManager: ChunkDataManager<T>,
-    private val persistentItems: List<Sortable>,
-    staticObjectBuilder: StaticObjectBuilder
+    private val chunkManager: ChunkManager<T>,
+    private val persistentItems: List<Sortable>
 ) {
     private val itemLevelCulling = false
-    private val pool = DrawablePool {
-        staticObjectBuilder.build()
-    }
-    private val poolableItems = mutableListOf<Drawable>() // currently visible instances
-
     private val active = mutableListOf<Sortable>()
     private val viewBounds = Rectangle()
+    private val visibleDrawables = mutableListOf<Drawable>()
 
     init {
         Diagnostics.addProvider {
@@ -38,7 +29,7 @@ class ChunkRenderer<T : Chunk>(
             "Persistent objects: ${persistentItems.size}"
         }
         Diagnostics.addProvider {
-            "Chunks rendered: ${chunkManager.visibleChunksCache.size}"
+            "Chunks rendered: ${chunkManager.visibleChunks.size}"
         }
         Diagnostics.addProvider {
             "Chunks loaded: ${chunkManager.chunks.size}"
@@ -61,38 +52,24 @@ class ChunkRenderer<T : Chunk>(
         val view = computeViewBounds()
 
         // Collect items in visible chunks
-        val visibleItems = mutableListOf<ChunkObjectData>()
+        visibleDrawables.clear()
 
         // Chunk-level culling
         with(chunkManager) {
-            updateView(view, camera.zoom)
-            visibleChunks.forEach { chunk ->
-                visibleItems +=
-                    when {
-                        itemLevelCulling -> chunk.visibleObjects
-                        else -> chunk.allObjects
-                    }
-            }
+            update(view, camera.zoom)
+            visibleDrawables += visibleChunks.flatMap { chunk ->
+                when {
+                    itemLevelCulling -> chunk.visibleObjects
+                    else -> chunk.allObjects
+                }
+            }.map { it.drawable }
         }
-
-
-        // Return all active instances to pool
-        poolableItems.forEach {
-            pool.free(it)
-        }
-        poolableItems.clear()
         active.clear()
 
         // Create/reuse instances for visible items
-        visibleItems.forEach { item ->
-            val inst = pool.obtain()
-            inst.bind(item)
-            poolableItems += inst
-        }
         active.addAll(persistentItems)
-        active.addAll(poolableItems)
+        active.addAll(visibleDrawables)
         // Y-sort for correct overlap
-        active.sortBy { -it.zIndex }
         active.sortWith(compareBy<Sortable> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
             .thenByDescending { it.zIndex }  // Secondary: z-index descending
         )
@@ -101,7 +78,6 @@ class ChunkRenderer<T : Chunk>(
     context(delta: Float)
     fun render(batch: SpriteBatch) {
         update()
-
         batch.projectionMatrix = camera.combined
         batch {
             active.forEach {
@@ -111,7 +87,5 @@ class ChunkRenderer<T : Chunk>(
                 }
             }
         }
-
-        chunkManager.unload()
     }
 }

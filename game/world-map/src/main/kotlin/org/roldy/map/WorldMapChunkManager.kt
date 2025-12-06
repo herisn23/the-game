@@ -1,14 +1,16 @@
 package org.roldy.map
 
 import org.roldy.core.Vector2Int
-import org.roldy.core.renderer.chunk.ChunkDataManager
+import org.roldy.core.renderer.chunk.ChunkManager
 import org.roldy.core.renderer.chunk.ChunkPopulator
+import org.roldy.core.renderer.chunk.DrawableBuilder
 
-class WorldMapChunkDataManager(
+class WorldMapChunkManager(
     private val tileSize: Int,
     private val mapSize: WorldMapSize,
-    populator: ChunkPopulator<WorldMapChunk>
-) : ChunkDataManager<WorldMapChunk>(populator) {
+    populator: ChunkPopulator<WorldMapChunk>,
+    drawableBuilder: DrawableBuilder
+) : ChunkManager<WorldMapChunk>(populator, drawableBuilder) {
     override val minCoords: Int = 0
     override val maxCoords: Int = mapSize.chunks - 1
 
