@@ -12,7 +12,7 @@ import kotlinx.serialization.encoding.Encoder
 object G2DColorSerializer : KSerializer<Color> {
     // Serial names of descriptors should be unique, this is why we advise including app package in the name.
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("org.roldy.terrain.Range", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("org.roldy.terrain.Color", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): Color =
         decoder.decodeString().let(Color::valueOf)
@@ -26,15 +26,40 @@ object G2DColorSerializer : KSerializer<Color> {
     }
 }
 
+object FloatComparisonSerializer : KSerializer<FloatComparison> {
+    // Serial names of descriptors should be unique, this is why we advise including app package in the name.
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("org.roldy.terrain.Range", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): FloatComparison =
+        decoder.decodeString().run {
+            val comparator = FloatComparison.FloatComparator.entries.find {
+                startsWith(it.char)
+            } ?: FloatComparison.FloatComparator.Lesser
+            val value = replaceFirst(comparator.char, "").toFloat()
+            FloatComparison(value, comparator)
+        }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: FloatComparison
+    ) {
+        encoder.encodeString("${value.equality.char}${value.value}")
+    }
+}
+
 const val maxValue = 10f
 
 @Serializable
 data class BiomeData(
     val name: String,
     val darker: Boolean = true,
-    override val elevation: Float = maxValue,
-    override val temperature: Float = maxValue,
-    override val moisture: Float = maxValue,
+    @Serializable(FloatComparisonSerializer::class)
+    override val elevation: FloatComparison = FloatComparison(maxValue),
+    @Serializable(FloatComparisonSerializer::class)
+    override val temperature: FloatComparison = FloatComparison(maxValue),
+    @Serializable(FloatComparisonSerializer::class)
+    override val moisture: FloatComparison = FloatComparison(maxValue),
     @Serializable(G2DColorSerializer::class)
     val color: Color,
     val terrains: List<TerrainData>
@@ -43,9 +68,12 @@ data class BiomeData(
     @Serializable
     data class TerrainData(
         val name: String,
-        override val elevation: Float = maxValue,
-        override val temperature: Float = maxValue,
-        override val moisture: Float = maxValue
+        @Serializable(FloatComparisonSerializer::class)
+        override val elevation: FloatComparison = FloatComparison(maxValue),
+        @Serializable(FloatComparisonSerializer::class)
+        override val temperature: FloatComparison = FloatComparison(maxValue),
+        @Serializable(FloatComparisonSerializer::class)
+        override val moisture: FloatComparison = FloatComparison(maxValue),
     ) : HeightData
 }
 

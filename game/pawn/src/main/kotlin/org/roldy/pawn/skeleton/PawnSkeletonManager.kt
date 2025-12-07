@@ -2,6 +2,7 @@ package org.roldy.pawn.skeleton
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Renderable
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
 import org.roldy.core.renderer.Layered
@@ -314,7 +315,6 @@ class PawnSkeletonManager(
      */
     context(deltaTime: Float)
     override fun render() {
-//        frontSkeleton.skeleton.bo
         skeletons.values.forEach { skel ->
             skel.animate() // Always process animations to preserve states between orientations
         }
@@ -414,6 +414,13 @@ class PawnSkeletonManager(
                 // Move right
                 skeletons.values.forEach { it.skeleton.x += speed }
             }
+        }
+    }
+
+    fun setPosition(position: Vector2) {
+        skeletons.values.forEach {
+            it.skeleton.x = position.x
+            it.skeleton.y = position.y
         }
     }
 }

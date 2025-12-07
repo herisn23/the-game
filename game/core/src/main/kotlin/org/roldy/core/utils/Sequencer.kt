@@ -1,4 +1,4 @@
-package org.roldy.utils
+package org.roldy.core.utils
 
 class Sequencer<T>(
     val list: List<T>,

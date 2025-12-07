@@ -135,10 +135,10 @@ object RoadsGenerator {
     private fun Map<Vector2Int, TileData>.getTerrainCost(x: Int, y: Int): Float {
         val tile = getValue(x x y)
         return when {
-            tile.elevation < 0.3f -> 100f        // Water - very expensive
-            tile.elevation > 0.75f -> 50f        // Mountains - expensive
-            tile.moisture < 0.2f -> 30f       // Desert - moderate
-            tile.elevation in 0.4f..0.6f -> 1f   // Plains - cheap!
+            tile.noiseData.elevation < 0.3f -> 100f        // Water - very expensive
+            tile.noiseData.elevation > 0.75f -> 50f        // Mountains - expensive
+            tile.noiseData.moisture < 0.2f -> 30f       // Desert - moderate
+            tile.noiseData.elevation in 0.4f..0.6f -> 1f   // Plains - cheap!
             else -> 10f               // Default
         }
     }

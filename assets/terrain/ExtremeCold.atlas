@@ -1,0 +1,12 @@
+ExtremeCold.png
+size:1024,512
+filter:Linear,Linear
+repeat:none
+hexSnowField00
+bounds:512,0,256,384
+hexSnowField01
+bounds:0,0,256,384
+hexSnowField02
+bounds:768,0,256,384
+hexSnowField03
+bounds:256,0,256,384

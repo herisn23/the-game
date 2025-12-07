@@ -1,6 +1,7 @@
 package org.roldy.pawn
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Renderable
 import org.roldy.pawn.skeleton.PawnSkeletonManager
 import org.roldy.pawn.skeleton.attribute.Slash1H
@@ -27,5 +28,9 @@ class Pawn(
         context(delta, this) {
             manager.render()
         }
+    }
+
+    fun setPosition(position: Vector2) {
+        manager.setPosition(position)
     }
 }

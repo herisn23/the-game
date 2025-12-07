@@ -47,12 +47,10 @@ data class Biome(
 class Terrain(
     val biome: Biome,
     val color: Color,
-    val data: BiomeData.TerrainData,
-    initialRegion: TextureRegion? = null
+    val data: BiomeData.TerrainData
 ) {
 
     val region: TextureRegion by lazy {
-        initialRegion ?:
         biome.atlas?.findRegion(data.name) ?:
         default
     }
@@ -68,8 +66,8 @@ class Terrain(
 
 }
 
-internal fun loadBiomes(tileSize: Int): List<Biome> =
-    loadAsset("biomes-configuration.yaml").readString()
+internal fun loadBiomes(tileSize: Int, biomesConfiguration:String): List<Biome> =
+    loadAsset(biomesConfiguration).readString()
         .run {
             Yaml.default.decodeFromString<BiomesConfiguration>(this)
         }

@@ -27,48 +27,66 @@ class Logger(
 
     fun debug(message: String, ex: Throwable? = null) {
         when {
-            ex != null -> Gdx.app.debug(tag, message, ex)
-            else -> Gdx.app.debug(tag, message)
+            ex != null -> Gdx.app.debug(tag, debugMessage(message), ex)
+            else -> Gdx.app.debug(tag, debugMessage(message))
         }
     }
 
     fun debug(message: () -> String) {
-        Gdx.app.debug(tag, message())
+        Gdx.app.debug(tag, debugMessage(message))
     }
 
     fun debug(ex: Throwable, message: () -> String) {
-        Gdx.app.debug(tag, message(), ex)
+        Gdx.app.debug(tag, debugMessage(message), ex)
     }
 
     fun error(ex: Throwable, message: () -> String) {
-        Gdx.app.error(tag, message(), ex)
+        Gdx.app.error(tag, errorMessage(message), ex)
     }
 
     fun error(message: () -> String) {
-        Gdx.app.error(tag, message())
+        Gdx.app.error(tag, errorMessage(message))
     }
 
     fun error(message: String, ex: Throwable? = null) {
         when {
-            ex != null -> Gdx.app.error(tag, message, ex)
-            else -> Gdx.app.error(tag, message)
+            ex != null -> Gdx.app.error(tag, errorMessage(message), ex)
+            else -> Gdx.app.error(tag, errorMessage(message))
         }
     }
 
     fun info(ex: Throwable, message: () -> String) {
-        Gdx.app.log(tag, message(), ex)
+        Gdx.app.log(tag, infoMessage(message), ex)
     }
 
     fun info(message: () -> String) {
-        Gdx.app.log(tag, message())
+        Gdx.app.log(tag, infoMessage(message))
     }
 
     fun info(message: String, ex: Throwable? = null) {
         when {
-            ex != null -> Gdx.app.log(tag, message, ex)
-            else -> Gdx.app.log(tag, message)
+            ex != null -> Gdx.app.log(tag, infoMessage(message), ex)
+            else -> Gdx.app.log(tag, infoMessage(message))
         }
     }
+
+    fun debugMessage(message: String) =
+        "[DEBUG] $message"
+
+    fun debugMessage(message: () -> String) =
+        debugMessage(message())
+
+    fun errorMessage(message: String) =
+        "[ERROR] $message"
+
+    fun errorMessage(message: () -> String) =
+        errorMessage(message())
+
+    fun infoMessage(message: String) =
+        "[INFO] $message"
+
+    fun infoMessage(message: () -> String) =
+        infoMessage(message())
 }
 
 val logger by lazy {

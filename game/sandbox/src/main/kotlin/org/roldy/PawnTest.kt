@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.core.Renderable
+import org.roldy.core.utils.sequencer
 import org.roldy.equipment.atlas.EquipmentAtlas
 import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
@@ -15,7 +16,6 @@ import org.roldy.keybind.KeybindSettings
 import org.roldy.keybind.keybinds
 import org.roldy.pawn.skeleton.PawnSkeletonManager
 import org.roldy.pawn.skeleton.attribute.*
-import org.roldy.utils.sequencer
 
 class PawnTest(
     val speed: Float,

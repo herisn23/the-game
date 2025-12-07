@@ -1,0 +1,205 @@
+biomes:
+  - name: Water # Atlas name
+    elevation: 0
+    color: 0b4f9c
+    terrains:
+      # Warm water
+      - name: hexOceanIceBergs00
+        elevation: -0.25
+        temperature: 0.05
+      - name: hexOceanIceBergs01
+        elevation: -0.2
+        temperature: 0.06
+      - name: hexOceanIceBergs02
+        elevation: -0.17
+        temperature: 0.07
+      - name: hexOceanIceBergs03
+        temperature: 0.08
+      - name: hexOcean00
+        elevation: -0.25
+      - name: hexOcean01
+        elevation: -0.2
+      - name: hexOcean02
+        elevation: -0.17
+      - name: hexOcean03
+  - name: ExtremeCold
+    temperature: '0.15'
+    moisture: '0.5'
+    color: 3dc5c5
+    terrains:
+      - name: hexSnowField00
+        temperature: 0.04
+      - name: hexSnowField01
+        temperature: 0.09
+      - name: hexSnowField02
+        temperature: 0.012
+      - name: hexSnowField03
+  - name: Cold
+    temperature: '0.3'
+    moisture: '0.8'
+    color: a9c5c5
+    terrains:
+      - name: hexPlainsColdSnowCovered00
+        temperature: '0.12'
+        moisture: '0.2'
+      - name: hexPlainsColdSnowCovered01
+        temperature: '0.18'
+        moisture: '0.25'
+      - name: hexPlainsColdSnowCovered02
+        temperature: '0.22'
+        moisture: '0.3'
+      - name: hexPlainsColdSnowCovered03
+        temperature: '0.25'
+        moisture: '0.35'
+      - name: hexPlainsCold00
+        temperature: '0.12'
+        moisture: '0.5'
+      - name: hexPlainsCold01
+        temperature: '0.18'
+        moisture: '0.55'
+      - name: hexPlainsCold02
+        temperature: '0.25'
+        moisture: '0.60'
+      - name: hexPlainsCold03
+  - name: Jungle
+    color: 197a33
+    temperature: '>0.65'
+    moisture: '>0.65'
+    terrains:
+      - name: hexTropicalPlains00
+        moisture: 0.7
+        temperature: 0.7
+      - name: hexTropicalPlains01
+        moisture: 0.75
+        temperature: 0.75
+      - name: hexTropicalPlains02
+        moisture: 0.8
+        temperature: 0.8
+      - name: hexTropicalPlains03
+        moisture: 0.85
+        temperature: 0.85
+      - name: hexJungle00
+        moisture: 0.9
+      - name: hexJungle01
+        moisture: 0.93
+      - name: hexJungle02
+        moisture: 0.96
+      - name: hexJungle03
+  - name: DeepDesert
+    moisture: '<0.4'
+    temperature: '>0.75'
+    color: ed9a21
+    # Dunes
+    terrains:
+      - name: hexDesertYellowDirtDunes00
+        moisture: 0.15
+      - name: hexDesertYellowDirtDunes01
+        moisture: 0.18
+      - name: hexDesertYellowDirtDunes02
+        moisture: 0.21
+      - name: hexDesertYellowDirtDunes03
+        moisture: 0.25
+      - name: hexDesertRedGrassDunes00
+        temperature: 0.8
+      - name: hexDesertRedGrassDunes01
+        temperature: 0.9
+      - name: hexDesertRedGrassDunes02
+        temperature: 0.95
+      - name: hexDesertRedGrassDunes03
+  - name: Desert
+    moisture: '<0.4'
+    temperature: '>0.55'
+    color: ebdb2b
+    terrains:
+      - name: hexDesertYellowBase00
+        moisture: 0.11
+        temperature: 0.5
+      - name: hexDesertYellowBase01
+        moisture: 0.14
+        temperature: 0.6
+      - name: hexDesertYellowBase02
+        moisture: 0.17
+        temperature: 0.7
+      - name: hexDesertYellowBase03
+        moisture: 0.2
+        temperature: 0.8
+      - name: hexDesertYellowDirt00
+        moisture: 0.01
+      - name: hexDesertYellowDirt01
+        moisture: 0.05
+      - name: hexDesertYellowDirt02
+        moisture: 0.1
+      - name: hexDesertYellowDirt03
+  - name: Savanna
+    moisture: '>0.2'
+    temperature: '>0.6'
+    color: 8a4807
+    terrains:
+      # Savanna
+      - name: hexDesertRedDirt00
+        moisture: '>0.35'
+        temperature: 0.6
+      - name: hexDesertRedDirt01
+        moisture: '>0.30'
+        temperature: 0.65
+      - name: hexDesertRedDirt02
+        moisture: '>0.25'
+        temperature: 0.7
+      - name: hexDesertRedDirt03
+        moisture: '>0.48'
+        temperature: 0.8
+      - name: hexDesertRedBase00
+        moisture: '>0.45'
+      - name: hexDesertRedBase01
+        moisture: '>0.42'
+      - name: hexDesertRedBase02
+        moisture: '>0.39'
+      - name: hexDesertRedBase03
+        moisture: '>0.36'
+      - name: hexDesertRedGrass00
+        moisture: '>0.33'
+      - name: hexDesertRedGrass01
+        moisture: '>0.29'
+      - name: hexDesertRedGrass02
+        moisture: '>0.26'
+      - name: hexDesertRedGrass03
+  - name: Swamp
+    temperature: '0.9'
+    elevation: '0.3'
+    color: 4dcc8b
+    terrains:
+      - name: hexBog00
+        moisture: 0.81
+      - name: hexBog01
+        moisture: 0.83
+      - name: hexBog02
+        moisture: 0.85
+      - name: hexBog03
+        moisture: 0.87
+      - name: hexWetlands00
+        temperature: 0.3
+      - name: hexWetlands01
+        temperature: 0.4
+      - name: hexWetlands02
+        temperature: 0.5
+      - name: hexWetlands03
+  - name: Forest
+    color: 2de442
+    terrains:
+      - name: hexScrublands00
+        moisture: 0.4
+      - name: hexScrublands01
+        moisture: 0.45
+      - name: hexScrublands02
+        moisture: 0.5
+      - name: hexScrublands03
+        moisture: 0.55
+      - name: hexPlains00
+        temperature: 0.5
+      - name: hexPlains01
+        temperature: 0.6
+      - name: hexPlains02
+        temperature: 0.65
+      - name: hexPlains03
+
+

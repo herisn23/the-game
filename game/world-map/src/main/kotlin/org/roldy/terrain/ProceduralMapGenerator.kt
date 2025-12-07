@@ -5,6 +5,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
+import org.roldy.core.x
 import org.roldy.terrain.biome.*
 import kotlin.math.abs
 
@@ -29,18 +30,20 @@ import kotlin.math.abs
 
 data class TileData(
     val terrain: Terrain,
-    val heightData: HeightData
-) : HeightData by heightData
+    val noiseData: ProceduralMapGenerator.NoiseData
+)
 
 class ProceduralMapGenerator(
     val seed: Long,
     val width: Int,
     val height: Int,
     val tileSize: Int,
-    val elevationScale: Float = 0.001f,    // Lower = smoother elevation changes
-    val moistureScale: Float = 0.003f,      // Lower = larger moisture zones
-    val temperatureScale: Float = 0.05f,    // Lower = larger temperature zones
-    private val enableTransitions: Boolean = true
+    val elevationScale: Float,
+    val moistureScale: Float,
+    val temperatureScale: Float,
+    val elevationOctaves:Int = 4,//4
+    val moistureOctaves:Int = 3,//3
+    val temperatureLatitude:Float = 0.85f//0.85f
 ) {
 
     private val temperatureNoise = SimplexNoise(seed)
@@ -49,26 +52,37 @@ class ProceduralMapGenerator(
 
     // Cache for terrain at each position
     private val terrainCache = mutableMapOf<Vector2Int, TileData>()
-    private val transitionResolver = TileTransitionResolver(width, height, terrainCache)
     private val fallbackTerrain = createFallbackTerrain()
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
      */
-    fun generate(): TiledMap {
+    fun generate(biomesConfiguration:String): TiledMap {
         val tiledMap = TiledMap()
-        val biomes = loadBiomes(tileSize)
+        val biomes = loadBiomes(tileSize, biomesConfiguration)
         // Generate base terrain layer
         tiledMap.layers.add(generateBaseLayer(biomes))
 
-        // Add transition layers if enabled
-        if (enableTransitions) {
-            tiledMap.layers.add(generateTransitionLayer())
-        }
+        // Generate colors layer
+        tiledMap.layers.add(generateBiomeLayer())
         return tiledMap
     }
 
     val terrainData: Map<Vector2Int, TileData> get() = terrainCache
+
+    private fun generateBiomeLayer(): TiledMapTileLayer {
+        val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val terrain = terrainCache.getValue(x x y)
+                val cell = TiledMapTileLayer.Cell().apply {
+                    tile = StaticTiledMapTile(terrain.terrain.biome.color)
+                }
+                layer.setCell(x, y, cell)
+            }
+        }
+        return layer
+    }
 
     /**
      * Generates the base terrain layer without transitions
@@ -99,39 +113,6 @@ class ProceduralMapGenerator(
     }
 
     /**
-     * Generates multiple transition layers for smooth terrain blending
-     * Creates separate layers for each transition type and direction
-     * This allows tiles to show all necessary transitions simultaneously
-     */
-    /**
-     * Generates a transition layer for smooth terrain blending
-     * This layer sits on top of the base layer and contains transition tiles
-     */
-    private fun generateTransitionLayer(): TiledMapTileLayer? {
-        val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
-        var transitionCount = 0
-
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                val transitionTile = transitionResolver.calculateTransitionTile(x, y)
-                if (transitionTile != null) {
-                    val cell = TiledMapTileLayer.Cell().apply {
-                        tile = StaticTiledMapTile(transitionTile.region)
-
-                    }
-
-                    layer.setCell(x, y, cell)
-                    transitionCount++
-                }
-            }
-        }
-
-        logger.info { "Generated transition layer with $transitionCount transition tiles" }
-        return if (transitionCount > 0) layer else null
-    }
-
-
-    /**
      * Generates noise data for a specific position
      */
     private fun generateNoiseData(x: Int, y: Int): NoiseData {
@@ -147,18 +128,17 @@ class ProceduralMapGenerator(
     private fun findTerrainForNoise(biomes: List<Biome>, noiseData: NoiseData): Terrain {
         // Find matching biome
         val biome = biomes.find { biome ->
-            noiseData.elevation <= biome.data.elevation &&
-                    noiseData.temperature <= biome.data.temperature &&
-                    noiseData.moisture <= biome.data.moisture
+            biome.data.elevation.match(noiseData.elevation) &&
+                    biome.data.temperature.match(noiseData.temperature) &&
+                    biome.data.moisture.match(noiseData.moisture)
         }
 
         // Find matching terrain within biome
         val terrain = biome?.terrains?.find { terrain ->
-            noiseData.elevation <= terrain.data.elevation &&
-                    noiseData.temperature <= terrain.data.temperature &&
-                    noiseData.moisture <= terrain.data.moisture
+            terrain.data.elevation.match(noiseData.elevation) &&
+                    terrain.data.temperature.match(noiseData.temperature) &&
+                    terrain.data.moisture.match(noiseData.moisture)
         }
-
         return terrain ?: fallbackTerrain.also {
             logger.debug { "No terrain for ${biome?.data?.name} for $noiseData" }
         }
@@ -173,7 +153,7 @@ class ProceduralMapGenerator(
         var amplitude = 1f
 
         // Use 4 octaves for detailed elevation
-        repeat(4) {
+        repeat(elevationOctaves) {
             total += elevationNoise(x * frequency, y * frequency) * amplitude
             frequency *= 2
             amplitude *= 0.5f
@@ -194,7 +174,7 @@ class ProceduralMapGenerator(
         val noise = temperatureNoise(x * 0.008f, y * 0.008f)
 
         // Combine latitude with noise (85% latitude, 15% noise)
-        return latitudeFactor * 0.85f + noise * temperatureScale
+        return latitudeFactor * temperatureLatitude + noise * temperatureScale
     }
 
     /**
@@ -206,7 +186,7 @@ class ProceduralMapGenerator(
         var frequency = moistureScale
 
         // Use 3 octaves for moisture variation
-        repeat(3) {
+        repeat(moistureOctaves) {
             total += moistureNoise(x * frequency, y * frequency) * amplitude
             frequency *= 2
             amplitude *= 0.5f
@@ -238,8 +218,8 @@ class ProceduralMapGenerator(
     data class NoiseData(
         val x: Int,
         val y: Int,
-        override val elevation: Float,
-        override val temperature: Float,
-        override val moisture: Float
-    ) : HeightData
+        val elevation: Float,
+        val temperature: Float,
+        val moisture: Float
+    )
 }

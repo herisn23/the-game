@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.InputProcessorDelegate
 import org.roldy.core.renderer.ChunkRenderer
+import org.roldy.core.x
 import org.roldy.keybind.keybinds
 import org.roldy.map.WorldMap
 import org.roldy.map.WorldMapSize
@@ -21,7 +22,7 @@ class WorldScene(
 ) : Scene {
     val mapSize = WorldMapSize.Small
     val batch = SpriteBatch()
-    val tileSize = 200
+    val tileSize = 256
 
     val pawnInputProcessor = PawnInputProcessor(keybinds) { currentPawn }
     val mapInputProcessor = WorldMapInputProcessor(keybinds)
@@ -35,10 +36,16 @@ class WorldScene(
             width = mapSize.size,
             height = mapSize.size,
             tileSize = tileSize,
-            enableTransitions = true,    // Enable transitions
+            moistureScale = mapSize.moistureScale,
+            temperatureScale = mapSize.temperatureScale,
+            elevationScale = mapSize.elevationScale
         )
     )
-    val playerPawn = Pawn(batch)
+    val playerPawn = Pawn(batch).apply {
+        val centerX = (mapSize.size * tileSize) / 2f
+        val centerY = (mapSize.size * tileSize) / 3f
+        setPosition(centerX x centerY)
+    }
 
     val currentPawn = playerPawn
     val chunkRenderer = ChunkRenderer(

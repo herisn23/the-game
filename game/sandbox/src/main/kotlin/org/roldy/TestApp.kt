@@ -22,13 +22,14 @@ class TestApp : ApplicationAdapter() {
         Logger.level = Level.Debug
         diagnostic = Diagnostics()
         camera = OrthographicCamera().apply {
-            zoom = 0f
+            zoom = 100f
             position.set(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2, 1f)
         }
         viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
 
         currentScene = WorldScene(camera)
         currentScene.onShow()
+
     }
 
     override fun resize(width: Int, height: Int) {
