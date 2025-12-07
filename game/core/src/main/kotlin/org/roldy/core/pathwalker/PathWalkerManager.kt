@@ -10,8 +10,15 @@ class PathWalkerManager(
     val placeable: Placeable
 ) : TiledObject {
     val logger by logger()
-    var currentPath: List<PathWalker.PathNode>? = null
+    private var currentPath: List<PathWalker.PathNode>? = null
     private var currentPathIndex = 0
+
+    var path: List<PathWalker.PathNode>?
+        get() = currentPath
+        set(value) {
+            currentPath = value
+            currentPathIndex = 0
+        }
 
     context(deltaTime: Float)
     fun walk() {

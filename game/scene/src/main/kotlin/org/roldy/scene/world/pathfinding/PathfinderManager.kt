@@ -19,10 +19,12 @@ class PathfinderManager(
         get() = lastCoords
         set(value) {
             lastCoords = value
-            task {
+            task { main ->
                 val path = pathfinder.findPath(fromPosition(), value)
-                if (path.isComplete) {
-                    onPathFound(path)
+                main {
+                    if (path.isComplete) {
+                        onPathFound(path)
+                    }
                 }
             }
         }

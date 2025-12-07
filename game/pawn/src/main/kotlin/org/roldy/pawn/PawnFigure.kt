@@ -49,7 +49,7 @@ class PawnFigure(
         }
 
     override fun pathWalking(path: List<PathWalker.PathNode>) {
-        pathWalkerManager.currentPath = path
+        pathWalkerManager.path = path
         logger.info { "Found path: $path" }
     }
 
