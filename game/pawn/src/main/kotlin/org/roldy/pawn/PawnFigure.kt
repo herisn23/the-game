@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
-import org.roldy.core.*
+import org.roldy.core.Placeable
+import org.roldy.core.Renderable
+import org.roldy.core.TiledObject
+import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.pathwalker.PathWalkerManager
 import org.roldy.core.renderer.Layered
@@ -50,7 +53,6 @@ class PawnFigure(
 
     override fun pathWalking(path: List<PathWalker.PathNode>) {
         pathWalkerManager.path = path
-        logger.info { "Found path: $path" }
     }
 
     override var coords: Vector2Int

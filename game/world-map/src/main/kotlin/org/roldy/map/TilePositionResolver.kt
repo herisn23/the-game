@@ -23,11 +23,11 @@ class TilePositionResolver(
     private val rowHeight = (tileHeight + hexSideLengthF) / 2f
 
     init {
-        logger.debug("HexHighlighter initialized:")
-        logger.debug("  tileWidth=$tileWidth, tileHeight=$tileHeight")
-        logger.debug("  hexSideLength=$hexSideLength")
-        logger.debug("  rowHeight=$rowHeight")
-        logger.debug("  staggerIndex=$staggerIndex")
+        logger.info("HexHighlighter initialized:")
+        logger.info("  tileWidth=$tileWidth, tileHeight=$tileHeight")
+        logger.info("  hexSideLength=$hexSideLength")
+        logger.info("  rowHeight=$rowHeight")
+        logger.info("  staggerIndex=$staggerIndex")
     }
 
     private fun getTileWorldPosition(tileX: Int, tileY: Int, offsetCorrection: Boolean): Vector2 {

@@ -32,8 +32,6 @@ class PathWalkerManager(
                     coords = nextWorldPos.coords
                     currentPathIndex++
 
-                    logger.debug { "Set coords: ${coords}" }
-
                     // Reached end of path
                     if (currentPathIndex >= path.size) {
                         currentPath = null
