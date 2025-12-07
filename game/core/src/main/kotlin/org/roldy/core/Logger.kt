@@ -2,7 +2,6 @@ package org.roldy.core
 
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
-import kotlin.reflect.KProperty
 
 class Logger(
     val tag: String
@@ -21,7 +20,7 @@ class Logger(
             set(value) {
                 Gdx.app.logLevel = value.level
             }
-        val default = Logger("App")
+        val default = Logger("Default")
     }
 
 
@@ -97,7 +96,6 @@ fun logger(tag: String): Lazy<Logger> = lazy {
     Logger(tag)
 }
 
-operator fun <T : Loggable> T.getValue(thisRef: Any?, property: KProperty<*>): Logger =
-    Logger(this::class.simpleName ?: property.name)
-
-interface Loggable
+inline fun <reified T:Any> T.logger(): Lazy<Logger> = lazy {
+    Logger(T::class.qualifiedName ?: "Unresolved")
+}

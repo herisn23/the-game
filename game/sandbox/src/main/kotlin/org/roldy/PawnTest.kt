@@ -11,11 +11,11 @@ import org.roldy.equipment.atlas.armor.Armor
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.*
 import org.roldy.equipment.atlas.weapon.*
-import org.roldy.keybind.KeybindProcessor
-import org.roldy.keybind.KeybindSettings
-import org.roldy.keybind.keybinds
 import org.roldy.pawn.skeleton.PawnSkeletonManager
-import org.roldy.pawn.skeleton.attribute.*
+import org.roldy.pawn.skeleton.attribute.CustomizablePawnSlotBody
+import org.roldy.pawn.skeleton.attribute.PawnArmorSlot
+import org.roldy.pawn.skeleton.attribute.PawnWeaponSlot
+import org.roldy.pawn.skeleton.attribute.Slash1H
 
 class PawnTest(
     val speed: Float,
@@ -48,7 +48,6 @@ class PawnTest(
             }
         }
     }
-    val inputProcessor = MyInputProcessor(this, keybinds)
     override val zIndex: Float
         get() = pawnManager.zIndex
 
@@ -118,53 +117,6 @@ class PawnTest(
         shields.forEach(ShieldAtlas::dispose)
         pawnManager.dispose()
         batch.dispose()
-    }
-
-    class MyInputProcessor(val app: PawnTest, override val settings: KeybindSettings) : KeybindProcessor {
-        var lastKeycode: Int = 0
-        val keyActions = mapOf(
-            Input.Keys.W to (
-                    {
-                        app.pawnManager.currentOrientation = Back
-                        app.pawnManager.walk(app.speed)
-                    } to {
-                        app.pawnManager.stop()
-                    }),
-            Input.Keys.A to (
-                    {
-                        app.pawnManager.currentOrientation = Left
-                        app.pawnManager.walk(app.speed)
-                    } to {
-                        app.pawnManager.stop()
-                    }),
-            Input.Keys.S to (
-                    {
-                        app.pawnManager.currentOrientation = Front
-                        app.pawnManager.walk(app.speed)
-                    } to {
-                        app.pawnManager.stop()
-                    }),
-            Input.Keys.D to (
-                    {
-                        app.pawnManager.currentOrientation = Right
-                        app.pawnManager.walk(app.speed)
-                    } to {
-                        app.pawnManager.stop()
-                    }
-                    )
-        )
-
-        override fun keyDown(keycode: Int): Boolean {
-            if (keyActions.keys.contains(keycode)) {
-                lastKeycode = keycode
-            }
-            return keyActions[keycode]?.first()?.let { true } ?: false
-        }
-
-        override fun keyUp(keycode: Int): Boolean {
-            if (keycode != lastKeycode) return false
-            return keyActions[keycode]?.second()?.let { true } ?: false
-        }
     }
 
 }

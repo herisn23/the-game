@@ -1,10 +1,10 @@
-package org.roldy
+package org.roldy.core
 
 import com.badlogic.gdx.InputAdapter
-import org.roldy.keybind.KeybindProcessor
+import com.badlogic.gdx.InputProcessor
 
 class InputProcessorDelegate(
-    val delegates: List<KeybindProcessor>
+    val delegates: List<InputProcessor>
 ) : InputAdapter() {
 
     override fun keyDown(keycode: Int): Boolean =
@@ -21,4 +21,16 @@ class InputProcessorDelegate(
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean =
         delegates.any { it.scrolled(amountX, amountY) }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
+        delegates.any { it.touchDown(screenX, screenY, pointer, button) }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
+        delegates.any { it.touchUp(screenX, screenY, pointer, button) }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean =
+        delegates.any { it.touchDragged(screenX, screenY, pointer) }
+
+    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
+        delegates.any { it.touchCancelled(screenX, screenY, pointer, button) }
 }

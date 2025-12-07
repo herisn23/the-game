@@ -3,14 +3,14 @@ package org.roldy.core.renderer.chunk
 import com.badlogic.gdx.math.Rectangle
 import org.roldy.core.MutableVector2Int
 import org.roldy.core.Vector2Int
-import org.roldy.core.renderer.drawable.Drawable
+import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 import org.roldy.core.renderer.drawable.DrawablePool
 import org.roldy.core.repeat
 import org.roldy.core.x
 import kotlin.math.floor
 
 fun interface PoolProvider<T: ChunkObjectData> {
-    fun provide(): Drawable<T>
+    fun provide(): ChunkManagedDrawable<T>
 }
 
 abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(

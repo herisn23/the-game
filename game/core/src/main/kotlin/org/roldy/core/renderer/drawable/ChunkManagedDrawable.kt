@@ -7,7 +7,7 @@ import org.roldy.core.renderer.Layered
 import org.roldy.core.renderer.chunk.ChunkItem
 import org.roldy.core.renderer.chunk.ChunkObjectData
 
-interface Drawable<D:ChunkObjectData>: Layered, ChunkItem<D>, Disposable {
+interface ChunkManagedDrawable<D:ChunkObjectData>: Layered, ChunkItem<D>, Disposable {
     context(delta: Float, camera: Camera)
     fun draw(batch: SpriteBatch)
 }

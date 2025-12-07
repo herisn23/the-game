@@ -3,18 +3,19 @@ package org.roldy.map
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer
 import com.badlogic.gdx.math.MathUtils
-import org.roldy.map.input.WorldMapInputProcessor
+import com.badlogic.gdx.math.Vector2
+import org.roldy.map.input.ZoomCameraProcessor
 import org.roldy.terrain.ProceduralMapGenerator
 
 
 class WorldMap(
     // Map parameters
     private val camera: OrthographicCamera,
-    private val inputProcessor: WorldMapInputProcessor,
+    private val zoom: ZoomCameraProcessor,
     generator: ProceduralMapGenerator
 ) {
     val terrainData = generator.terrainData
-    private val tiledMap = generator.generate("biomes-configuration-hex.yaml").apply {
+    val tiledMap = generator.generate("biomes-configuration-hex.yaml").apply {
         properties.put("width", generator.width)
         properties.put("height", generator.height)
         properties.put("tilewidth", generator.tileSize)
@@ -25,7 +26,11 @@ class WorldMap(
     }
 
     private val tiledMapRenderer = HexagonalTiledMapRenderer(tiledMap)
-    val tileFocus = TileFocus(tiledMap, terrainData)
+    val tilePosition = TilePositionResolver(this, terrainData)
+    private val tileFocus = TileFocus(tilePosition)
+
+    val mapBounds = MapBounds(tiledMap)
+
     context(_: Float)
     fun render() {
         // Handle input
@@ -37,7 +42,7 @@ class WorldMap(
 
     context(delta: Float)
     private fun zoomCamera() {
-        inputProcessor.zoom { zoom ->
+        zoom { zoom ->
             camera.zoom += zoom * delta
             camera.zoom = MathUtils.clamp(camera.zoom, 3f, 10f)
         }
@@ -45,5 +50,11 @@ class WorldMap(
 
     fun dispose() {
         tiledMapRenderer.dispose()
+    }
+
+    fun clampToBounds(position: Vector2, newPosition: (Vector2) -> Unit) {
+        if (!mapBounds.isInBounds(position)) {
+            newPosition(mapBounds.clampToMap(position))
+        }
     }
 }

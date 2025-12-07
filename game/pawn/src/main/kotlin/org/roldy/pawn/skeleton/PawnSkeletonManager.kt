@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Renderable
 import org.roldy.core.animation.AnimationTypeEventListenerHandler
 import org.roldy.core.renderer.Layered
+import org.roldy.core.utils.MoveUtils
+import org.roldy.core.x
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
@@ -93,7 +95,7 @@ class PawnSkeletonManager(
 
     private val rightSkeleton = createSkeleton(Right)
 
-    private val pivotYOrigin = frontSkeleton.height / 2
+    private var moveTo: Vector2? = null
 
     fun createSkeleton(orientation: PawnSkeletonOrientation) =
         PawnSkeleton(
@@ -322,7 +324,11 @@ class PawnSkeletonManager(
             render()
         }
         if (moving) {
-            move()
+            if (moveTo != null) {
+                moveTowards(moveTo!!)
+            } else {
+                moveFree()
+            }
         }
     }
 
@@ -348,6 +354,17 @@ class PawnSkeletonManager(
         skeletons.forEach { (_, skel) ->
             skel.animation.slash1H(speed)
         }
+    }
+
+    /**
+     * Starts walking animation and enables movement for all skeletons.
+     * Movement direction is determined by [currentOrientation].
+     *
+     * @param speed Animation and movement speed multiplier
+     */
+    fun walk(speed: Float, toPosition: Vector2) {
+        moveTo = toPosition
+        walk(speed)
     }
 
     /**
@@ -391,7 +408,7 @@ class PawnSkeletonManager(
      * @receiver deltaTime The time elapsed since last frame in seconds
      */
     context(deltaTime: Float)
-    private fun move() {
+    private fun moveFree() {
         val speed = PawnManagerMath.calcMovementSpeed(movementSpeed) * deltaTime
 
         when (currentOrientation) {
@@ -414,6 +431,24 @@ class PawnSkeletonManager(
                 // Move right
                 skeletons.values.forEach { it.skeleton.x += speed }
             }
+        }
+    }
+
+    context(deltaTime: Float)
+    private fun moveTowards(moveTo: Vector2) {
+        val speed = PawnManagerMath.calcMovementSpeed(movementSpeed) * deltaTime
+        skeletons.values.forEach {
+            MoveUtils.moveTowards(it.skeleton.x x it.skeleton.y, moveTo, speed * 100f, deltaTime) {
+                it.skeleton.x = moveTo.x
+                it.skeleton.y = moveTo.y
+                this.moving = false
+                this.moveTo = null
+                this.stop()
+            }?.let { position ->
+                it.skeleton.x = position.x
+                it.skeleton.y = position.y
+            }
+
         }
     }
 

@@ -2,9 +2,9 @@ package org.roldy.environment
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import org.roldy.core.renderer.drawable.Drawable
+import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 
-class MapObject : Drawable<MapObjectData> {
+class MapObject : ChunkManagedDrawable<MapObjectData> {
 
     var behaviour: MapBehaviourObject? = null
 

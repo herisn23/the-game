@@ -1,11 +1,11 @@
 package org.roldy.map.input
 
-import org.roldy.keybind.KeybindProcessor
-import org.roldy.keybind.KeybindSettings
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputProcessor
 
-class WorldMapInputProcessor(override val settings: KeybindSettings) : KeybindProcessor {
-    val zoom = ZoomCameraProcessor(settings)
-    private val processors = listOf(zoom)
+class WorldMapInputProcessor(
+    private val processors:List<InputProcessor>
+) : InputAdapter() {
 
     override fun keyDown(keycode: Int): Boolean =
         processors.any { it.keyDown(keycode) }
@@ -18,4 +18,10 @@ class WorldMapInputProcessor(override val settings: KeybindSettings) : KeybindPr
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean =
         processors.any { it.mouseMoved(screenX, screenY) }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
+        processors.any { it.touchDown(screenX, screenY, pointer, button) }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
+        processors.any { it.touchUp(screenX, screenY, pointer, button) }
 }

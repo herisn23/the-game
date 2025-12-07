@@ -1,11 +1,11 @@
 package org.roldy.map.input
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
 import org.roldy.core.keybind.KeybindName
-import org.roldy.keybind.KeybindProcessor
-import org.roldy.keybind.KeybindSettings
+import org.roldy.core.keybind.KeybindSettings
 
-class ZoomCameraProcessor(override val settings: KeybindSettings) : KeybindProcessor {
+class ZoomCameraProcessor(val settings: KeybindSettings) : InputAdapter() {
     private val keyZoomSensitivity: Float = 15f
     private var zoomDirection: Float = 0f
     private var scrollZooming = false

@@ -3,6 +3,7 @@ package org.roldy.core.coroutines
 import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -40,7 +41,7 @@ val scope = CoroutineScope(Dispatchers.Default)
  * }
  * ```
  */
-fun async(action: Coroutine) {
+fun async(action: Coroutine): Job =
     scope.launch {
         action { onRenderThread ->
             // Post the runnable to the LibGDX application loop,
@@ -48,4 +49,24 @@ fun async(action: Coroutine) {
             Gdx.app.postRunnable(onRenderThread)
         }
     }
+
+class SingleTaskAsync {
+    var lastJob: Job? = null
+    operator fun invoke(action: Coroutine) {
+        lastJob?.cancel()
+        lastJob = async {
+            action(it)
+            lastJob = null
+        }
+    }
+
+    fun cancel() {
+        lastJob?.cancel()
+        lastJob = null
+    }
+
+    val isActive: Boolean
+        get() = lastJob?.isActive == true
 }
+
+fun singleTask() = lazy { SingleTaskAsync() }
