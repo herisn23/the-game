@@ -48,13 +48,14 @@ class WorldScene(
     }
 
     val currentPawn = playerPawn
+    val populator = WorldPopulator(map.terrainData, mapSize, seed)
     val chunkRenderer = ChunkRenderer(
         camera,
         listOf(playerPawn),
         WorldMapChunkManager(
             tileSize,
             mapSize,
-            WorldPopulator(map.terrainData, mapSize, seed)
+            populator
         )
     )
 
@@ -79,5 +80,9 @@ class WorldScene(
 
     override fun onHide() {
         Gdx.input.inputProcessor = null
+    }
+    override fun dispose() {
+        map.dispose()
+        populator.dispose()
     }
 }

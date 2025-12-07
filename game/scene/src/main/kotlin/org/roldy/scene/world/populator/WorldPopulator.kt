@@ -58,4 +58,8 @@ class WorldPopulator(
             }
         }.toMap()
     }
+
+    fun dispose() {
+
+    }
 }

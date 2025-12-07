@@ -1,5 +1,7 @@
 package org.roldy.terrain
 
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
@@ -41,9 +43,10 @@ class ProceduralMapGenerator(
     val elevationScale: Float,
     val moistureScale: Float,
     val temperatureScale: Float,
-    val elevationOctaves:Int = 4,//4
-    val moistureOctaves:Int = 3,//3
-    val temperatureLatitude:Float = 0.85f//0.85f
+    val elevationOctaves: Int = 4,//4
+    val moistureOctaves: Int = 3,//3
+    val temperatureLatitude: Float = 0.85f,//0.85f
+    val generateColoredLayer: Boolean = false
 ) {
 
     private val temperatureNoise = SimplexNoise(seed)
@@ -54,21 +57,80 @@ class ProceduralMapGenerator(
     private val terrainCache = mutableMapOf<Vector2Int, TileData>()
     private val fallbackTerrain = createFallbackTerrain()
 
+    private val dirtUnderTexture =
+        Texture("terrain/HexUnderDirt.png")
+            .let(::TextureRegion)
+
+    private val waterUnderTexture =
+        Texture("terrain/HexUnderWater.png")
+            .let(::TextureRegion)
+
     /**
      * Generates a complete TiledMap with biomes and optional transitions
      */
-    fun generate(biomesConfiguration:String): TiledMap {
+    fun generate(biomesConfiguration: String): TiledMap {
         val tiledMap = TiledMap()
         val biomes = loadBiomes(tileSize, biomesConfiguration)
         // Generate base terrain layer
-        tiledMap.layers.add(generateBaseLayer(biomes))
+        val baseLayer = generateBaseLayer(biomes)
+        val underLayer = generateUnderLayer()
 
+        tiledMap.layers.add(underLayer)
+        tiledMap.layers.add(baseLayer)
+
+        if (generateColoredLayer)
         // Generate colors layer
-        tiledMap.layers.add(generateBiomeLayer())
+            tiledMap.layers.add(generateBiomeLayer())
+
+
         return tiledMap
     }
 
     val terrainData: Map<Vector2Int, TileData> get() = terrainCache
+
+
+    private fun generateUnderLayer(): TiledMapTileLayer {
+        val layer = TiledMapTileLayer(width, height, tileSize, tileSize)
+
+        fun generateFor(size: Int, shouldApply: (Vector2Int) -> Boolean = { true }, vector: (Int) -> Vector2Int) {
+            repeat(size) { index ->
+                val vector = vector(index)
+                if(shouldApply(vector)) {
+                    val cell = TiledMapTileLayer.Cell().apply {
+                        val data = terrainData[vector]
+                        tile = StaticTiledMapTile(resolveUnderTileTexture(data))
+                        tile.offsetY = tileSize / -2f
+                    }
+                    layer.setCell(vector.x, vector.y, cell)
+                }
+            }
+        }
+
+        // first row
+        generateFor(width) {
+            it x 0
+        }
+
+        // left column
+        generateFor(height, { it.y % 2 == 0 }) {
+            0 x it
+        }
+
+        // right column
+        generateFor(height, { it.y % 2 != 0 }) {
+            width - 1 x it
+        }
+
+        return layer
+    }
+
+    fun resolveUnderTileTexture(tileData: TileData?): TextureRegion {
+        val isWater = tileData?.terrain?.biome?.data?.name == "Water"
+        return when {
+            isWater -> waterUnderTexture
+            else -> dirtUnderTexture
+        }
+    }
 
     private fun generateBiomeLayer(): TiledMapTileLayer {
         val layer = TiledMapTileLayer(width, height, tileSize, tileSize)

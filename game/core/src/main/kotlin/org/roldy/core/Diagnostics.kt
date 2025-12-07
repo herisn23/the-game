@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.graphics.profiling.GLProfiler
 import com.badlogic.gdx.utils.viewport.FitViewport
+import org.roldy.core.Logger.Level
 import org.roldy.utils.invoke
 
 class Diagnostics {
@@ -22,16 +24,36 @@ class Diagnostics {
         BitmapFont()
     }
 
+
+    init {
+        Logger.level = Level.Debug
+    }
+
     companion object {
-        private val diagnosticsProviders: MutableList<() -> String> = mutableListOf<() -> String>().apply {
-            add {
-                "FPS: ${Gdx.graphics.framesPerSecond}"
-            }
-            add {
-                "Delta: ${Gdx.graphics.deltaTime}"
-            }
-            add {
-                "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB"
+        private val diagnosticsProviders: MutableList<() -> String> by lazy {
+            val profiler = GLProfiler(Gdx.graphics)
+            mutableListOf<() -> String>().apply {
+                add {
+                    "FPS: ${Gdx.graphics.framesPerSecond}"
+                }
+                add {
+                    "Delta: ${Gdx.graphics.deltaTime}"
+                }
+                add {
+                    "Memory: ${Gdx.app.javaHeap / 1024 / 1024} MB"
+                }
+//                add {
+//                    "Draw calls: ${profiler.drawCalls}"
+//                }
+//                add {
+//                    "Texture bindings: ${profiler.textureBindings}"
+//                }
+//                add {
+//                    "Shader switches : ${ profiler.shaderSwitches }"
+//                }
+//                add {
+//                    "Vertices: ${ profiler.vertexCount.total }"
+//                }
             }
         }
 

@@ -31,6 +31,7 @@ abstract class SimpleSpriteObject(
     }
 
     val shape = ShapeRenderer()
+
     context(delta: Float, camera: Camera)
     private fun renderBoundaries() {
         shape.projectionMatrix = camera.combined
@@ -39,4 +40,6 @@ abstract class SimpleSpriteObject(
         shape.rect(sprite.x, sprite.y, sprite.width, sprite.height)
         shape.end()
     }
+
+    override fun dispose() {}
 }

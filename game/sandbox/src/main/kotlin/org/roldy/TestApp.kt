@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import org.roldy.core.Diagnostics
-import org.roldy.core.Logger
-import org.roldy.core.Logger.Level
 import org.roldy.scene.Scene
 import org.roldy.scene.world.WorldScene
 
@@ -19,7 +17,6 @@ class TestApp : ApplicationAdapter() {
     lateinit var currentScene: Scene
 
     override fun create() {
-        Logger.level = Level.Debug
         diagnostic = Diagnostics()
         camera = OrthographicCamera().apply {
             zoom = 100f
@@ -52,5 +49,6 @@ class TestApp : ApplicationAdapter() {
 
     override fun dispose() {
         diagnostic.dispose()
+        currentScene.dispose()
     }
 }
