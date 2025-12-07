@@ -99,13 +99,13 @@ biomes:
         moisture: 0.21
       - name: hexDesertYellowDirtDunes03
         moisture: 0.25
-      - name: hexDesertRedGrassDunes00
+      - name: hexDesertDunes00
         temperature: 0.8
-      - name: hexDesertRedGrassDunes01
+      - name: hexDesertDunes01
         temperature: 0.9
-      - name: hexDesertRedGrassDunes02
+      - name: hexDesertDunes02
         temperature: 0.95
-      - name: hexDesertRedGrassDunes03
+      - name: hexDesertDunes03
   - name: Desert
     moisture: '<0.4'
     temperature: '>0.55'
