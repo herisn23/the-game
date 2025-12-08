@@ -1,6 +1,5 @@
 package org.roldy.core
 
-interface TiledObject {
-
+interface TilePositioned {
     var coords: Vector2Int
 }

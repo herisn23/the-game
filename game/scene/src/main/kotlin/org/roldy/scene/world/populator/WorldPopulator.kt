@@ -7,14 +7,14 @@ import org.roldy.scene.world.chunk.WorldMapChunk
 import org.roldy.terrain.TileData
 
 interface WorldPopulator {
-    val worldMap: WorldMap
+    val map: WorldMap
     fun worldPosition(coords: Vector2Int, offsetCorrection: Boolean = false): Vector2 =
-        worldMap.tilePosition.resolve(coords, offsetCorrection)
+        map.tilePosition.resolve(coords, offsetCorrection)
 
 
     fun WorldMapChunk.data(): Map<Vector2Int, TileData> =
         tilesCoords.mapNotNull { coords ->
-            worldMap.terrainData[coords]?.let {
+            map.terrainData[coords]?.let {
                 coords to it
             }
         }.toMap()

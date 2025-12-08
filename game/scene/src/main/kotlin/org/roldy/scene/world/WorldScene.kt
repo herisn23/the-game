@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import org.roldy.core.InputProcessorDelegate
-import org.roldy.core.Placeable
+import org.roldy.core.WorldPositioned
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.keybind.keybinds
@@ -19,19 +19,21 @@ import org.roldy.pawn.PawnFigure
 import org.roldy.scene.Scene
 import org.roldy.scene.world.chunk.WorldMapChunkManager
 import org.roldy.scene.world.debug.DebugRenderer
-import org.roldy.scene.world.pathfinding.PathfinderManager
+import org.roldy.scene.world.pathfinding.AsyncPathfindingProxy
+import org.roldy.scene.world.pathfinding.Pathfinder
 import org.roldy.scene.world.populator.WorldMapPopulator
 
 class WorldScene(
     private val camera: OrthographicCamera
 ) : AutoDisposableAdapter(), Scene {
     val debugEnabled = false
-    val mapSize = WorldMapSize.Small
+    val mapSize = WorldMapSize.Debug
     val tileSize = 256
 
     val zoom = ZoomCameraProcessor(keybinds)
     val seed = 1L
     val batch by disposable { SpriteBatch() }
+
 
     val map by disposable {
         WorldMap(
@@ -42,12 +44,15 @@ class WorldScene(
             tileSize
         )
     }
-    val populator by disposable { WorldMapPopulator(map) }
+
+    val pathfinder = Pathfinder(map)
+
+    val populator by disposable { WorldMapPopulator(map, pathfinder) }
 
     val currentPawn by disposable {
         PawnFigure(batch).apply {
             val center = mapSize.size / 2 x mapSize.size / 2
-            coords = 245 x 112
+            coords = center
             position = map.tilePosition.resolve(coords)
         }
     }
@@ -61,14 +66,12 @@ class WorldScene(
         chunkManager
     )
     val debugRenderer by disposable { DebugRenderer(camera, map, chunkManager) }
-
-    val objectMove = ObjectMoveInputProcessor(keybinds, map, camera) {
-        PathfinderManager(map, {
-            currentPawn.coords
-        }) { path ->
-            currentPawn.pathWalking(path.tiles)
-        }
+    val pathfinderProxy = AsyncPathfindingProxy(pathfinder, {
+        currentPawn.coords
+    }) { path ->
+        currentPawn.pathWalking(path.tiles)
     }
+    val objectMove = ObjectMoveInputProcessor(keybinds, map, camera, pathfinderProxy::findPath)
     val mapInputProcessor = WorldMapInputProcessor(listOf(zoom, objectMove))
 
 
@@ -85,7 +88,7 @@ class WorldScene(
 
     private fun clampMovableObjectsToMapBounds() {
         chunkRenderer.objects.forEach {
-            if (it is Placeable) {
+            if (it is WorldPositioned) {
                 map.clampToBounds(it.position) { position ->
                     it.position = position
                 }

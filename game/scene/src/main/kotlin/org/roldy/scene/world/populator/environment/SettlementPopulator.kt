@@ -22,10 +22,10 @@ data class SettlementData(
     val name: String
 )
 
-class SettlementPopulator(override val worldMap: WorldMap) : AutoDisposableAdapter(), WorldChunkPopulator {
+class SettlementPopulator(override val map: WorldMap) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
-    val settlementsAtlas by disposable { TextureAtlas(loadAsset("environment/Settlements.atlas")) }
-    val settlements = generate(worldMap.terrainData, worldMap.mapSize, worldMap.seed)
+    val atlas by disposable { TextureAtlas(loadAsset("environment/Settlements.atlas")) }
+    val settlements = generate(map.terrainData, map.mapSize, map.seed)
 
     override fun populate(
         chunk: WorldMapChunk,
@@ -39,7 +39,7 @@ class SettlementPopulator(override val worldMap: WorldMap) : AutoDisposableAdapt
             val position = worldPosition(settle.coords)
             logger.debug { "Loading ${settle.coords} in chunk ${chunk.coords}" }
             MapObjectData(name = settle.name, position = position, settle.coords) {
-                Settlement(it, settlementsAtlas).disposable()
+                Settlement(it, atlas).disposable()
             }
         }
     }
@@ -74,8 +74,6 @@ class SettlementPopulator(override val worldMap: WorldMap) : AutoDisposableAdapt
                 settlements.add(SettlementData(coords, "Settlement${settlements.size + 1}"))
             }
         }
-        settlements.add(SettlementData(299 x 299, "Magic"))
-        settlements.add(SettlementData(249 x 99, "Magic"))
         return settlements
     }
 }

@@ -1,14 +1,14 @@
 package org.roldy.core.pathwalker
 
-import org.roldy.core.Placeable
-import org.roldy.core.TiledObject
+import org.roldy.core.TilePositioned
 import org.roldy.core.Vector2Int
+import org.roldy.core.WorldPositioned
 import org.roldy.core.logger
 import org.roldy.core.utils.MoveUtils
 
 class PathWalkerManager(
-    val placeable: Placeable
-) : TiledObject {
+    val worldPositioned: WorldPositioned
+) : TilePositioned {
     val logger by logger()
     private var currentPath: List<PathWalker.PathNode>? = null
     private var currentPathIndex = 0
@@ -27,8 +27,8 @@ class PathWalkerManager(
             if (currentPathIndex < path.size) {
                 val nextWorldPos = path[currentPathIndex]
 
-                MoveUtils.moveTowards(placeable.position, nextWorldPos.position, 500f, deltaTime) {
-                    placeable.position = nextWorldPos.position
+                MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, 500f, deltaTime) {
+                    worldPositioned.position = nextWorldPos.position
                     coords = nextWorldPos.coords
                     currentPathIndex++
 
@@ -38,7 +38,7 @@ class PathWalkerManager(
                         currentPathIndex = 0
                     }
                 }?.let {
-                    placeable.position = it
+                    worldPositioned.position = it
                 }
             }
         }

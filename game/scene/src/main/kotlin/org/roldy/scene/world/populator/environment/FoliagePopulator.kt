@@ -7,7 +7,7 @@ import org.roldy.scene.world.chunk.WorldMapChunk
 import org.roldy.scene.world.populator.WorldChunkPopulator
 
 class FoliagePopulator(
-    override val worldMap: WorldMap
+    override val map: WorldMap
 ): AutoDisposableAdapter(), WorldChunkPopulator {
     override fun populate(
         chunk: WorldMapChunk,

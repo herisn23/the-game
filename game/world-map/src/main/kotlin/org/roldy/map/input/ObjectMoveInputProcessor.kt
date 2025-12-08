@@ -2,7 +2,7 @@ package org.roldy.map.input
 
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
-import org.roldy.core.TiledObject
+import org.roldy.core.Vector2Int
 import org.roldy.core.keybind.KeybindName
 import org.roldy.core.keybind.KeybindSettings
 import org.roldy.core.utils.unproject
@@ -13,7 +13,7 @@ class ObjectMoveInputProcessor(
     val settings: KeybindSettings,
     val worldMap: WorldMap,
     val camera: OrthographicCamera,
-    val tiled: () -> TiledObject
+    val updateCoords: (Vector2Int) -> Unit
 ) : InputAdapter() {
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -23,7 +23,7 @@ class ObjectMoveInputProcessor(
         worldMap.tilePosition(
             mousePos.x x mousePos.y
         ) { coords, _, _ ->
-            tiled().coords = coords
+            updateCoords(coords)
         }
 
         return false
