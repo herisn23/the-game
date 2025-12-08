@@ -9,20 +9,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.profiling.GLProfiler
 import com.badlogic.gdx.utils.viewport.FitViewport
 import org.roldy.core.Logger.Level
+import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 import org.roldy.utils.invoke
 
-class Diagnostics {
-    private val batch by lazy {
-        SpriteBatch()
-    }
-
-    private val shape by lazy {
-        ShapeRenderer()
-    }
-
-    private val font by lazy {
-        BitmapFont()
-    }
+class Diagnostics : AutoDisposableAdapter() {
+    private val batch by disposable { SpriteBatch() }
+    private val shape by disposable { ShapeRenderer() }
+    private val font by disposable { BitmapFont() }
 
 
     init {
@@ -92,11 +86,5 @@ class Diagnostics {
                 y += yStep
             }
         }
-    }
-
-    fun dispose() {
-        batch.dispose()
-        font.dispose()
-        shape.dispose()
     }
 }

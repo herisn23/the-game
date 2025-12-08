@@ -100,7 +100,7 @@ class PawnSkeletonManager(
     fun createSkeleton(orientation: PawnSkeletonOrientation) =
         PawnSkeleton(
             orientation,
-            PawnSkeletonData.instance.getValue(orientation),
+            PawnSkeletonData.instance.getValue(orientation).disposable(),
             defaultSkinColor,
             defaultHairColor,
             defaultUnderWearColor,

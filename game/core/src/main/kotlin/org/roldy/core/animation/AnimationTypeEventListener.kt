@@ -2,6 +2,7 @@ package org.roldy.core.animation
 
 import com.esotericsoftware.spine.AnimationState
 import com.esotericsoftware.spine.Event
+import org.roldy.core.disposable.AutoDisposableAdapter
 
 interface AnimationTypeEventListener<T : AnimationTypeEventListener<T>> {
     fun addEventListener(
@@ -10,7 +11,7 @@ interface AnimationTypeEventListener<T : AnimationTypeEventListener<T>> {
     )
 }
 
-abstract class AnimationTypeEventListenerHandler<T : AnimationTypeEventListener<T>> : AnimationTypeEventListener<T> {
+abstract class AnimationTypeEventListenerHandler<T : AnimationTypeEventListener<T>> : AutoDisposableAdapter(), AnimationTypeEventListener<T> {
     private val eventListeners = mutableMapOf<String, EventListener<T>>()
     override fun addEventListener(
         animationType: AnimationType,

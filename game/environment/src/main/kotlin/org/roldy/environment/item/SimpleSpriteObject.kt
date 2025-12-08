@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.renderer.Layered
 import org.roldy.environment.MapBehaviourObject
 import org.roldy.environment.MapObjectData
@@ -14,7 +15,7 @@ abstract class SimpleSpriteObject(
     data: MapObjectData,
     region: TextureRegion,
     initializeSprite: Sprite.() -> Unit = {}
-) : MapBehaviourObject {
+) : AutoDisposableAdapter(), MapBehaviourObject {
 
     val sprite = Sprite(region).apply {
         setPosition(data.position.x, data.position.y)
@@ -30,7 +31,7 @@ abstract class SimpleSpriteObject(
 //        renderBoundaries()
     }
 
-    val shape = ShapeRenderer()
+    val shape = ShapeRenderer().disposable()
 
     context(delta: Float, camera: Camera)
     private fun renderBoundaries() {
@@ -40,6 +41,4 @@ abstract class SimpleSpriteObject(
         shape.rect(sprite.x, sprite.y, sprite.width, sprite.height)
         shape.end()
     }
-
-    override fun dispose() {}
 }

@@ -6,6 +6,8 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import org.roldy.core.Vector2Int
+import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 import org.roldy.core.logger
 import org.roldy.core.x
 import org.roldy.terrain.biome.*
@@ -47,7 +49,7 @@ class ProceduralMapGenerator(
     val moistureOctaves: Int = 3,//3
     val temperatureLatitude: Float = 0.85f,//0.85f
     val generateColoredLayer: Boolean = false
-) {
+) : AutoDisposableAdapter() {
 
     private val temperatureNoise = SimplexNoise(seed)
     private val moistureNoise = SimplexNoise(seed + 1)
@@ -57,13 +59,10 @@ class ProceduralMapGenerator(
     private val terrainCache = mutableMapOf<Vector2Int, TileData>()
     private val fallbackTerrain = createFallbackTerrain()
 
-    private val dirtUnderTexture =
-        Texture("terrain/HexUnderDirt.png")
-            .let(::TextureRegion)
-
-    private val waterUnderTexture =
-        Texture("terrain/HexUnderWater.png")
-            .let(::TextureRegion)
+    private val dirtUnderTexture by disposable { Texture("terrain/HexUnderDirt.png") }
+    private val dirtUnderTextureRegion by lazy { TextureRegion(dirtUnderTexture) }
+    private val waterUnderTexture by disposable { Texture("terrain/HexUnderWater.png") }
+    private val waterUnderTextureRegion by lazy { TextureRegion(waterUnderTexture) }
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
@@ -95,7 +94,7 @@ class ProceduralMapGenerator(
         fun generateFor(size: Int, shouldApply: (Vector2Int) -> Boolean = { true }, vector: (Int) -> Vector2Int) {
             repeat(size) { index ->
                 val vector = vector(index)
-                if(shouldApply(vector)) {
+                if (shouldApply(vector)) {
                     val cell = TiledMapTileLayer.Cell().apply {
                         val data = terrainData[vector]
                         tile = StaticTiledMapTile(resolveUnderTileTexture(data))
@@ -127,8 +126,8 @@ class ProceduralMapGenerator(
     fun resolveUnderTileTexture(tileData: TileData?): TextureRegion {
         val isWater = tileData?.terrain?.biome?.data?.name == "Water"
         return when {
-            isWater -> waterUnderTexture
-            else -> dirtUnderTexture
+            isWater -> waterUnderTextureRegion
+            else -> dirtUnderTextureRegion
         }
     }
 

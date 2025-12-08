@@ -1,6 +1,8 @@
 package org.roldy.scene.world.populator
 
+import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.Vector2Int
+import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.renderer.chunk.ChunkPopulator
 import org.roldy.environment.MapObjectData
 import org.roldy.map.WorldMapSize
@@ -11,10 +13,10 @@ class WorldPopulator(
     private val terrainData: Map<Vector2Int, TileData>,
     private val mapSize: WorldMapSize,
     private val seed: Long
-) : ChunkPopulator<MapObjectData, WorldMapChunk> {
+) : AutoDisposableAdapter(), ChunkPopulator<MapObjectData, WorldMapChunk>, Disposable {
 
 //    val trees = TextureAtlas(loadAsset("Road.atlas"))
-//    val houseAtlas = TextureAtlas(loadAsset("House.atlas"))
+//    val houseAtlas by disposable {TextureAtlas(loadAsset("House.atlas"))}
 //    val settlements = SettlementsGenerator.generate(terrainData, mapSize, seed)
 //    val roads = RoadsGenerator.generate(settlements, terrainData, mapSize)
 //
@@ -57,9 +59,5 @@ class WorldPopulator(
                 coords to it
             }
         }.toMap()
-    }
-
-    fun dispose() {
-
     }
 }

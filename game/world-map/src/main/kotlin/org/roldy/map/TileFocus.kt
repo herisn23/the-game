@@ -5,16 +5,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.Vector2Int
+import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.utils.unproject
 import org.roldy.core.x
 
 class TileFocus(
     private val tilePositionResolver: TilePositionResolver
-) : Disposable {
-    val highlightTexture = Texture("HexTileHighlighter.png")
-    private val batch = SpriteBatch()
+) : AutoDisposableAdapter() {
+    val highlightTexture = Texture("HexTileHighlighter.png").disposable()
+    private val batch = SpriteBatch().disposable()
     var focusedTile: Vector2Int? = null
     var focusTilePosition: Vector2? = null
 
@@ -56,10 +56,5 @@ class TileFocus(
                 }
             }
         }
-    }
-
-    override fun dispose() {
-        batch.dispose()
-        highlightTexture.dispose()
     }
 }

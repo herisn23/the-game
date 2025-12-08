@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.esotericsoftware.spine.*
 import com.esotericsoftware.spine.attachments.RegionAttachment
 import org.roldy.core.asset.loadAsset
+import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 import org.roldy.equipment.atlas.armor.ArmorAtlas
 import org.roldy.equipment.atlas.customization.CustomizationAtlas
 import org.roldy.equipment.atlas.customization.UnderWearAtlas
@@ -22,9 +24,9 @@ import org.roldy.pawn.skeleton.slot.PawnWeaponSlotData
 
 class PawnSkeletonData private constructor(
     orientation: PawnSkeletonOrientation
-) {
+): AutoDisposableAdapter() {
     val skeletonPath = "pawn/human/skeleton"
-    val textureAtlas by lazy {
+    val textureAtlas by disposable {
         TextureAtlas(loadAsset("$skeletonPath/${orientation.skeletonName}.atlas"))
     }
     val binarySkeleton: SkeletonBinary by lazy {
@@ -51,7 +53,7 @@ class PawnSkeleton(
     private val defaultHairColor: Color,
     private val defaultUnderwearColor: Color,
     private val batch: SpriteBatch,
-) : ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
+) :  ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
             CustomizablePawnSlotBody.Hair to false,

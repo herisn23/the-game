@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Placeable
 import org.roldy.core.Renderable
+import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 import org.roldy.core.x
 import org.roldy.pawn.handler.MoveHandler
 import org.roldy.pawn.skeleton.PawnSkeletonManager
@@ -11,10 +13,10 @@ import org.roldy.pawn.skeleton.attribute.Slash1H
 
 class Pawn(
     val batch: SpriteBatch
-) : Renderable, Placeable {
+) : AutoDisposableAdapter(), Renderable, Placeable {
     val walkSpeed: Float = 1f
     private val move = MoveHandler(this)
-    val manager: PawnSkeletonManager by lazy {
+    val manager: PawnSkeletonManager by disposable {
         PawnSkeletonManager(batch).apply {
             addEventListener(Slash1H) { _, _ ->
                 println("hit")

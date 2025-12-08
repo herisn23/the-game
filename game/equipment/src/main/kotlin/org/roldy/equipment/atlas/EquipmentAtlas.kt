@@ -2,15 +2,13 @@ package org.roldy.equipment.atlas
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import org.roldy.core.asset.loadAsset
+import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 
-abstract class EquipmentAtlas(atlasPath: String) {
+abstract class EquipmentAtlas(atlasPath: String): AutoDisposableAdapter() {
 
-    val atlas by lazy {
+    val atlas by disposable {
         TextureAtlas(loadAsset(atlasPath))
-    }
-
-    fun dispose() {
-        atlas.dispose()
     }
 
     fun findRegion(regionName: String): TextureAtlas.AtlasRegion =
