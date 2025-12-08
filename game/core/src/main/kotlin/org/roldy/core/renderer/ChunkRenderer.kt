@@ -11,7 +11,6 @@ import org.roldy.core.renderer.chunk.ChunkObjectData
 import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 import org.roldy.utils.invoke
 
-
 class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
     private val camera: OrthographicCamera,
     private val persistentItems: List<Layered>,

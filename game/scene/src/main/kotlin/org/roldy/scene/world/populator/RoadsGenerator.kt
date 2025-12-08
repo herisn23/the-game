@@ -4,6 +4,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.x
 import org.roldy.map.WorldMapSize
 import org.roldy.scene.distance
+import org.roldy.scene.world.populator.environment.SettlementData
 import org.roldy.terrain.TileData
 
 object RoadsGenerator {

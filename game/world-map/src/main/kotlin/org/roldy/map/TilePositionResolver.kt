@@ -15,8 +15,8 @@ class TilePositionResolver(
 ) {
     val logger by logger()
     val layer = worldMap.tiledMap.layers[1] as TiledMapTileLayer
-    val hexSideLength: Int = worldMap.tiledMap.properties.get("hexsidelength", Int::class.java)
-    val staggerIndex: String = worldMap.tiledMap.properties.get("staggerindex", String::class.java)
+    val hexSideLength: Int = worldMap.hexSideLength
+    val staggerIndex: String = worldMap.staggerIndex
     private val tileWidth = layer.tileWidth.toFloat()
     private val tileHeight = layer.tileHeight.toFloat()
     private val hexSideLengthF = hexSideLength.toFloat()

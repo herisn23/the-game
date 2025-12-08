@@ -27,7 +27,7 @@ class PathWalkerManager(
             if (currentPathIndex < path.size) {
                 val nextWorldPos = path[currentPathIndex]
 
-                MoveUtils.moveTowards(placeable.position, nextWorldPos.position, 100f, deltaTime) {
+                MoveUtils.moveTowards(placeable.position, nextWorldPos.position, 500f, deltaTime) {
                     placeable.position = nextWorldPos.position
                     coords = nextWorldPos.coords
                     currentPathIndex++

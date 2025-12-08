@@ -1,12 +1,9 @@
 package org.roldy.core.renderer.chunk
 
 import com.badlogic.gdx.math.Rectangle
-import org.roldy.core.MutableVector2Int
-import org.roldy.core.Vector2Int
+import org.roldy.core.*
 import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 import org.roldy.core.renderer.drawable.DrawablePool
-import org.roldy.core.repeat
-import org.roldy.core.x
 import kotlin.math.floor
 
 fun interface PoolProvider<T: ChunkObjectData> {
@@ -17,9 +14,13 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     private val populator: ChunkPopulator<D, T>,
     poolProvider: PoolProvider<D>
 ) {
+
+
+    protected val logger by logger()
     abstract val minCoords: Int
     abstract val maxCoords: Int
-    protected abstract val chunkSize: Float
+    protected abstract val chunkWidth: Float
+    protected abstract val chunkHeight: Float
     internal val chunks = mutableMapOf<Vector2Int, T>()
     private val visibilityViewChunks = Rectangle()
     private val visibilityViewObjects = Rectangle()
@@ -98,6 +99,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         }
         toUnload.forEach {
             chunks.remove(it.key)?.objects?.forEach { obj ->
+                logger.debug { "Free object: in chunk ${it.key}, ${obj.data}" }
                 pool.free(obj.drawable)
             }
         }
@@ -108,7 +110,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         y: Float
     ): MutableVector2Int =
         apply {
-            this.x = floor(x / chunkSize).toInt()
-            this.y = floor(y / chunkSize).toInt()
+            this.x = floor(x / chunkWidth).toInt()
+            this.y = floor(y / chunkHeight).toInt()
         }
 }

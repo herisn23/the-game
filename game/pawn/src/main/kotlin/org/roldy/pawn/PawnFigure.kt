@@ -30,14 +30,8 @@ class PawnFigure(
         pathWalkerManager.walk()
     }
 
-
-    override fun dispose() {
-        tex.dispose()
-        batch.dispose()
-    }
-
     override val layer: Int
-        get() = Layered.LAYER_2
+        get() = Layered.LAYER_3
 
     override val zIndex: Float
         get() = sprite.y - sprite.height / 2

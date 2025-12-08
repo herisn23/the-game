@@ -6,4 +6,4 @@ import org.roldy.environment.MapObjectData
 class Settlement(
     data: MapObjectData,
     atlas: TextureAtlas
-) : SimpleSpriteObject(data, atlas.findRegion("house"))
+) : SimpleSpriteObject(data, atlas.findRegion("hexDirtCastle00_blue"))

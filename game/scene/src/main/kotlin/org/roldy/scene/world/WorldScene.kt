@@ -18,14 +18,15 @@ import org.roldy.map.input.ZoomCameraProcessor
 import org.roldy.pawn.PawnFigure
 import org.roldy.scene.Scene
 import org.roldy.scene.world.chunk.WorldMapChunkManager
+import org.roldy.scene.world.debug.DebugRenderer
 import org.roldy.scene.world.pathfinding.PathfinderManager
-import org.roldy.scene.world.populator.WorldPopulator
-import org.roldy.terrain.ProceduralMapGenerator
+import org.roldy.scene.world.populator.WorldMapPopulator
 
 class WorldScene(
     private val camera: OrthographicCamera
 ) : AutoDisposableAdapter(), Scene {
-    val mapSize = WorldMapSize.Debug
+    val debugEnabled = false
+    val mapSize = WorldMapSize.Small
     val tileSize = 256
 
     val zoom = ZoomCameraProcessor(keybinds)
@@ -36,39 +37,30 @@ class WorldScene(
         WorldMap(
             camera,
             zoom,
-            ProceduralMapGenerator(
-                seed = seed,
-                width = mapSize.size,
-                height = mapSize.size,
-                tileSize = tileSize,
-                moistureScale = mapSize.moistureScale,
-                temperatureScale = mapSize.temperatureScale,
-                elevationScale = mapSize.elevationScale
-            )
+            seed,
+            mapSize,
+            tileSize
         )
     }
-    val populator by disposable { WorldPopulator(map.terrainData, mapSize, seed) }
+    val populator by disposable { WorldMapPopulator(map) }
 
     val currentPawn by disposable {
         PawnFigure(batch).apply {
-            val centerX = (mapSize.size * tileSize) / 2f
-            val centerY = (mapSize.size * tileSize) / 3f
-            val center = centerX x centerY
-            map.tilePosition.resolve(center)?.let { tileCoords ->
-                coords = tileCoords
-                position = map.tilePosition.resolve(tileCoords)
-            }
+            val center = mapSize.size / 2 x mapSize.size / 2
+            coords = 245 x 112
+            position = map.tilePosition.resolve(coords)
         }
     }
+    val chunkManager = WorldMapChunkManager(
+        map,
+        populator
+    )
     val chunkRenderer = ChunkRenderer(
         camera,
         listOf(currentPawn),
-        WorldMapChunkManager(
-            tileSize,
-            mapSize,
-            populator
-        )
+        chunkManager
     )
+    val debugRenderer by disposable { DebugRenderer(camera, map, chunkManager) }
 
     val objectMove = ObjectMoveInputProcessor(keybinds, map, camera) {
         PathfinderManager(map, {
@@ -87,6 +79,8 @@ class WorldScene(
         camera.update()
         map.render()
         chunkRenderer.render(batch)
+        if (debugEnabled)
+            debugRenderer.render()
     }
 
     private fun clampMovableObjectsToMapBounds() {

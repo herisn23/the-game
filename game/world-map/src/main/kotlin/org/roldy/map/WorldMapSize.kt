@@ -12,7 +12,7 @@ interface WorldMapSize {
     val temperatureScale: Float get() = 0.05f    // Lower = larger temperature zones, default:0.05f
 
     object Debug : WorldMapSize {
-        override val size: Int = 10
+        override val size: Int = 30
     }
 
     object Small : WorldMapSize {

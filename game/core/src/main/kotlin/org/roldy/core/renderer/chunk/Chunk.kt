@@ -5,7 +5,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 
 
-abstract class Chunk<T: ChunkObjectData>(val coords: Vector2Int, val size: Float) {
+abstract class Chunk<T: ChunkObjectData>(val coords: Vector2Int, val chunkWidth: Float, val chunkHeight: Float) {
     class ChunkObject<T: ChunkObjectData>(
         val data: T,
         val drawable: ChunkManagedDrawable<T>,
@@ -22,8 +22,8 @@ abstract class Chunk<T: ChunkObjectData>(val coords: Vector2Int, val size: Float
             objects.filterTo(this.visibleObjects, predicate)
         }
 
-    val x = coords.x * size
-    val y = coords.y * size
-    val bounds = Rectangle(x, y, x + size, y + size)
+    val x = coords.x * chunkWidth
+    val y = coords.y * chunkHeight
+    val bounds = Rectangle(x, y, x + chunkWidth, y + chunkHeight)
 }
 

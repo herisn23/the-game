@@ -27,3 +27,9 @@ fun <T : Disposable?> AutoDisposable.disposable(disposable: T): T {
         }
     }
 }
+
+fun <T : Disposable?> AutoDisposable.disposableList(
+    vararg elements: T
+) = elements.map {
+    it.disposable()
+}

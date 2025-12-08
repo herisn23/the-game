@@ -13,17 +13,39 @@ class WorldMap(
     // Map parameters
     private val camera: OrthographicCamera,
     private val zoom: ZoomCameraProcessor,
-    generator: ProceduralMapGenerator
-): AutoDisposableAdapter() {
+    val seed: Long,
+    val mapSize: WorldMapSize,
+    val tileSize: Int
+) : AutoDisposableAdapter() {
+
+    val generator = ProceduralMapGenerator(
+        seed = seed,
+        width = mapSize.size,
+        height = mapSize.size,
+        tileSize = tileSize,
+        moistureScale = mapSize.moistureScale,
+        temperatureScale = mapSize.temperatureScale,
+        elevationScale = mapSize.elevationScale
+    ).disposable()
     val terrainData = generator.terrainData
+
+    val staggerAxis = "y"
+    val staggerIndex = "even"
+    val tileWidth = generator.tileSize
+    val tileHeight = generator.tileSize
+    val width: Int = generator.width
+    val height: Int = generator.height
+    val hexSideLength =  generator.tileSize / 2
+
+    val yCorrection = .75f
     val tiledMap = generator.generate("biomes-configuration-hex.yaml").apply {
-        properties.put("width", generator.width)
-        properties.put("height", generator.height)
-        properties.put("tilewidth", generator.tileSize)
-        properties.put("tileheight", generator.tileSize)
-        properties.put("hexsidelength", generator.tileSize / 2)
-        properties.put("staggeraxis", "y") // or "x"
-        properties.put("staggerindex", "even"); // or "odd"
+        properties.put("width", width)
+        properties.put("height", height)
+        properties.put("tilewidth", tileWidth)
+        properties.put("tileheight", tileHeight)
+        properties.put("hexsidelength", hexSideLength)
+        properties.put("staggeraxis", staggerAxis) // or "x"
+        properties.put("staggerindex", staggerIndex); // or "odd"
     }
 
     private val tiledMapRenderer = HexagonalTiledMapRenderer(tiledMap).disposable()
@@ -45,7 +67,7 @@ class WorldMap(
     private fun zoomCamera() {
         zoom { zoom ->
             camera.zoom += zoom * delta
-            camera.zoom = MathUtils.clamp(camera.zoom, 3f, 10f)
+            camera.zoom = MathUtils.clamp(camera.zoom, 2f, 10f)
         }
     }
 
@@ -55,3 +77,4 @@ class WorldMap(
         }
     }
 }
+
