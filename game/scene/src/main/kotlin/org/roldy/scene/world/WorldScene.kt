@@ -51,7 +51,7 @@ class WorldScene(
 
     val currentPawn by disposable {
         PawnFigure(batch).apply {
-            val center = mapSize.size / 2 x mapSize.size / 2
+            val center = 216 x 180//mapSize.size / 2 x mapSize.size / 2
             coords = center
             position = map.tilePosition.resolve(coords)
         }

@@ -10,36 +10,35 @@ class PathWalkerManager(
     val worldPositioned: WorldPositioned
 ) : TilePositioned {
     val logger by logger()
-    private var currentPath: List<PathWalker.PathNode>? = null
+    private var currentPath: List<PathWalker.PathNode> = emptyList()
     private var currentPathIndex = 0
 
-    var path: List<PathWalker.PathNode>?
+    var path: List<PathWalker.PathNode>
         get() = currentPath
         set(value) {
-            currentPath = value
+            //current node is not finished yet, add i to new path
+            val currentNode = currentPath.getOrNull(currentPathIndex)
+            currentPath = currentNode?.let { listOf(it) + value } ?: value
             currentPathIndex = 0
         }
 
     context(deltaTime: Float)
     fun walk() {
-        // Follow the path
-        currentPath?.let { path ->
-            if (currentPathIndex < path.size) {
-                val nextWorldPos = path[currentPathIndex]
+        if (currentPathIndex < path.size) {
+            val nextWorldPos = path[currentPathIndex]
+            //always set coords by nextPosition to correct resolving of next path if current path is still processing
+            coords = nextWorldPos.coords
+            MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, 500f, deltaTime) {
+                worldPositioned.position = nextWorldPos.position
+                currentPathIndex++
 
-                MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, 500f, deltaTime) {
-                    worldPositioned.position = nextWorldPos.position
-                    coords = nextWorldPos.coords
-                    currentPathIndex++
-
-                    // Reached end of path
-                    if (currentPathIndex >= path.size) {
-                        currentPath = null
-                        currentPathIndex = 0
-                    }
-                }?.let {
-                    worldPositioned.position = it
+                // Reached end of path
+                if (currentPathIndex >= path.size) {
+                    currentPath = emptyList()
+                    currentPathIndex = 0
                 }
+            }?.let {
+                worldPositioned.position = it
             }
         }
     }

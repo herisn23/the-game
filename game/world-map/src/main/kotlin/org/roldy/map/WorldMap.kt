@@ -59,7 +59,7 @@ class WorldMap(
         // Handle input
         zoomCamera()
         tiledMapRenderer.setView(camera)
-//        tiledMapRenderer.render()//IntArray(1){0}
+        tiledMapRenderer.render()//IntArray(1){0}
         tileFocus.render(camera)
     }
 
@@ -67,7 +67,7 @@ class WorldMap(
     private fun zoomCamera() {
         zoom { zoom ->
             camera.zoom += zoom * delta
-            camera.zoom = MathUtils.clamp(camera.zoom, 1.5f, 100f)
+            camera.zoom = MathUtils.clamp(camera.zoom, 1.5f, 10f)
         }
     }
 

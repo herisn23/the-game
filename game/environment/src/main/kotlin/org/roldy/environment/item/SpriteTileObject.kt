@@ -17,13 +17,15 @@ class SpriteTileObject : TileBehaviour {
         override val position: Vector2,
         override val coords: Vector2Int,
         val textureRegion: TextureRegion,
-        val rotation: Float = 0f
+        val rotation: Float = 0f,
+        val layer: Int = Layered.LAYER_2
     ) : TileObject.Data
 
     val sprite = Sprite()
+    var data: Data? = null
 
     override val zIndex: Float get() = sprite.run { y - height / 2f }
-    override val layer: Int = Layered.LAYER_2
+    override val layer: Int get() = data?.layer ?: Layered.LAYER_2
 
     context(delta: Float, camera: Camera)
     override fun draw(batch: SpriteBatch) {
@@ -31,7 +33,8 @@ class SpriteTileObject : TileBehaviour {
     }
 
     override fun bind(data: TileObject.Data) {
-        if(data !is Data) return
+        if (data !is Data) return
+        this.data = data
         sprite.setRegion(data.textureRegion)
         sprite.setSize(data.textureRegion.regionWidth.toFloat(), data.textureRegion.regionHeight.toFloat())
         sprite.setOriginCenter()

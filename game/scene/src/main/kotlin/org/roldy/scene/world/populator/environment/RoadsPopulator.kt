@@ -8,6 +8,7 @@ import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
+import org.roldy.core.renderer.Layered
 import org.roldy.core.x
 import org.roldy.environment.TileObject
 import org.roldy.environment.item.SpriteTileObject
@@ -117,7 +118,8 @@ class RoadsPopulator(
                 name = if (isSettlement) "road-settlement" else "road",
                 position = position,
                 coords = road.coords,
-                textureRegion = getRoadTexture(connections, road.coords)
+                textureRegion = getRoadTexture(connections, road.coords),
+                layer = Layered.LAYER_1
             )
         }
     }
