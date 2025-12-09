@@ -15,26 +15,87 @@ import org.roldy.map.WorldMap
 import org.roldy.scene.world.chunk.WorldMapChunk
 import org.roldy.scene.world.pathfinding.Pathfinder
 import org.roldy.scene.world.populator.WorldChunkPopulator
+import org.roldy.scene.world.populator.environment.road.*
 import kotlin.math.abs
-import kotlin.random.Random
+import kotlin.math.absoluteValue
 
 class RoadsPopulator(
     override val map: WorldMap,
     pathfinder: Pathfinder,
     private val settlements: List<SettlementData>,
+    private val includeSettlementTiles: Boolean = true  // Set false to create dead ends
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
+
+    enum class Algorithm(
+        val alg: RoadNetworkAlgorithm,
+        val config: Map<String, Any> = emptyMap()
+    ) {
+        HIERARCHICAL(
+            Hierarchical,
+            mapOf("tierLevels" to 3, "randomness" to 0.3f)
+        ),
+        WEIGHTED(
+            Weighted,
+            mapOf("getImportance" to WeightedImportance { it.coords.sum })
+        ),
+        HUB_AND_SPOKE(
+            HubAndSpoke,
+            mapOf("hubCount" to 3)
+        ),
+        DELAUNAY(
+            Delaunay,
+            mapOf("pruningFactor" to 0.3f)
+        ),
+        MST(
+            MinimumSpanningTree,
+            mapOf("randomness" to 0.9f)
+        ),
+        K_NEAREST(
+            KNearest, mapOf("k" to 3)
+        );
+
+        fun generate(seed: Long, settlements: List<SettlementData>) =
+            alg.generate(seed, settlements, config)
+    }
 
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex
 
+    private val settlementCoords = settlements.map { it.coords }.toSet()
+
     val roadsPositions = generateRoadNetwork(
         settlements = settlements,
         pathfinder = pathfinder,
-        algorithm = RoadNetworkAlgorithm.K_NEAREST,
-        k = 3
+        algorithm = Algorithm.MST,
     )
 
     val atlas by disposable { TextureAtlas(loadAsset("environment/Roads.atlas")) }
+
+    // Cache available variants for each bitmask
+    private val variantCache = mutableMapOf<String, List<Int>>()
+
+    init {
+        // Pre-populate variant cache from atlas
+        atlas.regions.forEach { region ->
+            val match = Regex("hexRoad-(\\d{6})-(\\d{2})").find(region.name)
+            match?.let {
+                val bitmask = it.groupValues[1]
+                val variant = it.groupValues[2].toInt()
+
+                variantCache.getOrPut(bitmask) { mutableListOf<Int>() }
+                    .let { list ->
+                        if (list is MutableList && variant !in list) {
+                            list.add(variant)
+                        }
+                    }
+            }
+        }
+
+        // Sort variant lists
+        variantCache.values.forEach { (it as? MutableList)?.sort() }
+
+        println("Loaded road variants for ${variantCache.size} bitmasks")
+    }
 
     override fun populate(
         chunk: WorldMapChunk,
@@ -50,30 +111,31 @@ class RoadsPopulator(
         return roadsInChunk.map { road ->
             val position = worldPosition(road.coords)
             val connections = getConnectedDirections(road.coords, roadCoordsSet)
-            val roadVariant = determineRoadVariant(connections)
+            val isSettlement = road.coords in settlementCoords
 
             SpriteTileObject.Data(
-                name = "road",
+                name = if (isSettlement) "road-settlement" else "road",
                 position = position,
                 coords = road.coords,
-                textureRegion = getRoadTexture(roadVariant, road.coords)
+                textureRegion = getRoadTexture(connections, road.coords)
             )
         }
     }
 
+    /**
+     * Generates road network using specified algorithm.
+     */
     private fun generateRoadNetwork(
         settlements: List<SettlementData>,
         pathfinder: Pathfinder,
-        algorithm: RoadNetworkAlgorithm,
-        k: Int = 3
+        algorithm: Algorithm
     ): List<PathWalker.PathNode> {
         if (settlements.size < 2) return emptyList()
 
-        val edges = when (algorithm) {
-            RoadNetworkAlgorithm.MST -> buildMinimumSpanningTree(settlements)
-            RoadNetworkAlgorithm.K_NEAREST -> buildKNearestNetwork(settlements, k)
-        }
+        // Build network edges
+        val edges = algorithm.generate(map.seed, settlements)
 
+        // Calculate paths for all edges
         val allPaths = mutableListOf<PathWalker.PathNode>()
         edges.forEach { (from, to) ->
             val path = pathfinder.findPath(from.coords, to.coords)
@@ -82,83 +144,41 @@ class RoadsPopulator(
             }
         }
 
-        val settlementCoords = settlements.map { it.coords }.toSet()
-        return allPaths
-            .distinctBy { it.coords }
-            .filterNot { it.coords in settlementCoords }
-    }
+        // Remove duplicates, optionally filter settlements
+        val result = allPaths.distinctBy { it.coords }
 
-    private fun buildMinimumSpanningTree(
-        settlements: List<SettlementData>
-    ): List<Pair<SettlementData, SettlementData>> {
-        val edges = mutableListOf<Pair<SettlementData, SettlementData>>()
-        val visited = mutableSetOf<SettlementData>()
-
-        visited.add(settlements.first())
-
-        while (visited.size < settlements.size) {
-            var minDistance = Float.MAX_VALUE
-            var closestEdge: Pair<SettlementData, SettlementData>? = null
-
-            visited.forEach { from ->
-                settlements.filter { it !in visited }.forEach { to ->
-                    val distance = hexDistance(from.coords, to.coords)
-                    if (distance < minDistance) {
-                        minDistance = distance
-                        closestEdge = from to to
-                    }
-                }
-            }
-
-            closestEdge?.let { (from, to) ->
-                edges.add(from to to)
-                visited.add(to)
-            }
+        return if (includeSettlementTiles) {
+            result
+        } else {
+            result.filterNot { it.coords in settlementCoords }
         }
-
-        return edges
     }
 
-    private fun buildKNearestNetwork(
-        settlements: List<SettlementData>,
-        k: Int
-    ): List<Pair<SettlementData, SettlementData>> {
-        val edges = mutableListOf<Pair<SettlementData, SettlementData>>()
-        val processedPairs = mutableSetOf<Set<SettlementData>>()
 
-        settlements.forEach { from ->
-            val nearest = settlements
-                .filter { it != from }
-                .sortedBy { to -> hexDistance(from.coords, to.coords) }
-                .take(k)
-
-            nearest.forEach { to ->
-                val pair = setOf(from, to)
-                if (pair !in processedPairs) {
-                    processedPairs.add(pair)
-                    edges.add(from to to)
-                }
-            }
-        }
-
-        return edges
-    }
-
+    /**
+     * Get all hex directions that have roads connected to this tile.
+     */
     private fun getConnectedDirections(
         coords: Vector2Int,
         roadCoords: Set<Vector2Int>
     ): List<HexEdgeDirection> {
-        return HexEdgeDirection.values().filter { direction ->
+        return HexEdgeDirection.entries.filter { direction ->
             val neighbor = getHexNeighbor(coords, direction)
             neighbor in roadCoords
         }
     }
 
+    /**
+     * Gets the neighboring hex coordinate in the given direction.
+     * Accounts for stagger offset on flat-top hexagons.
+     */
     private fun getHexNeighbor(coords: Vector2Int, direction: HexEdgeDirection): Vector2Int {
         if (staggerAxis != "y") {
+            // Handle x-axis stagger if needed
             return coords + direction.getOffset(false)
         }
 
+        // Y-axis stagger (flat-top hexagons)
         val isStaggered = if (staggerIndex == "even") {
             coords.y % 2 == 0
         } else {
@@ -169,145 +189,107 @@ class RoadsPopulator(
     }
 
     /**
-     * Determines the specific road variant based on connections.
+     * Gets texture region for road tile based on connections.
+     * Uses bitmask naming: hexRoad-{6-bit}-{2-digit-variant}
      */
-    private fun determineRoadVariant(connections: List<HexEdgeDirection>): RoadVariant {
-        return when (connections.size) {
-            0 -> RoadVariant.Isolated
-            1 -> RoadVariant.End(connections[0])
-            2 -> {
-                val dir1 = connections[0]
-                val dir2 = connections[1]
-                if (areOpposite(dir1, dir2)) {
-                    RoadVariant.Straight(dir1, dir2)
-                } else {
-                    RoadVariant.Curve(dir1, dir2)
-                }
-            }
-            3 -> RoadVariant.TJunction(connections)
-            4 -> RoadVariant.FourWay(connections)
-            5 -> RoadVariant.FiveWay(connections)
-            6 -> RoadVariant.SixWay
-            else -> RoadVariant.Isolated
-        }
+    private fun getRoadTexture(connections: List<HexEdgeDirection>, coords: Vector2Int): TextureRegion {
+        val bitmask = connectionsToBitmask(connections)
+
+        // DEBUG: Print what we're looking for
+        println("Coords $coords: Connections = ${connections.map { it.name }} → Bitmask = $bitmask")
+
+        val availableVariants = getAvailableVariants(bitmask)
+        val variant = pickVariant(availableVariants, coords)
+
+        val regionName = "hexRoad-$bitmask-${variant.toString().padStart(2, '0')}"
+
+        return atlas.findRegion(regionName)
+            ?: atlas.findRegion("hexRoad-000000-00")
+            ?: error("No fallback road texture found in atlas")
     }
 
-    private fun areOpposite(dir1: HexEdgeDirection, dir2: HexEdgeDirection): Boolean {
-        return when (dir1) {
-            HexEdgeDirection.EAST -> dir2 == HexEdgeDirection.WEST
-            HexEdgeDirection.WEST -> dir2 == HexEdgeDirection.EAST
-            HexEdgeDirection.NORTHEAST -> dir2 == HexEdgeDirection.SOUTHWEST
-            HexEdgeDirection.SOUTHWEST -> dir2 == HexEdgeDirection.NORTHEAST
-            HexEdgeDirection.NORTHWEST -> dir2 == HexEdgeDirection.SOUTHEAST
-            HexEdgeDirection.SOUTHEAST -> dir2 == HexEdgeDirection.NORTHWEST
+    /**
+     * Converts list of connected directions to 6-bit binary string.
+     * Bit order per asset documentation: NORTHWEST, NORTHEAST, EAST, SOUTHEAST, SOUTHWEST, WEST
+     *
+     * Bit positions (right to left, 0-5):
+     * Bit 0: WEST
+     * Bit 1: SOUTHWEST
+     * Bit 2: SOUTHEAST
+     * Bit 3: EAST
+     * Bit 4: NORTHEAST
+     * Bit 5: NORTHWEST
+     *
+     * Examples:
+     * - EAST + WEST = 001001
+     * - WEST + EAST + SOUTHWEST = 001011
+     */
+    private fun connectionsToBitmask(connections: List<HexEdgeDirection>): String {
+        var mask = 0
+
+        connections.forEach { dir ->
+            val bitPosition = when (dir) {
+                HexEdgeDirection.WEST -> 0
+                HexEdgeDirection.SOUTHWEST -> 1
+                HexEdgeDirection.SOUTHEAST -> 2
+                HexEdgeDirection.EAST -> 3
+                HexEdgeDirection.NORTHEAST -> 4
+                HexEdgeDirection.NORTHWEST -> 5
+            }
+            mask = mask or (1 shl bitPosition)
+        }
+
+        return mask.toString(2).padStart(6, '0')
+    }
+
+    /**
+     * Gets list of available variant numbers for a bitmask.
+     * Results are cached after first lookup.
+     */
+    private fun getAvailableVariants(bitmask: String): List<Int> {
+        return variantCache.getOrPut(bitmask) {
+            val variants = mutableListOf<Int>()
+
+            // Check variants 00 through 99
+            for (i in 0..99) {
+                val variantStr = i.toString().padStart(2, '0')
+                val regionName = "hexRoad-$bitmask-$variantStr"
+
+                if (atlas.findRegion(regionName) != null) {
+                    variants.add(i)
+                } else if (variants.isNotEmpty()) {
+                    // Stop checking once we hit a gap (variants are sequential)
+                    break
+                }
+            }
+
+            // If no variants found, return [0] as fallback
+            if (variants.isEmpty()) {
+                println("Warning: No variants found for bitmask $bitmask")
+                listOf(0)
+            } else {
+                variants
+            }
         }
     }
 
     /**
-     * Maps road variant to texture region name.
+     * Picks a variant deterministically based on coordinates.
+     * Ensures consistent variation across the map.
      */
-    private fun getRoadTexture(variant: RoadVariant, coords: Vector2Int): TextureRegion {
-        val regionName = when (variant) {
-            // Straight roads (3 variants)
-            is RoadVariant.Straight -> when {
-                variant.hasDirections(HexEdgeDirection.EAST, HexEdgeDirection.WEST) ->
-                    variantOf("w-e", coords, 1,3)
-                variant.hasDirections(HexEdgeDirection.NORTHEAST, HexEdgeDirection.SOUTHWEST) ->
-                    "hexRoad-straight-ne-sw"
-                variant.hasDirections(HexEdgeDirection.NORTHWEST, HexEdgeDirection.SOUTHEAST) ->
-                    "hexRoad-straight-nw-se"
-                else -> "default"
-            }
+    private fun pickVariant(availableVariants: List<Int>, coords: Vector2Int): Int {
+        if (availableVariants.isEmpty()) return 0
+        if (availableVariants.size == 1) return availableVariants[0]
 
-            // Curves (6 variants for clockwise curves)
-            is RoadVariant.Curve -> when {
-                variant.hasDirections(HexEdgeDirection.EAST, HexEdgeDirection.NORTHEAST) ->
-                    "hexRoad-curve-e-ne"
-                variant.hasDirections(HexEdgeDirection.NORTHEAST, HexEdgeDirection.NORTHWEST) ->
-                    "hexRoad-curve-ne-nw"
-                variant.hasDirections(HexEdgeDirection.NORTHWEST, HexEdgeDirection.WEST) ->
-                    "hexRoad-curve-nw-w"
-                variant.hasDirections(HexEdgeDirection.WEST, HexEdgeDirection.SOUTHWEST) ->
-                    "hexRoad-curve-w-sw"
-                variant.hasDirections(HexEdgeDirection.SOUTHWEST, HexEdgeDirection.SOUTHEAST) ->
-                    "hexRoad-curve-sw-se"
-                variant.hasDirections(HexEdgeDirection.SOUTHEAST, HexEdgeDirection.EAST) ->
-                    "hexRoad-curve-se-e"
-                else -> "hexRoad-default"
-            }
-
-            // T-Junctions (6 variants - gap in each direction)
-            is RoadVariant.TJunction -> {
-                val missing = HexEdgeDirection.values().first { it !in variant.connections }
-                when (missing) {
-                    HexEdgeDirection.EAST -> "hexRoad-t-gap-e"
-                    HexEdgeDirection.NORTHEAST -> "hexRoad-t-gap-ne"
-                    HexEdgeDirection.NORTHWEST -> "hexRoad-t-gap-nw"
-                    HexEdgeDirection.WEST -> "hexRoad-t-gap-w"
-                    HexEdgeDirection.SOUTHWEST -> "hexRoad-t-gap-sw"
-                    HexEdgeDirection.SOUTHEAST -> "hexRoad-t-gap-se"
-                }
-            }
-
-            // Ends (6 variants - one for each direction)
-            is RoadVariant.End -> when (variant.direction) {
-                HexEdgeDirection.EAST -> "hexRoad-end-e"
-                HexEdgeDirection.NORTHEAST -> "hexRoad-end-ne"
-                HexEdgeDirection.NORTHWEST -> "hexRoad-end-nw"
-                HexEdgeDirection.WEST -> "hexRoad-end-w"
-                HexEdgeDirection.SOUTHWEST -> "hexRoad-end-sw"
-                HexEdgeDirection.SOUTHEAST -> "hexRoad-end-se"
-            }
-
-            // Intersections
-            is RoadVariant.FourWay -> "hexRoad-4way"
-            is RoadVariant.FiveWay -> "hexRoad-5way"
-            is RoadVariant.SixWay -> "hexRoad-6way"
-            is RoadVariant.Isolated -> "hexRoad-default"
-        }
-
-        return atlas.findRegion(regionName) ?: atlas.findRegion("default")
-    }
-    fun variantOf(name:String, coords: Vector2Int, from:Int, to:Int) =
-        Random(coords.x + coords.y).nextInt(
-            from, to
-        ).let {
-            "$name-$it"
-        }
-
-
-    private fun hexDistance(a: Vector2Int, b: Vector2Int): Float {
-        return (abs(a.x - b.x) + abs(a.y - b.y)).toFloat()
+        // Hash coordinates to pick variant
+        val hash = (coords.x * 73856093) xor (coords.y * 19349663)
+        return availableVariants[hash.absoluteValue % availableVariants.size]
     }
 }
 
 /**
- * Specific road variants with their directions.
+ * Hexagonal edge-to-edge directions for flat-top hexagons.
  */
-sealed class RoadVariant {
-    object Isolated : RoadVariant()
-    data class End(val direction: HexEdgeDirection) : RoadVariant()
-    data class Straight(val dir1: HexEdgeDirection, val dir2: HexEdgeDirection) : RoadVariant() {
-        fun hasDirections(d1: HexEdgeDirection, d2: HexEdgeDirection): Boolean {
-            return (dir1 == d1 && dir2 == d2) || (dir1 == d2 && dir2 == d1)
-        }
-    }
-    data class Curve(val dir1: HexEdgeDirection, val dir2: HexEdgeDirection) : RoadVariant() {
-        fun hasDirections(d1: HexEdgeDirection, d2: HexEdgeDirection): Boolean {
-            return (dir1 == d1 && dir2 == d2) || (dir1 == d2 && dir2 == d1)
-        }
-    }
-    data class TJunction(val connections: List<HexEdgeDirection>) : RoadVariant()
-    data class FourWay(val connections: List<HexEdgeDirection>) : RoadVariant()
-    data class FiveWay(val connections: List<HexEdgeDirection>) : RoadVariant()
-    object SixWay : RoadVariant()
-}
-
-enum class RoadNetworkAlgorithm {
-    MST,
-    K_NEAREST
-}
-
 enum class HexEdgeDirection {
     EAST,
     NORTHEAST,
@@ -316,6 +298,10 @@ enum class HexEdgeDirection {
     SOUTHWEST,
     SOUTHEAST;
 
+    /**
+     * Get offset for this direction based on stagger.
+     * For Y-axis stagger (flat-top hexagons).
+     */
     fun getOffset(isStaggered: Boolean): Vector2Int {
         return when (this) {
             EAST -> 1 x 0
@@ -326,4 +312,11 @@ enum class HexEdgeDirection {
             SOUTHWEST -> if (isStaggered) -1 x -1 else 0 x -1
         }
     }
+}
+
+/**
+ * Calculates hex distance between two coordinates.
+ */
+fun hexDistance(a: Vector2Int, b: Vector2Int): Float {
+    return (abs(a.x - b.x) + abs(a.y - b.y)).toFloat()
 }

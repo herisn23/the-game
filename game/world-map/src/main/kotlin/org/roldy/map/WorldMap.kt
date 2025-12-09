@@ -67,7 +67,7 @@ class WorldMap(
     private fun zoomCamera() {
         zoom { zoom ->
             camera.zoom += zoom * delta
-            camera.zoom = MathUtils.clamp(camera.zoom, 1.5f, 10f)
+            camera.zoom = MathUtils.clamp(camera.zoom, 1.5f, 100f)
         }
     }
 

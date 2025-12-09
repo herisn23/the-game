@@ -27,7 +27,7 @@ class WorldScene(
     private val camera: OrthographicCamera
 ) : AutoDisposableAdapter(), Scene {
     val debugEnabled = false
-    val mapSize = WorldMapSize.Debug
+    val mapSize = WorldMapSize.Small
     val tileSize = 256
 
     val zoom = ZoomCameraProcessor(keybinds)
