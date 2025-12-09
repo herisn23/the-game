@@ -6,8 +6,8 @@ import org.roldy.core.renderer.drawable.ChunkManagedDrawable
 import org.roldy.core.renderer.drawable.DrawablePool
 import kotlin.math.floor
 
-fun interface PoolProvider<T: ChunkObjectData> {
-    fun provide(): ChunkManagedDrawable<T>
+fun interface PoolProvider<D: ChunkObjectData> {
+    fun provide(): ChunkManagedDrawable<D>
 }
 
 abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
@@ -40,9 +40,10 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         return chunks.getOrPut(coords) {
             getChunk(coords).apply {
                 objects.addAll(populator.populate(this).map {
-                    val item = pool.obtain()
-                    item.bind(it)
-                    Chunk.ChunkObject(it, item)
+                    val item = pool.obtain().apply {
+                        bind(it)
+                    }
+                    Chunk.Object(it, item)
                 })
             }
         }

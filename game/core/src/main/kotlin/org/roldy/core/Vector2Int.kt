@@ -15,3 +15,5 @@ data class MutableVector2Int(override var x: Int, override var y: Int) : IVector
 
 infix fun Int.x(other: Int) = Vector2Int(this, other)
 infix fun Float.x(other: Float) = Vector2(this, other)
+infix operator fun Vector2Int.plus(other: Vector2Int): Vector2Int  =
+    Vector2Int(this.x + other.x, this.y + other.y)

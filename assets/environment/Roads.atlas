@@ -1,6 +1,12 @@
 Roads.png
-size:256,512
+size:1024,512
 filter:Linear,Linear
 repeat:none
-hexRoad-001001-00
+default
+bounds:256,0,256,384
+w-e-1
+bounds:512,0,256,384
+w-e-2
 bounds:0,0,256,384
+w-e-3
+bounds:768,0,256,384

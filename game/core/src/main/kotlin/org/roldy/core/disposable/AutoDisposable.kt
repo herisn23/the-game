@@ -12,6 +12,9 @@ interface AutoDisposable : Disposable {
             }
         }
     }
+    override fun dispose() {
+        disposables.forEach(Disposable::dispose)
+    }
 }
 
 fun <T : Disposable?> AutoDisposable.disposable(initializer: () -> T): Lazy<T> {

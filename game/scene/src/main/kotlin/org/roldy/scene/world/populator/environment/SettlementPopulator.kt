@@ -7,8 +7,8 @@ import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.logger
 import org.roldy.core.x
-import org.roldy.environment.MapObjectData
-import org.roldy.environment.item.Settlement
+import org.roldy.environment.TileObject
+import org.roldy.environment.item.SpriteTileObject
 import org.roldy.map.WorldMap
 import org.roldy.map.WorldMapSize
 import org.roldy.scene.distance
@@ -29,8 +29,8 @@ class SettlementPopulator(override val map: WorldMap) : AutoDisposableAdapter(),
 
     override fun populate(
         chunk: WorldMapChunk,
-        existingObjects: List<MapObjectData>
-    ): List<MapObjectData> {
+        existingObjects: List<TileObject.Data>
+    ): List<TileObject.Data> {
         val data = chunk.data()
         val settlementsInChunk = settlements.filter { settlement ->
             data.contains(settlement.coords)
@@ -38,11 +38,13 @@ class SettlementPopulator(override val map: WorldMap) : AutoDisposableAdapter(),
         return settlementsInChunk.map { settle ->
             val position = worldPosition(settle.coords)
             logger.debug { "Loading ${settle.coords} in chunk ${chunk.coords}" }
-            MapObjectData(name = settle.name, position = position, settle.coords) {
-                Settlement(it, atlas).disposable()
-            }
+            SpriteTileObject.Data(
+                name = settle.name, position = position, coords = settle.coords,
+                textureRegion = atlas.findRegion("hexDirtCastle00_blue")
+            )
         }
     }
+
     private fun generate(
         terrainData: Map<Vector2Int, TileData>,
         mapSize: WorldMapSize,
@@ -66,7 +68,7 @@ class SettlementPopulator(override val map: WorldMap) : AutoDisposableAdapter(),
 //                    tile.moisture > 0.3f &&           // Not desert
                     tile.noiseData.temperature in 0.3f..0.7f &&        // Temperate
                     settlements.none {
-                        distance(x, y, it.coords.x, it.coords.y) < 15  // Min distance from others
+                        distance(x, y, it.coords.x, it.coords.y) < 5  // Min distance from others
                     }
 
             if (isSuitable) {

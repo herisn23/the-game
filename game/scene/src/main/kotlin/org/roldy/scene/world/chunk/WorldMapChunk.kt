@@ -4,7 +4,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.renderer.chunk.Chunk
 import org.roldy.core.repeat
 import org.roldy.core.x
-import org.roldy.environment.MapObjectData
+import org.roldy.environment.TileObject
 
 
 class WorldMapChunk(
@@ -13,7 +13,7 @@ class WorldMapChunk(
     chunkHeight: Float,
     val tilesX: Int,
     val tilesY: Int
-) : Chunk<MapObjectData>(coords, chunkWidth, chunkHeight) {
+) : Chunk<TileObject.Data>(coords, chunkWidth, chunkHeight) {
     val tilesCoords: List<Vector2Int> =
         mutableListOf<Vector2Int>().apply {
 

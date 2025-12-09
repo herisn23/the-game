@@ -9,6 +9,4 @@ class DrawablePool<T: ChunkObjectData>(
     override fun newObject(): ChunkManagedDrawable<T> {
         return instance()
     }
-    fun create() =
-        instance()
 }

@@ -13,6 +13,7 @@ interface WorldMapSize {
 
     object Debug : WorldMapSize {
         override val size: Int = 30
+        override val settlements: Int = 10
     }
 
     object Small : WorldMapSize {
