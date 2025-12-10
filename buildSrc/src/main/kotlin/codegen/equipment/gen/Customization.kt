@@ -6,7 +6,7 @@ import java.io.File
 import java.util.Locale.getDefault
 
 object Customization : Generator {
-    override val pack = "org.roldy.equipment.atlas.customization"
+    override val pack = "org.roldy.rendering.equipment.atlas.customization"
     override val dir = "pawn/human/customization"
     val names = listOf("beard", "body", "ears", "eyebrows", "eyes", "hair", "mouth", "underwear")
 

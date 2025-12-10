@@ -1,4 +1,4 @@
-package org.roldy.utils
+package org.roldy.core.utils
 
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch

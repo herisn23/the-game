@@ -24,12 +24,19 @@
             <option value="$PROJECT_DIR$/game" />
             <option value="$PROJECT_DIR$/game/application" />
             <option value="$PROJECT_DIR$/game/core" />
-            <option value="$PROJECT_DIR$/game/environment" />
-            <option value="$PROJECT_DIR$/game/equipment" />
-            <option value="$PROJECT_DIR$/game/pawn" />
+            <option value="$PROJECT_DIR$/game/layer" />
+            <option value="$PROJECT_DIR$/game/layer/data" />
+            <option value="$PROJECT_DIR$/game/layer/gameplay" />
+            <option value="$PROJECT_DIR$/game/layer/gameplay/input-processing" />
+            <option value="$PROJECT_DIR$/game/layer/gameplay/world" />
+            <option value="$PROJECT_DIR$/game/layer/rendering" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/environment" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/equipment" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/g2d" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/map" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/pawn" />
+            <option value="$PROJECT_DIR$/game/layer/rendering/scene" />
             <option value="$PROJECT_DIR$/game/sandbox" />
-            <option value="$PROJECT_DIR$/game/scene" />
-            <option value="$PROJECT_DIR$/game/world-map" />
             <option value="$PROJECT_DIR$/launcher" />
             <option value="$PROJECT_DIR$/unity" />
           </set>

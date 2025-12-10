@@ -1,4 +1,4 @@
-package org.roldy.utils
+package org.roldy.core.utils
 
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty

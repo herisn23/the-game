@@ -5,13 +5,25 @@ include("launcher")
 include("unity")
 
 include("game:application")
-include("game:world-map")
-include("game:pawn")
 include("game:sandbox")
 include("game:core")
-include("game:equipment")
-include("game:environment")
-include("game:scene")
+
+//rendering layer should never access to gameplay layer
+include("game:layer:rendering:map")
+include("game:layer:rendering:pawn")
+include("game:layer:rendering:environment")
+include("game:layer:rendering:scene")
+include("game:layer:rendering:equipment")
+include("game:layer:rendering:g2d")
+
+
+
+include("game:layer:gameplay:world")
+include("game:layer:gameplay:input-processing")
+
+include("game:layer:data")
+
+
 
 dependencyResolutionManagement {
     repositories {

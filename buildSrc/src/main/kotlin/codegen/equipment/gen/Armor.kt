@@ -5,7 +5,7 @@ import java.io.File
 
 
 object Armors : Generator {
-    override val pack = "org.roldy.equipment.atlas.armor"
+    override val pack = "org.roldy.rendering.equipment.atlas.armor"
     override val dir = "pawn/human/armor"
 
     override fun generate(root: File): List<ClassInfo> =

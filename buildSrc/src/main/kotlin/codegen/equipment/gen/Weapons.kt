@@ -6,7 +6,7 @@ import java.util.Locale.getDefault
 
 object Weapons : Generator {
 
-    override val pack = "org.roldy.equipment.atlas.weapon"
+    override val pack = "org.roldy.rendering.equipment.atlas.weapon"
     override val dir = "weapons"
     val weapons = listOf(
         "axe", "dagger", "hammer", "lance", "staff", "sword", "wand"
@@ -40,7 +40,7 @@ object Weapons : Generator {
     fun template(path: String, name: String, weapons: List<String>) =
         """
 package $pack    
-import org.roldy.equipment.atlas.EquipmentAtlas
+import org.roldy.rendering.equipment.atlas.EquipmentAtlas
 
 object $name : EquipmentAtlas("$path") {
     ${weapons.joinToString("\n") { objectTemplate(it) }}

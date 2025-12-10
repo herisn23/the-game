@@ -1,19 +1,18 @@
 package org.roldy.core.pathwalker
 
+import org.roldy.core.PathWalker
 import org.roldy.core.TilePositioned
 import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
-import org.roldy.core.logger
 import org.roldy.core.utils.MoveUtils
 
 class PathWalkerManager(
     val worldPositioned: WorldPositioned
 ) : TilePositioned {
-    val logger by logger()
-    private var currentPath: List<PathWalker.PathNode> = emptyList()
+    private var currentPath: List<PathWalker.Node> = emptyList()
     private var currentPathIndex = 0
 
-    var path: List<PathWalker.PathNode>
+    var path: List<PathWalker.Node>
         get() = currentPath
         set(value) {
             //current node is not finished yet, add i to new path
