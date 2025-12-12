@@ -6,6 +6,7 @@ dependencies {
     implementation(projects.game.layer.rendering.environment)
 
     implementation(projects.game.layer.gameplay.world)
+    implementation(projects.game.layer.gameplay.state)
 
     implementation(projects.game.layer.data)
 }

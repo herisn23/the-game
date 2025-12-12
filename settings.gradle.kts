@@ -20,6 +20,7 @@ include("game:layer:rendering:g2d")
 
 include("game:layer:gameplay:world")
 include("game:layer:gameplay:scene")
+include("game:layer:gameplay:state")
 
 include("game:layer:data")
 

@@ -44,9 +44,7 @@ object PawnManagerMath {
  * The manager implements various interfaces to support equipment, customization, and animations,
  * delegating all operations to the underlying skeleton instances.
  */
-class PawnSkeletonManager(
-    private val batch: SpriteBatch
-) : AnimationTypeEventListenerHandler<PawnAnimator>(),
+class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
     Renderable,
     ArmorWearer,
     Customizable,
@@ -103,8 +101,7 @@ class PawnSkeletonManager(
             PawnSkeletonData.instance.getValue(orientation).disposable(),
             defaultSkinColor,
             defaultHairColor,
-            defaultUnderWearColor,
-            batch
+            defaultUnderWearColor
         )
 
     /**
@@ -316,12 +313,12 @@ class PawnSkeletonManager(
      * @receiver batch The sprite batch used for rendering
      */
     context(deltaTime: Float)
-    override fun render() {
+    override fun render(batch: SpriteBatch) {
         skeletons.values.forEach { skel ->
             skel.animate() // Always process animations to preserve states between orientations
         }
         skeletons[currentOrientation]?.run {
-            render()
+            render(batch)
         }
         if (moving) {
             if (moveTo != null) {

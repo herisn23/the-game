@@ -1,8 +1,9 @@
 package org.roldy.rendering.g2d
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 
 interface Renderable: Layered, Disposable {
     context(deltaTime: Float)
-    fun render()
+    fun render(batch: SpriteBatch)
 }

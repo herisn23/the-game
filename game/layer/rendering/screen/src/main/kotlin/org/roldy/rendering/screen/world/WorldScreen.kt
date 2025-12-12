@@ -1,15 +1,10 @@
 package org.roldy.rendering.screen.world
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import org.roldy.core.InputProcessorDelegate
-import org.roldy.core.keybind.keybinds
-import org.roldy.core.pathwalker.AsyncPathfindingProxy
-import org.roldy.core.pathwalker.FindPath
-import org.roldy.core.x
-import org.roldy.data.pawn.PawnData
-import org.roldy.data.tile.walkCost
+import com.badlogic.gdx.math.MathUtils
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
@@ -18,44 +13,25 @@ import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.world.chunk.WorldMapChunkManager
 import org.roldy.rendering.screen.world.debug.DebugRenderer
-import org.roldy.rendering.screen.world.input.ObjectMoveInputProcessor
-import org.roldy.rendering.screen.world.input.ZoomInputProcessor
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 
 class WorldScreen(
     private val camera: OrthographicCamera,
     private val map: WorldMap,
     populator: WorldMapPopulator,
-    findPath: FindPath,
+    val pawn: PawnFigure,
+    val inputProcessor: InputProcessor,
+    val zoom: ((Float, Float, Float) -> Unit) -> Unit,
     private val debugEnabled: Boolean = false,
 ) : AutoDisposableScreenAdapter() {
     val batch by disposable { SpriteBatch() }
     val diagnostics by disposable { Diagnostics() }
 
-    val zoom = ZoomInputProcessor(keybinds, camera, 1f, 10f)
-
-    val pathfinderProxy = AsyncPathfindingProxy(findPath, {
-        currentPawn.coords
-    }) { path ->
-        currentPawn.pathWalking(path)
-    }
-
-    val currentPawn: PawnFigure by disposable {
-        PawnFigure(batch, { PawnData() }) {
-            //TODO this code shouldn't be here
-            val objects = chunkManager.tileData(it)
-            (objects + listOfNotNull(map.terrainData[it])).walkCost()
-        }.apply {
-            val center = map.data.size.width / 2 x map.data.size.height / 2
-            coords = center
-            position = map.tilePosition.resolve(coords)
-        }
-    }
     val chunkManager by disposable {
         WorldMapChunkManager(
             map,
             populator,
-            listOf(currentPawn)
+            listOf(pawn)
         )
     }
 
@@ -71,8 +47,11 @@ class WorldScreen(
 
     override fun render(delta: Float) {
         context(delta) {
-            zoom.update()
-            camera.position.set(currentPawn.position.x, currentPawn.position.y, 0f)
+            zoom { zoom, min, max ->
+                camera.zoom += zoom * delta
+                camera.zoom = MathUtils.clamp(camera.zoom, min, max)
+            }
+            camera.position.set(pawn.position.x, pawn.position.y, 0f)
             camera.update()
             map.render()
             chunkRenderer.render(batch)
@@ -84,12 +63,7 @@ class WorldScreen(
     }
 
     override fun show() {
-        Gdx.input.inputProcessor = InputProcessorDelegate(
-            listOf(
-                zoom,
-                ObjectMoveInputProcessor(keybinds, map, camera, pathfinderProxy::findPath)
-            )
-        )
+        Gdx.input.inputProcessor = inputProcessor
         chunkManager.pause = false
     }
 

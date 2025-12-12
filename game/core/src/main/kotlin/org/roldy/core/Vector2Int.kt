@@ -1,12 +1,14 @@
 package org.roldy.core
 
 import com.badlogic.gdx.math.Vector2
+import kotlinx.serialization.Serializable
 
 interface IVector2Int {
     val x: Int
     val y: Int
 }
 
+@Serializable
 data class Vector2Int(override val x: Int, override val y: Int) : IVector2Int {
     val sum get() = x + y
 }

@@ -51,8 +51,7 @@ class PawnSkeleton(
     private val pawnSkeletonData: PawnSkeletonData,
     private val defaultSkinColor: Color,
     private val defaultHairColor: Color,
-    private val defaultUnderwearColor: Color,
-    private val batch: SpriteBatch,
+    private val defaultUnderwearColor: Color
 ) :  ArmorWearer, Customizable, Strippable, WeaponWearer, UnderwearWearer, ShieldWearer {
     companion object {
         val hiddenSlotsDefault = mapOf(
@@ -280,7 +279,7 @@ class PawnSkeleton(
     }
 
     context(deltaTime: Float)
-    fun render() {
+    fun render(batch: SpriteBatch) {
         drawHairColor()
         drawSkinColor()
         drawUnderWearColor()

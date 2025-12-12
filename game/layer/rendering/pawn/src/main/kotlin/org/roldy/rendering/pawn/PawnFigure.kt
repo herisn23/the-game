@@ -13,15 +13,16 @@ import org.roldy.data.pawn.PawnData
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
+import kotlin.properties.Delegates
 
 class PawnFigure(
-    val batch: SpriteBatch,
-    val data: () -> PawnData,
+    val data: PawnData,
     val walkCost: (Vector2Int) -> Float
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
-    val pathWalkerManager = PathWalkerManager(this) {
-        val data = data()
-        data.defaultTileSpeed * data().speed * walkCost(it)
+    val pathWalkerManager = PathWalkerManager(this, {
+        data.defaultTileSpeed * data.speed * walkCost(it)
+    }) {
+        this.coords = it
     }
     val tex = Texture("purple_circle.png").disposable()
     val sprite = Sprite(tex).apply {
@@ -29,11 +30,12 @@ class PawnFigure(
         setOriginCenter()
     }
 
+
     override var walkable: Boolean = false
 
 
     context(deltaTime: Float)
-    override fun render() {
+    override fun render(batch: SpriteBatch) {
         sprite.draw(batch)
         pathWalkerManager.walk()
     }
@@ -57,9 +59,7 @@ class PawnFigure(
         pathWalkerManager.path = path.tiles
     }
 
-    override var coords: Vector2Int
-        get() = pathWalkerManager.coords
-        set(value) {
-            pathWalkerManager.coords = value
-        }
+    override var coords: Vector2Int by Delegates.observable(data.coords) { _, _, newValue ->
+        data.coords = newValue
+    }
 }

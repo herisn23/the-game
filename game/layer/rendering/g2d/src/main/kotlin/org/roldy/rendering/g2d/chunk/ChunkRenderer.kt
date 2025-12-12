@@ -8,7 +8,6 @@ import org.roldy.core.utils.invoke
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
-import org.roldy.rendering.g2d.Sortable
 import org.roldy.rendering.g2d.drawable.ChunkManagedDrawable
 
 class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
@@ -66,12 +65,10 @@ class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
                 active.forEach {
                     when (it) {
                         is ChunkManagedDrawable<*> -> it.draw(batch)
-                        is Renderable -> it.render()
+                        is Renderable -> it.render(batch)
                     }
                 }
             }
         }
     }
-
-    val objects: List<Sortable> get() = active
 }

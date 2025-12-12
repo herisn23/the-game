@@ -10,11 +10,9 @@ import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.pawn.skeleton.PawnSkeletonManager
 import org.roldy.rendering.pawn.skeleton.attribute.Slash1H
 
-class Pawn(
-    val batch: SpriteBatch
-) : AutoDisposableAdapter(), Renderable, WorldPositioned {
+class Pawn : AutoDisposableAdapter(), Renderable, WorldPositioned {
     val manager: PawnSkeletonManager by disposable {
-        PawnSkeletonManager(batch).apply {
+        PawnSkeletonManager().apply {
             addEventListener(Slash1H) { _, _ ->
                 println("hit")
             }
@@ -25,9 +23,9 @@ class Pawn(
         get() = manager.zIndex
 
     context(delta: Float)
-    override fun render() {
-        context(delta, this) {
-            manager.render()
+    override fun render(batch: SpriteBatch) {
+        context(delta) {
+            manager.render(batch)
         }
     }
 
