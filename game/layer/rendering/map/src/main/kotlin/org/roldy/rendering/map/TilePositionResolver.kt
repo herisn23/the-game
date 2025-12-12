@@ -50,7 +50,7 @@ class TilePositionResolver(
         position: Vector2,
         offsetCorrection: Boolean = true,
         onMiss: () -> Unit = {},
-        onMatch: (Vector2Int, Vector2, TileData) -> Unit
+        onMatch: (Vector2Int, Vector2, MapTerrainData) -> Unit
     ) {
         resolve(position, offsetCorrection, onMiss, onMatch)
     }
@@ -62,7 +62,7 @@ class TilePositionResolver(
         position: Vector2,
         offsetCorrection: Boolean = true,
         onMiss: () -> Unit = {},
-        onMatch: (Vector2Int, Vector2, TileData) -> Unit
+        onMatch: (Vector2Int, Vector2, MapTerrainData) -> Unit
     ) {
         resolve(position)?.let {
             onMatch(it, getTileWorldPosition(it.x, it.y, offsetCorrection), worldMap.terrainData.getValue(it))
@@ -104,7 +104,7 @@ class TilePositionResolver(
     operator fun invoke(
         position: Vector2Int,
         offsetCorrection: Boolean = true,
-        converted: (Vector2Int, Vector2, TileData) -> Unit
+        converted: (Vector2Int, Vector2, MapTerrainData) -> Unit
     ) {
         converted(position, resolve(position, offsetCorrection), worldMap.terrainData.getValue(position))
     }

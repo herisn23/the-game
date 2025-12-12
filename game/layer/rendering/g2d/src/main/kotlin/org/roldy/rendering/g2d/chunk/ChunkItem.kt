@@ -1,5 +1,7 @@
 package org.roldy.rendering.g2d.chunk
 
-interface ChunkItem<D:ChunkObjectData> {
-    fun bind(data: D)
+import org.roldy.rendering.g2d.Layered
+
+interface ChunkItem<D:ChunkObjectData>: Layered {
+    var data: D?
 }

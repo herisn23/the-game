@@ -12,14 +12,14 @@ include("game:core")
 include("game:layer:rendering:map")
 include("game:layer:rendering:pawn")
 include("game:layer:rendering:environment")
-include("game:layer:rendering:scene")
+include("game:layer:rendering:screen")
 include("game:layer:rendering:equipment")
 include("game:layer:rendering:g2d")
 
 
 
 include("game:layer:gameplay:world")
-include("game:layer:gameplay:input-processing")
+include("game:layer:gameplay:scene")
 
 include("game:layer:data")
 

@@ -42,7 +42,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     val preloadRadius = -300f
 
-    val visibleChunks: List<Chunk<D>> get() = visibleChunksCache
+    val visibleChunks: List<Chunk<D>> get() = visibleChunksCache.toList()
 
     private val pool = DrawablePool {
         poolProvider.provide()
@@ -61,6 +61,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
                 else -> chunk.allObjects
             }
         }.map { it.drawable }
+
         return (visibleDrawables + persistentObjects)
             .sortedWith(compareBy<Layered> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
                 .thenByDescending { it.zIndex }  // Secondary: z-index descending
@@ -80,7 +81,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
             getChunk(coords).apply {
                 objects.addAll(populator.populate(this).map {
                     val item = pool.obtain().apply {
-                        bind(it)
+                        data = it
                     }
                     Chunk.Object(it, item)
                 })
@@ -88,7 +89,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         }
     }
 
-    internal val Chunk<D>.visibleObjects
+    internal val Chunk<D>.visibleObjects: List<Chunk.Object<D>>
         get() =
             filterForVisibleObjects {
                 visibilityViewObjects.contains(it.data.position.x, it.data.position.y)
@@ -156,4 +157,10 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     override fun dispose() {
         eventTask.cancel()
     }
+
+    var pause
+        get() = eventTask.paused
+        set(value) {
+            eventTask.paused = value
+        }
 }

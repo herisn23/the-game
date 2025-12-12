@@ -17,6 +17,7 @@ data class BiomeData(
     override val moisture: FloatComparison = FloatComparison(maxValue),
     @Serializable(G2DColorSerializer::class)
     val color: Color,
+    val walkCost: Float,
     val terrains: List<TerrainData>
 ) : HeightData {
 

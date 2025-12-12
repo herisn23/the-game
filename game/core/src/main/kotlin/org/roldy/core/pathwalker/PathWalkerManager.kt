@@ -1,14 +1,13 @@
 package org.roldy.core.pathwalker
 
-import org.roldy.core.PathWalker
-import org.roldy.core.TilePositioned
 import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
 import org.roldy.core.utils.MoveUtils
 
 class PathWalkerManager(
-    val worldPositioned: WorldPositioned
-) : TilePositioned {
+    val worldPositioned: WorldPositioned,
+    val speed: (Vector2Int) -> Float
+) {
     private var currentPath: List<PathWalker.Node> = emptyList()
     private var currentPathIndex = 0
 
@@ -27,7 +26,7 @@ class PathWalkerManager(
             val nextWorldPos = path[currentPathIndex]
             //always set coords by nextPosition to correct resolving of next path if current path is still processing
             coords = nextWorldPos.coords
-            MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, 500f, deltaTime) {
+            MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, speed(coords), deltaTime) {
                 worldPositioned.position = nextWorldPos.position
                 currentPathIndex++
 
@@ -42,6 +41,6 @@ class PathWalkerManager(
         }
     }
 
-    override var coords: Vector2Int = Vector2Int(0, 0)
+    var coords: Vector2Int = Vector2Int(0, 0)
 
 }

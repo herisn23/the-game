@@ -1,22 +1,21 @@
 package org.roldy.gameplay.world.generator
 
-import org.roldy.core.PathWalker
 import org.roldy.core.Vector2Int
-import org.roldy.core.pathwalker.Pathfinder
+import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.x
 import org.roldy.gameplay.world.generator.road.*
+import org.roldy.gameplay.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
-import org.roldy.rendering.scene.world.populator.environment.RoadData
-import org.roldy.rendering.scene.world.populator.environment.SettlementData
+import org.roldy.rendering.screen.world.populator.environment.RoadData
+import org.roldy.rendering.screen.world.populator.environment.SettlementData
 import kotlin.math.abs
 
 class RoadGenerator(
     val map: WorldMap,
-    val settlements: List<SettlementData>,
-    val pathfinder: Pathfinder
+    val settlements: List<SettlementData>
 ) {
-    private val settlementCoords = settlements.map { it.coords }.toSet()
+    val pathfinder = TilePathfinder(map)
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex
 

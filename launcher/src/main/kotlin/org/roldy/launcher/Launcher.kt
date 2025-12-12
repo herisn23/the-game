@@ -1,6 +1,6 @@
 package org.roldy.launcher
 
-import org.roldy.rendering.Game
+import org.roldy.Game
 
 
 /** Launches the desktop (LWJGL3) application. */

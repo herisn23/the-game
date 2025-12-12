@@ -4,15 +4,15 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.core.x
 import org.roldy.data.map.MapData
-import org.roldy.rendering.map.TileData
-import org.roldy.rendering.scene.world.distance
-import org.roldy.rendering.scene.world.populator.environment.SettlementData
+import org.roldy.rendering.map.MapTerrainData
+import org.roldy.rendering.screen.world.distance
+import org.roldy.rendering.screen.world.populator.environment.SettlementData
 import kotlin.random.Random
 
 object SettlementGenerator {
     val logger by logger()
     fun generate(
-        terrainData: Map<Vector2Int, TileData>,
+        terrainData: Map<Vector2Int, MapTerrainData>,
         mapData: MapData
     ): List<SettlementData> {
         val mapSize = mapData.size

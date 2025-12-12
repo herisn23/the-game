@@ -13,13 +13,17 @@ import org.roldy.data.biome.BiomeData
 import org.roldy.data.biome.match
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
+import org.roldy.data.tile.TileData
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 
-data class TileData(
+data class MapTerrainData(
     val terrain: Terrain,
-    val noiseData: NoiseData
-)
+    val noiseData: NoiseData,
+    override val coords: Vector2Int
+) : TileData {
+    override val walkCost: Float = terrain.biome.data.walkCost
+}
 
 class HexagonalTiledMapCreator(
     val data: MapData,
@@ -30,7 +34,7 @@ class HexagonalTiledMapCreator(
 
 
     // Cache for terrain at each position
-    private val terrainCache = mutableMapOf<Vector2Int, TileData>()
+    private val terrainCache = mutableMapOf<Vector2Int, MapTerrainData>()
     private val fallbackTerrain = createFallbackTerrain()
 
     private val dirtUnderTextureRegion by lazy { TextureRegion(Texture("terrain/HexUnderDirt.png").disposable()) }
@@ -40,7 +44,7 @@ class HexagonalTiledMapCreator(
     /**
      * Generates a complete TiledMap with biomes and optional transitions
      */
-    fun create(): Pair<TiledMap, Map<Vector2Int, TileData>> {
+    fun create(): Pair<TiledMap, Map<Vector2Int, MapTerrainData>> {
         val tiledMap = TiledMap()
         val biomes = readBiomes(biomesData, data.tileSize)
         // Generate base terrain layer
@@ -53,7 +57,7 @@ class HexagonalTiledMapCreator(
         if (generateColorsLayer)
         // Generate colors layer
             tiledMap.layers.add(generateBiomeLayer())
-        return tiledMap to terrainCache
+        return tiledMap.disposable() to terrainCache
     }
 
     private fun generateUnderLayer(): TiledMapTileLayer {
@@ -90,8 +94,8 @@ class HexagonalTiledMapCreator(
         return layer
     }
 
-    fun resolveUnderTileTexture(tileData: TileData?): TextureRegion {
-        val isWater = tileData?.terrain?.biome?.data?.name == "Water"
+    fun resolveUnderTileTexture(mapTerrainData: MapTerrainData?): TextureRegion {
+        val isWater = mapTerrainData?.terrain?.biome?.data?.name == "Water"
         return when {
             isWater -> waterUnderTextureRegion
             else -> dirtUnderTextureRegion
@@ -119,9 +123,10 @@ class HexagonalTiledMapCreator(
             val terrain = findTerrainForNoise(biomes, noiseData)
 
             // Cache the terrain for transition calculations
-            terrainCache[coords] = TileData(
+            terrainCache[coords] = MapTerrainData(
                 terrain,
-                noiseData
+                noiseData,
+                coords
             )
 
             // Create cell with the selected terrain
@@ -166,7 +171,8 @@ class HexagonalTiledMapCreator(
                 terrains = listOf(
                     BiomeData.TerrainData("Fallback")
                 ),
-                color = Color.MAGENTA
+                color = Color.MAGENTA,
+                walkCost = 0f
             ),
             data.tileSize
         ).terrains.first()

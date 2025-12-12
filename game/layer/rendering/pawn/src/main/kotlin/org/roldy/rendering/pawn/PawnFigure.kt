@@ -4,24 +4,32 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
-import org.roldy.core.PathWalker
 import org.roldy.core.TilePositioned
 import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
+import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.pathwalker.PathWalkerManager
+import org.roldy.data.pawn.PawnData
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 
 class PawnFigure(
     val batch: SpriteBatch,
+    val data: () -> PawnData,
+    val walkCost: (Vector2Int) -> Float
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
-    val pathWalkerManager = PathWalkerManager(this)
+    val pathWalkerManager = PathWalkerManager(this) {
+        val data = data()
+        data.defaultTileSpeed * data().speed * walkCost(it)
+    }
     val tex = Texture("purple_circle.png").disposable()
     val sprite = Sprite(tex).apply {
         setSize(100f, 100f)
         setOriginCenter()
     }
+
+    override var walkable: Boolean = false
 
 
     context(deltaTime: Float)

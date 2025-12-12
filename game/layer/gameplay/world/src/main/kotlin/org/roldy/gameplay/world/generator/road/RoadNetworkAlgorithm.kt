@@ -1,6 +1,6 @@
 package org.roldy.gameplay.world.generator.road
 
-import org.roldy.rendering.scene.world.populator.environment.SettlementData
+import org.roldy.rendering.screen.world.populator.environment.SettlementData
 
 interface RoadNetworkAlgorithm {
 

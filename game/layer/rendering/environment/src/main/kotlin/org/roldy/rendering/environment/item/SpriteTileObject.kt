@@ -18,7 +18,8 @@ class SpriteTileObject : TileBehaviour {
         override val coords: Vector2Int,
         val textureRegion: TextureRegion,
         val rotation: Float = 0f,
-        val layer: Int = Layered.LAYER_2
+        val layer: Int = Layered.LAYER_2,
+        override val data: Map<String, Any> = emptyMap()
     ) : TileObject.Data
 
     val sprite = Sprite()

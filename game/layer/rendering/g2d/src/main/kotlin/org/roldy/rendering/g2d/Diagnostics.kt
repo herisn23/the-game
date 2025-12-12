@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.FitViewport
-import org.roldy.core.Logger
 import org.roldy.core.utils.invoke
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.disposable.disposable
@@ -16,11 +15,6 @@ class Diagnostics : AutoDisposableAdapter() {
     private val batch by disposable { SpriteBatch() }
     private val shape by disposable { ShapeRenderer() }
     private val font by disposable { BitmapFont() }
-
-
-    init {
-        Logger.Companion.level = Logger.Level.Debug
-    }
 
     companion object {
         private val diagnosticsProviders: MutableList<() -> String> by lazy {

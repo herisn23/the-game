@@ -14,7 +14,7 @@ class WorldMap(
     private val camera: OrthographicCamera,
     val data: MapData,
     val tiledMap: TiledMap,
-    val terrainData: Map<Vector2Int, TileData>
+    val terrainData: Map<Vector2Int, MapTerrainData>
 ) : AutoDisposableAdapter() {
 
     val staggerAxis = "y"

@@ -8,7 +8,6 @@ interface IVector2Int {
 }
 
 data class Vector2Int(override val x: Int, override val y: Int) : IVector2Int {
-    val vector by lazy { Vector2(x.toFloat(), y.toFloat()) }
     val sum get() = x + y
 }
 
