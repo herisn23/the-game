@@ -1,5 +1,6 @@
 package org.roldy.rendering.pawn
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -17,6 +18,7 @@ import kotlin.properties.Delegates
 
 class PawnFigure(
     val data: PawnData,
+    val camera: Camera,
     val walkCost: (Vector2Int) -> Float
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
     val pathWalkerManager = PathWalkerManager(this, {
@@ -36,6 +38,7 @@ class PawnFigure(
 
     context(deltaTime: Float)
     override fun render(batch: SpriteBatch) {
+        camera.position.set(position.x, position.y, 0f)
         sprite.draw(batch)
         pathWalkerManager.walk()
     }

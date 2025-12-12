@@ -15,10 +15,11 @@ fun interface PoolProvider<D : ChunkObjectData> {
 
 abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     private val populator: ChunkPopulator<D, T>,
-    val persistentObjects: List<Layered>,
     poolProvider: PoolProvider<D>
 ) : Disposable {
     protected val logger by logger()
+
+    val persistentObjects = populator.createPersistentItems()
 
     private val eventTask = EventTask(emitter = ::process)
 

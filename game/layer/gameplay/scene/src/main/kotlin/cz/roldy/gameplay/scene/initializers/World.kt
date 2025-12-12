@@ -58,15 +58,6 @@ fun AutoDisposable.createWorldScreen(): Screen {
     val settlements = SettlementGenerator.generate(terrainData, mapData)
     val roads = RoadGenerator(map, settlements).generate()
 
-    val populator by disposable {
-        WorldMapPopulator(
-            map, listOf(
-                SettlementPopulator(map, settlements),
-                RoadsPopulator(map, roads)
-            )
-        )
-    }
-
     val pathfinder = TilePathfinder(map) { tile, _ ->
         val objectsData = screen.chunkManager.tileData(tile)
         val terrainData = listOfNotNull(map.terrainData[tile])
@@ -86,10 +77,10 @@ fun AutoDisposable.createWorldScreen(): Screen {
     val zoom = ZoomInputProcessor(keybinds, camera, 1f, 10f)
 
     val currentPawn: PawnFigure by disposable {
-        PawnFigure(gameState.pawn, {
+        PawnFigure(gameState.pawn, camera) {
             val objects = screen.chunkManager.tileData(it)
             (objects + listOfNotNull(map.terrainData[it])).walkCost()
-        }).apply {
+        }.apply {
             position = map.tilePosition.resolve(data.coords)
         }
     }
@@ -98,12 +89,20 @@ fun AutoDisposable.createWorldScreen(): Screen {
         currentPawn.pathWalking(path)
     }
 
+    val populator by disposable {
+        WorldMapPopulator(
+            map, listOf(
+                SettlementPopulator(map, settlements),
+                RoadsPopulator(map, roads)
+            ),
+            listOf(currentPawn)
+        )
+    }
     screen = disposable(
         WorldScreen(
             camera,
             map,
             populator,
-            currentPawn,
             InputProcessorDelegate(
                 listOf(
                     zoom,

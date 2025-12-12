@@ -10,7 +10,6 @@ import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.map.WorldMap
-import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.world.chunk.WorldMapChunkManager
 import org.roldy.rendering.screen.world.debug.DebugRenderer
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
@@ -19,7 +18,6 @@ class WorldScreen(
     private val camera: OrthographicCamera,
     private val map: WorldMap,
     populator: WorldMapPopulator,
-    val pawn: PawnFigure,
     val inputProcessor: InputProcessor,
     val zoom: ((Float, Float, Float) -> Unit) -> Unit,
     private val debugEnabled: Boolean = false,
@@ -30,8 +28,7 @@ class WorldScreen(
     val chunkManager by disposable {
         WorldMapChunkManager(
             map,
-            populator,
-            listOf(pawn)
+            populator
         )
     }
 
@@ -51,7 +48,6 @@ class WorldScreen(
                 camera.zoom += zoom * delta
                 camera.zoom = MathUtils.clamp(camera.zoom, min, max)
             }
-            camera.position.set(pawn.position.x, pawn.position.y, 0f)
             camera.update()
             map.render()
             chunkRenderer.render(batch)
