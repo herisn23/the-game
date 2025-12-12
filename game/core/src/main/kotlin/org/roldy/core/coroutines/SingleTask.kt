@@ -1,6 +1,5 @@
 package org.roldy.core.coroutines
 
-import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,11 +42,7 @@ val scope = CoroutineScope(Dispatchers.Default)
  */
 fun async(action: Coroutine): Job =
     scope.launch {
-        action { onRenderThread ->
-            // Post the runnable to the LibGDX application loop,
-            // ensuring it runs on the rendering thread.
-            Gdx.app.postRunnable(onRenderThread)
-        }
+        action(::onGPUThread)
     }
 
 class SingleTaskAsync {

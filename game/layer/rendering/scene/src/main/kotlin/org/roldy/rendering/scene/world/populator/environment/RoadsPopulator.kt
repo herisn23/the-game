@@ -9,7 +9,6 @@ import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
-import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.scene.world.chunk.WorldMapChunk
 import org.roldy.rendering.scene.world.populator.WorldChunkPopulator
@@ -27,7 +26,7 @@ class RoadsPopulator(
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
 
-    val atlas by disposable { AtlasLoader.roads }
+    val atlas = AtlasLoader.roads.disposable()
 
     // Cache available variants for each bitmask
     private val variantCache = mutableMapOf<String, List<Int>>()

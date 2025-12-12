@@ -25,4 +25,8 @@ class AsyncPathfindingProxy(
             }
         }
     }
+
+    fun stop() {
+        task.cancel()
+    }
 }

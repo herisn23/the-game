@@ -3,6 +3,7 @@ package org.roldy.rendering.g2d.chunk
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
+import org.roldy.core.coroutines.onGPUThread
 import org.roldy.core.utils.invoke
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.Layered
@@ -12,27 +13,31 @@ import org.roldy.rendering.g2d.drawable.ChunkManagedDrawable
 
 class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
     private val camera: OrthographicCamera,
-    private val chunkManager: ChunkManager<D, T>,
-    private val persistentObjects: List<Layered>
+    private val chunkManager: ChunkManager<D, T>
 ) {
-    private val itemLevelCulling = false
-    private val active = mutableListOf<Layered>()
     private val viewBounds = Rectangle()
-    private val visibleDrawables = mutableListOf<ChunkManagedDrawable<D>>()
+    private val active: MutableList<Layered> = mutableListOf()
 
     init {
         Diagnostics.addProvider {
             "Items rendered: ${active.size}"
         }
         Diagnostics.addProvider {
-            "Persistent objects: ${persistentObjects.size}"
+            "Persistent objects: ${chunkManager.persistentObjects.size}"
         }
         Diagnostics.addProvider {
-            "Chunks rendered: ${chunkManager.visibleChunks.size}"
+            "Chunks visible: ${chunkManager.visibleChunks.size}"
         }
         Diagnostics.addProvider {
             "Chunks loaded: ${chunkManager.chunks.size}"
         }
+
+        chunkManager.addListener(
+            onGPUThread { data ->
+                active.clear()
+                active.addAll(data)
+            }
+        )
     }
 
     private fun computeViewBounds(): Rectangle {
@@ -49,29 +54,7 @@ class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
 
     private fun update() {
         val view = computeViewBounds()
-
-        // Collect items in visible chunks
-        visibleDrawables.clear()
-
-        // Chunk-level culling
-        with(chunkManager) {
-            update(view, camera.zoom)
-            visibleDrawables += visibleChunks.flatMap { chunk ->
-                when {
-                    itemLevelCulling -> chunk.visibleObjects
-                    else -> chunk.allObjects
-                }
-            }.map { it.drawable }
-        }
-        active.clear()
-
-        // Create/reuse instances for visible items
-        active.addAll(persistentObjects)
-        active.addAll(visibleDrawables)
-        // Y-sort for correct overlap
-        active.sortWith(compareBy<Layered> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
-            .thenByDescending { it.zIndex }  // Secondary: z-index descending
-        )
+        chunkManager.update(view, camera.zoom)
     }
 
     context(delta: Float)

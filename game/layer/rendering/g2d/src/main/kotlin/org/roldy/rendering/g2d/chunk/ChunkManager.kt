@@ -1,37 +1,76 @@
 package org.roldy.rendering.g2d.chunk
 
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.*
+import org.roldy.core.coroutines.EventTask
+import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.drawable.ChunkManagedDrawable
 import org.roldy.rendering.g2d.drawable.DrawablePool
 import kotlin.math.floor
 
-fun interface PoolProvider<D: ChunkObjectData> {
+fun interface PoolProvider<D : ChunkObjectData> {
     fun provide(): ChunkManagedDrawable<D>
 }
 
 abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     private val populator: ChunkPopulator<D, T>,
+    val persistentObjects: List<Layered>,
     poolProvider: PoolProvider<D>
-) {
-
-
+) : Disposable {
     protected val logger by logger()
+
+    private val eventTask = EventTask(emitter = ::process)
+
+    private val itemLevelCulling = true
+
     abstract val minCoords: Int
     abstract val maxCoords: Int
+
     protected abstract val chunkWidth: Float
     protected abstract val chunkHeight: Float
+
     internal val chunks = mutableMapOf<Vector2Int, T>()
+
     private val visibilityViewChunks = Rectangle()
     private val visibilityViewObjects = Rectangle()
+
     private val min = MutableVector2Int(0, 0)
     private val max = MutableVector2Int(0, 0)
+
     private val visibleChunksCache = mutableListOf<T>()
-    val preloadRadius = -100f
-    val visibleChunks: List<T> get() = visibleChunksCache
+
+    val preloadRadius = -300f
+
+    val visibleChunks: List<Chunk<D>> get() = visibleChunksCache
+
     private val pool = DrawablePool {
         poolProvider.provide()
     }
+
+    init {
+        eventTask.start()
+    }
+
+    private suspend fun process(): List<Layered> {
+        updateVisibleChunks()
+        // Chunk-level culling
+        val visibleDrawables = visibleChunksCache.flatMap { chunk ->
+            when {
+                itemLevelCulling -> chunk.visibleObjects
+                else -> chunk.allObjects
+            }
+        }.map { it.drawable }
+        return (visibleDrawables + persistentObjects)
+            .sortedWith(compareBy<Layered> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
+                .thenByDescending { it.zIndex }  // Secondary: z-index descending
+            )
+    }
+
+    fun addListener(listener: (List<Layered>) -> Unit) {
+        eventTask.addListener(listener)
+    }
+
 
     abstract fun getChunk(coords: Vector2Int): T
 
@@ -57,7 +96,6 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     fun update(view: Rectangle, zoom: Float) {
         updateVisibilityViews(view, zoom)
-        updateVisibleChunks()
     }
 
     private fun updateVisibilityViews(view: Rectangle, zoom: Float) {
@@ -114,4 +152,8 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
             this.x = floor(x / chunkWidth).toInt()
             this.y = floor(y / chunkHeight).toInt()
         }
+
+    override fun dispose() {
+        eventTask.cancel()
+    }
 }

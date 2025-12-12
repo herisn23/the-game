@@ -34,12 +34,12 @@ class WorldScene(
     }
     val chunkManager = WorldMapChunkManager(
         map,
-        populator
+        populator,
+        listOf(currentPawn)
     )
     val chunkRenderer = ChunkRenderer(
         camera,
-        chunkManager,
-        listOf(currentPawn)
+        chunkManager
     )
     val debugRenderer by disposable { DebugRenderer(camera, map, chunkManager) }
 
