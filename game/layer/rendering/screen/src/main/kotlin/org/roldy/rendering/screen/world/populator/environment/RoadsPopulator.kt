@@ -61,7 +61,7 @@ class RoadsPopulator(
         chunk: WorldMapChunk,
         existingObjects: List<TileObject.Data>
     ): List<TileObject.Data> {
-        val chunkData = chunk.data()
+        val chunkData = chunk.terrainData()
         val roadsInChunk = roads.filter { road ->
             chunkData.contains(road.node.coords)
         }

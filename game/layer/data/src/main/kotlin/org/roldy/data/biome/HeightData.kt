@@ -2,11 +2,12 @@ package org.roldy.data.biome
 
 import org.roldy.data.biome.FloatComparison.FloatComparator.Greater
 import org.roldy.data.biome.FloatComparison.FloatComparator.Lesser
+import org.roldy.data.map.NoiseData
 
 
 data class FloatComparison(
     val value: Float,
-    val equality: FloatComparator = FloatComparator.Lesser
+    val equality: FloatComparator = Lesser
 ) {
     enum class FloatComparator(
         val char: String,
@@ -21,8 +22,13 @@ interface HeightData {
     val moisture: FloatComparison
 }
 
-infix fun FloatComparison.match(value: Float):Boolean =
+infix fun FloatComparison.match(value: Float): Boolean =
     when (equality) {
         Lesser -> value <= this.value
         Greater -> value >= this.value
     }
+
+infix fun HeightData.match(noiseData: NoiseData) =
+    elevation.match(noiseData.elevation) &&
+            temperature.match(noiseData.temperature) &&
+            moisture.match(noiseData.moisture)

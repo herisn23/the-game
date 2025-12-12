@@ -11,7 +11,7 @@ interface WorldPopulator {
     fun worldPosition(coords: Vector2Int, offsetCorrection: Boolean = false): Vector2 =
         map.tilePosition.resolve(coords, offsetCorrection)
 
-    fun WorldMapChunk.data(): Map<Vector2Int, MapTerrainData> =
+    fun WorldMapChunk.terrainData(): Map<Vector2Int, MapTerrainData> =
         tilesCoords.mapNotNull { coords ->
             map.terrainData[coords]?.let {
                 coords to it

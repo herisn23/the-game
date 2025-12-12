@@ -26,7 +26,7 @@ class SettlementPopulator(
         chunk: WorldMapChunk,
         existingObjects: List<TileObject.Data>
     ): List<TileObject.Data> {
-        val data = chunk.data()
+        val data = chunk.terrainData()
         val settlementsInChunk = settlements.filter { settlement ->
             data.contains(settlement.coords)
         }

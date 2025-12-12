@@ -36,6 +36,7 @@ class WorldScreen(
         camera,
         chunkManager
     )
+
     val debugRenderer by disposable { DebugRenderer(camera, map, chunkManager) }
 
     override fun resize(width: Int, height: Int) {

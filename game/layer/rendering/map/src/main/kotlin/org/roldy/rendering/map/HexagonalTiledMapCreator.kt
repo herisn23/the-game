@@ -145,16 +145,12 @@ class HexagonalTiledMapCreator(
     private fun findTerrainForNoise(biomes: List<Biome>, noiseData: NoiseData): Terrain {
         // Find matching biome
         val biome = biomes.find { biome ->
-            biome.data.elevation.match(noiseData.elevation) &&
-                    biome.data.temperature.match(noiseData.temperature) &&
-                    biome.data.moisture.match(noiseData.moisture)
+            biome.data.match(noiseData)
         }
 
         // Find matching terrain within biome
         val terrain = biome?.terrains?.find { terrain ->
-            terrain.data.elevation.match(noiseData.elevation) &&
-                    terrain.data.temperature.match(noiseData.temperature) &&
-                    terrain.data.moisture.match(noiseData.moisture)
+            terrain.data.match(noiseData)
         }
         return terrain ?: fallbackTerrain.also {
             logger.debug { "No terrain for ${biome?.data?.name} for $noiseData" }
@@ -168,6 +164,7 @@ class HexagonalTiledMapCreator(
         return Biome(
             BiomeData(
                 "Fallback",
+                mountains = emptyList(),
                 terrains = listOf(
                     BiomeData.TerrainData("Fallback")
                 ),

@@ -6,7 +6,7 @@ import org.roldy.core.x
 
 @Serializable
 data class PawnData(
-    var defaultTileSpeed: Float = 1000f,
+    var defaultTileSpeed: Float = 10000f,
     var speed: Float = 0.5f,
     var coords: Vector2Int = 0 x 0
 )

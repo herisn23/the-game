@@ -28,12 +28,14 @@ import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.ProxyScreen
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
+import org.roldy.rendering.screen.world.populator.environment.FoliagePopulator
+import org.roldy.rendering.screen.world.populator.environment.MountainsPopulator
 import org.roldy.rendering.screen.world.populator.environment.RoadsPopulator
 import org.roldy.rendering.screen.world.populator.environment.SettlementPopulator
 import org.roldy.state.load
 
 fun AutoDisposable.createWorldScreen(): Screen {
-    val mapData = MapData(1L, MapSize.Debug, 256)
+    val mapData = MapData(1L, MapSize.Small, 256)
     val noiseData = ProceduralMapGenerator(mapData).generate()
 
     val mapCreator by disposable {
@@ -93,7 +95,9 @@ fun AutoDisposable.createWorldScreen(): Screen {
         WorldMapPopulator(
             map, listOf(
                 SettlementPopulator(map, settlements),
-                RoadsPopulator(map, roads)
+                RoadsPopulator(map, roads),
+                MountainsPopulator(map),
+                FoliagePopulator(map)
             ),
             listOf(currentPawn)
         )
