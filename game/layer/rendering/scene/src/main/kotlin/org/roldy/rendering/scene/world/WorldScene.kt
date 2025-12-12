@@ -55,6 +55,7 @@ class WorldScene(
     }
 
     private fun clampMovableObjectsToMapBounds() {
+        //TODO this method should be removed?
         chunkRenderer.objects.forEach {
             if (it is WorldPositioned) {
                 map.clampToBounds(it.position) { position ->
