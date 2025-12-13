@@ -1,6 +1,7 @@
 package org.roldy.rendering.screen.world.populator.environment
 
 import org.roldy.core.Vector2Int
+import org.roldy.core.logger
 import org.roldy.data.biome.match
 import org.roldy.data.tile.TileData
 import org.roldy.rendering.environment.TileObject
@@ -11,6 +12,7 @@ import org.roldy.rendering.map.MapTerrainData
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
+import kotlin.random.Random
 
 data class MountainData(
     override val coords: Vector2Int
@@ -26,13 +28,20 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
     ): List<TileObject.Data> {
         val data = chunk.availableTerrainData(existingObjects)
         return data.mapNotNull { (coords, terrainData) ->
-            terrainData.mountainData().find {
+            val random = Random(coords.sum + map.data.seed)
+            terrainData.mountainData().filter {
                 it.elevation.match(terrainData.noiseData.elevation)
-            }?.let { mountain ->
+            }.randomOrNull(random)?.let { mountain ->
                 SpriteTileObject.Data(
                     layer = Layered.LAYER_4,
                     name = "mountain", position = worldPosition(coords), coords = coords,
-                    textureRegion = terrainData.terrain.biome.atlas.findRegion(mountain.name),
+                    textureRegion = runCatching {
+                        terrainData.terrain.biome.atlas.findRegion(mountain.name)
+                    }.onFailure {
+                        logger.error(it) {
+                            mountain.name
+                        }
+                    }.getOrThrow(),
                     data = mapOf("data" to MountainData(coords))
                 )
             }

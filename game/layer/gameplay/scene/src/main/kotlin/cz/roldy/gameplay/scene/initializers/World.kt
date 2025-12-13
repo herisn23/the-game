@@ -15,6 +15,7 @@ import org.roldy.data.tile.walkCost
 import org.roldy.gameplay.world.SettlementGenerator
 import org.roldy.gameplay.world.generator.ProceduralMapGenerator
 import org.roldy.gameplay.world.generator.RoadGenerator
+import org.roldy.gameplay.world.input.DebugInputProcessor
 import org.roldy.gameplay.world.input.GameSaveInputProcessor
 import org.roldy.gameplay.world.input.ObjectMoveInputProcessor
 import org.roldy.gameplay.world.input.ZoomInputProcessor
@@ -35,7 +36,7 @@ import org.roldy.rendering.screen.world.populator.environment.SettlementPopulato
 import org.roldy.state.load
 
 fun AutoDisposable.createWorldScreen(): Screen {
-    val mapData = MapData(1L, MapSize.Small, 256)
+    val mapData = MapData(1L, MapSize.Debug, 256)
     val noiseData = ProceduralMapGenerator(mapData).generate()
 
     val mapCreator by disposable {
@@ -111,7 +112,11 @@ fun AutoDisposable.createWorldScreen(): Screen {
                 listOf(
                     zoom,
                     ObjectMoveInputProcessor(keybinds, map, camera, pathfinderProxy::findPath),
-                    GameSaveInputProcessor(keybinds, gameState)
+                    GameSaveInputProcessor(keybinds, gameState),
+                    DebugInputProcessor {
+                        currentPawn.data.coords = 0 x 0
+                        currentPawn.position = map.tilePosition.resolve(currentPawn.data.coords)
+                    }
                 )
             ),
             zoom::invoke

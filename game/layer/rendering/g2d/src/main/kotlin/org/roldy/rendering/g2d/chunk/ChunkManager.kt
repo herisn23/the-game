@@ -140,7 +140,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         }
         toUnload.forEach {
             chunks.remove(it.key)?.objects?.forEach { obj ->
-                logger.debug { "Free object: in chunk ${it.key}, ${obj.data}" }
+//                logger.debug { "Free object: in chunk ${it.key}, ${obj.data}" }
                 pool.free(obj.drawable)
             }
         }

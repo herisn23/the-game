@@ -30,13 +30,13 @@ biomes:
     color: 3dc5c5
     mountains:
       - name: hexMountainSnow00
-        elevation: '>0.95'
+        elevation: '>0.80'
       - name: hexMountainSnow01
-        elevation: '>0.93'
+        elevation: '>0.80'
       - name: hexMountainSnow02
-        elevation: '>0.89'
+        elevation: '>0.80'
       - name: hexMountainSnow03
-        elevation: '>0.86'
+        elevation: '>0.80'
     terrains:
       - name: hexSnowField00
         temperature: 0.04
@@ -52,21 +52,21 @@ biomes:
     color: a9c5c5
     mountains:
       - name: hexHillsColdSnowCovered00
-        elevation: '>0.95'
+        elevation: '>0.80'
       - name: hexHillsColdSnowCovered01
-        elevation: '>0.93'
+        elevation: '>0.80'
       - name: hexHillsColdSnowCovered02
-        elevation: '>0.9'
+        elevation: '>0.80'
       - name: hexHillsColdSnowCovered03
-        elevation: '>0.88'
+        elevation: '>0.80'
       - name: hexHillsCold00
-        elevation: '>0.85'
+        elevation: '>0.80'
       - name: hexHillsCold01
-        elevation: '>0.83'
+        elevation: '>0.80'
       - name: hexHillsCold02
-        elevation: '>0.81'
+        elevation: '>0.80'
       - name: hexHillsCold03
-        elevation: '>0.8'
+        elevation: '>0.80'
     terrains:
       - name: hexPlainsColdSnowCovered00
         temperature: '0.12'
@@ -122,17 +122,17 @@ biomes:
     color: ed9a21
     mountains:
       - name: hexDesertYellowMesaLarge00
-        elevation: '>0.95'
+        elevation: '>0.80'
       - name: hexDesertYellowMesaLarge01
-        elevation: '>0.93'
+        elevation: '>0.80'
       - name: hexDesertYellowMesas00
-        elevation: '>0.9'
+        elevation: '>0.80'
       - name: hexDesertYellowMesas01
-        elevation: '>0.87'
+        elevation: '>0.80'
       - name: hexDesertYellowMesas02
-        elevation: '>0.85'
+        elevation: '>0.80'
       - name: hexDesertYellowMesas03
-        elevation: '>0.82'
+        elevation: '>0.80'
     # Dunes
     terrains:
       - name: hexDesertYellowDirtDunes00
@@ -157,13 +157,13 @@ biomes:
     color: ebdb2b
     mountains:
       - name: hexDesertYellowMesaLarge00
-        elevation: '>0.95'
+        elevation: '>0.80'
       - name: hexDesertYellowMesaLarge01
-        elevation: '>0.93'
+        elevation: '>0.80'
       - name: hexDesertYellowMesaLargeOasis00
-        elevation: '>0.89'
+        elevation: '>0.80'
       - name: hexDesertYellowMesaLargeOasis00
-        elevation: '>0.87'
+        elevation: '>0.80'
     terrains:
       - name: hexDesertYellowBase00
         moisture: 0.11
@@ -190,16 +190,16 @@ biomes:
     temperature: '>0.6'
     color: 8a4807
     mountains:
-      - name: hexDesertRedMesaLarge03
-        elevation: '>0.95'
+      - name: hexDesertRedMesaLarge00
+        elevation: '>0.80'
       - name: hexDesertRedMountains00
-        elevation: '>0.93'
+        elevation: '>0.80'
       - name: hexDesertRedMountains01
-        elevation: '>0.89'
+        elevation: '>0.80'
       - name: hexDesertRedMountains02
-        elevation: '>0.87'
+        elevation: '>0.80'
       - name: hexDesertRedMountains03
-        elevation: '>0.85'
+        elevation: '>0.80'
     terrains:
       # Savanna
       - name: hexDesertRedDirt00
