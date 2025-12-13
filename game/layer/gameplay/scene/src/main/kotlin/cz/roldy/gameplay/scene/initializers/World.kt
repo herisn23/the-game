@@ -12,9 +12,10 @@ import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
 import org.roldy.data.pawn.PawnData
 import org.roldy.data.tile.walkCost
-import org.roldy.gameplay.world.SettlementGenerator
+import org.roldy.gameplay.world.generator.MinesGenerator
 import org.roldy.gameplay.world.generator.ProceduralMapGenerator
 import org.roldy.gameplay.world.generator.RoadGenerator
+import org.roldy.gameplay.world.generator.SettlementGenerator
 import org.roldy.gameplay.world.input.DebugInputProcessor
 import org.roldy.gameplay.world.input.GameSaveInputProcessor
 import org.roldy.gameplay.world.input.ObjectMoveInputProcessor
@@ -29,10 +30,7 @@ import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.ProxyScreen
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
-import org.roldy.rendering.screen.world.populator.environment.FoliagePopulator
-import org.roldy.rendering.screen.world.populator.environment.MountainsPopulator
-import org.roldy.rendering.screen.world.populator.environment.RoadsPopulator
-import org.roldy.rendering.screen.world.populator.environment.SettlementPopulator
+import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.load
 
 fun AutoDisposable.createWorldScreen(): Screen {
@@ -58,8 +56,9 @@ fun AutoDisposable.createWorldScreen(): Screen {
         WorldMap(camera, mapData, tiledMap, terrainData)
     }
     lateinit var screen: WorldScreen
-    val settlements = SettlementGenerator.generate(terrainData, mapData)
+    val settlements = SettlementGenerator(terrainData, mapData).generate()
     val roads = RoadGenerator(map, settlements).generate()
+    val mines = MinesGenerator(terrainData, mapData).generate()
 
     val pathfinder = TilePathfinder(map) { tile, _ ->
         val objectsData = screen.chunkManager.tileData(tile)
@@ -98,6 +97,7 @@ fun AutoDisposable.createWorldScreen(): Screen {
                 SettlementPopulator(map, settlements),
                 RoadsPopulator(map, roads),
                 MountainsPopulator(map),
+                MinesPopulator(map),
                 FoliagePopulator(map)
             ),
             listOf(currentPawn)

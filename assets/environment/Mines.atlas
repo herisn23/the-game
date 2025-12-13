@@ -1,0 +1,6 @@
+Mines.png
+size:256,512
+filter:Linear,Linear
+repeat:none
+hexDirtClayPit01
+bounds:0,0,256,384

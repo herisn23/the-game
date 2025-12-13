@@ -3,7 +3,7 @@ package org.roldy.data.tile
 import org.roldy.core.Vector2Int
 
 interface TileData {
-    val walkCost: Float
+    val walkCost: Float get() = 1f
     val coords: Vector2Int
 }
 
