@@ -2,6 +2,7 @@ package org.roldy.rendering.screen.world.populator.environment
 
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
+import org.roldy.data.state.MineState
 import org.roldy.data.tile.mine.MineData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
@@ -12,7 +13,7 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 
 class MinesPopulator(
     override val map: WorldMap,
-    val mines: List<MineData>
+    val mines: List<MineState>
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
 
     val atlas = AtlasLoader.mines.disposable()
@@ -29,7 +30,7 @@ class MinesPopulator(
             val position = worldPosition(mine.coords)
             logger.debug { "Loading ${mine.coords} in chunk ${chunk.coords}" }
             SpriteTileObject.Data(
-                name = "mine", position = position, coords = mine.coords,
+                position = position, coords = mine.coords,
                 textureRegion = atlas.findRegion(mine.harvestable.mineType.texture),
             )
         }

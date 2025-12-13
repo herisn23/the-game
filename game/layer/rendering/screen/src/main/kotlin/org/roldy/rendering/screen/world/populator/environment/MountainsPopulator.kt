@@ -28,7 +28,8 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
             }.randomOrNull(random)?.let { mountain ->
                 SpriteTileObject.Data(
                     layer = Layered.LAYER_4,
-                    name = "mountain", position = worldPosition(coords), coords = coords,
+                    position = worldPosition(coords),
+                    coords = coords,
                     textureRegion = runCatching {
                         terrainData.terrain.biome.atlas.findRegion(mountain.name)
                     }.onFailure {

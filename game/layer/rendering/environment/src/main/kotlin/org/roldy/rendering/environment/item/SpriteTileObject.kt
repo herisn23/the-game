@@ -13,7 +13,6 @@ import org.roldy.rendering.g2d.Layered
 class SpriteTileObject : TileBehaviour {
 
     class Data(
-        override val name: String,
         override val position: Vector2,
         override val coords: Vector2Int,
         override val data: Map<String, Any> = emptyMap(),

@@ -61,7 +61,6 @@ class RoadsPopulator(
         return roadsInChunk.map { road ->
             val position = worldPosition(road.node.coords)
             SpriteTileObject.Data(
-                name = "road",
                 position = position,
                 coords = road.node.coords,
                 textureRegion = getRoadTexture(road.bitmask, road.node.coords),

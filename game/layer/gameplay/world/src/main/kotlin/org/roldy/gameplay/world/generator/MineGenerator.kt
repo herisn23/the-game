@@ -30,7 +30,7 @@ class MineGenerator(
     private fun generateMinesInSettlements(): MutableList<MineData> {
         val mines = mutableListOf<MineData>()
         settlements.forEach { settlement ->
-            val radius = settlement.radius.toMutableSet()
+            val radius = settlement.radiusCoords.toMutableSet()
             val settlementMines = mutableListOf<MineData>()
             repeat(settlement.harvestableCount) { i ->
                 val random = Random(mapData.seed + settlement.coords.sum + i)
@@ -65,7 +65,7 @@ class MineGenerator(
         val claimedCoords = mutableSetOf<Vector2Int>()
         val maxMines = mapData.size.size
         val attempts = maxMines * 10
-        val regionsHexes = settlements.flatMap { it.radius }
+        val regionsHexes = settlements.flatMap { it.radiusCoords }
         val rngX = Random(mapData.seed + GeneratorSeeds.MINES_SEED + 1)
         val rngY = Random(mapData.seed + GeneratorSeeds.MINES_SEED + 2)
 

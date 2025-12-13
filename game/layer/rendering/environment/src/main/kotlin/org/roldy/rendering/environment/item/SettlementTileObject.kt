@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
+import org.roldy.data.state.SettlementState
 import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.rendering.environment.TileBehaviour
 import org.roldy.rendering.environment.TileObject
@@ -15,7 +16,6 @@ class SettlementTileObject : TileBehaviour {
     val spriteObject = SpriteTileObject()
 
     data class Data(
-        override val name: String,
         override val position: Vector2,
         override val coords: Vector2Int,
         override val textureRegion: TextureRegion,
@@ -23,7 +23,7 @@ class SettlementTileObject : TileBehaviour {
         override val layer: Int = Layered.LAYER_2,
         override val data: Map<String, Any> = emptyMap(),
         val borderTextureRegion: TextureRegion,
-        val settlementData: SettlementData,
+        val settlementData: SettlementState,
         val worldPosition: (Vector2Int) -> Vector2,
         val inBounds: (Vector2Int) -> Boolean
     ) : SpriteTileObject.ISpriteData
@@ -44,10 +44,10 @@ class SettlementTileObject : TileBehaviour {
         spriteObject.bind(data)
         this.data = data as Data
         data.run {
-            settlementData.radius.map {
+            settlementData.region.map {
                 Sprite(borderTextureRegion).apply {
                     val position = worldPosition(it)
-                    color = settlementData.color
+                    color = settlementData.ruler.color
                     setSize(borderTextureRegion.regionWidth.toFloat(), borderTextureRegion.regionHeight.toFloat())
                     setOriginCenter()
                     setPosition(position.x, position.y)

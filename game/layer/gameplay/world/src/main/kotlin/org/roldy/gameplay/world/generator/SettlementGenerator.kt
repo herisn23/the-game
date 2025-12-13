@@ -61,13 +61,14 @@ class SettlementGenerator(
 
                 val radius = hexRadius(coords, regionSize, mapSize.min, mapSize.max).filter {
                     //remove hexes which are in bound of another settlement
-                    val existing = settlements.flatMap(SettlementData::radius).toSet()
+                    val existing = settlements.flatMap(SettlementData::radiusCoords).toSet()
                     !existing.contains(it)
                 }
                 settlements.add(
                     SettlementData(
                         coords,
                         "Settlement${settlements.size + 1}",
+                        regionSize,
                         radius,
                         harvestableCount,
                         randomColor(random)

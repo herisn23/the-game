@@ -2,6 +2,7 @@ package org.roldy.gameplay.scene.initializers
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.InputProcessorDelegate
 import org.roldy.core.TimeManager
@@ -97,10 +98,10 @@ fun AutoDisposable.createWorldScreen(): Screen {
     val populator by disposable {
         WorldMapPopulator(
             map, listOf(
-                SettlementPopulator(map, settlements),
+                SettlementPopulator(map, gameState.settlements),
                 RoadsPopulator(map, roads),
                 MountainsPopulator(map),
-                MinesPopulator(map, mines),
+                MinesPopulator(map, gameState.mines + gameState.settlements.flatMap { it.mines }),
                 FoliagePopulator(map)
             ),
             listOf(currentPawn)

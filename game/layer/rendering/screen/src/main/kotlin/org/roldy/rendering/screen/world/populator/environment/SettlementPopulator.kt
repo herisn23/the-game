@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
+import org.roldy.data.state.SettlementState
 import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SettlementTileObject
@@ -16,7 +17,7 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 
 class SettlementPopulator(
     override val map: WorldMap,
-    val settlements: List<SettlementData>
+    val settlements: List<SettlementState>
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
     val atlas = AtlasLoader.settlements.disposable()
@@ -34,7 +35,6 @@ class SettlementPopulator(
             val position = worldPosition(settle.coords)
             logger.debug { "Loading ${settle.coords} in chunk ${chunk.coords}" }
             SettlementTileObject.Data(
-                name = settle.name,
                 position = position,
                 coords = settle.coords,
                 textureRegion = atlas.findRegion("hexDirtCastle00_blue"),

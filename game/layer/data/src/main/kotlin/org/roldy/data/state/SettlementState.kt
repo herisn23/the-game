@@ -8,5 +8,5 @@ data class SettlementState(
     val coords: Vector2Int,
     var ruler: RulerState,
     var mines: List<MineState>,
-    var radius: List<Vector2Int>
+    var region: List<Vector2Int>
 )

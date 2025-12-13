@@ -30,9 +30,9 @@ fun createGameState(
 private fun SettlementData.toState(mines: List<MineData>) =
     SettlementState(
         coords = coords,
-        ruler = RulerState(),
+        ruler = RulerState(color = color),
         mines = mines.filter { it.settlementData == this }.map(MineData::toState),
-        radius = radius
+        region = radiusCoords
     )
 
 private fun MineData.toState() = MineState(
