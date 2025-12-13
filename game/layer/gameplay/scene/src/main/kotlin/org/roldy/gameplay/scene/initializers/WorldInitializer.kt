@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.InputProcessorDelegate
+import org.roldy.core.TimeManager
 import org.roldy.core.div
 import org.roldy.core.keybind.keybinds
 import org.roldy.core.pathwalker.AsyncPathfindingProxy
 import org.roldy.core.x
-import org.roldy.data.GameState
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
-import org.roldy.data.pawn.PawnData
+import org.roldy.data.state.GameState
 import org.roldy.data.tile.walkCost
 import org.roldy.gameplay.world.generator.MineGenerator
 import org.roldy.gameplay.world.generator.ProceduralMapGenerator
@@ -32,11 +32,7 @@ import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.ProxyScreen
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
-import org.roldy.rendering.screen.world.populator.environment.FoliagePopulator
-import org.roldy.rendering.screen.world.populator.environment.MinesPopulator
-import org.roldy.rendering.screen.world.populator.environment.MountainsPopulator
-import org.roldy.rendering.screen.world.populator.environment.RoadsPopulator
-import org.roldy.rendering.screen.world.populator.environment.SettlementPopulator
+import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.load
 
 fun AutoDisposable.createWorldScreen(): Screen {
@@ -77,18 +73,16 @@ fun AutoDisposable.createWorldScreen(): Screen {
     }
 
     val gameState = load {
-        GameState(
-            PawnData().apply {
-                val center = map.data.size.width / 2 x map.data.size.height / 2
-                coords = center
-            }
-        )
+        createGameState(settlements, mines) {
+            val center = map.data.size.width / 2 x map.data.size.height / 2
+            center
+        }
     }
 
     val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
 
     val currentPawn: PawnFigure by disposable {
-        PawnFigure(gameState.pawn, camera) {
+        PawnFigure(gameState.player.pawn, camera) {
             val objects = screen.chunkManager.tileData(it)
             (objects + listOfNotNull(map.terrainData[it])).walkCost()
         }.apply {
@@ -112,6 +106,7 @@ fun AutoDisposable.createWorldScreen(): Screen {
             listOf(currentPawn)
         )
     }
+    val timeManager = TimeManager()
     screen = disposable(
         WorldScreen(
             camera,
@@ -122,7 +117,7 @@ fun AutoDisposable.createWorldScreen(): Screen {
                     zoom,
                     ObjectMoveInputProcessor(keybinds, map, camera, pathfinderProxy::findPath),
                     GameSaveInputProcessor(keybinds, gameState),
-                    DebugInputProcessor {
+                    DebugInputProcessor(timeManager) {
                         currentPawn.coords = mapData.size.max / 2
                         currentPawn.position = map.tilePosition.resolve(currentPawn.data.coords)
                     }
@@ -132,5 +127,5 @@ fun AutoDisposable.createWorldScreen(): Screen {
         )
     )
 
-    return ProxyScreen(screen, camera)
+    return ProxyScreen(timeManager, screen, camera)
 }

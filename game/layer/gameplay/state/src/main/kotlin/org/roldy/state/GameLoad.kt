@@ -1,7 +1,7 @@
 package org.roldy.state
 
 import kotlinx.serialization.json.Json
-import org.roldy.data.GameState
+import org.roldy.data.state.GameState
 import java.io.File
 
 val json = Json {

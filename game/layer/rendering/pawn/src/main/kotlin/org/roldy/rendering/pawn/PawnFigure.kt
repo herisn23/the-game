@@ -10,14 +10,14 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.pathwalker.PathWalkerManager
-import org.roldy.data.pawn.PawnData
+import org.roldy.data.state.PawnState
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import kotlin.properties.Delegates
 
 class PawnFigure(
-    val data: PawnData,
+    val data: PawnState,
     val camera: Camera,
     val walkCost: (Vector2Int) -> Float
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {

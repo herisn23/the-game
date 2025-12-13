@@ -4,7 +4,7 @@ import com.badlogic.gdx.InputAdapter
 import org.roldy.core.keybind.KeybindName
 import org.roldy.core.keybind.KeybindSettings
 import org.roldy.core.logger
-import org.roldy.data.GameState
+import org.roldy.data.state.GameState
 import org.roldy.state.save
 
 class GameSaveInputProcessor(
