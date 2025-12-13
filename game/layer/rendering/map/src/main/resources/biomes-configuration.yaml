@@ -1,6 +1,6 @@
 biomes:
-  - name: Water # Atlas name
-    elevation: 0
+  - type: Water # Atlas name
+    elevation: '0'
     color: 0b4f9c
     walkCost: -1
     terrains:
@@ -23,7 +23,7 @@ biomes:
       - name: hexOcean02
         elevation: -0.17
       - name: hexOcean03
-  - name: ExtremeCold
+  - type: ExtremeCold
     temperature: '0.15'
     moisture: '0.5'
     walkCost: 0.1
@@ -45,7 +45,7 @@ biomes:
       - name: hexSnowField02
         temperature: 0.012
       - name: hexSnowField03
-  - name: Cold
+  - type: Cold
     temperature: '0.3'
     moisture: '0.8'
     walkCost: 0.2
@@ -90,7 +90,7 @@ biomes:
         temperature: '0.25'
         moisture: '0.60'
       - name: hexPlainsCold03
-  - name: Jungle
+  - type: Jungle
     color: 197a33
     walkCost: 1
     temperature: '>0.65'
@@ -115,7 +115,7 @@ biomes:
       - name: hexJungle02
         moisture: 0.96
       - name: hexJungle03
-  - name: DeepDesert
+  - type: DeepDesert
     walkCost: 0.2
     moisture: '<0.4'
     temperature: '>0.75'
@@ -150,7 +150,7 @@ biomes:
       - name: hexDesertDunes02
         temperature: 0.95
       - name: hexDesertDunes03
-  - name: Desert
+  - type: Desert
     walkCost: 0.3
     moisture: '<0.4'
     temperature: '>0.55'
@@ -184,7 +184,7 @@ biomes:
       - name: hexDesertYellowDirt02
         moisture: 0.1
       - name: hexDesertYellowDirt03
-  - name: Savanna
+  - type: Savanna
     walkCost: 1
     moisture: '>0.2'
     temperature: '>0.6'
@@ -229,7 +229,7 @@ biomes:
       - name: hexDesertRedGrass02
         moisture: '>0.26'
       - name: hexDesertRedGrass03
-  - name: Swamp
+  - type: Swamp
     walkCost: 0.7
     temperature: '0.9'
     elevation: '0.3'
@@ -250,7 +250,7 @@ biomes:
       - name: hexWetlands02
         temperature: 0.5
       - name: hexWetlands03
-  - name: Forest
+  - type: Forest
     walkCost: 1
     color: 2de442
     terrains:

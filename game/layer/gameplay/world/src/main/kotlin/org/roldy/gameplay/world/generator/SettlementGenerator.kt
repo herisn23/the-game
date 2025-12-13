@@ -27,7 +27,7 @@ class SettlementGenerator(
         val mapSize = mapData.size
         val seed = mapData.seed
         val count = mapSize.settlements
-        val settlementRng = Random(seed + 1)
+        val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlements = mutableListOf<SettlementData>()
         val attempts = count * 10 // Try multiple times to find good spots
 
@@ -47,9 +47,17 @@ class SettlementGenerator(
 
             if (isSuitable) {
                 val random = Random(seed + coords.sum)
-                val maxHarvestable = random.nextInt(maxRegionSize) // settlement can have max of 6 mines
                 val regionSize = random.nextInt(minRegionSize, maxRegionSize) // tiles from settlement is 15
-                logger.debug { "Generated settlement $coords" }
+                val maxHarvestable = random.nextInt(regionSize) // settlement can have max of 6 mines
+                val harvestableCount = min(harvestable.size, maxHarvestable)
+                logger.debug {
+                    """
+                        
+                        Generated settlement: $coords
+                            Region size: $regionSize
+                            Harvestable size: $harvestableCount
+                    """.trimIndent()
+                }
 
                 val radius = hexRadius(coords, regionSize, mapSize.min, mapSize.max).filter {
                     //remove hexes which are in bound of another settlement
@@ -61,7 +69,7 @@ class SettlementGenerator(
                         coords,
                         "Settlement${settlements.size + 1}",
                         radius,
-                        harvestable.shuffled(random).subList(0, min(harvestable.size, maxHarvestable)),
+                        harvestableCount,
                         randomColor(random)
                     )
                 )

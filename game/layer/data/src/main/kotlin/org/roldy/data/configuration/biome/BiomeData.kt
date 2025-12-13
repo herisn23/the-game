@@ -11,7 +11,7 @@ const val maxValue = 10f
 
 @Serializable
 data class BiomeData(
-    val name: String,
+    val type: BiomeType,
     val darker: Boolean = true,
     @Serializable(FloatComparisonSerializer::class)
     override val elevation: FloatComparison = FloatComparison(

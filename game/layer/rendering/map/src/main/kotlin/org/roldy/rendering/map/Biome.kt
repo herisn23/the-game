@@ -16,7 +16,7 @@ data class Biome(
 ) : AutoDisposableAdapter() {
 
     val atlas by disposable {
-        AtlasLoader.load("terrain/${data.name}.atlas")
+        AtlasLoader.load("terrain/${data.type.name}.atlas")
     }
     val terrains by lazy {
         data.terrains.map {
@@ -45,7 +45,7 @@ class Terrain(
 
     private val default by lazy {
         Pixmap(biome.tileSize, biome.tileSize, Pixmap.Format.RGBA8888).run {
-            logger.debug("Region ${data.name} not found in Atlas ${biome.data.name}")
+            logger.debug("Region ${data.name} not found in Atlas ${biome.data.type}")
             setColor(color)
             fill()
             TextureRegion(Texture(this).disposable())

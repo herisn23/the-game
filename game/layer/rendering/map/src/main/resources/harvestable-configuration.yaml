@@ -1,52 +1,76 @@
 wood:
   Alder:
     elevation: 0.1..0.3
+    biomes: [Forest, Swamp, Cold]
   Aspen:
     elevation: 0.1..0.3
+    biomes: [Forest, Cold, ExtremeCold]
   Ebony:
     elevation: 0.1..0.3
+    biomes: [Jungle, Savanna, Forest]
   Mahogany:
     elevation: 0.1..0.3
+    biomes: [Jungle, Forest, Swamp]
   Maple:
     elevation: 0.1..0.3
+    biomes: [Forest, Cold, Savanna]
   Oak:
     elevation: 0.1..0.3
+    biomes: [Forest, Savanna, Swamp, Cold]
 fiber:
   Flax:
     elevation: 0.1..0.3
+    biomes: [Forest, Savanna, Cold, Swamp]
   Hemp:
     elevation: 0.1..0.3
+    biomes: [Forest, Swamp, Savanna, Cold]
   Kenaf:
     elevation: 0.1..0.3
+    biomes: [Jungle, Swamp, Savanna, Forest]
   Jute:
     elevation: 0.1..0.3
+    biomes: [Jungle, Swamp, Savanna, Desert]
   Coir:
     elevation: 0.1..0.3
+    biomes: [Jungle, Savanna, Swamp, Desert]
   Cotton:
     elevation: 0.1..0.3
+    biomes: [Savanna, Desert, Jungle, Forest]
 metal:
   Osmium:
     elevation: 0.3..0.5
+    biomes: [ExtremeCold, Cold, Forest, Swamp]
   Titanium:
     elevation: 0.3..0.5
+    biomes: [Cold, Forest, Desert, Savanna, ExtremeCold]
   Uranium:
     elevation: 0.3..0.5
+    biomes: [DeepDesert, Desert, Cold, Swamp]
   Zirconium:
     elevation: 0.3..0.5
+    biomes: [DeepDesert, Desert, Swamp, Savanna, Forest]
   Chromium:
     elevation: 0.3..0.5
+    biomes: [ExtremeCold, Cold, Forest, Desert, Jungle]
   Vanadium:
     elevation: 0.3..0.5
+    biomes: [ExtremeCold, DeepDesert, Cold, Desert, Jungle]
 gem:
   Amazonite:
     elevation: 0.2..0.8
+    biomes: [Desert, Cold, ExtremeCold, DeepDesert, Forest]
   Carnelian:
     elevation: 0.2..0.8
+    biomes: [Desert, Savanna, DeepDesert, Jungle, Forest]
   Diopside:
     elevation: 0.2..0.8
+    biomes: [DeepDesert, ExtremeCold, Cold, Desert, Swamp]
   Eudialyte:
     elevation: 0.2..0.8
+    biomes: [DeepDesert, ExtremeCold, Cold, Swamp, Jungle]
   Hematite:
     elevation: 0.2..0.8
+    biomes: [Swamp, Desert, Savanna, Forest, Cold, Jungle]
   Jadeite:
     elevation: 0.2..0.8
+    biomes: [Jungle, Swamp, Cold, ExtremeCold, Forest, Desert]

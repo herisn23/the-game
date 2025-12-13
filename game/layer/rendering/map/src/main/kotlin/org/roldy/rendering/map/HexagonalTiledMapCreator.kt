@@ -10,6 +10,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeData
+import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
@@ -97,7 +98,7 @@ class HexagonalTiledMapCreator(
     }
 
     fun resolveUnderTileTexture(mapTerrainData: MapTerrainData?): TextureRegion {
-        val isWater = mapTerrainData?.terrain?.biome?.data?.name == "Water"
+        val isWater = mapTerrainData?.terrain?.biome?.data?.type == BiomeType.Water
         return when {
             isWater -> waterUnderTextureRegion
             else -> dirtUnderTextureRegion
@@ -155,7 +156,7 @@ class HexagonalTiledMapCreator(
             terrain.data.match(noiseData)
         }
         return terrain ?: fallbackTerrain.also {
-            logger.debug { "No terrain for ${biome?.data?.name} for $noiseData" }
+            logger.debug { "No terrain for ${biome?.data?.type} for $noiseData" }
         }
     }
 
@@ -165,13 +166,13 @@ class HexagonalTiledMapCreator(
     private fun createFallbackTerrain(): Terrain {
         return Biome(
             BiomeData(
-                "Fallback",
+                BiomeType.Water,
                 mountains = emptyList(),
                 terrains = listOf(
                     BiomeData.TerrainData("Fallback")
                 ),
                 color = Color.MAGENTA,
-                walkCost = 0f
+                walkCost = -1f
             ),
             data.tileSize
         ).terrains.first()

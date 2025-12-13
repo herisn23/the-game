@@ -17,6 +17,7 @@ class RoadGenerator(
     val settlements: List<SettlementData>
 ) {
     val pathfinder = TilePathfinder(map) { tile, goal->
+        //calculate walkCost from terrainData and add some noise to make roads more natural(not so straight)
         map.terrainData.getValue(tile).walkCost * Random(map.data.seed + tile.sum + goal.sum).nextFloat()
     }
     private val staggerAxis = map.staggerAxis
@@ -63,7 +64,7 @@ class RoadGenerator(
         if (settlements.size < 2) return emptyList()
 
         // Build network edges
-        val edges = algorithm.generate(map.data.seed, settlements)
+        val edges = algorithm.generate(map.data.seed + GeneratorSeeds.ROADS_SEED, settlements)
 
         // Calculate paths for all edges
         val allPaths = mutableListOf<PathWalker.Node>()
