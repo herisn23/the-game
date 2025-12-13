@@ -1,7 +1,7 @@
 package org.roldy.gameplay.world.generator.road
 
-import org.roldy.gameplay.world.generator.hexDistance
-import org.roldy.rendering.screen.world.populator.environment.SettlementData
+import org.roldy.core.utils.hexDistance
+import org.roldy.data.tile.settlement.SettlementData
 
 
 fun interface WeightedImportance {
@@ -20,7 +20,7 @@ object Weighted : RoadNetworkAlgorithm {
         config: Map<String, Any>
     ): List<Pair<SettlementData, SettlementData>> {
         val getImportance: WeightedImportance by config
-        val edges = mutableListOf<Triple<SettlementData, SettlementData, Float>>()
+        val edges = mutableListOf<Triple<SettlementData, SettlementData, Int>>()
 
         // Create weighted edges
         for (i in settlements.indices) {
@@ -41,7 +41,7 @@ object Weighted : RoadNetworkAlgorithm {
     }
 
     private fun buildMSTFromWeightedEdges(
-        edges: List<Triple<SettlementData, SettlementData, Float>>
+        edges: List<Triple<SettlementData, SettlementData, Int>>
     ): List<Pair<SettlementData, SettlementData>> {
         val result = mutableListOf<Pair<SettlementData, SettlementData>>()
         val visited = mutableSetOf<SettlementData>()

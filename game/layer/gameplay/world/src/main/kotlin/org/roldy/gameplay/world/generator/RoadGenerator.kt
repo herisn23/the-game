@@ -4,18 +4,21 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.x
+import org.roldy.data.tile.road.RoadData
+import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.gameplay.world.generator.road.*
 import org.roldy.gameplay.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
-import org.roldy.rendering.screen.world.populator.environment.RoadData
-import org.roldy.rendering.screen.world.populator.environment.SettlementData
 import kotlin.math.abs
+import kotlin.random.Random
 
 class RoadGenerator(
     val map: WorldMap,
     val settlements: List<SettlementData>
 ) {
-    val pathfinder = TilePathfinder(map)
+    val pathfinder = TilePathfinder(map) { tile, goal->
+        map.terrainData.getValue(tile).walkCost * Random(map.data.seed + tile.sum + goal.sum).nextFloat()
+    }
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex
 
@@ -175,9 +178,3 @@ enum class HexEdgeDirection {
     }
 }
 
-/**
- * Calculates hex distance between two coordinates.
- */
-fun hexDistance(a: Vector2Int, b: Vector2Int): Float {
-    return (abs(a.x - b.x) + abs(a.y - b.y)).toFloat()
-}

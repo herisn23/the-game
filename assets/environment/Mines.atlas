@@ -1,6 +1,12 @@
 Mines.png
-size:256,512
+size:1024,512
 filter:Linear,Linear
 repeat:none
 hexDirtClayPit01
+bounds:768,0,256,384
+hexForestBroadleafForester00
 bounds:0,0,256,384
+hexHillsMine00
+bounds:256,0,256,384
+hexPlainsFarm00
+bounds:512,0,256,384

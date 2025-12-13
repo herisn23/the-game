@@ -40,7 +40,7 @@ class TestApp : AutoDisposableApplicationAdapter() {
         viewport.apply()
 
         context(Gdx.graphics.deltaTime, camera) {
-            zoom.update()
+//            zoom.update()
         }
 
         diagnostic.render()

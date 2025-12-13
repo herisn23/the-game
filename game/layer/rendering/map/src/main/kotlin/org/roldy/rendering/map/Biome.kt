@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
-import org.roldy.data.biome.BiomeData
+import org.roldy.data.configuration.biome.BiomeData
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.disposable.disposable
 

@@ -1,4 +1,4 @@
-package org.roldy.data.biome
+package org.roldy.data.configuration
 
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.KSerializer
@@ -7,11 +7,30 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.ranges.ClosedFloatingPointRange
+
+object ClosedFloatingPointRangeSerializer: KSerializer<ClosedFloatingPointRange<Float>> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("org.roldy.ClosedFloatingPointRange", PrimitiveKind.STRING)
+
+    override fun serialize(
+        encoder: Encoder,
+        value: ClosedFloatingPointRange<Float>
+    ) {
+        encoder.encodeString("${value.start}..${value.endInclusive}")
+    }
+
+    override fun deserialize(decoder: Decoder): ClosedFloatingPointRange<Float> {
+        val (start, endInclusive) = decoder.decodeString().split("..").map { it.toFloat() }
+        return start ..endInclusive
+    }
+
+}
 
 object G2DColorSerializer : KSerializer<Color> {
     // Serial names of descriptors should be unique, this is why we advise including app package in the name.
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("org.roldy.terrain.Color", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("org.roldy.Color", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): Color =
         decoder.decodeString().let(Color::valueOf)
@@ -28,7 +47,7 @@ object G2DColorSerializer : KSerializer<Color> {
 object FloatComparisonSerializer : KSerializer<FloatComparison> {
     // Serial names of descriptors should be unique, this is why we advise including app package in the name.
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("org.roldy.terrain.Range", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("org.roldy.FloatComparison", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): FloatComparison =
         decoder.decodeString().run {

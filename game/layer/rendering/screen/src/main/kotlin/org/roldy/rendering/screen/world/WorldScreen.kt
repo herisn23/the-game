@@ -20,7 +20,7 @@ class WorldScreen(
     populator: WorldMapPopulator,
     val inputProcessor: InputProcessor,
     val zoom: ((Float, Float, Float) -> Unit) -> Unit,
-    private val debugEnabled: Boolean = false,
+    private val debugEnabled: Boolean = false
 ) : AutoDisposableScreenAdapter() {
     val batch by disposable { SpriteBatch() }
     val diagnostics by disposable { Diagnostics() }

@@ -21,7 +21,7 @@ class TilePositionResolver(
     private val rowHeight = (tileHeight + hexSideLengthF) / 2f
 
     init {
-        logger.info("HexHighlighter initialized:")
+        logger.info("TilePositionResolver initialized:")
         logger.info("  tileWidth=$tileWidth, tileHeight=$tileHeight")
         logger.info("  hexSideLength=$hexSideLength")
         logger.info("  rowHeight=$rowHeight")

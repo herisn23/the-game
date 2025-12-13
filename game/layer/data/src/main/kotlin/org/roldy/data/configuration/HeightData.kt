@@ -1,9 +1,8 @@
-package org.roldy.data.biome
+package org.roldy.data.configuration
 
-import org.roldy.data.biome.FloatComparison.FloatComparator.Greater
-import org.roldy.data.biome.FloatComparison.FloatComparator.Lesser
+import org.roldy.data.configuration.FloatComparison.FloatComparator.Greater
+import org.roldy.data.configuration.FloatComparison.FloatComparator.Lesser
 import org.roldy.data.map.NoiseData
-
 
 data class FloatComparison(
     val value: Float,

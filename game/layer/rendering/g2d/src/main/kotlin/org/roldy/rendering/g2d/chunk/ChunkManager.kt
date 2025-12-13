@@ -43,7 +43,9 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     val preloadRadius = -300f
 
-    val visibleChunks: List<Chunk<D>> get() = visibleChunksCache.toList()
+    val visibleChunks: List<Chunk<D>> get() = synchronized(visibleChunksCache) {
+        visibleChunksCache.toList()
+    }
 
     private val pool = DrawablePool {
         poolProvider.provide()

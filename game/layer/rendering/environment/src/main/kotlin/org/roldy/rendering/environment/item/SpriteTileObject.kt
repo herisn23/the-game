@@ -16,14 +16,20 @@ class SpriteTileObject : TileBehaviour {
         override val name: String,
         override val position: Vector2,
         override val coords: Vector2Int,
-        val textureRegion: TextureRegion,
-        val rotation: Float = 0f,
-        val layer: Int = Layered.LAYER_2,
-        override val data: Map<String, Any> = emptyMap()
-    ) : TileObject.Data
+        override val data: Map<String, Any> = emptyMap(),
+        override val textureRegion: TextureRegion,
+        override val rotation: Float = 0f,
+        override val layer: Int = Layered.LAYER_2
+    ) : ISpriteData
+
+    interface ISpriteData : TileObject.Data {
+        val textureRegion: TextureRegion
+        val rotation: Float
+        val layer: Int
+    }
 
     val sprite = Sprite()
-    var data: Data? = null
+    var data: ISpriteData? = null
 
     override val zIndex: Float get() = sprite.run { y - height / 2f }
     override val layer: Int get() = data?.layer ?: Layered.LAYER_2
@@ -34,8 +40,8 @@ class SpriteTileObject : TileBehaviour {
     }
 
     override fun bind(data: TileObject.Data) {
-        if (data !is Data) return
-        this.data = data
+        this.data = data as ISpriteData
+
         sprite.setRegion(data.textureRegion)
         sprite.setSize(data.textureRegion.regionWidth.toFloat(), data.textureRegion.regionHeight.toFloat())
         sprite.setOriginCenter()

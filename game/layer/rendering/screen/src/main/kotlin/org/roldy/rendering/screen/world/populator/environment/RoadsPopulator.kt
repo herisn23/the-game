@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.Vector2Int
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
-import org.roldy.core.pathwalker.PathWalker
-import org.roldy.data.tile.TileData
+import org.roldy.data.tile.road.RoadData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.Layered
@@ -16,13 +15,6 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import kotlin.math.absoluteValue
 
 
-data class RoadData(
-    val node: PathWalker.Node,
-    val bitmask: String
-) : TileData {
-    override val walkCost: Float = 2f
-    override val coords: Vector2Int = node.coords
-}
 
 class RoadsPopulator(
     override val map: WorldMap,

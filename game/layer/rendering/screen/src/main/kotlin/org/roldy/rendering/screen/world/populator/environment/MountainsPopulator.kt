@@ -1,9 +1,8 @@
 package org.roldy.rendering.screen.world.populator.environment
 
-import org.roldy.core.Vector2Int
 import org.roldy.core.logger
-import org.roldy.data.biome.match
-import org.roldy.data.tile.TileData
+import org.roldy.data.configuration.match
+import org.roldy.data.tile.mountain.MountainData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.Layered
@@ -14,11 +13,6 @@ import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import kotlin.random.Random
 
-data class MountainData(
-    override val coords: Vector2Int
-) : TileData {
-    override val walkCost: Float = 0f
-}
 
 class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), WorldChunkPopulator {
 

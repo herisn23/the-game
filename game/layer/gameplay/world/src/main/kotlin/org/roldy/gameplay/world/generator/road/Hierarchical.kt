@@ -1,7 +1,7 @@
 package org.roldy.gameplay.world.generator.road
 
-import org.roldy.gameplay.world.generator.hexDistance
-import org.roldy.rendering.screen.world.populator.environment.SettlementData
+import org.roldy.core.utils.hexDistance
+import org.roldy.data.tile.settlement.SettlementData
 
 object Hierarchical : RoadNetworkAlgorithm {
     /**

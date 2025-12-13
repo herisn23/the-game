@@ -1,6 +1,6 @@
-package cz.roldy.gameplay.scene
+package org.roldy.gameplay.scene
 
-import cz.roldy.gameplay.scene.initializers.createWorldScreen
+import org.roldy.gameplay.scene.initializers.createWorldScreen
 import org.roldy.core.Logger
 import org.roldy.rendering.g2d.disposable.AutoDisposableGameAdapter
 

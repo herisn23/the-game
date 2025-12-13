@@ -24,7 +24,6 @@ class WorldMap(
     val width: Int = data.size.width
     val height: Int = data.size.height
     val hexSideLength = data.tileSize / 2
-    var zoom: Float = 0f
 
     init {
         tiledMap.apply {
@@ -41,9 +40,10 @@ class WorldMap(
     val yCorrection = .75f
     private val tiledMapRenderer = HexagonalTiledMapRenderer(tiledMap).disposable()
     val tilePosition = TilePositionResolver(this)
+    val mapBounds = MapBounds(tiledMap)
+
     private val tileFocus = TileFocus(tilePosition).disposable()
 
-    val mapBounds = MapBounds(tiledMap)
 
     context(_: Float)
     fun render() {

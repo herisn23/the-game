@@ -2,7 +2,7 @@ package org.roldy
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import cz.roldy.gameplay.scene.GameScene
+import org.roldy.gameplay.scene.GameScene
 
 object Game {
     fun start() {

@@ -1,0 +1,52 @@
+wood:
+  Alder:
+    elevation: 0.1..0.3
+  Aspen:
+    elevation: 0.1..0.3
+  Ebony:
+    elevation: 0.1..0.3
+  Mahogany:
+    elevation: 0.1..0.3
+  Maple:
+    elevation: 0.1..0.3
+  Oak:
+    elevation: 0.1..0.3
+fiber:
+  Flax:
+    elevation: 0.1..0.3
+  Hemp:
+    elevation: 0.1..0.3
+  Kenaf:
+    elevation: 0.1..0.3
+  Jute:
+    elevation: 0.1..0.3
+  Coir:
+    elevation: 0.1..0.3
+  Cotton:
+    elevation: 0.1..0.3
+metal:
+  Osmium:
+    elevation: 0.3..0.5
+  Titanium:
+    elevation: 0.3..0.5
+  Uranium:
+    elevation: 0.3..0.5
+  Zirconium:
+    elevation: 0.3..0.5
+  Chromium:
+    elevation: 0.3..0.5
+  Vanadium:
+    elevation: 0.3..0.5
+gem:
+  Amazonite:
+    elevation: 0.2..0.8
+  Carnelian:
+    elevation: 0.2..0.8
+  Diopside:
+    elevation: 0.2..0.8
+  Eudialyte:
+    elevation: 0.2..0.8
+  Hematite:
+    elevation: 0.2..0.8
+  Jadeite:
+    elevation: 0.2..0.8

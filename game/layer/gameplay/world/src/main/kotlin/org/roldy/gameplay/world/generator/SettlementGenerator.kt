@@ -2,11 +2,15 @@ package org.roldy.gameplay.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
+import org.roldy.core.utils.hexDistance
+import org.roldy.core.utils.hexRadius
+import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.map.MapData
+import org.roldy.data.tile.mine.MineType
+import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.rendering.map.MapTerrainData
-import org.roldy.rendering.screen.world.distance
-import org.roldy.rendering.screen.world.populator.environment.SettlementData
+import kotlin.math.min
 import kotlin.random.Random
 
 class SettlementGenerator(
@@ -14,6 +18,11 @@ class SettlementGenerator(
     val mapData: MapData
 ) {
     val logger by logger()
+    val harvestable = MineType.harvestable
+
+    val maxRegionSize = mapData.size.width / mapData.size.settlements
+    val minRegionSize = minOf(10, maxRegionSize)
+
     fun generate(): List<SettlementData> {
         val mapSize = mapData.size
         val seed = mapData.seed
@@ -32,15 +41,30 @@ class SettlementGenerator(
 
             // Check if location is suitable
             val isSuitable = tile.noiseData.elevation in 0.1f..0.65f &&  // Not too high/low
-//                    tile.moisture > 0.3f &&           // Not desert
-                    tile.noiseData.temperature in 0.3f..0.7f &&        // Temperate
                     settlements.none {
-                        distance(x, y, it.coords.x, it.coords.y) < 5  // Min distance from others
+                        hexDistance(x x y, it.coords) < mapSize.max.x / 4  // Min distance from others
                     }
 
             if (isSuitable) {
+                val random = Random(seed + coords.sum)
+                val maxHarvestable = random.nextInt(maxRegionSize) // settlement can have max of 6 mines
+                val regionSize = random.nextInt(minRegionSize, maxRegionSize) // tiles from settlement is 15
                 logger.debug { "Generated settlement $coords" }
-                settlements.add(SettlementData(coords, "Settlement${settlements.size + 1}"))
+
+                val radius = hexRadius(coords, regionSize, mapSize.min, mapSize.max).filter {
+                    //remove hexes which are in bound of another settlement
+                    val existing = settlements.flatMap(SettlementData::radius).toSet()
+                    !existing.contains(it)
+                }
+                settlements.add(
+                    SettlementData(
+                        coords,
+                        "Settlement${settlements.size + 1}",
+                        radius,
+                        harvestable.shuffled(random).subList(0, min(harvestable.size, maxHarvestable)),
+                        randomColor(random)
+                    )
+                )
             }
         }
         return settlements

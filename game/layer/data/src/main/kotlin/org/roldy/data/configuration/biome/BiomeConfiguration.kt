@@ -1,6 +1,7 @@
-package org.roldy.data.biome
+package org.roldy.data.configuration.biome
 
 import kotlinx.serialization.Serializable
+import org.roldy.data.configuration.biome.BiomeData
 
 
 @Serializable

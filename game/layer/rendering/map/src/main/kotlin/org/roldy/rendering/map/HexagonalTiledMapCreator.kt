@@ -9,8 +9,9 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.core.x
-import org.roldy.data.biome.BiomeData
-import org.roldy.data.biome.match
+import org.roldy.data.configuration.biome.BiomeData
+import org.roldy.data.configuration.biome.BiomesConfiguration
+import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.tile.TileData
@@ -28,10 +29,11 @@ data class MapTerrainData(
 class HexagonalTiledMapCreator(
     val data: MapData,
     val noiseData: Map<Vector2Int, NoiseData>,
-    val biomesData: List<BiomeData>,
+    configuration: BiomesConfiguration,
     val generateColorsLayer: Boolean = false
 ) : AutoDisposableAdapter() {
 
+    val biomesData = configuration.biomes
 
     // Cache for terrain at each position
     private val terrainCache = mutableMapOf<Vector2Int, MapTerrainData>()
