@@ -60,8 +60,8 @@ class MineGenerator(
         return mines
     }
 
-    private fun generateMinesOutsideSettlements(): MutableList<org.roldy.gp.world.generator.data.MineData> {
-        val mines = mutableListOf<org.roldy.gp.world.generator.data.MineData>()
+    private fun generateMinesOutsideSettlements(): MutableList<MineData> {
+        val mines = mutableListOf<MineData>()
         val claimedCoords = mutableSetOf<Vector2Int>()
         val maxMines = mapData.size.size
         val attempts = maxMines * 10

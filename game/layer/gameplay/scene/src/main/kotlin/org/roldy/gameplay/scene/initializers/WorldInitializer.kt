@@ -12,6 +12,7 @@ import org.roldy.core.pathwalker.AsyncPathfindingProxy
 import org.roldy.core.x
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
+import org.roldy.data.state.MineState
 import org.roldy.data.tile.walkCost
 import org.roldy.gameplay.scene.GameTime
 import org.roldy.gp.world.generator.MineGenerator
@@ -25,7 +26,7 @@ import org.roldy.gp.world.input.ZoomInputProcessor
 import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
-import org.roldy.gp.world.processor.MineProcessor
+import org.roldy.gp.world.processor.RefreshingProcessor
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -92,10 +93,12 @@ fun AutoDisposable.createWorldScreen(
     val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
 
     val currentPawn: PawnFigure by disposable {
-        PawnFigure(gameState.player.pawn, camera) {
+        PawnFigure(gameState.player.pawn, camera, {
             val objects = screen.chunkManager.tileData(it)
             (objects + listOfNotNull(map.terrainData[it])).walkCost()
+        }) {
         }.apply {
+            //initialize world position based on coords
             position = map.tilePosition.resolve(data.coords)
         }
     }
@@ -110,7 +113,7 @@ fun AutoDisposable.createWorldScreen(
                 SettlementPopulator(map, gameState.settlements),
                 RoadsPopulator(map, roads),
                 MountainsPopulator(map),
-                MinesPopulator(map, gameState.mines + gameState.settlements.flatMap { it.mines }),
+                MinesPopulator(map, gameState.mines),
                 FoliagePopulator(map)
             ),
             listOf(currentPawn)
@@ -142,13 +145,13 @@ fun AutoDisposable.createWorldScreen(
             zoom::invoke
         )
     )
-    val mineProcessing = MineProcessor(gameState)
-
+    val refreshingProcessor = RefreshingProcessor(gameState)
     val gameTime = GameTime(gameState.time)
+
     Diagnostics.addProvider {
         "Game time: ${gameTime.formattedTime}"
     }
-    processingLoop.addListener(mineProcessing)
+    processingLoop.addListener(refreshingProcessor)
     processingLoop.addListener {
         gameTime.update()
         gameState.time = gameTime.time

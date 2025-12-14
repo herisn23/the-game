@@ -31,7 +31,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     protected abstract val chunkWidth: Float
     protected abstract val chunkHeight: Float
 
-    internal val chunks = mutableMapOf<Vector2Int, T>()
+    private val chunks = mutableMapOf<Vector2Int, T>()
 
     private val visibilityViewChunks = Rectangle()
     private val visibilityViewObjects = Rectangle()
@@ -43,9 +43,10 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     val preloadRadius = -300f
 
-    val visibleChunks: List<Chunk<D>> get() = synchronized(visibleChunksCache) {
-        visibleChunksCache.toList()
-    }
+    val visibleChunks: List<Chunk<D>>
+        get() = synchronized(visibleChunksCache) {
+            visibleChunksCache.toList()
+        }
 
     private val pool = DrawablePool {
         poolProvider.provide()
@@ -53,14 +54,15 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     private suspend fun process(): List<Layered> {
         updateVisibleChunks()
+        val visibleDrawables = synchronized(visibleChunksCache) {
+            visibleChunksCache.flatMap { chunk ->
+                when {
+                    itemLevelCulling -> chunk.visibleObjects
+                    else -> chunk.allObjects
+                }
+            }.map { it.drawable }
+        }
         // Chunk-level culling
-        val visibleDrawables = visibleChunksCache.flatMap { chunk ->
-            when {
-                itemLevelCulling -> chunk.visibleObjects
-                else -> chunk.allObjects
-            }
-        }.map { it.drawable }
-
         return (visibleDrawables + persistentObjects)
             .sortedWith(compareBy<Layered> { it.layer }      // Primary: layer ascending (-1, 0, 1, 2...)
                 .thenByDescending { it.zIndex }  // Secondary: z-index descending
@@ -117,22 +119,24 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
     }
 
     private fun updateVisibleChunks() {
-        visibleChunksCache.clear()
+        synchronized(visibleChunksCache) {
+            visibleChunksCache.clear()
 
-        min.worldToChunk(visibilityViewChunks.x, visibilityViewChunks.y)
-        max.worldToChunk(visibilityViewChunks.width, visibilityViewChunks.height)
+            min.worldToChunk(visibilityViewChunks.x, visibilityViewChunks.y)
+            max.worldToChunk(visibilityViewChunks.width, visibilityViewChunks.height)
 
-        repeat(
-            maxOf(minCoords, min.x)..minOf(maxCoords, max.x),
-            maxOf(minCoords, min.y)..minOf(maxCoords, max.y)
-        ) { x, y ->
-            visibleChunksCache += getOrCreateChunk(x x y)
+            repeat(
+                maxOf(minCoords, min.x)..minOf(maxCoords, max.x),
+                maxOf(minCoords, min.y)..minOf(maxCoords, max.y)
+            ) { x, y ->
+                visibleChunksCache += getOrCreateChunk(x x y)
+            }
+            //unload no longer visible chunks and their objects
+            unload()
         }
-        //unload no longer visible chunks and their objects
-        unload()
     }
 
-    fun unload() {
+    private fun unload() {
         val toUnload = chunks.filter {
             !visibleChunksCache.contains(it.value)
         }

@@ -19,13 +19,14 @@ import kotlin.properties.Delegates
 class PawnFigure(
     val data: PawnState,
     val camera: Camera,
-    val walkCost: (Vector2Int) -> Float
+    val walkCost: (Vector2Int) -> Float,
+    onPathEnd: (Vector2Int) -> Unit
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
     val pathWalkerManager = PathWalkerManager(this, {
         data.defaultTileSpeed * data.speed * walkCost(it)
-    }) {
+    }, {
         this.coords = it
-    }
+    }, onPathEnd)
     val tex = Texture("purple_circle.png").disposable()
     val sprite = Sprite(tex).apply {
         setSize(100f, 100f)

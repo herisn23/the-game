@@ -6,6 +6,7 @@ import org.roldy.data.state.GameState
 import org.roldy.data.state.MineState
 import org.roldy.data.state.PawnState
 import org.roldy.data.state.PlayerState
+import org.roldy.data.state.RefreshingState
 import org.roldy.data.state.RulerState
 import org.roldy.data.state.SettlementState
 import org.roldy.gp.world.generator.data.MineData
@@ -19,10 +20,8 @@ fun createGameState(
     findSuitableSpotForPlayer: () -> Vector2Int
 ): GameState = GameState(
     mapData = mapData,
-    settlements = settlements.map {
-        it.toState(mines)
-    },
-    mines = mines.filter { it.settlementData == null }.map(MineData::toState),
+    settlements = settlements.map(SettlementData::toState),
+    mines = mines.map(MineData::toState),
     player = PlayerState(
         pawn = PawnState(
             coords = findSuitableSpotForPlayer()
@@ -30,11 +29,11 @@ fun createGameState(
     )
 )
 
-private fun SettlementData.toState(mines: List<MineData>) =
+private fun SettlementData.toState() =
     SettlementState(
+        id = id,
         coords = coords,
         ruler = RulerState(color = color),
-        mines = mines.filter { it.settlementData == this }.map(MineData::toState),
         region = radiusCoords,
         texture = texture,
     )
@@ -42,6 +41,6 @@ private fun SettlementData.toState(mines: List<MineData>) =
 private fun MineData.toState() = MineState(
     coords = coords,
     harvestable = harvestable,
-    max = 10,
-    current = 10
+    settlement = settlementData?.id,
+    refreshing = RefreshingState()
 )

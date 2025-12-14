@@ -8,6 +8,7 @@ class PathWalkerManager(
     val worldPositioned: WorldPositioned,
     val speed: (Vector2Int) -> Float,
     val onCoordsChanged: (Vector2Int) -> Unit,
+    val onPathEnd: (Vector2Int) -> Unit
 ) {
     private var currentPath: List<PathWalker.Node> = emptyList()
     private var currentPathIndex = 0
@@ -35,6 +36,7 @@ class PathWalkerManager(
 
                 // Reached end of path
                 if (currentPathIndex >= path.size) {
+                    onPathEnd(coords)
                     currentPath = emptyList()
                     currentPathIndex = 0
                 }

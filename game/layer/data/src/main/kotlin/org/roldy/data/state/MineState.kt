@@ -8,6 +8,6 @@ import org.roldy.data.mine.harvestable.Harvestable
 data class MineState(
     val coords: Vector2Int,
     val harvestable: Harvestable,
-    var max: Int,
-    var current: Int
+    val refreshing: RefreshingState,
+    val settlement: Int?
 )

@@ -27,6 +27,7 @@ class SettlementGenerator(
         val mapSize = mapData.size
         val seed = mapData.seed
         val count = mapSize.settlements
+        val idGen = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlements = mutableListOf<SettlementData>()
         val attempts = count * 10 // Try multiple times to find good spots
@@ -66,6 +67,7 @@ class SettlementGenerator(
                 }
                 settlements.add(
                     SettlementData(
+                        id = idGen.nextInt(),
                         coords,
                         "Settlement${settlements.size + 1}",
                         regionSize,

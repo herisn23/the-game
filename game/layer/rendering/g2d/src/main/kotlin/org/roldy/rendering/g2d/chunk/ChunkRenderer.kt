@@ -27,9 +27,6 @@ class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
         Diagnostics.addProvider {
             "Chunks visible: ${chunkManager.visibleChunks.size}"
         }
-        Diagnostics.addProvider {
-            "Chunks loaded: ${chunkManager.chunks.size}"
-        }
 
         chunkManager.addListener(
             onGPUThread { data ->

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.Vector2Int
 
 data class SettlementData(
+    val id: Int,
     val coords: Vector2Int,
     val name: String,
     val radius: Int,
