@@ -1,10 +1,9 @@
-package org.roldy.data.tile.road
+package org.roldy.data.tile
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
-import org.roldy.data.tile.TileData
 
-data class RoadData(
+data class RoadTileData(
     val node: PathWalker.Node,
     val bitmask: String
 ) : TileData {

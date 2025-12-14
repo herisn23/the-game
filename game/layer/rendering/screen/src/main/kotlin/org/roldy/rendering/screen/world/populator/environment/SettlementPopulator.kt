@@ -5,10 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
 import org.roldy.data.state.SettlementState
-import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SettlementTileObject
-import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
@@ -33,11 +31,10 @@ class SettlementPopulator(
         }
         return settlementsInChunk.map { settle ->
             val position = worldPosition(settle.coords)
-            logger.debug { "Loading ${settle.coords} in chunk ${chunk.coords}" }
             SettlementTileObject.Data(
                 position = position,
                 coords = settle.coords,
-                textureRegion = atlas.findRegion("hexDirtCastle00_blue"),
+                textureRegion = atlas.findRegion(settle.texture),
                 borderTextureRegion = border,
                 settlementData = settle,
                 worldPosition = ::worldPosition,

@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import org.roldy.core.TimeManager
 
 class ProxyScreen(
-    val timeManager: TimeManager,
     val screen: Screen,
     camera: OrthographicCamera,
 ) : Screen by screen {
@@ -23,7 +22,7 @@ class ProxyScreen(
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         viewport.apply()
-        screen.render(timeManager.getDelta(delta))
+        screen.render(delta)
     }
 
 }

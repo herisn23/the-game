@@ -2,7 +2,7 @@ package org.roldy.data.state
 
 import kotlinx.serialization.Serializable
 import org.roldy.core.Vector2Int
-import org.roldy.data.tile.mine.harvestable.Harvestable
+import org.roldy.data.mine.harvestable.Harvestable
 
 @Serializable
 data class MineState(

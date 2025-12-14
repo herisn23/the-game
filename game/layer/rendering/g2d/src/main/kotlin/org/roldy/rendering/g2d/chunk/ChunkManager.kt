@@ -3,7 +3,7 @@ package org.roldy.rendering.g2d.chunk
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.*
-import org.roldy.core.coroutines.EventTask
+import org.roldy.core.coroutines.ProcessingLoop
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.drawable.ChunkManagedDrawable
 import org.roldy.rendering.g2d.drawable.DrawablePool
@@ -21,7 +21,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     val persistentObjects = populator.createPersistentItems()
 
-    private val eventTask = EventTask(emitter = ::process)
+    private val eventTask = ProcessingLoop(emitter = ::process)
 
     private val itemLevelCulling = true
 

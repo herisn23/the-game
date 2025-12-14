@@ -1,7 +1,7 @@
 package org.roldy.gameplay.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.data.tile.settlement.SettlementData
+import org.roldy.gameplay.world.generator.data.SettlementData
 
 object HubAndSpoke: RoadNetworkAlgorithm {
     /**

@@ -1,9 +1,8 @@
-package org.roldy.data.tile.mountain
+package org.roldy.data.tile
 
 import org.roldy.core.Vector2Int
-import org.roldy.data.tile.TileData
 
-data class MountainData(
+data class MountainTileData(
     override val coords: Vector2Int
 ) : TileData {
     override val walkCost: Float = 0f

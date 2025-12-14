@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.data.state.SettlementState
-import org.roldy.data.tile.settlement.SettlementData
 import org.roldy.rendering.environment.TileBehaviour
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.g2d.Layered

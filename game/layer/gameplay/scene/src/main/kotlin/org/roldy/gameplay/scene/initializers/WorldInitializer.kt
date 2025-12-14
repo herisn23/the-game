@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.InputProcessorDelegate
 import org.roldy.core.TimeManager
+import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.div
 import org.roldy.core.keybind.keybinds
 import org.roldy.core.pathwalker.AsyncPathfindingProxy
@@ -14,6 +15,7 @@ import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
 import org.roldy.data.state.GameState
 import org.roldy.data.tile.walkCost
+import org.roldy.gameplay.scene.GameTime
 import org.roldy.gameplay.world.generator.MineGenerator
 import org.roldy.gameplay.world.generator.ProceduralMapGenerator
 import org.roldy.gameplay.world.generator.RoadGenerator
@@ -25,6 +27,7 @@ import org.roldy.gameplay.world.input.ZoomInputProcessor
 import org.roldy.gameplay.world.loadBiomesConfiguration
 import org.roldy.gameplay.world.loadHarvestableConfiguration
 import org.roldy.gameplay.world.pathfinding.TilePathfinder
+import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.map.HexagonalTiledMapCreator
@@ -36,7 +39,7 @@ import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.load
 
-fun AutoDisposable.createWorldScreen(): Screen {
+fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: DeltaProcessingLoop): Screen {
     val mapData = MapData(1L, MapSize.Small, 256)
     val noiseData = ProceduralMapGenerator(mapData).generate()
 
@@ -107,9 +110,10 @@ fun AutoDisposable.createWorldScreen(): Screen {
             listOf(currentPawn)
         )
     }
-    val timeManager = TimeManager()
+
     screen = disposable(
         WorldScreen(
+            timeManager,
             camera,
             map,
             populator,
@@ -127,6 +131,11 @@ fun AutoDisposable.createWorldScreen(): Screen {
             zoom::invoke
         )
     )
+    val gameTime = GameTime()
+    Diagnostics.addProvider {
+        "Game time: ${gameTime.formattedTime}"
+    }
+    processingLoop.addListener(gameTime::update)
 
-    return ProxyScreen(timeManager, screen, camera)
+    return ProxyScreen(screen, camera)
 }

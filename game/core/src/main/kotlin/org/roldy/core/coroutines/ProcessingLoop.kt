@@ -6,7 +6,7 @@ import org.roldy.core.logger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class EventTask<D>(
+class ProcessingLoop<D>(
     val delay: Duration = 16.milliseconds,
     val emitter: suspend () -> D,
 ) {

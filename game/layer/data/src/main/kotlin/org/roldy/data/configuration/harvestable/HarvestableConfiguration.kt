@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 import org.roldy.data.configuration.ClosedFloatingPointRangeSerializer
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.maxValue
-import org.roldy.data.tile.mine.harvestable.Fiber
-import org.roldy.data.tile.mine.harvestable.Gem
-import org.roldy.data.tile.mine.harvestable.Harvestable
-import org.roldy.data.tile.mine.harvestable.Metal
-import org.roldy.data.tile.mine.harvestable.Wood
+import org.roldy.data.mine.harvestable.Fiber
+import org.roldy.data.mine.harvestable.Gem
+import org.roldy.data.mine.harvestable.Harvestable
+import org.roldy.data.mine.harvestable.Metal
+import org.roldy.data.mine.harvestable.Wood
 
 @Serializable
 data class HarvestableConfiguration(

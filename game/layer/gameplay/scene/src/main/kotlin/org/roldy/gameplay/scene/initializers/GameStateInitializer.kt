@@ -7,8 +7,8 @@ import org.roldy.data.state.PawnState
 import org.roldy.data.state.PlayerState
 import org.roldy.data.state.RulerState
 import org.roldy.data.state.SettlementState
-import org.roldy.data.tile.mine.MineData
-import org.roldy.data.tile.settlement.SettlementData
+import org.roldy.gameplay.world.generator.data.MineData
+import org.roldy.gameplay.world.generator.data.SettlementData
 
 
 fun createGameState(
@@ -32,7 +32,8 @@ private fun SettlementData.toState(mines: List<MineData>) =
         coords = coords,
         ruler = RulerState(color = color),
         mines = mines.filter { it.settlementData == this }.map(MineData::toState),
-        region = radiusCoords
+        region = radiusCoords,
+        texture = texture,
     )
 
 private fun MineData.toState() = MineState(

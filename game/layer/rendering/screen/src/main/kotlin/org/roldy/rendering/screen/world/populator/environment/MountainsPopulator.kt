@@ -1,8 +1,10 @@
 package org.roldy.rendering.screen.world.populator.environment
 
+import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.data.configuration.match
-import org.roldy.data.tile.mountain.MountainData
+import org.roldy.data.tile.MountainTileData
+import org.roldy.data.tile.TileData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.Layered
@@ -37,7 +39,7 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
                             mountain.name
                         }
                     }.getOrThrow(),
-                    data = mapOf("data" to MountainData(coords))
+                    data = mapOf("data" to MountainTileData(coords)),
                 )
             }
         }

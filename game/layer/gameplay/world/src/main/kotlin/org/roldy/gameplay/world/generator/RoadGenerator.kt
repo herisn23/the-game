@@ -4,12 +4,11 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.x
-import org.roldy.data.tile.road.RoadData
-import org.roldy.data.tile.settlement.SettlementData
+import org.roldy.data.tile.RoadTileData
+import org.roldy.gameplay.world.generator.data.SettlementData
 import org.roldy.gameplay.world.generator.road.*
 import org.roldy.gameplay.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
-import kotlin.math.abs
 import kotlin.random.Random
 
 class RoadGenerator(
@@ -60,7 +59,7 @@ class RoadGenerator(
      */
     fun generate(
         algorithm: Algorithm = Algorithm.MST,
-    ): List<RoadData> {
+    ): List<RoadTileData> {
         if (settlements.size < 2) return emptyList()
 
         // Build network edges
@@ -79,7 +78,7 @@ class RoadGenerator(
         // Remove duplicates, optionally filter settlements
         return roads.map {
             val connections = getConnectedDirections(it.coords, roadCoordsSet)
-            RoadData(it, connectionsToBitmask(connections))
+            RoadTileData(it, connectionsToBitmask(connections))
         }
     }
 

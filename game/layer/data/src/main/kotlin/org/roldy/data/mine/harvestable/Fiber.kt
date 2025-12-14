@@ -1,7 +1,7 @@
-package org.roldy.data.tile.mine.harvestable
+package org.roldy.data.mine.harvestable
 
 import kotlinx.serialization.SerialName
-import org.roldy.data.tile.mine.MineType
+import org.roldy.data.mine.MineType
 
 @SerialName("Fiber")
 enum class Fiber(

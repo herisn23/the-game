@@ -7,8 +7,8 @@ import org.roldy.core.utils.hexRadius
 import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.map.MapData
-import org.roldy.data.tile.mine.MineType
-import org.roldy.data.tile.settlement.SettlementData
+import org.roldy.data.mine.MineType
+import org.roldy.gameplay.world.generator.data.SettlementData
 import org.roldy.rendering.map.MapTerrainData
 import kotlin.math.min
 import kotlin.random.Random
@@ -71,7 +71,8 @@ class SettlementGenerator(
                         regionSize,
                         radius,
                         harvestableCount,
-                        randomColor(random)
+                        randomColor(random),
+                        texture = "hexDirtCastle00_blue"
                     )
                 )
             }

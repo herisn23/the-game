@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
+import org.roldy.core.TimeManager
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
@@ -15,6 +16,7 @@ import org.roldy.rendering.screen.world.debug.DebugRenderer
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 
 class WorldScreen(
+    val timeManager: TimeManager,
     private val camera: OrthographicCamera,
     private val map: WorldMap,
     populator: WorldMapPopulator,
@@ -44,11 +46,11 @@ class WorldScreen(
     }
 
     override fun render(delta: Float) {
-        context(delta) {
-            zoom { zoom, min, max ->
-                camera.zoom += zoom * delta
-                camera.zoom = MathUtils.clamp(camera.zoom, min, max)
-            }
+        zoom { zoom, min, max ->
+            camera.zoom += zoom * delta
+            camera.zoom = MathUtils.clamp(camera.zoom, min, max)
+        }
+        context(timeManager.getDelta(delta)) {
             camera.update()
             map.render()
             chunkRenderer.render(batch)

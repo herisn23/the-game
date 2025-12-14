@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.Vector2Int
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
-import org.roldy.data.tile.road.RoadData
+import org.roldy.data.tile.RoadTileData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 import org.roldy.rendering.g2d.Layered
@@ -15,10 +15,9 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import kotlin.math.absoluteValue
 
 
-
 class RoadsPopulator(
     override val map: WorldMap,
-    private val roads: List<RoadData>
+    private val roads: List<RoadTileData>
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
 
