@@ -21,10 +21,10 @@ gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", vers
 gdx-backend-headless={module="com.badlogicgames.gdx:gdx-backend-headless", version.ref="gdx"}
 gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
 gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.ref = "gdx" }
-gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelperVersion" }
-gdx-ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
 gdx-spine = { module="com.esotericsoftware.spine:spine-libgdx", version.ref="gdxSpine"}
 gdx-tools = {module="com.badlogicgames.gdx:gdx-tools", version.ref="gdx"}
+gdx-freetype = {module="com.badlogicgames.gdx:gdx-freetype", version.ref="gdx"}
+gdx-freetype-platform = {module="com.badlogicgames.gdx:gdx-freetype-platform", version.ref="gdx"}
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

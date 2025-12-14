@@ -14,7 +14,7 @@ import org.roldy.rendering.g2d.disposable.disposable
 class Diagnostics : AutoDisposableAdapter() {
     private val batch by disposable { SpriteBatch() }
     private val shape by disposable { ShapeRenderer() }
-    private val font by disposable { BitmapFont() }
+    private val font by disposable { gameFont(size=12) }
 
     companion object {
         private val diagnosticsProviders: MutableList<() -> String> by lazy {

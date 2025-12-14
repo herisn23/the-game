@@ -12,6 +12,7 @@ object AtlasLoader {
     val settlements get() = load("environment/Settlements.atlas")
     val roads get() = load("environment/Roads.atlas")
     val mines get() = load("environment/Mines.atlas")
+    val gui get() = load("GUI.atlas")
 
     fun load(name: String) =
         TextureAtlas(loadAsset(name))

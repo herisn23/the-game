@@ -15,6 +15,7 @@ include("game:layer:rendering:environment")
 include("game:layer:rendering:screen")
 include("game:layer:rendering:equipment")
 include("game:layer:rendering:g2d")
+include("game:layer:rendering:gui")
 
 
 

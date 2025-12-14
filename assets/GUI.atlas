@@ -1,0 +1,7 @@
+GUI.png
+size:1024,256
+repeat:none
+Button_RL_Background
+bounds:540,2,256,210
+Button_RL_Foreground
+bounds:2,62,536,150

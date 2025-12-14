@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import org.roldy.core.TimeManager
 import org.roldy.rendering.g2d.Diagnostics
+import org.roldy.rendering.g2d.Gui
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
@@ -16,6 +17,7 @@ import org.roldy.rendering.screen.world.debug.DebugRenderer
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 
 class WorldScreen(
+    val gui: Gui,
     val timeManager: TimeManager,
     private val camera: OrthographicCamera,
     private val map: WorldMap,
@@ -58,6 +60,7 @@ class WorldScreen(
                 debugRenderer.render()
             }
             diagnostics.render()
+            gui.render()
         }
     }
 

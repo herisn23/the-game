@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.Vector2Int
 import org.roldy.core.keybind.KeybindName
 import org.roldy.core.keybind.KeybindSettings
+import org.roldy.core.logger
 import org.roldy.core.utils.unproject
 import org.roldy.core.x
 import org.roldy.rendering.map.WorldMap
@@ -17,6 +18,7 @@ class ObjectMoveInputProcessor(
 ) : InputAdapter() {
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        logger.info { "Received touch up $screenX, $screenY, $pointer" }
         if (button != settings[KeybindName.MoveTo]) return false
         val mousePos = screenX.toFloat() x screenY.toFloat()
         camera.unproject(mousePos)

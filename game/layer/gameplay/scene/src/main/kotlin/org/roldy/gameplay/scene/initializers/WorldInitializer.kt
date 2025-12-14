@@ -27,6 +27,7 @@ import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.processor.RefreshingProcessor
+import org.roldy.gui.TestGui
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -92,11 +93,19 @@ fun AutoDisposable.createWorldScreen(
 
     val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
 
+
+    var foundMine: MineState? = null
     val currentPawn: PawnFigure by disposable {
         PawnFigure(gameState.player.pawn, camera, {
             val objects = screen.chunkManager.tileData(it)
             (objects + listOfNotNull(map.terrainData[it])).walkCost()
         }) {
+            foundMine = gameState.mines.find { mine -> mine.coords == it }
+            foundMine?.let {
+                if (it.refreshing.current == it.refreshing.max) {
+                    foundMine?.refreshing?.current = 0
+                }
+            }
         }.apply {
             //initialize world position based on coords
             position = map.tilePosition.resolve(data.coords)
@@ -119,15 +128,17 @@ fun AutoDisposable.createWorldScreen(
             listOf(currentPawn)
         )
     }
-
+    val gui = TestGui()
     screen = disposable(
         WorldScreen(
+            gui,
             timeManager,
             camera,
             map,
             populator,
             InputProcessorDelegate(
                 listOf(
+                    gui.stage,
                     zoom,
                     ObjectMoveInputProcessor(
                         keybinds,
@@ -150,6 +161,9 @@ fun AutoDisposable.createWorldScreen(
 
     Diagnostics.addProvider {
         "Game time: ${gameTime.formattedTime}"
+    }
+    Diagnostics.addProvider {
+        "Current mining: ${foundMine?.refreshing?.current}"
     }
     processingLoop.addListener(refreshingProcessor)
     processingLoop.addListener {
