@@ -1,6 +1,7 @@
-package org.roldy.gameplay.world.generator.road
+package org.roldy.gp.world.generator.road
 
-import org.roldy.gameplay.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.data.SettlementData
+
 
 interface RoadNetworkAlgorithm {
 

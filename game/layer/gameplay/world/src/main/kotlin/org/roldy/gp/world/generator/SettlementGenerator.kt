@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.generator
+package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
@@ -8,7 +8,7 @@ import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.map.MapData
 import org.roldy.data.mine.MineType
-import org.roldy.gameplay.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.data.SettlementData
 import org.roldy.rendering.map.MapTerrainData
 import kotlin.math.min
 import kotlin.random.Random

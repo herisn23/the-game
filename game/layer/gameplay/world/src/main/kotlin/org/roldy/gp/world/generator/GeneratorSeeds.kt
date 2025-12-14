@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.generator
+package org.roldy.gp.world.generator
 
 object GeneratorSeeds {
 

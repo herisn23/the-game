@@ -1,21 +1,21 @@
-package org.roldy.gameplay.world.generator
+package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.x
 import org.roldy.data.tile.RoadTileData
-import org.roldy.gameplay.world.generator.data.SettlementData
-import org.roldy.gameplay.world.generator.road.*
-import org.roldy.gameplay.world.pathfinding.TilePathfinder
+import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.road.*
+import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
 import kotlin.random.Random
 
 class RoadGenerator(
     val map: WorldMap,
-    val settlements: List<SettlementData>
+    val settlements: List<org.roldy.gp.world.generator.data.SettlementData>
 ) {
-    val pathfinder = TilePathfinder(map) { tile, goal->
+    val pathfinder = TilePathfinder(map) { tile, goal ->
         //calculate walkCost from terrainData and add some noise to make roads more natural(not so straight)
         map.terrainData.getValue(tile).walkCost * Random(map.data.seed + tile.sum + goal.sum).nextFloat()
     }
@@ -23,7 +23,7 @@ class RoadGenerator(
     private val staggerIndex = map.staggerIndex
 
     enum class Algorithm(
-        val alg: RoadNetworkAlgorithm,
+        val alg: org.roldy.gp.world.generator.road.RoadNetworkAlgorithm,
         val config: Map<String, Any> = emptyMap()
     ) {
         HIERARCHICAL(
@@ -89,7 +89,7 @@ class RoadGenerator(
     private fun getConnectedDirections(
         coords: Vector2Int,
         roadCoords: Set<Vector2Int>
-    ): List<HexEdgeDirection> {
+    ): List<org.roldy.gp.world.generator.HexEdgeDirection> {
         return HexEdgeDirection.entries.filter { direction ->
             val neighbor = getHexNeighbor(coords, direction)
             neighbor in roadCoords
@@ -100,7 +100,7 @@ class RoadGenerator(
      * Gets the neighboring hex coordinate in the given direction.
      * Accounts for stagger offset on flat-top hexagons.
      */
-    private fun getHexNeighbor(coords: Vector2Int, direction: HexEdgeDirection): Vector2Int {
+    private fun getHexNeighbor(coords: Vector2Int, direction: org.roldy.gp.world.generator.HexEdgeDirection): Vector2Int {
         if (staggerAxis != "y") {
             // Handle x-axis stagger if needed
             return coords + direction.getOffset(false)
@@ -132,7 +132,7 @@ class RoadGenerator(
      * - EAST + WEST = 001001
      * - WEST + EAST + SOUTHWEST = 001011
      */
-    private fun connectionsToBitmask(connections: List<HexEdgeDirection>): String {
+    private fun connectionsToBitmask(connections: List<org.roldy.gp.world.generator.HexEdgeDirection>): String {
         var mask = 0
 
         connections.forEach { dir ->

@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.generator.data
+package org.roldy.gp.world.generator.data
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture

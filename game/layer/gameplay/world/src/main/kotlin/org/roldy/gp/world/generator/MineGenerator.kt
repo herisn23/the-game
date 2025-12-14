@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.generator
+package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
@@ -7,10 +7,10 @@ import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
-import org.roldy.gameplay.world.generator.data.MineData
+import org.roldy.gp.world.generator.data.MineData
 import org.roldy.data.mine.MineType
 import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.gameplay.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.data.SettlementData
 import org.roldy.rendering.map.MapTerrainData
 import kotlin.random.Random
 
@@ -60,8 +60,8 @@ class MineGenerator(
         return mines
     }
 
-    private fun generateMinesOutsideSettlements(): MutableList<MineData> {
-        val mines = mutableListOf<MineData>()
+    private fun generateMinesOutsideSettlements(): MutableList<org.roldy.gp.world.generator.data.MineData> {
+        val mines = mutableListOf<org.roldy.gp.world.generator.data.MineData>()
         val claimedCoords = mutableSetOf<Vector2Int>()
         val maxMines = mapData.size.size
         val attempts = maxMines * 10

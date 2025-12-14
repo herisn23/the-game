@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.pathfinding
+package org.roldy.gp.world.pathfinding
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker

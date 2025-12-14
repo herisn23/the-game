@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world
+package org.roldy.gp.world
 
 import java.util.*
 import kotlin.math.floor

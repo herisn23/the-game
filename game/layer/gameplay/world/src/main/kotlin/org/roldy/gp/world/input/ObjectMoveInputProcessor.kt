@@ -1,4 +1,4 @@
-package org.roldy.gameplay.world.input
+package org.roldy.gp.world.input
 
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera

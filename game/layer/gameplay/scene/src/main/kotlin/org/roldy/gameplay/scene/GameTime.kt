@@ -1,12 +1,15 @@
 package org.roldy.gameplay.scene
 
-class GameTime {
-    private var totalTime = 0f
+class GameTime(
+    initialTime: Float = 0f
+) {
+    private var totalTime = initialTime
 
     fun update(delta: Float) {
         totalTime += delta
     }
 
+    val time get() = totalTime
     val totalSeconds get() = totalTime
     val totalMinutes get() = totalTime / 60f
     val totalHours get() = totalTime / 3600f

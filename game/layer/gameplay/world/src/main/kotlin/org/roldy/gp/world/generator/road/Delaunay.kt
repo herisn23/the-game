@@ -1,7 +1,7 @@
-package org.roldy.gameplay.world.generator.road
+package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.gameplay.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.data.SettlementData
 
 object Delaunay: RoadNetworkAlgorithm {
     /**

@@ -1,21 +1,24 @@
 package org.roldy.gameplay.scene.initializers
 
 import org.roldy.core.Vector2Int
+import org.roldy.data.map.MapData
 import org.roldy.data.state.GameState
 import org.roldy.data.state.MineState
 import org.roldy.data.state.PawnState
 import org.roldy.data.state.PlayerState
 import org.roldy.data.state.RulerState
 import org.roldy.data.state.SettlementState
-import org.roldy.gameplay.world.generator.data.MineData
-import org.roldy.gameplay.world.generator.data.SettlementData
+import org.roldy.gp.world.generator.data.MineData
+import org.roldy.gp.world.generator.data.SettlementData
 
 
 fun createGameState(
+    mapData: MapData,
     settlements: List<SettlementData>,
     mines: List<MineData>,
     findSuitableSpotForPlayer: () -> Vector2Int
 ): GameState = GameState(
+    mapData = mapData,
     settlements = settlements.map {
         it.toState(mines)
     },

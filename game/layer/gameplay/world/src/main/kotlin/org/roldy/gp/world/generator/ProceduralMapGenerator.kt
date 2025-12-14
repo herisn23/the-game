@@ -1,9 +1,9 @@
-package org.roldy.gameplay.world.generator
+package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
-import org.roldy.gameplay.world.SimplexNoise
+import org.roldy.gp.world.SimplexNoise
 import kotlin.math.abs
 
 class ProceduralMapGenerator(

@@ -16,17 +16,17 @@ import org.roldy.data.map.MapSize
 import org.roldy.data.state.GameState
 import org.roldy.data.tile.walkCost
 import org.roldy.gameplay.scene.GameTime
-import org.roldy.gameplay.world.generator.MineGenerator
-import org.roldy.gameplay.world.generator.ProceduralMapGenerator
-import org.roldy.gameplay.world.generator.RoadGenerator
-import org.roldy.gameplay.world.generator.SettlementGenerator
-import org.roldy.gameplay.world.input.DebugInputProcessor
-import org.roldy.gameplay.world.input.GameSaveInputProcessor
-import org.roldy.gameplay.world.input.ObjectMoveInputProcessor
-import org.roldy.gameplay.world.input.ZoomInputProcessor
-import org.roldy.gameplay.world.loadBiomesConfiguration
-import org.roldy.gameplay.world.loadHarvestableConfiguration
-import org.roldy.gameplay.world.pathfinding.TilePathfinder
+import org.roldy.gp.world.generator.MineGenerator
+import org.roldy.gp.world.generator.ProceduralMapGenerator
+import org.roldy.gp.world.generator.RoadGenerator
+import org.roldy.gp.world.generator.SettlementGenerator
+import org.roldy.gp.world.input.DebugInputProcessor
+import org.roldy.gp.world.input.GameSaveInputProcessor
+import org.roldy.gp.world.input.ObjectMoveInputProcessor
+import org.roldy.gp.world.input.ZoomInputProcessor
+import org.roldy.gp.world.loadBiomesConfiguration
+import org.roldy.gp.world.loadHarvestableConfiguration
+import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -39,7 +39,10 @@ import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.load
 
-fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: DeltaProcessingLoop): Screen {
+fun AutoDisposable.createWorldScreen(
+    timeManager: TimeManager,
+    processingLoop: DeltaProcessingLoop
+): Screen {
     val mapData = MapData(1L, MapSize.Small, 256)
     val noiseData = ProceduralMapGenerator(mapData).generate()
 
@@ -67,7 +70,12 @@ fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: D
     lateinit var screen: WorldScreen
     val settlements = SettlementGenerator(terrainData, mapData).generate()
     val roads = RoadGenerator(map, settlements).generate()
-    val mines = MineGenerator(terrainData, mapData, settlements, harvestableConfiguration).generate()
+    val mines = MineGenerator(
+        terrainData,
+        mapData,
+        settlements,
+        harvestableConfiguration
+    ).generate()
 
     val pathfinder = TilePathfinder(map) { tile, _ ->
         val objectsData = screen.chunkManager.tileData(tile)
@@ -77,9 +85,8 @@ fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: D
     }
 
     val gameState = load {
-        createGameState(settlements, mines) {
-            val center = map.data.size.width / 2 x map.data.size.height / 2
-            center
+        createGameState(mapData, settlements, mines) {
+            map.data.size.width / 2 x map.data.size.height / 2
         }
     }
 
@@ -120,7 +127,12 @@ fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: D
             InputProcessorDelegate(
                 listOf(
                     zoom,
-                    ObjectMoveInputProcessor(keybinds, map, camera, pathfinderProxy::findPath),
+                    ObjectMoveInputProcessor(
+                        keybinds,
+                        map,
+                        camera,
+                        pathfinderProxy::findPath
+                    ),
                     GameSaveInputProcessor(keybinds, gameState),
                     DebugInputProcessor(timeManager) {
                         currentPawn.coords = mapData.size.max / 2
@@ -131,11 +143,14 @@ fun AutoDisposable.createWorldScreen(timeManager: TimeManager, processingLoop: D
             zoom::invoke
         )
     )
-    val gameTime = GameTime()
+    val gameTime = GameTime(gameState.time)
     Diagnostics.addProvider {
         "Game time: ${gameTime.formattedTime}"
     }
-    processingLoop.addListener(gameTime::update)
+    processingLoop.addListener {
+        gameTime.update(it)
+        gameState.time = gameTime.time
+    }
 
     return ProxyScreen(screen, camera)
 }
