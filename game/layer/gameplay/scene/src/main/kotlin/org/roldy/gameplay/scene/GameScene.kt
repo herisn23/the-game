@@ -6,7 +6,7 @@ import org.roldy.core.TimeManager
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.rendering.g2d.disposable.AutoDisposableGameAdapter
 
-class GameScene: AutoDisposableGameAdapter() {
+class GameScene : AutoDisposableGameAdapter() {
     val timeManager by lazy {
         TimeManager()
     }
@@ -17,5 +17,11 @@ class GameScene: AutoDisposableGameAdapter() {
     override fun create() {
         Logger.level = Logger.Level.Debug
         setScreen(createWorldScreen(timeManager, processingLoop))
+    }
+
+
+    override fun dispose() {
+        super.dispose()
+        processingLoop.cancel()
     }
 }

@@ -5,7 +5,8 @@ class GameTime(
 ) {
     private var totalTime = initialTime
 
-    fun update(delta: Float) {
+    context(delta:Float)
+    fun update() {
         totalTime += delta
     }
 

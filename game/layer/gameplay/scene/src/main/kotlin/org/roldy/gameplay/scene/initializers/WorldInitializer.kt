@@ -2,7 +2,6 @@ package org.roldy.gameplay.scene.initializers
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.InputProcessorDelegate
 import org.roldy.core.TimeManager
@@ -13,7 +12,6 @@ import org.roldy.core.pathwalker.AsyncPathfindingProxy
 import org.roldy.core.x
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
-import org.roldy.data.state.GameState
 import org.roldy.data.tile.walkCost
 import org.roldy.gameplay.scene.GameTime
 import org.roldy.gp.world.generator.MineGenerator
@@ -27,6 +25,7 @@ import org.roldy.gp.world.input.ZoomInputProcessor
 import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
+import org.roldy.gp.world.processor.MineProcessor
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -143,12 +142,15 @@ fun AutoDisposable.createWorldScreen(
             zoom::invoke
         )
     )
+    val mineProcessing = MineProcessor(gameState)
+
     val gameTime = GameTime(gameState.time)
     Diagnostics.addProvider {
         "Game time: ${gameTime.formattedTime}"
     }
+    processingLoop.addListener(mineProcessing)
     processingLoop.addListener {
-        gameTime.update(it)
+        gameTime.update()
         gameState.time = gameTime.time
     }
 

@@ -5,16 +5,13 @@ import org.roldy.core.TimeManager
 class DeltaProcessingLoop(
     val timeManager: TimeManager
 ) {
-    private val task = ProcessingLoop(emitter = ::calculateDelta)
-
-    init {
-        task.start()
-    }
+    private val task = ConcurrentLoop(emitter = ::calculateDelta)
 
     private var lastLoopTime = -1L
     private var deltaTime = 0f
     var resetDeltaTime = false
     val delta get() = deltaTime
+
     private fun calculateDelta(): Float {
         val time = System.nanoTime()
         if (lastLoopTime == -1L) lastLoopTime = time
@@ -29,7 +26,7 @@ class DeltaProcessingLoop(
         return timeManager.getDelta(deltaTime)
     }
 
-    fun addListener(listener: (Float) -> Unit) {
+    fun addListener(listener: ConcurrentLoopConsumer<Float>) {
         task.addListener(listener)
     }
 
