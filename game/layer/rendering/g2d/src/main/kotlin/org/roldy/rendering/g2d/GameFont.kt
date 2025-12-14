@@ -10,6 +10,7 @@ fun gameFont(
     border: Float = 0f,
     color: Color = Color.WHITE,
     borderColor: Color = Color.WHITE,
+    initialize: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {}
 ): BitmapFont {
     val generator = FreeTypeFontGenerator(loadAsset("font/DragonHunter-9Ynxj.otf"))
 
@@ -18,6 +19,8 @@ fun gameFont(
     parameter.color = color
     parameter.borderWidth = border  // Optional outline
     parameter.borderColor = borderColor
-
-    return generator.generateFont(parameter)
+    initialize(parameter)
+    return generator.generateFont(parameter).also {
+        generator.dispose()
+    }
 }

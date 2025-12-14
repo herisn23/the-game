@@ -1,7 +1,13 @@
 GUI.png
-size:1024,256
+size:2048,256
 repeat:none
 Button_RL_Background
-bounds:540,2,256,210
+bounds:1080,20,256,210
 Button_RL_Foreground
-bounds:2,62,536,150
+bounds:2,80,536,150
+Button_RL_Hover
+bounds:1338,90,128,140
+Button_RL_Overlay1
+bounds:2,2,536,76
+Button_RL_Overlay2
+bounds:540,86,538,144
