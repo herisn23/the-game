@@ -15,7 +15,7 @@ class Diagnostics : AutoDisposableAdapter() {
     private val batch by disposable { SpriteBatch() }
     private val shape by disposable { ShapeRenderer() }
     private val font by disposable { gameFont(size=12) }
-    var enabled = false
+    var enabled = true
 
     companion object {
         private val diagnosticsProviders: MutableList<() -> String> by lazy {

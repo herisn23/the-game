@@ -8,6 +8,7 @@ graalHelperVersion = "2.0.1"
 construo = "2.1.0"
 ashley = "1.7.4"
 gdxSpine="4.2.10"
+classgraph="4.8.165"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
@@ -25,6 +26,8 @@ gdx-spine = { module="com.esotericsoftware.spine:spine-libgdx", version.ref="gdx
 gdx-tools = {module="com.badlogicgames.gdx:gdx-tools", version.ref="gdx"}
 gdx-freetype = {module="com.badlogicgames.gdx:gdx-freetype", version.ref="gdx"}
 gdx-freetype-platform = {module="com.badlogicgames.gdx:gdx-freetype-platform", version.ref="gdx"}
+
+classgraph = {module="io.github.classgraph:classgraph", version.ref="classgraph"}
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

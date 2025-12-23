@@ -1,25 +1,26 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.Gdx
-import org.roldy.core.i18n.I18N
-import org.roldy.core.i18n.Languages
-import org.roldy.core.i18n.TextKeys
 import org.roldy.core.i18n.t
+import org.roldy.core.logger
 import org.roldy.core.utils.sequencer
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.g2d.gui.onClick
 import org.roldy.rendering.g2d.gui.table
-import java.util.Locale
+import java.util.*
 
 class TestGui : AutoDisposableAdapter(), Gui {
 
 
     val stage = gui(.5f) { gui ->
         val stage = this
-
         val locales by sequencer {
-            Languages.all
+            gui.i18n.languages
+        }
+
+        logger.debug {
+            gui.i18n.languages.joinToString(",")
         }
 
         table {
@@ -27,9 +28,9 @@ class TestGui : AutoDisposableAdapter(), Gui {
             setSize(stage.width, stage.height)
             setPosition(0f, 0f)
 
-            mainButton(t { test2 }) {
+            mainButton(t { lang }) {
                 onClick {
-                    gui.i18n.reload(locales.next())
+                    gui.i18n.locale = locales.next()
                 }
             }
 //

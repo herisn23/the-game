@@ -20,7 +20,7 @@ object Game {
             //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
 
-            setWindowedMode(mode.width, mode.height)
+            setWindowedMode(mode.width/2, mode.height)
 //            setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode())
             //// You can change these files; they are in lwjgl3/src/main/resources/ .
             //// They can also be loaded from the root of assets/ .
@@ -31,7 +31,7 @@ object Game {
             //// This uses the dependency `com.badlogicgames.gdx:gdx-lwjgl3-angle` to function.
             //// You can choose to remove the following line and the mentioned dependency if you want; they
             //// are not intended for games that use GL30 (which is compatibility with OpenGL ES 3.0).
-            setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0)
+//            setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0)
 
         })
     }

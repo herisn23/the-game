@@ -68,16 +68,25 @@ tasks.jar {
 distributions {
     main {
         contents {
-            from(assets) {
-                into(assets.name)   // will appear as build/distributions/my-app/assets
+            from(rootProject.file("assets")) {
+                into("assets")   // will appear as build/distributions/my-app/assets
             }
 
-            from(i18n) {
-                into(i18n.name)   // will appear as build/distributions/my-app/assets
+            from(rootProject.file("i18n")) {
+                into("i18n")   // will appear as build/distributions/my-app/assets
             }
+
+            fun Project.inGameFolder(): Boolean =
+                if (parent?.name == "game") {
+                    true
+                } else if (parent != null) {
+                    parent!!.inGameFolder()
+                } else {
+                    false
+                }
 
             rootProject.allprojects.forEach {
-                if (it.parent?.name == "game")
+                if (it.inGameFolder())
                     from(it.tasks.jar) {
                         into("modules")
                     }
@@ -91,6 +100,9 @@ construo {
     name.set("app")
     // human-readable name, used for example in the `.app` name for macOS
     humanName.set("appName")
+    roast {
+//        vmArgs = listOf("hovno")
+    }
     // targets
     targets {
         create<Target.Windows>("win") {
@@ -99,6 +111,7 @@ construo {
             jdkUrl.set("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.9%2B10/OpenJDK21U-jdk_x64_windows_hotspot_21.0.9_10.zip")
             // run app with console to see logs
             useConsole.set(true)
+            useGpuHint.set(false)
         }
     }
 }

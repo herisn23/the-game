@@ -1,14 +1,13 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import org.roldy.core.i18n.I18N
-import org.roldy.core.i18n.TextKeys
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.brighter
 import org.roldy.core.utils.get
 import org.roldy.core.utils.transparentColor
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.i18n.localizable
 
 @Scene2dDsl
 context(gui: GuiContext)
@@ -76,21 +75,20 @@ fun <S> KWidget<S>.mainButton(
         }
 
         ninePatch(gui.atlas["Button_RL_Hover"], left = 56, right = 56) {
-            textButton({
-                gui.i18n[text()]
-            }, buttonStyle {
-                this.up = tint(transparentColor(0f))
-                this.down = tint(gui.colors.default alpha 0.25f)
-                this.over = tint(gui.colors.default alpha 0.15f)
-                this.font = font
-            }) {
-                gui.i18n.addOnLocaleChangedListener(::updateText)
-                stretch(
-                    width,
-                    height,
-                    stretch + 3
-                )
-                init()
+            localizable(text) { string ->
+                textButton(string, buttonStyle {
+                    this.up = tint(transparentColor(0f))
+                    this.down = tint(gui.colors.default alpha 0.25f)
+                    this.over = tint(gui.colors.default alpha 0.15f)
+                    this.font = font
+                }) {
+                    stretch(
+                        width,
+                        height,
+                        stretch + 3
+                    )
+                    init()
+                }
             }
         }
     }
