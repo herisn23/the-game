@@ -1,6 +1,6 @@
 package codegen.equipment.gen
 
-import codegen.equipment.ClassInfo
+import codegen.ClassInfo
 import codegen.equipment.ClassNameNormalizer
 import java.io.File
 import java.nio.file.Path

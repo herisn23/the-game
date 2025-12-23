@@ -15,6 +15,7 @@ class Diagnostics : AutoDisposableAdapter() {
     private val batch by disposable { SpriteBatch() }
     private val shape by disposable { ShapeRenderer() }
     private val font by disposable { gameFont(size=12) }
+    var enabled = false
 
     companion object {
         private val diagnosticsProviders: MutableList<() -> String> by lazy {
@@ -50,6 +51,7 @@ class Diagnostics : AutoDisposableAdapter() {
 
     val yStep = 20f
     fun render() {
+        if(!enabled) return
         batch.projectionMatrix = camera.combined
         shape.projectionMatrix = camera.combined
 

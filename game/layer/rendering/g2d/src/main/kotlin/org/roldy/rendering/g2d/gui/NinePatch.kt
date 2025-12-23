@@ -1,7 +1,8 @@
-package org.roldy.rendering.g2d
+package org.roldy.rendering.g2d.gui
 
 import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 
 data class NinePatchParams(
@@ -11,23 +12,26 @@ data class NinePatchParams(
     val bottom: Int = 0,
 )
 
-fun <D> ninePatch(
+@Scene2dDsl
+context(_: C)
+fun <A : Actor, S, C : KContext> KWidget<S>.ninePatch(
     region: TextureRegion,
     params: NinePatchParams,
-    configure: NinePatchDrawable.() -> D
-): D {
-    return ninePatch(region, params.left, params.right, params.top, params.bottom, configure)
-}
+    element: NinePatchDrawable.() -> A
+): A =
+    ninePatch(region, params.left, params.right, params.top, params.bottom, element)
 
-fun <D> ninePatch(
+@Scene2dDsl
+context(_: C)
+fun <A : Actor, S, C : KContext> KWidget<S>.ninePatch(
     region: TextureRegion,
     left: Int = 0,
     right: Int = 0,
     top: Int = 0,
     bottom: Int = 0,
-    configure: NinePatchDrawable.() -> D
-): D {
+    element: (NinePatchDrawable).() -> A
+): A {
     val ninePatch = NinePatch(region, left, right, top, bottom)
     val drawable = NinePatchDrawable(ninePatch)
-    return configure(drawable)
+    return actor(element(drawable))
 }

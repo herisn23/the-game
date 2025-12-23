@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import org.roldy.gameplay.world.input.ZoomInputProcessor
+import org.roldy.gp.world.input.ZoomInputProcessor
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposableApplicationAdapter
 import org.roldy.rendering.screen.world.WorldScreen

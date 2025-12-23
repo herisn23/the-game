@@ -1,6 +1,6 @@
 package codegen.equipment.gen
 
-import codegen.equipment.ClassInfo
+import codegen.ClassInfo
 import java.io.File
 import java.util.Locale.getDefault
 

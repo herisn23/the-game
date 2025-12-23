@@ -1,31 +1,56 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.Gdx
-import org.roldy.rendering.g2d.Gui
+import org.roldy.core.i18n.I18N
+import org.roldy.core.i18n.Languages
+import org.roldy.core.i18n.TextKeys
+import org.roldy.core.i18n.t
+import org.roldy.core.utils.sequencer
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
-
+import org.roldy.rendering.g2d.gui.Gui
+import org.roldy.rendering.g2d.gui.onClick
+import org.roldy.rendering.g2d.gui.table
+import java.util.Locale
 
 class TestGui : AutoDisposableAdapter(), Gui {
 
 
-    val stage = gui {
-        button("Just ty something") {
-            print("click")
-        }.apply {
-            setPosition(1000f, 400f)
+    val stage = gui(.5f) { gui ->
+        val stage = this
+
+        val locales by sequencer {
+            Languages.all
+        }
+
+        table {
+            setFillParent(true)
+            setSize(stage.width, stage.height)
+            setPosition(0f, 0f)
+
+            mainButton(t { test2 }) {
+                onClick {
+                    gui.i18n.reload(locales.next())
+                }
+            }
+//
+////            row()
+//
+//            button("3")
+//            button("4")
+//            simpleButton()
+//            simpleButton()
+
+//            pack()
         }
     }
 
-    init {
-        // Make everything appear 50% smaller
-        stage.viewport.camera.viewportWidth = Gdx.graphics.width * 2f
-        stage.viewport.camera.viewportHeight = Gdx.graphics.height * 2f
-        stage.viewport.camera.position.set(
-            stage.viewport.camera.viewportWidth / 2f,
-            stage.viewport.camera.viewportHeight / 2f,
-            0f
-        )
-        stage.viewport.camera.update()
+    override fun resize(width: Int, height: Int) {
+        stage.viewport.update(width, height, true)
+
+        // Force update mouse position after resize
+        val mouseX = Gdx.input.getX();
+        val mouseY = Gdx.input.getY();
+        stage.mouseMoved(mouseX, mouseY);
     }
 
     context(delta: Float)

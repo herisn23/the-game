@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import org.roldy.core.TimeManager
 import org.roldy.rendering.g2d.Diagnostics
-import org.roldy.rendering.g2d.Gui
+import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
@@ -45,6 +45,7 @@ class WorldScreen(
 
     override fun resize(width: Int, height: Int) {
         diagnostics.resize(width, height)
+        gui.resize(width, height)
     }
 
     override fun render(delta: Float) {

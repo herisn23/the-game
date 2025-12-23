@@ -24,6 +24,10 @@ val assets: SourceSet by sourceSets.creating {
     resources.srcDirs(rootProject.file("assets").path)
 }
 
+val i18n: SourceSet by sourceSets.creating {
+    resources.srcDirs(rootProject.file("i18n").path)
+}
+
 dependencies {
     implementation(libs.bundles.gdx)
     runtimeOnly(variantOf(libs.gdx.platform) {
@@ -36,6 +40,7 @@ dependencies {
 
     //exclude assets from compileTime we only need it at runtime
     runtimeOnly(assets.output)
+    runtimeOnly(i18n.output)
 }
 
 
@@ -63,8 +68,12 @@ tasks.jar {
 distributions {
     main {
         contents {
-            from(rootProject.file("assets")) {
-                into("assets")   // will appear as build/distributions/my-app/assets
+            from(assets) {
+                into(assets.name)   // will appear as build/distributions/my-app/assets
+            }
+
+            from(i18n) {
+                into(i18n.name)   // will appear as build/distributions/my-app/assets
             }
 
             rootProject.allprojects.forEach {
