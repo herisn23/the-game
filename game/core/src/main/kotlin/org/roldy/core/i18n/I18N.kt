@@ -1,11 +1,8 @@
 package org.roldy.core.i18n
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.I18NBundle
 import io.github.classgraph.ClassGraph
 import org.roldy.core.asset.loadAsset
-import org.roldy.core.logger
-import java.nio.file.Path
 import java.util.Locale
 import kotlin.properties.Delegates
 
@@ -68,7 +65,7 @@ class I18N(
 
     class Key(val key: String, vararg val formatArguments: Any) {
 
-        fun args(vararg args: Any) =
+        fun format(vararg args: Any) =
             Key(key = key, formatArguments = args)
     }
 

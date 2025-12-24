@@ -26,8 +26,8 @@ class DeltaProcessingLoop(
         return timeManager.getDelta(deltaTime)
     }
 
-    fun addListener(listener: ConcurrentLoopConsumer<Float>) {
-        task.addListener(listener)
+    fun addConsumer(consumer: ConcurrentLoopConsumer<Float>) {
+        task.addConsumer(consumer)
     }
 
     fun cancel() {

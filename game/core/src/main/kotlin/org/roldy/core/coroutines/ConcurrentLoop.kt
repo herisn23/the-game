@@ -9,13 +9,13 @@ fun interface ConcurrentLoopConsumer<D> {
 class ConcurrentLoop<D>(
     val emitter: suspend () -> D,
 ) : Loop() {
-    private val listeners = mutableListOf<ConcurrentLoopConsumer<D>>()
+    private val consumers = mutableListOf<ConcurrentLoopConsumer<D>>()
 
     override fun start() {
         start {
             runCatching {
                 val data = emitter()
-                val snapshot = synchronized(listeners) { listeners.toList() }
+                val snapshot = synchronized(consumers) { consumers.toList() }
                 snapshot.forEach {
                     context(data) {
                         it.update()
@@ -27,8 +27,8 @@ class ConcurrentLoop<D>(
         }
     }
 
-    fun addListener(consumer: ConcurrentLoopConsumer<D>) =
-        synchronized(listeners) {
-            listeners.add(consumer)
+    fun addConsumer(consumer: ConcurrentLoopConsumer<D>) =
+        synchronized(consumers) {
+            consumers.add(consumer)
         }
 }

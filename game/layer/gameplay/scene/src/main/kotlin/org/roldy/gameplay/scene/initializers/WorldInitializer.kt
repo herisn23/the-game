@@ -3,12 +3,15 @@ package org.roldy.gameplay.scene.initializers
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector3
 import org.roldy.core.InputProcessorDelegate
 import org.roldy.core.TimeManager
+import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.div
 import org.roldy.core.keybind.keybinds
 import org.roldy.core.pathwalker.AsyncPathfindingProxy
+import org.roldy.core.utils.project
 import org.roldy.core.x
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
@@ -21,13 +24,13 @@ import org.roldy.gp.world.generator.RoadGenerator
 import org.roldy.gp.world.generator.SettlementGenerator
 import org.roldy.gp.world.input.DebugInputProcessor
 import org.roldy.gp.world.input.GameSaveInputProcessor
-import org.roldy.gp.world.input.ObjectMoveInputProcessor
+import org.roldy.gp.world.input.MouseHandleInputProcessor
 import org.roldy.gp.world.input.ZoomInputProcessor
 import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.processor.RefreshingProcessor
-import org.roldy.gui.TestGui
+import org.roldy.gui.WorldGUI
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -100,12 +103,12 @@ fun AutoDisposable.createWorldScreen(
             val objects = screen.chunkManager.tileData(it)
             (objects + listOfNotNull(map.terrainData[it])).walkCost()
         }) {
-            foundMine = gameState.mines.find { mine -> mine.coords == it }
-            foundMine?.let {
-                if (it.refreshing.current == it.refreshing.max) {
-                    foundMine?.refreshing?.current = 0
-                }
-            }
+//            foundMine = gameState.mines.find { mine -> mine.coords == it }
+//            foundMine?.let {
+//                if (it.refreshing.current == it.refreshing.max) {
+//                    foundMine?.refreshing?.current = 0
+//                }
+//            }
         }.apply {
             //initialize world position based on coords
             position = map.tilePosition.resolve(data.coords)
@@ -128,34 +131,49 @@ fun AutoDisposable.createWorldScreen(
             listOf(currentPawn)
         )
     }
-    val gui = TestGui()
-    screen = disposable(
-        WorldScreen(
-            gui,
-            timeManager,
-            camera,
-            map,
-            populator,
-            InputProcessorDelegate(
-                listOf(
-                    gui.stage,
-                    zoom,
-                    ObjectMoveInputProcessor(
-                        keybinds,
-                        map,
-                        camera,
-                        pathfinderProxy::findPath
-                    ),
-                    GameSaveInputProcessor(keybinds, gameState),
-                    DebugInputProcessor(timeManager) {
-                        currentPawn.coords = mapData.size.max / 2
-                        currentPawn.position = map.tilePosition.resolve(currentPawn.data.coords)
-                    }
-                )
-            ),
-            zoom::invoke
-        )
-    )
+
+    val gui = WorldGUI()
+
+    fun tileFocus(coords: Vector2Int) {
+        fun screen(): Vector2Int {
+            val world = map.tilePosition.resolve(coords)
+            camera.project(world)
+            val flippedY = Gdx.graphics.height - world.y
+            return world.x.toInt() x flippedY.toInt()
+        }
+
+
+        val mine = gameState.mines.find { mine -> mine.coords == coords }?.harvestable?.name ?: "no mine"
+        gui.showTileInfo(screen(), mine).followPosition = ::screen
+    }
+
+    screen = WorldScreen(
+        gui,
+        timeManager,
+        camera,
+        map,
+        populator,
+        InputProcessorDelegate(
+            listOf(
+                gui.stage,
+                zoom,
+                MouseHandleInputProcessor(
+                    keybinds,
+                    map,
+                    camera,
+                    pathfinderProxy::findPath,
+                    ::tileFocus,
+                ),
+                GameSaveInputProcessor(keybinds, gameState),
+                DebugInputProcessor(timeManager) {
+                    currentPawn.coords = mapData.size.max / 2
+                    currentPawn.position = map.tilePosition.resolve(currentPawn.data.coords)
+                }
+            )
+        ),
+        zoom::invoke
+    ).disposable()
+
     val refreshingProcessor = RefreshingProcessor(gameState)
     val gameTime = GameTime(gameState.time)
 
@@ -165,8 +183,9 @@ fun AutoDisposable.createWorldScreen(
     Diagnostics.addProvider {
         "Current mining: ${foundMine?.refreshing?.current}"
     }
-    processingLoop.addListener(refreshingProcessor)
-    processingLoop.addListener {
+
+    processingLoop.addConsumer(refreshingProcessor)
+    processingLoop.addConsumer {
         gameTime.update()
         gameState.time = gameTime.time
     }

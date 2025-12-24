@@ -23,7 +23,6 @@ fun <S> KWidget<S>.mainButton(
     val font = gui.font(32) {
         padTop = 0
         padBottom = 0
-        color = gui.colors.tint
     }
     val stretch = 30f
     val ninePatchParams = NinePatchParams(50, 50, 30, 30)
@@ -34,12 +33,12 @@ fun <S> KWidget<S>.mainButton(
         //background
         ninePatch(gui.atlas["Button_RL_Background"], ninePatchParams) {
             setMinSize(width, height)
-            KImage(this)
+            image(this)
         }
 
         //foreground
         ninePatch(gui.atlas["Button_RL_Foreground"], ninePatchParams) {
-            KImage(this).apply {
+            image(this) {
                 stretch(
                     width,
                     height,
@@ -51,7 +50,7 @@ fun <S> KWidget<S>.mainButton(
 
         //overlay 1
         ninePatch(gui.atlas["Button_RL_Overlay1"], 0, 0, 13, 0) {
-            KImage(this).apply {
+            image(this) {
                 stretch(
                     width,
                     76f,
@@ -63,7 +62,7 @@ fun <S> KWidget<S>.mainButton(
 
         //overlay 2
         ninePatch(gui.atlas["Button_RL_Overlay2"], 30, 46, 27, 30) {
-            KImage(this).apply {
+            image(this) {
                 stretch(
                     width,
                     height,

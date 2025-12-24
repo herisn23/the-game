@@ -8,5 +8,8 @@ enum class KeybindName {
     MoveTo,
 
     // Game save-load
-    QuickSave, QuickLoad
+    QuickSave, QuickLoad,
+
+    //Tile focus
+    TileFocus
 }

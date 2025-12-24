@@ -10,24 +10,31 @@ import org.roldy.core.utils.unproject
 import org.roldy.core.x
 import org.roldy.rendering.map.WorldMap
 
-class ObjectMoveInputProcessor(
+class MouseHandleInputProcessor(
     val settings: KeybindSettings,
     val worldMap: WorldMap,
     val camera: OrthographicCamera,
-    val updateCoords: (Vector2Int) -> Unit
+    val moveTo: (Vector2Int) -> Unit,
+    val focusOn: (Vector2Int) -> Unit
 ) : InputAdapter() {
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         logger.info { "Received touch up $screenX, $screenY, $pointer" }
-        if (button != settings[KeybindName.MoveTo]) return false
+        return button.onTouch(KeybindName.MoveTo, screenX, screenY, moveTo) ||
+                button.onTouch(KeybindName.TileFocus, screenX, screenY) {
+                    focusOn(it)
+                }
+    }
+
+    fun Int.onTouch(keybind: KeybindName, screenX: Int, screenY: Int, coords: (Vector2Int) -> Unit): Boolean {
+        if (this != settings[keybind]) return false
         val mousePos = screenX.toFloat() x screenY.toFloat()
         camera.unproject(mousePos)
         worldMap.tilePosition(
             mousePos.x x mousePos.y
         ) { coords, _, _ ->
-            updateCoords(coords)
+            coords(coords)
         }
-
-        return false
+        return true
     }
 }

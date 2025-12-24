@@ -28,12 +28,12 @@ data class GuiContext(
 fun Gui.gui(scale: Float = 1f, build: context(GuiContext) (@Scene2dDsl KStage).(GuiContext) -> Unit): KStage {
     val atlas by disposable { AtlasLoader.gui }
     val colors = GUIColors(
-        default = Color.RED,
+        default = Color.PURPLE,
         tint = Color.valueOf("FFEDCFFF")
     )
     val bundle = I18N()
     val guiContext = GuiContext(atlas, colors, bundle) { size, initialize ->
-        gameFont(size = size, initialize = initialize).disposable()
+        gameFont(size = size, color = colors.tint, initialize = initialize).disposable()
     }
 
     val stage by disposable {

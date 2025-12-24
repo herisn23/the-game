@@ -17,7 +17,8 @@ val defaultKeybinds = mapOf(
     KeybindName.CameraZoomOut to Input.Keys.E,
     KeybindName.MoveTo to Input.Buttons.LEFT,
     KeybindName.QuickSave to Input.Keys.F5,
-    KeybindName.QuickLoad to Input.Keys.F6
+    KeybindName.QuickLoad to Input.Keys.F6,
+    KeybindName.TileFocus to Input.Buttons.RIGHT
 )
 
 val keybinds = KeybindSettings()

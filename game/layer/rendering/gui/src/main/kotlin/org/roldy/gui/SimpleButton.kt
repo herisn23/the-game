@@ -19,7 +19,6 @@ fun <S> KWidget<S>.simpleButton(): KTextButton {
     val font = gui.font(16) {
         padTop = 0
         padBottom = 0
-        color = gui.colors.tint
     }
 
     fun a(color: Color) = Pixmap(1, 1, Pixmap.Format.RGBA8888).run {

@@ -6,4 +6,5 @@ import org.roldy.data.mine.MineType
 @Serializable
 sealed interface Harvestable {
     val mineType: MineType
+    val name: String
 }
