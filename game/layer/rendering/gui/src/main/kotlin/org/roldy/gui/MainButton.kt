@@ -1,13 +1,14 @@
 package org.roldy.gui
 
-import com.badlogic.gdx.scenes.scene2d.Actor
 import org.roldy.core.i18n.I18N
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.brighter
 import org.roldy.core.utils.get
 import org.roldy.core.utils.transparentColor
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.i18n.KLocalizableProxy
 import org.roldy.rendering.g2d.gui.i18n.localizable
+import org.roldy.rendering.g2d.gui.i18n.removable
 
 @Scene2dDsl
 context(gui: GuiContext)
@@ -16,7 +17,7 @@ fun <S> KWidget<S>.mainButton(
     width: Float = 1f,
     height: Float = 1f,
     init: (@Scene2dDsl KTextButton).() -> Unit = {}
-): Actor {
+): KLocalizableProxy<KStack> {
     val width: Float = 735f * width
     val height: Float = 210f * height
     val font = gui.font(32) {
@@ -26,7 +27,8 @@ fun <S> KWidget<S>.mainButton(
     }
     val stretch = 30f
     val ninePatchParams = NinePatchParams(50, 50, 30, 30)
-    return stack {
+    lateinit var button: KLocalizableProxy<KStack>
+    stack {
         setLayoutEnabled(false)
 
         //background
@@ -89,7 +91,12 @@ fun <S> KWidget<S>.mainButton(
                     )
                     init()
                 }
+            }.also {
+                //when button is removed we also remove a onLocaleChanged listener
+                button = it.removable(this@stack)
             }
         }
+
     }
+    return button
 }

@@ -36,7 +36,7 @@ class I18N(
         }
     }
 
-    private val listeners: MutableList<() -> Unit> = mutableListOf()
+    val listeners: MutableList<() -> Unit> = mutableListOf()
 
     val asset by lazy { loadAsset("strings/i18n") }
 

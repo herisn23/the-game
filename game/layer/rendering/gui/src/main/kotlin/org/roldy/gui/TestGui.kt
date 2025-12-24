@@ -28,10 +28,14 @@ class TestGui : AutoDisposableAdapter(), Gui {
             setSize(stage.width, stage.height)
             setPosition(0f, 0f)
 
-            mainButton(t { lang }) {
+            val btn = mainButton(t { lang }) {
                 onClick {
                     gui.i18n.locale = locales.next()
                 }
+            }
+
+            mainButton(t { lang }) {
+                onClick(btn::remove)
             }
 //
 ////            row()

@@ -20,7 +20,7 @@ object Game {
             //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
 
-            setWindowedMode(mode.width/2, mode.height)
+            setWindowedMode(mode.width, mode.height)
 //            setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode())
             //// You can change these files; they are in lwjgl3/src/main/resources/ .
             //// They can also be loaded from the root of assets/ .

@@ -11,7 +11,7 @@ import kotlin.contracts.contract
 class KTextButton(
     override val text: () -> String,
     style: TextButtonStyle
-) : TextButton(text(), style), KTableWidget, Text {
+) : TextButton(text(), style), KTableWidget, TextActor {
     override fun updateText() {
         setText(text())
     }

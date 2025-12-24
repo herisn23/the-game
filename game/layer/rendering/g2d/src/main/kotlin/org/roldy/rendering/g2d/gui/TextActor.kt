@@ -1,6 +1,7 @@
 package org.roldy.rendering.g2d.gui
 
-interface Text {
+interface TextActor {
     val text: () -> String
     fun updateText()
+
 }

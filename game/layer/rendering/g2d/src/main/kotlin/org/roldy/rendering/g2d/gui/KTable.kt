@@ -5,11 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 
 @Scene2dDsl
-class KTable(
-    val adAs: Table.(Actor) -> Unit = {
-        add(it)
-    },
-) : Table(), KTableWidget
+class KTable : Table(), KTableWidget {
+
+}
 
 @Scene2dDsl
 interface KTableWidget : KWidget<Cell<*>> {
