@@ -2,6 +2,7 @@ package org.roldy.gui.tooltip
 
 import com.badlogic.gdx.scenes.scene2d.Actor
 import org.roldy.gui.GuiContext
+import org.roldy.gui.TextManager
 import org.roldy.gui.label
 import org.roldy.rendering.g2d.gui.KStructuredTooltip
 import org.roldy.rendering.g2d.gui.Scene2dDsl
@@ -12,7 +13,7 @@ import tooltipBackground
 @Scene2dDsl
 context(gui: GuiContext)
 fun Actor.textTooltip(
-    text: () -> String
+    text: TextManager
 ) = tooltipBackground {
     structuredTooltip(this) {
         padding = 10f

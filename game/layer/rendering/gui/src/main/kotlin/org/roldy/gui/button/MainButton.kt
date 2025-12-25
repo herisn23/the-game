@@ -6,17 +6,17 @@ import buttonRLHover
 import buttonRLOverlay1
 import buttonRLOverlay2
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import org.roldy.core.i18n.I18N
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.brighter
 import org.roldy.gui.GuiContext
+import org.roldy.gui.TextManager
 import org.roldy.rendering.g2d.gui.*
-import org.roldy.rendering.g2d.gui.i18n.localizable
+
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> KWidget<S>.mainButton(
-    text: () -> I18N.Key,
+    text: TextManager,
     init: (@Scene2dDsl KTextButton).() -> Unit = {}
 ): KTextButton {
     val font = gui.font(60) {
@@ -38,8 +38,7 @@ fun <S> KWidget<S>.mainButton(
         }
         table(true) {
             pad(padding + 5)
-
-            localizable(text) { string ->
+            text { string ->
                 textButton(
                     string, textButtonStyle(
                         font = font,

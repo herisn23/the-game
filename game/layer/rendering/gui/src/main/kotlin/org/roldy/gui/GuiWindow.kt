@@ -22,7 +22,7 @@ private const val OrnamentEffectWidth = 512f
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> KWidget<S>.guiWindow(
-    title: () -> String,
+    title: TextManager,
     init: context(GuiContext) (@Scene2dDsl KTable).(S) -> Unit = {}
 ) = window { cell ->
     dragBoxHeight = HeaderHeight

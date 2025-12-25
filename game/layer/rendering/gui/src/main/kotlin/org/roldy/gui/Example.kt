@@ -3,12 +3,11 @@ package org.roldy.gui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.utils.sequencer
+import org.roldy.gui.button.*
 import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.KWidget
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.image
-import org.roldy.rendering.g2d.gui.table
+import org.roldy.rendering.g2d.gui.*
 import kotlin.contracts.ExperimentalContracts
+import kotlin.system.exitProcess
 
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
@@ -22,30 +21,24 @@ fun <S> KWidget<S>.example() {
     table {
         align(Align.top)
         setFillParent(true)
-        guiWindow({ "overlay" }) {
-            it.padTop(100f).padRight(20f)
-//            mainButton(t{lang})
-        }
-        val window = guiWindow({ "Title" }) {
+        val window = guiWindow(string { "Title" }) {
             it.padTop(100f)
-//            mainButton(t{lang})
         }
-//        mainButton(t { lang }) {
-//            onClick {
-////                gui.i18n.locale = langs.next()
-//                window.open()
-//            }
-//        }
-//        squareButton(gui.drawable { Plus })
-//        circularButton(gui.drawable { Plus })
-//        circularButton(gui.drawable { Plus }, CircularButtonSize.S)
-//        circularButton(gui.drawable { Plus }, CircularButtonSize.L)
-//        smallButton(t { close }) {
-//            onClick {
-//                exitProcess(1)
-//            }
-//        }
-//        row()
+        mainButton(string { "Close" }) {
+            onClick {
+                window.open()
+            }
+        }
+        squareButton(gui.drawable { Plus })
+        circularButton(gui.drawable { Plus })
+        circularButton(gui.drawable { Plus }, CircularButtonSize.S)
+        circularButton(gui.drawable { Plus }, CircularButtonSize.L)
+        smallButton(translate { close }) {
+            onClick {
+                exitProcess(1)
+            }
+        }
+        row()
 
     }
 }
