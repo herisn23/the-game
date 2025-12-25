@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import org.roldy.core.i18n.I18N
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.TextActor
+import org.roldy.rendering.g2d.gui.updateTextAction
 
 @Scene2dDsl
 context(ctx: I18NContext)
@@ -14,5 +15,7 @@ fun <A> localizable(
     val actor = init {
         ctx.i18n[key()]
     }
-    return actor
+    return actor.apply {
+        addAction(updateTextAction())
+    }
 }

@@ -2,7 +2,10 @@ package org.roldy.rendering.g2d.gui
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.utils.Align
+import org.roldy.core.utils.alpha
+import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.KTextButton.KTextButtonStyle
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -10,15 +13,24 @@ import kotlin.contracts.contract
 
 @Scene2dDsl
 class KTextButton(
-    val text: () -> String,
+    text: () -> String,
     val style: KTextButtonStyle
-) : TextButton(text(), TextButtonStyle().apply {
-    font = style.font
+) : Button(ButtonStyle().apply {
+    up = emptyImage(alpha(0f))
 }), KTableWidget, TextActor, KButton {
+    val label = KLabel(text, labelStyle {
+        font = style.font
+    })
     private val manager = KButtonManager(style.background, this)
 
+    init {
+        label.setAlignment(Align.center)
+        add(label).grow()
+    }
+
     override fun updateText() {
-        setText(text())
+        label.updateText()
+
     }
     override fun draw(batch: Batch, parentAlpha: Float) {
         manager.draw(batch, parentAlpha)

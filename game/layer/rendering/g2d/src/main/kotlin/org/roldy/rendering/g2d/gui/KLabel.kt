@@ -2,8 +2,6 @@ package org.roldy.rendering.g2d.gui
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import sun.font.TextLabel
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -32,3 +30,12 @@ fun <S, C : KContext> KWidget<S>.label(
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
     return actor(KLabel(text, style), init)
 }
+
+@Scene2dDsl
+fun KLabel.autoupdate() =
+    addAction(updateTextAction())
+
+fun labelStyle(init: LabelStyle.() -> Unit) =
+    LabelStyle().also {
+        init(it)
+    }

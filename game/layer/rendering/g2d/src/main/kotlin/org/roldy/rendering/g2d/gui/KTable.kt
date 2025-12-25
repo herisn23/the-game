@@ -57,6 +57,8 @@ fun <S, C : KContext> KWidget<S>.table(
         build(it)
         if(stackable) {
             grow()
+        } else {
+            pack()
         }
     }
 

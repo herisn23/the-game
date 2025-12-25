@@ -9,6 +9,8 @@ data class NinePatchParams(
     val right: Int = 0,
     val top: Int = 0,
     val bottom: Int = 0,
+    val flipX: Boolean = false,
+    val flipY: Boolean = false
 )
 
 @NinePatchDsl
@@ -19,6 +21,14 @@ fun <A, C : KContext> ninePatch(
     element: @NinePatchDsl NinePatchDrawable.() -> A
 ): A =
     ninePatch(region, params.left, params.right, params.top, params.bottom, element)
+
+@NinePatchDsl
+context(_: C)
+fun <C : KContext> ninePatch(
+    region: TextureRegion,
+    params: NinePatchParams
+): NinePatchDrawable =
+    ninePatch(region, params.left, params.right, params.top, params.bottom)
 
 @NinePatchDsl
 context(_: C)

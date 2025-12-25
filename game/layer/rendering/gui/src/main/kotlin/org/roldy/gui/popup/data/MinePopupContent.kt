@@ -17,7 +17,7 @@ context(guiContext: GuiContext)
 fun KTable.minePopupContent(popup: KPopup, mine: MineState) {
     align(Align.left)
 
-    label({ mine.harvestable.name }, 35, false)
+    label({ mine.harvestable.name }, 35)
 
     row()
 

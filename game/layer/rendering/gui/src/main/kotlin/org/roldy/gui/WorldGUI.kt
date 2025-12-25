@@ -1,11 +1,6 @@
 package org.roldy.gui
 
-import com.badlogic.gdx.Gdx
 import org.roldy.core.Vector2Int
-import org.roldy.core.i18n.t
-import org.roldy.core.utils.drawable
-import org.roldy.core.utils.sequencer
-import org.roldy.gui.button.*
 import org.roldy.gui.popup.globalPopup
 import org.roldy.gui.popup.tilePopup
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
@@ -17,29 +12,14 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
     lateinit var worldTooltip: Pair<KClampingPopup, GuiContext>
     lateinit var tileTooltip: Pair<KStandardPopup, GuiContext>
 
-    val stage = gui(.5f) { gui ->
+    val stage = gui(1f) { gui ->
         val stage = this
-        val langs by sequencer { gui.i18n.languages }
-        table {
-            setFillParent(true)
-            setSize(stage.width, stage.height)
-            setPosition(0f, 0f)
-            mainButton(t { lang }) {
-                onClick {
-                    gui.i18n.locale = langs.next()
-                }
-            }
-            squareButton(gui.atlas.drawable("Plus"))
-            circularButton(gui.atlas.drawable("Plus"))
-            circularButton(gui.atlas.drawable("Plus"), CircularButtonSize.S)
-            circularButton(gui.atlas.drawable("Plus"), CircularButtonSize.L)
-            smallButton(t { close })
-        }
         stack {
             setLayoutEnabled(false)
             this@WorldGUI.worldTooltip = globalPopup() to gui
             this@WorldGUI.tileTooltip = tilePopup() to gui
         }
+        example()
     }
 
     @Scene2dDsl
@@ -57,12 +37,12 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
     }
 
     override fun resize(width: Int, height: Int) {
-        stage.viewport.update(width, height, true)
+        stage.resize(width, height)
 
-        // Force update mouse position after resize
-        val mouseX = Gdx.input.x
-        val mouseY = Gdx.input.y
-        stage.mouseMoved(mouseX, mouseY);
+//        // Force update mouse position after resize
+//        val mouseX = Gdx.input.x
+//        val mouseY = Gdx.input.y
+//        stage.mouseMoved(mouseX, mouseY);
     }
 
     context(delta: Float)

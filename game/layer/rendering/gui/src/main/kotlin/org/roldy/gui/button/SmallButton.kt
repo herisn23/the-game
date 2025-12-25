@@ -1,9 +1,10 @@
 package org.roldy.gui.button
 
+import buttonRSBackgroundGrayscale
+import buttonRSBorder2
 import com.badlogic.gdx.graphics.Color
 import org.roldy.core.i18n.I18N
 import org.roldy.core.utils.alpha
-import org.roldy.core.utils.get
 import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
@@ -13,7 +14,7 @@ import org.roldy.rendering.g2d.gui.i18n.localizable
 context(gui: GuiContext)
 fun <S> KWidget<S>.smallButton(
     text: () -> I18N.Key,
-    init: (@Scene2dDsl KTextButton).() -> Unit = {}
+    init: (@Scene2dDsl KTextButton).(S) -> Unit = {}
 ): KTextButton {
     val font = gui.font(25) {
         padTop = 0
@@ -22,20 +23,18 @@ fun <S> KWidget<S>.smallButton(
 
     val padding = 20f
     lateinit var button: KTextButton
-    table(true) {
+    table(true) { cell->
         //background
-        ninePatch(gui.atlas["Button_RS_Background_Grayscale"], ninePatchParams(18)) {
+        buttonRSBackgroundGrayscale {
             image(this) {
-                color = gui.colors.default
+                color = gui.colors.primary
             }
         }
         table(true) {
             pad(padding)
             //border
-            ninePatch(gui.atlas["Button_RS_Border2"], ninePatchParams(16)) {
-                image(this) {
-//                    it.pad(20f)
-                }
+            buttonRSBorder2 {
+                image(this)
             }
         }
         table(true) {
@@ -56,8 +55,7 @@ fun <S> KWidget<S>.smallButton(
                 ) {
                     padLeft(padding)
                     padRight(padding)
-                    addAction(updateTextAction())
-                    init()
+                    init(cell)
                     button = this
                 }
             }

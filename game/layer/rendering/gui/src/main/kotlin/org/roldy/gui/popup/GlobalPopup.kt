@@ -1,16 +1,19 @@
 package org.roldy.gui.popup
 
-import org.roldy.core.utils.get
 import org.roldy.gui.GuiContext
-import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.KClampingPopup
+import org.roldy.rendering.g2d.gui.KWidget
+import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.clampingPopup
+import popupNinePatch
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> KWidget<S>.globalPopup(): KClampingPopup {
-    val topLeft = popupNinePatch("Popup_Top_Left").tint(gui.colors.default)
-    val topRight = popupNinePatch("Popup_Top_Right").tint(gui.colors.default)
-    val bottomLeft = popupNinePatch("Popup_Bottom_Left").tint(gui.colors.default)
-    val bottomRight = popupNinePatch("Popup_Bottom_Right").tint(gui.colors.default)
+    val topLeft = popupNinePatch { Popup_Top_Left }.tint(gui.colors.primary)
+    val topRight = popupNinePatch { Popup_Top_Right }.tint(gui.colors.primary)
+    val bottomLeft = popupNinePatch { Popup_Bottom_Left }.tint(gui.colors.primary)
+    val bottomRight = popupNinePatch { Popup_Bottom_Right }.tint(gui.colors.primary)
     return clampingPopup(
         KClampingPopup.Backgrounds(
             topLeft,
@@ -23,9 +26,3 @@ fun <S> KWidget<S>.globalPopup(): KClampingPopup {
     }
 }
 
-@NinePatchDsl
-context(gui: GuiContext)
-private fun popupNinePatch(name: String) =
-    ninePatch(gui.atlas[name], NinePatchParams(60, 60, 60, 60)) {
-        this
-    }

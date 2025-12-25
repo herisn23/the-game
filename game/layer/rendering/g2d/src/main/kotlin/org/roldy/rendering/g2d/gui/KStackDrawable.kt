@@ -16,6 +16,8 @@ class KStackDrawable : BaseDrawable() {
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
         drawables.forEach { it.draw(batch, x, y, width, height) }
     }
+
+
 }
 
 @DrawableDsl

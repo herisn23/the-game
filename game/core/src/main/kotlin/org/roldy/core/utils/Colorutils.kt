@@ -35,6 +35,9 @@ fun alpha(alpha: Float): Color =
         alpha
     )
 
+fun hex(hex: String): Color =
+    Color.valueOf(hex)
+
 fun color(red: Float, green: Float, blue: Float, alpha: Float): Color =
     Color(red, green, blue, alpha)
 

@@ -3,7 +3,6 @@ package org.roldy.gui.button
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.utils.alpha
-import org.roldy.core.utils.get
 import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
@@ -12,16 +11,14 @@ import org.roldy.rendering.g2d.gui.*
 context(gui: GuiContext)
 fun <S> KWidget<S>.squareButton(
     icon: Drawable,
-    init: (@Scene2dDsl KImageButton).() -> Unit = {}
-): KImageButton {
-    lateinit var button: KImageButton
-    table(true) {
-        image(gui.atlas["Button_Square_Background"])
-
+    init: (@Scene2dDsl KImageButton).(S) -> Unit = {}
+): KTable {
+    return table(true) { cell ->
+        image(gui.region { Button_Square_Background })
         table(true) {
             pad(18f)
-            image(gui.atlas["Button_Square_Foreground"]) {
-                color = gui.colors.default
+            image(gui.region { Button_Square_Foreground }) {
+                color = gui.colors.primary
             }
             imageButton(
                 buttonDrawable(
@@ -34,10 +31,8 @@ fun <S> KWidget<S>.squareButton(
                 )
             ) {
                 image(icon)
-                button = this
-                init()
+                init(cell)
             }
         }
     }
-    return button
 }
