@@ -34,3 +34,26 @@ fun <A, C : KContext> ninePatch(
     val drawable = NinePatchDrawable(ninePatch)
     return element(drawable)
 }
+
+@NinePatchDsl
+context(_: C)
+fun <C : KContext> ninePatch(
+    region: TextureRegion,
+    left: Int = 0,
+    right: Int = 0,
+    top: Int = 0,
+    bottom: Int = 0
+): NinePatchDrawable {
+    val ninePatch = NinePatch(region, left, right, top, bottom)
+    return NinePatchDrawable(ninePatch)
+}
+
+@NinePatchDsl
+fun ninePatchParams(
+    clip: Int = 0,
+    left: Int = clip,
+    right: Int = clip,
+    top: Int = clip,
+    bottom: Int = clip,
+) =
+    NinePatchParams(left, right, top, bottom)

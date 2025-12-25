@@ -15,6 +15,10 @@ class I18N(
     defaultLocale: Locale = Locale.ENGLISH
 ) {
 
+    init {
+        I18NBundle.setExceptionOnMissingKey(false)
+    }
+
 
     var locale by Delegates.observable(defaultLocale) { _, _, newValue ->
         listeners.forEach {

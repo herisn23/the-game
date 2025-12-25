@@ -11,3 +11,7 @@ annotation class Scene2dCallbackDsl
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class NinePatchDsl
+
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class DrawableDsl

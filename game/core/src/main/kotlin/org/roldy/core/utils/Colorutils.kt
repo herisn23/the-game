@@ -29,7 +29,7 @@ fun randomColor(random: Random) =
         1f
     )
 
-fun transparentColor(alpha: Float): Color =
+fun alpha(alpha: Float): Color =
     Color(
         1f, 1f, 1f,
         alpha

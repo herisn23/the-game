@@ -6,20 +6,20 @@ import org.roldy.rendering.g2d.gui.*
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.worldPopup() = popupNinePatch {
-    val topLeft = popupNinePatch("Popup_Top_Left")
-    val topRight = popupNinePatch("Popup_Top_Right")
-    val bottomLeft = popupNinePatch("Popup_Bottom_Left")
-    val bottomRight = popupNinePatch("Popup_Bottom_Right")
-    popup(
-        KPopup.Backgrounds(
-            topLeft.tint(gui.colors.default),
-            topRight.tint(gui.colors.default),
-            bottomLeft.tint(gui.colors.default),
-            bottomRight.tint(gui.colors.default)
+fun <S> KWidget<S>.worldAnchoredPopup(): KClampingPopup {
+    val topLeft = popupNinePatch("Popup_Top_Left").tint(gui.colors.default)
+    val topRight = popupNinePatch("Popup_Top_Right").tint(gui.colors.default)
+    val bottomLeft = popupNinePatch("Popup_Bottom_Left").tint(gui.colors.default)
+    val bottomRight = popupNinePatch("Popup_Bottom_Right").tint(gui.colors.default)
+    return clampingPopup(
+        KClampingPopup.Backgrounds(
+            topLeft,
+            topRight,
+            bottomLeft,
+            bottomRight
         )
     ) {
-        padding = 20f
+        padding = 10f
     }
 }
 

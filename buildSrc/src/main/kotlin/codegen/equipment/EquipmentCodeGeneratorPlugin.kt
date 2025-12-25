@@ -10,6 +10,7 @@ class EquipmentCodeGeneratorPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Register the code generation task
         val generateTask = project.tasks.register<GenerateClassesTask>("generateAssetsClasses") {
+
             group = "code generation"
             description = "Generates Java/Kotlin classes before compilation"
 

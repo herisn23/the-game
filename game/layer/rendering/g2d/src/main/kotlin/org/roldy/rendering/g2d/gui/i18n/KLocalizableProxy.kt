@@ -14,24 +14,5 @@ fun <A> localizable(
     val actor = init {
         ctx.i18n[key()]
     }
-    ctx.i18n.addOnLocaleChangedListener(actor::updateText)
     return actor
 }
-
-data class KLocalizableProxy<A : Actor>(
-    val actor: A,
-    private val onRemove: () -> Unit
-) {
-    fun remove(): Boolean =
-        actor.remove().also { onRemove() }
-}
-
-context(ctx: I18NContext)
-fun <TA, A : Actor> TA.removable(actor: A) where TA : TextActor, TA : Actor =
-    KLocalizableProxy(actor) {
-        ctx.i18n.removeOnLocaleChangedListener(::updateText)
-    }
-
-context(ctx: I18NContext)
-fun <TA> TA.removable() where TA : TextActor, TA : Actor =
-    removable(this)

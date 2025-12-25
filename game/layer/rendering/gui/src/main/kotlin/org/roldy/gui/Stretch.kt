@@ -4,8 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 
 
 fun Actor.stretch(
-    width: Float,
-    height: Float,
     stretch: Float = 0f,
     left: Float = stretch,
     right: Float = stretch,

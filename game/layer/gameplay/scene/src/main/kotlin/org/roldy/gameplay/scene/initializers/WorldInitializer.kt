@@ -31,6 +31,8 @@ import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.processor.RefreshingProcessor
 import org.roldy.gui.WorldGUI
+import org.roldy.gui.label
+import org.roldy.gui.popup.minePopup
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -64,7 +66,7 @@ fun AutoDisposable.createWorldScreen(
     val (tiledMap, terrainData) = mapCreator.create()
 
     val camera = OrthographicCamera().apply {
-        zoom = 20f
+        zoom = 3f
         position.set(Gdx.graphics.width.toFloat() / 2, Gdx.graphics.height.toFloat() / 2, 1f)
     }
 
@@ -94,7 +96,7 @@ fun AutoDisposable.createWorldScreen(
         }
     }
 
-    val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
+    val zoom = ZoomInputProcessor(keybinds, camera, 2f, 10f)
 
 
     var foundMine: MineState? = null
@@ -141,10 +143,16 @@ fun AutoDisposable.createWorldScreen(
             val flippedY = Gdx.graphics.height - world.y
             return world.x.toInt() x flippedY.toInt()
         }
+        gui.tileTooltip.first.hide()
 
+        val mine = gameState.mines.find { mine -> mine.coords == coords }
+        mine?.let {
+            gui
+                .showTileInfo({ popup->
+                    minePopup(popup, it)
+                }, ::screen)
+        }
 
-        val mine = gameState.mines.find { mine -> mine.coords == coords }?.harvestable?.name ?: "no mine"
-        gui.showTileInfo(screen(), mine).followPosition = ::screen
     }
 
     screen = WorldScreen(

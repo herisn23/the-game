@@ -14,7 +14,10 @@ class KLabel(
     style: LabelStyle
 ) : Label(text(), style), TextActor {
     override fun updateText() {
-        setText(text())
+        val newText = text()
+        if (!textEquals(newText)) {//update text only when its changed
+            setText(newText)
+        }
     }
 }
 

@@ -26,16 +26,16 @@ class I18NCodeGenPlugin : Plugin<Project> {
         }
 
         // Make compilation depend on code generation
-        project.tasks.named("compileJava") {
+        project.tasks.named("classes") {
             dependsOn(generateTask)
         }
 
-        // If using Kotlin
-        project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            project.tasks.named("compileKotlin") {
-                dependsOn(generateTask)
-            }
-        }
+//        // If using Kotlin
+//        project.plugins.withId("org.jetbrains.kotlin.jvm") {
+//            project.tasks.named("compileKotlin") {
+//                dependsOn(generateTask)
+//            }
+//        }
     }
 
 }
