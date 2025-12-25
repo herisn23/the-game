@@ -4,7 +4,7 @@ import org.roldy.rendering.g2d.gui.*
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.label(text: () -> String, fontSize: Int = 25) =
+fun <S> KWidget<S>.label(text: () -> String, fontSize: Int = 25, autoupdate: Boolean = true) =
     label(text, labelStyle {
         font = gui.font(fontSize) {}
 
@@ -14,5 +14,6 @@ fun <S> KWidget<S>.label(text: () -> String, fontSize: Int = 25) =
          */
         font.data.markupEnabled = true
     }) {
-        addAction(updateTextAction())
+        if (autoupdate)
+            addAction(updateTextAction())
     }

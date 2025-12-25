@@ -1,8 +1,9 @@
-package org.roldy.gui
+package org.roldy.gui.popup
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import org.roldy.core.utils.get
+import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.gui.*
 
 @Scene2dDsl

@@ -3,7 +3,11 @@ package org.roldy.gui
 import com.badlogic.gdx.Gdx
 import org.roldy.core.Vector2Int
 import org.roldy.core.i18n.t
+import org.roldy.core.utils.drawable
 import org.roldy.core.utils.sequencer
+import org.roldy.gui.button.*
+import org.roldy.gui.popup.globalPopup
+import org.roldy.gui.popup.tilePopup
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.gui.*
 
@@ -20,18 +24,20 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
             setFillParent(true)
             setSize(stage.width, stage.height)
             setPosition(0f, 0f)
-//
             mainButton(t { lang }) {
-//                onClick {
-//                    gui.i18n.locale = langs.next()
-//                }
+                onClick {
+                    gui.i18n.locale = langs.next()
+                }
             }
-
-            simpleButton(t { close })
+            squareButton(gui.atlas.drawable("Plus"))
+            circularButton(gui.atlas.drawable("Plus"))
+            circularButton(gui.atlas.drawable("Plus"), CircularButtonSize.S)
+            circularButton(gui.atlas.drawable("Plus"), CircularButtonSize.L)
+            smallButton(t { close })
         }
         stack {
             setLayoutEnabled(false)
-            this@WorldGUI.worldTooltip = worldAnchoredPopup() to gui
+            this@WorldGUI.worldTooltip = globalPopup() to gui
             this@WorldGUI.tileTooltip = tilePopup() to gui
         }
     }

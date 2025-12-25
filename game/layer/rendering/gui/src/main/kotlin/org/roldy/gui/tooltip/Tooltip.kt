@@ -1,16 +1,16 @@
-package org.roldy.gui
+package org.roldy.gui.tooltip
 
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
-import org.roldy.core.i18n.t
 import org.roldy.core.utils.get
+import org.roldy.gui.GuiContext
+import org.roldy.gui.label
 import org.roldy.rendering.g2d.gui.*
-import org.roldy.rendering.g2d.gui.i18n.localizable
 
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun Actor.simpleTooltip(
+fun Actor.textTooltip(
     text: () -> String
 ) = tooltipNinePatch {
     structuredTooltip(this) {

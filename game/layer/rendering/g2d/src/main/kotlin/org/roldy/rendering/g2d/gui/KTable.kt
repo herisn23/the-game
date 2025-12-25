@@ -53,6 +53,11 @@ fun <S, C : KContext> KWidget<S>.table(
     stackable: Boolean = false,
     build: context(C) (@Scene2dDsl KTable).(S) -> Unit
 ): KTable =
-    actor(KTable(stackable), build)
+    actor(KTable(stackable)) {
+        build(it)
+        if(stackable) {
+            grow()
+        }
+    }
 
 

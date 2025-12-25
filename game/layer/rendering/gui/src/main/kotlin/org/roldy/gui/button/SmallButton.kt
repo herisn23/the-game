@@ -1,26 +1,28 @@
-package org.roldy.gui
+package org.roldy.gui.button
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.Actor
 import org.roldy.core.i18n.I18N
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.get
+import org.roldy.gui.GuiContext
+import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.i18n.localizable
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.simpleButton(
+fun <S> KWidget<S>.smallButton(
     text: () -> I18N.Key,
     init: (@Scene2dDsl KTextButton).() -> Unit = {}
-): Actor {
+): KTextButton {
     val font = gui.font(25) {
         padTop = 0
         padBottom = 0
     }
 
     val padding = 20f
-    return table(true) {
+    lateinit var button: KTextButton
+    table(true) {
         //background
         ninePatch(gui.atlas["Button_RS_Background_Grayscale"], ninePatchParams(18)) {
             image(this) {
@@ -35,21 +37,20 @@ fun <S> KWidget<S>.simpleButton(
 //                    it.pad(20f)
                 }
             }
-            grow()
         }
         table(true) {
             pad(padding - 3) //pad to parent
             localizable(text) {
                 textButton(
-                    it, buttonStyle(
+                    it, textButtonStyle(
                         font = font,
-                        background = buttonDrawable {
-                            emptyImage(alpha(1f))
-                        },
-                        transition(
-                            normalColor = Color.WHITE alpha 0f,
-                            pressedColor = Color.WHITE alpha .1f,
-                            overColor = Color.WHITE alpha 0.2f
+                        background = buttonDrawable(
+                            drawable = emptyImage(alpha(.2f)),
+                            transition =  transition(
+                                normalColor = Color.WHITE alpha 0f,
+                                pressedColor = Color.WHITE alpha .5f,
+                                overColor = Color.WHITE alpha 1f
+                            )
                         )
                     )
                 ) {
@@ -57,10 +58,10 @@ fun <S> KWidget<S>.simpleButton(
                     padRight(padding)
                     addAction(updateTextAction())
                     init()
+                    button = this
                 }
             }
-            grow()
         }
-        grow()
     }
+    return button
 }

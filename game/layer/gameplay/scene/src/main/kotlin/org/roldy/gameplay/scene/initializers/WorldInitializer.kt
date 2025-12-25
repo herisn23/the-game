@@ -3,16 +3,11 @@ package org.roldy.gameplay.scene.initializers
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.math.Vector3
-import org.roldy.core.InputProcessorDelegate
-import org.roldy.core.TimeManager
-import org.roldy.core.Vector2Int
+import org.roldy.core.*
 import org.roldy.core.coroutines.DeltaProcessingLoop
-import org.roldy.core.div
 import org.roldy.core.keybind.keybinds
 import org.roldy.core.pathwalker.AsyncPathfindingProxy
 import org.roldy.core.utils.project
-import org.roldy.core.x
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
 import org.roldy.data.state.MineState
@@ -31,8 +26,7 @@ import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.processor.RefreshingProcessor
 import org.roldy.gui.WorldGUI
-import org.roldy.gui.label
-import org.roldy.gui.popup.minePopup
+import org.roldy.gui.popup.data.minePopupContent
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -149,7 +143,7 @@ fun AutoDisposable.createWorldScreen(
         mine?.let {
             gui
                 .showTileInfo({ popup->
-                    minePopup(popup, it)
+                    minePopupContent(popup, it)
                 }, ::screen)
         }
 

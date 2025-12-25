@@ -93,22 +93,19 @@ class KMaskedImage(
 fun mask(
     content: Drawable,
     color: Color = Color.WHITE,
-    masking: Boolean = false,
     init: @DrawableDsl KMaskedImage.() -> Unit = {}
 ): KMaskedImage =
-    KMaskedImage(content, color, masking).apply {
+    KMaskedImage(content, color, true).apply {
         init()
     }
-
 @DrawableDsl
 @JvmName("stackmask")
 fun KStackDrawable.mask(
     content: Drawable,
     color: Color = Color.WHITE,
-    masking: Boolean = false,
     init: @DrawableDsl KMaskedImage.() -> Unit = {}
 ): KMaskedImage =
-    KMaskedImage(content, color, masking).apply {
+    KMaskedImage(content, color, true).apply {
         init()
         add(this)
     }

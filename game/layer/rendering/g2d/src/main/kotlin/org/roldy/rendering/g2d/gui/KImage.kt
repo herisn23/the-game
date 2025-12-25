@@ -18,11 +18,11 @@ class KImage : Image {
 @Scene2dDsl
 context(_: C)
 fun <S, C : KContext> KWidget<S>.image(
-    patch: Drawable,
+    drawable: Drawable,
     init: context(C) (@Scene2dDsl KImage).(S) -> Unit = {}
 ): KImage {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return actor(KImage(patch), init)
+    return actor(KImage(drawable), init)
 }
 
 @OptIn(ExperimentalContracts::class)

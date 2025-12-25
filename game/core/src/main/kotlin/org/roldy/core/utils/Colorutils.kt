@@ -35,5 +35,8 @@ fun alpha(alpha: Float): Color =
         alpha
     )
 
+fun color(red: Float, green: Float, blue: Float, alpha: Float): Color =
+    Color(red, green, blue, alpha)
+
 fun randomColor(seed: Long) =
     randomColor(Random(seed))

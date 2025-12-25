@@ -1,11 +1,11 @@
-package org.roldy.gui.popup
+package org.roldy.gui.popup.data
 
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.i18n.t
 import org.roldy.data.state.MineState
 import org.roldy.gui.GuiContext
+import org.roldy.gui.button.smallButton
 import org.roldy.gui.label
-import org.roldy.gui.simpleButton
 import org.roldy.rendering.g2d.gui.KPopup
 import org.roldy.rendering.g2d.gui.KTable
 import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
@@ -14,10 +14,10 @@ import org.roldy.rendering.g2d.gui.onClick
 
 @Scene2dCallbackDsl
 context(guiContext: GuiContext)
-fun KTable.minePopup(popup: KPopup, mine: MineState) {
+fun KTable.minePopupContent(popup: KPopup, mine: MineState) {
     align(Align.left)
 
-    label({ "mine.harvestable.name" }, 35)
+    label({ mine.harvestable.name }, 35, false)
 
     row()
 
@@ -32,9 +32,9 @@ fun KTable.minePopup(popup: KPopup, mine: MineState) {
     }
 
     row()
-    simpleButton(t{close}) {
+
+    smallButton(t{close}) {
         onClick {
-            println("CLosing popup")
             popup.hide()
         }
     }
