@@ -17,7 +17,7 @@ import org.roldy.rendering.g2d.gui.*
 context(gui: GuiContext)
 fun <S> KWidget<S>.mainButton(
     text: TextManager,
-    init: (@Scene2dDsl KTextButton).() -> Unit = {}
+    init: (@Scene2dDsl KTextButton).(S) -> Unit = {}
 ): KTextButton {
     val font = gui.font(60) {
         padTop = 0
@@ -25,12 +25,12 @@ fun <S> KWidget<S>.mainButton(
     }
     val padding = 30f
     lateinit var button: KTextButton
-    table(true) {
+    table(true) { cell ->
         //background
         buttonRLBackground {
             image(this)
         }
-        table {
+        table(true) {
             pad(padding)
             buttonRLForeground {
                 image(tint(gui.colors.primary))
@@ -55,7 +55,7 @@ fun <S> KWidget<S>.mainButton(
                         )
                     )
                 ) {
-                    init()
+                    init(cell)
                     button = this
                 }
             }

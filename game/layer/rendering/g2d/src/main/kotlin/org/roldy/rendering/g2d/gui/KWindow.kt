@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 
 @Scene2dDsl
@@ -78,24 +79,25 @@ class KWindow : Table(), KTableWidget {
 
     @Scene2dCallbackDsl
     context(_: C)
-    fun <C : KContext> header(build: @Scene2dCallbackDsl KTable.() -> Unit) =
+    fun <C : KContext> header(build: @Scene2dCallbackDsl KTable.(Cell<*>) -> Unit) =
         table {
             debug = this@KWindow.debug
             it.growX().minWidth(0f)
-            build()
+            build(it)
         }.also {
             row()
         }
 
     @Scene2dCallbackDsl
     context(_: C)
-    fun <C : KContext> content(build: @Scene2dCallbackDsl KTable.() -> Unit) =
+    fun <C : KContext> content(build: @Scene2dCallbackDsl KTable.(Cell<*>) -> Unit) =
         table {
+            touchable = Touchable.enabled
             debug = this@KWindow.debug
             padLeft(0f)
             padRight(0f)
-            setFillParent(true)
-            build()
+//            setFillParent(true)
+            build(it)
         }
 
     fun open(onComplete: (() -> Unit)? = null) {

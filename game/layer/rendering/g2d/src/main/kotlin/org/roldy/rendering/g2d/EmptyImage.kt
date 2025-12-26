@@ -7,7 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import org.roldy.core.utils.alpha
 
 
-fun emptyImage(color: Color = alpha(1f)) = Pixmap(1, 1, Pixmap.Format.RGBA8888).run {
+fun emptyImage(
+    color: Color = alpha(1f),
+    width: Int = 1,
+    height: Int = 1,
+) = Pixmap(width, height, Pixmap.Format.RGBA8888).run {
     setColor(color)
     fill()
     TextureRegionDrawable(Texture(this)).also {

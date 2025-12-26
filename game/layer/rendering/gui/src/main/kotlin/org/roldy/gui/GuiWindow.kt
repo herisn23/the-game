@@ -1,6 +1,7 @@
 package org.roldy.gui
 
-import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import generalContainer
 import generalContainerBorder2
 import org.roldy.gui.button.squareButton
@@ -23,9 +24,10 @@ private const val OrnamentEffectWidth = 512f
 context(gui: GuiContext)
 fun <S> KWidget<S>.guiWindow(
     title: TextManager,
-    init: context(GuiContext) (@Scene2dDsl KTable).(S) -> Unit = {}
-) = window { cell ->
-    animationDuration = 0.0f
+    init: context(GuiContext) (@Scene2dDsl KTable).(Cell<*>) -> Unit = {}
+) = window {
+    touchable = Touchable.enabled
+    animationDuration = 0.1f
     dragBoxHeight = HeaderHeight
     dragBoxRightOffset = CloseButtonSize
     background = generalContainer {
@@ -90,10 +92,8 @@ fun <S> KWidget<S>.guiWindow(
     }
     content {
         pad(BorderPadding)
-        padTop(HeaderHeight + BorderPadding)
-        align(Align.top)
-        init(cell)
-
+//        padTop(HeaderHeight + BorderPadding)
+        init(it)
     }
     pack()
     setPosition(

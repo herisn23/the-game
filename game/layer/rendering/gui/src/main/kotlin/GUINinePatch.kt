@@ -71,8 +71,24 @@ fun <A> generalContainer(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
 
 @NinePatchDsl
 context(gui: GuiContext)
+fun <A> generalContainer2(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
+    ninePatch(gui.region { General_Container_2 }, ninePatchParams(80), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> generalContainerBorder(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
+    ninePatch(gui.region { General_Container_Border }, ninePatchParams(18), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
 fun <A> generalContainerBorder2(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { General_Container_Border_2 }, ninePatchParams(52), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> generalContainerBorder3(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
+    ninePatch(gui.region { General_Container_Border_3 }, ninePatchParams(40), element)
+
 
 @NinePatchDsl
 context(gui: GuiContext)
@@ -136,20 +152,17 @@ context(gui: GuiContext)
 fun <A> slotHover(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { Slot_Hover }, ninePatchParams(26), element)
 
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> separatorHorizontal(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Separator_Horizontal }, ninePatchParams(left = 10, right = 10), element)
 
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> separatorVertical(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Separator_Horizontal }, ninePatchParams(top = 8, bottom = 8), element)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> separatorVertical2(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Separator_Horizontal }, ninePatchParams(top = 12, bottom = 12), element)

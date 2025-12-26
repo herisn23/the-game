@@ -1,58 +1,93 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.data.item.ItemGrade
+import org.roldy.gui.button.mainButton
 import org.roldy.rendering.g2d.gui.*
+import separatorHorizontal
 import kotlin.properties.Delegates
-import kotlin.random.Random
 
 private const val MaxCountDisplay = 99
 private const val Columns = 8
 private const val Rows = 8
 private const val CellPadding = 5f
-
-context(gui: GuiContext)
-val defaultScrollPaneStyle
-    get() =
-        scrollPaneStyle {
-
-        }
+private const val GridWidth = Columns * SlotSize + Columns * (CellPadding * 2) + SlotSize + CellPadding * 2 + 55
+private const val GridHeight = Rows * SlotSize - SlotSize / 2 - 2
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> KWidget<S>.inventory() =
-    guiWindow(translate { inventory }) {
-        val grades = ItemGrade.entries
-        scrollPane({
-            it.height(Rows * SlotSize)
-            setFadeScrollBars(false)
-            setScrollBarPositions(true, true)
-            setScrollingDisabled(true, false)
-        }, defaultScrollPaneStyle) {
-            table {
-                ScrollPane(this).apply {
-                    this.setSize(4004f, 1000f)
-                }
-                defaults().pad(CellPadding)
-                repeat(64) { i ->
-                    inventorySlot {
-                        grade = grades.random()
-                        count = Random.nextInt(0, 10000)
-                        onClick {
-                            setIcon(gui.drawable { Icon_Sword_128 })
-                        }
-                    }
-                    if ((i + 1) % Columns == 0) {
-                        row()
+    guiWindow(translate { inventory }) { contentCell ->
+        contentCell.top().grow()
+        lateinit var grid: KGrid
+        val pool = pool<Actor, GuiContext>(100) {
+            {
+                inventorySlot {
+                    onClick {
+
                     }
                 }
             }
         }
 
+        @Scene2dCallbackDsl
+        fun addSlot() {
+            with(pool) {
+                grid.pull()
+            }
+        }
+        table {
+            scroll({
+                it.width(GridWidth)
+                    .height(GridHeight)
+                    .align(Align.topLeft)
+                    .fill()
+            }) {
+                grid(Columns, CellPadding) {
+                    pad(15f)
+                    align(Align.topLeft)
+                    grid = this
+                    repeat(49) {
+                        addSlot()
+                    }
+                }
+            }
+        }
+        row()
+        buttons {
+            mainButton(string { "Remove" }) {
+                it.left().expand()
+                onClick {
+                    pool.push(grid.children.first())
+                }
+            }
+            mainButton(string { "Add" }) {
+                it.right().expand()
+                onClick {
+                    addSlot()
+
+                }
+            }
+        }
     }
+
+@Scene2dDsl
+context(gui: GuiContext)
+private fun KTable.buttons(build: (@Scene2dDsl KTable).() -> Unit = {}) {
+    image(separatorHorizontal { this }) {
+        it.fillX().pad(-30f).padTop(1f).padBottom(1f)
+    }
+    row()
+    table { bottomCell ->
+        bottomCell.fill().padRight(20f)
+        row()
+        build()
+    }
+}
+
 
 @Scene2dCallbackDsl
 data class InventorySlot(
@@ -81,15 +116,21 @@ data class InventorySlot(
         slot.onClick(onClick)
     }
 
-    fun setIcon(drawable: Drawable) {
+    fun setIcon(drawable: Drawable?) {
         slot.setIcon(drawable)
+    }
+
+    fun clean() {
+        setIcon(null)
+        grade = null
+        count = null
     }
 }
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.inventorySlot(ref: (@Scene2dDsl InventorySlot).() -> Unit = {}) =
-    slot {
+fun <S> KWidget<S>.inventorySlot(ref: (@Scene2dDsl InventorySlot).(KTable) -> Unit = {}) =
+    slot { slotTable ->
         var gradeText = ""
         var countText = ""
         lateinit var label: KLabel
@@ -126,6 +167,6 @@ fun <S> KWidget<S>.inventorySlot(ref: (@Scene2dDsl InventorySlot).() -> Unit = {
                 autoupdate()
             }
         }
-        slot.ref()
+        slot.ref(slotTable)
     }
 

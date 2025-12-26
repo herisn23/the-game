@@ -21,7 +21,7 @@ data class Slot(
         button.onClick(onClick)
     }
 
-    fun setIcon(drawable: Drawable) {
+    fun setIcon(drawable: Drawable?) {
         icon.drawable = drawable
     }
 
@@ -33,9 +33,10 @@ data class Slot(
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> KWidget<S>.slot(
-    init: (@Scene2dDsl Slot).() -> Unit = {}
+    init: (@Scene2dDsl Slot).(KTable) -> Unit = {}
 ): KTable =
     table(true) {
+        val slotTable = this
         image(gui.region { Slot_Background })
         lateinit var icon: KImage
         lateinit var content: KTable
@@ -68,7 +69,7 @@ fun <S> KWidget<S>.slot(
                     )
                 )
             ) {
-                Slot(this, icon, content).init()
+                Slot(this, icon, content).init(slotTable)
             }
         }
     }
