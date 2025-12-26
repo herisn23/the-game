@@ -2,11 +2,11 @@ package org.roldy.gui.popup
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import org.roldy.gui.GuiContext
+import org.roldy.gui.tooltipBackground
 import org.roldy.rendering.g2d.gui.KStandardPopup
 import org.roldy.rendering.g2d.gui.KWidget
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.standardPopup
-import tooltipBackground
 
 @Scene2dDsl
 context(gui: GuiContext)

@@ -1,7 +1,6 @@
 package org.roldy.gui
 
 import org.roldy.core.Vector2Int
-import org.roldy.gui.popup.globalPopup
 import org.roldy.gui.popup.tilePopup
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.gui.*
@@ -9,13 +8,11 @@ import org.roldy.rendering.g2d.gui.*
 
 class WorldGUI : AutoDisposableAdapter(), Gui {
 
-    lateinit var worldTooltip: Pair<KClampingPopup, GuiContext>
     lateinit var tileTooltip: Pair<KStandardPopup, GuiContext>
 
     val stage = gui(1f) { gui ->
         stack {
             setLayoutEnabled(false)
-            this@WorldGUI.worldTooltip = globalPopup() to gui
             this@WorldGUI.tileTooltip = tilePopup() to gui
         }
         example()
@@ -29,7 +26,7 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
                 show {
                     content(it)
                 }
-                followPosition = follow
+                position = follow
             }
         }
         return popup
@@ -37,11 +34,6 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
 
     override fun resize(width: Int, height: Int) {
         stage.resize(width, height)
-
-//        // Force update mouse position after resize
-//        val mouseX = Gdx.input.x
-//        val mouseY = Gdx.input.y
-//        stage.mouseMoved(mouseX, mouseY);
     }
 
     context(delta: Float)

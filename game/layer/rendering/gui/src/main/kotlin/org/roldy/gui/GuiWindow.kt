@@ -2,16 +2,8 @@ package org.roldy.gui
 
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
-import generalContainer
-import generalContainerBorder2
 import org.roldy.gui.button.squareButton
 import org.roldy.rendering.g2d.gui.*
-import windowHeaderBackground
-import windowHeaderBorder
-import windowHeaderMiddleGlow
-import windowHeaderOrnament
-import windowHeaderOrnamentEffect
-import windowHeaderOverlay
 
 
 private const val HeaderHeight = 140f

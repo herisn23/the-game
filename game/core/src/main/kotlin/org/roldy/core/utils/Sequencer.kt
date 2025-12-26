@@ -54,5 +54,8 @@ class Sequencer<T>(
 fun <T> sequencer(list: ()->List<T>) = lazy {
     Sequencer(list())
 }
+fun <T> sequencer(vararg list: T) = lazy {
+    Sequencer(list.toList())
+}
 
 fun <T> sequencer(list: List<T>) = Sequencer(list)

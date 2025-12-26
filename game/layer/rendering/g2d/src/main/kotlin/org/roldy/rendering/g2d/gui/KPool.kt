@@ -3,6 +3,10 @@ package org.roldy.rendering.g2d.gui
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Pool
 
+interface PoolItem {
+    fun clean()
+}
+
 @Scene2dCallbackDsl
 class KPool<A : Actor>(
     val getActor: KPool<A>.() -> KWidget<Unit>.() -> A,
@@ -26,6 +30,10 @@ class KPool<A : Actor>(
     fun push(actor: A): Unit =
         this@KPool.free(actor).also {
             actor.remove()
+
+            if (actor.userObject is PoolItem) {
+                (actor.userObject as PoolItem).clean()
+            }
         }
 
     override fun <T : Actor> storeActor(actor: T) {

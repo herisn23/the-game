@@ -1,11 +1,11 @@
 package org.roldy.gui.button
 
-import buttonRSBackgroundGrayscale
-import buttonRSBorder2
 import com.badlogic.gdx.graphics.Color
 import org.roldy.core.utils.alpha
 import org.roldy.gui.GuiContext
 import org.roldy.gui.TextManager
+import org.roldy.gui.buttonRSBackgroundGrayscale
+import org.roldy.gui.buttonRSBorder2
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 

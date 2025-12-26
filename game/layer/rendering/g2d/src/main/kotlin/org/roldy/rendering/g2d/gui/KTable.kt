@@ -20,9 +20,9 @@ class KTable(
         if (stackable) {
             if (stack == null) {
                 stack = add(Stack())
-                stack()
             }
             stack?.actor?.addActor(actor)
+            stack()
             return stack!! as Cell<T>
         } else {
             return super.storeActor(actor)
@@ -39,11 +39,8 @@ interface KTableWidget : KWidget<Cell<*>> {
 
     fun <T : Actor> add(actor: T): Cell<T>
 
-    override fun <T : Actor> storeActor(actor: T): Cell<T> {
-        val cell = add(actor)
-        actor.userObject = cell
-        return cell
-    }
+    override fun <T : Actor> storeActor(actor: T): Cell<T> =
+        add(actor)
 }
 
 
@@ -55,7 +52,7 @@ fun <S, C : KContext> KWidget<S>.table(
 ): KTable =
     actor(KTable(stackable)) {
         build(it)
-        if(stackable) {
+        if (stackable) {
             grow()
         } else {
             pack()

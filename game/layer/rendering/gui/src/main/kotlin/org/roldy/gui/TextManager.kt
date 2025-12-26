@@ -40,3 +40,9 @@ fun string(text: () -> String) =
     TextManager(
         text = text
     )
+
+@Scene2dCallbackDsl
+fun string(text: String) =
+    TextManager(
+        text = { text }
+    )

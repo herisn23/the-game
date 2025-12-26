@@ -1,6 +1,7 @@
 package org.roldy.rendering.g2d.gui
 
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 
 @Scene2dDsl
@@ -22,9 +23,8 @@ class KGrid(
         storing = false
 
         actors.forEach { actor ->
-            val cell = add(actor)
+            add(actor)
             newRowIfNecessary()
-            actor.userObject = cell
         }
     }
 
@@ -54,6 +54,7 @@ class KGrid(
     }
 
     init {
+        touchable = Touchable.childrenOnly
         defaults().pad(padding)
     }
 

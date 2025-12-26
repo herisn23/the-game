@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.utils.alpha
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
-import slotHover
 import kotlin.properties.Delegates
 
 const val SlotSize = 126f
@@ -44,9 +43,11 @@ fun <S> KWidget<S>.slot(
     table(true) {
         val slotTable = this
         image(gui.region { Slot_Background })
+
         lateinit var icon: KImage
         lateinit var content: KTable
         lateinit var button: KImageButton
+
         table(true) {
             pad(8f)
             image(emptyImage(alpha(0f))) {
@@ -58,7 +59,7 @@ fun <S> KWidget<S>.slot(
             content = this
         }
         table(true) {
-            pad(-3f)
+            pad(3f)
 
             imageButton(
                 buttonDrawable(
@@ -75,10 +76,10 @@ fun <S> KWidget<S>.slot(
             }
         }
         table(true) {
+            touchable = Touchable.disabled
             image(
                 emptyImage(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
                     if (button.isDisabled) {
-
                         draw(x, y, width, height)
                     }
                 })

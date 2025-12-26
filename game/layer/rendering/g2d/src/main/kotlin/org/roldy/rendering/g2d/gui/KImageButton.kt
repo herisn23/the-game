@@ -16,7 +16,6 @@ class KImageButton(
 ) : ImageButton(
     ImageButtonStyle().apply {
         imageUp = emptyImage(alpha(0f))
-        imageDisabled = disabled
     }
 ), KTableWidget, KButton {
     val normalState = KButtonDrawableManager(drawable, this)

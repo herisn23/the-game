@@ -8,10 +8,10 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.x
 import kotlin.properties.Delegates
 
-abstract class KPopup: Container<Stack>(Stack())  {
+abstract class KPopup : Container<Stack>(Stack()) {
     protected val table = KTable()
     protected val tmp = Vector2()
-    var followPosition: () -> Vector2Int = { 0 x 0 }
+    var position: () -> Vector2Int = { 0 x 0 }
 
     var padding by Delegates.observable(0f) { _, _, newValue ->
         this.table.pad(newValue)
@@ -27,6 +27,7 @@ abstract class KPopup: Container<Stack>(Stack())  {
         super.act(delta)
         updatePosition()
     }
+
     protected abstract fun updatePosition()
 
     fun show(position: Vector2Int, content: KTable.(KPopup) -> Unit) {
@@ -41,8 +42,12 @@ abstract class KPopup: Container<Stack>(Stack())  {
         showAt(position)
     }
 
+    fun clean() {
+        table.clear()
+    }
+
     fun show(content: KTable.(KPopup) -> Unit) {
-        show(followPosition(), content)
+        show(position(), content)
     }
 
     fun hide() {
@@ -50,8 +55,9 @@ abstract class KPopup: Container<Stack>(Stack())  {
         pack()
         isVisible = false
     }
+
     fun showAt(screen: Vector2Int) {
-        followPosition = { screen }
+        position = { screen }
         if (stage != null) {
             // Convert screen coords to stage coords
             updatePosition()
@@ -59,8 +65,8 @@ abstract class KPopup: Container<Stack>(Stack())  {
         }
     }
 
-    protected fun calculatePosition(): Vector2 {
-        val screen = followPosition()
+    internal fun calculatePosition(): Vector2 {
+        val screen = position()
         val vec = stage.screenToStageCoordinates(tmp.set(screen.x.toFloat(), screen.y.toFloat()))
         return vec
     }

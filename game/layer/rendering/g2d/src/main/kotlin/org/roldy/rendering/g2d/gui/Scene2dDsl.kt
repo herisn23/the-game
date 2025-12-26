@@ -2,7 +2,6 @@ package org.roldy.rendering.g2d.gui
 
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
-@Suppress("FunctionName")
 annotation class Scene2dDsl
 
 @DslMarker

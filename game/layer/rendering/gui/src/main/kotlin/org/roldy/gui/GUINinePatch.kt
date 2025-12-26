@@ -1,8 +1,7 @@
+package org.roldy.gui
+
 import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
-import org.roldy.gui.GUITexture
-import org.roldy.gui.GUITextures
-import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.gui.NinePatchDsl
 import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
 import org.roldy.rendering.g2d.gui.ninePatch

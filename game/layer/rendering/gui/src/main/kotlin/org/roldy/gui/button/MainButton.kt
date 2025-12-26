@@ -1,15 +1,9 @@
 package org.roldy.gui.button
 
-import buttonRLBackground
-import buttonRLForeground
-import buttonRLHover
-import buttonRLOverlay1
-import buttonRLOverlay2
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.brighter
-import org.roldy.gui.GuiContext
-import org.roldy.gui.TextManager
+import org.roldy.gui.*
 import org.roldy.rendering.g2d.gui.*
 
 

@@ -3,12 +3,12 @@ package org.roldy.gui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
+import org.roldy.core.cast
 import org.roldy.data.item.ItemGrade
 import org.roldy.gui.button.mainButton
+import org.roldy.gui.popup.popup
 import org.roldy.rendering.g2d.gui.*
-import separatorHorizontal
 import kotlin.properties.Delegates
-import kotlin.random.Random
 
 private const val MaxCountDisplay = 99
 private const val Columns = 8
@@ -19,62 +19,220 @@ private const val GridHeight = Rows * SlotSize - SlotSize / 2
 private const val MinCells = 48
 
 @Scene2dCallbackDsl
-class Inventory(
-//    private val grid: KGrid
-) {
+data class InventorySlot<T>(
+    private val inventory: Inventory<T>,
+    private val table: KTable,
+    private val slot: Slot,
+    private val onRemoved: () -> Unit,
+    private val setGrade: (ItemGrade?) -> Unit,
+    private val setCount: (String) -> Unit
+) : PoolItem {
+    var slotData: Data<T>? = null
+    internal lateinit var tooltip: KContextualPopup
 
-    private val slotListeners: MutableList<InventorySlot.() -> Unit> = mutableListOf()
+    data class Data<A>(
+        val icon: Drawable,
+        val grade: ItemGrade? = null,
+        val count: Int? = null,
+        val item: A,
+        val tooltip: (@Scene2dCallbackDsl KTable).(Data<A>) -> Unit
+    )
 
-    fun onSlotClick(onClick: InventorySlot.() -> Unit) {
-        slotListeners.add(onClick)
+    val occupied get() = slotData != null
+
+    var isDisabled: Boolean
+        get() = slot.isDisabled
+        set(value) {
+            slot.isDisabled = value
+        }
+
+    var grade: ItemGrade? by Delegates.observable(null) { _, _, newValue ->
+        newValue?.let {
+            setGrade(newValue)
+        } ?: setGrade(null)
+    }
+    var count: Int? by Delegates.observable(null) { _, _, newValue ->
+        newValue?.let {
+            setCount(newValue.clampToString())
+        } ?: setCount("")
     }
 
-    internal fun invokeClick(slot: InventorySlot) {
-        slotListeners.forEach {
-            slot.it()
+    private fun Int.clampToString() =
+        when (this > MaxCountDisplay) {
+            true -> "99+"
+            false -> toString()
         }
+
+    fun onClick(onClick: InventorySlot<T>.() -> Unit) {
+        slot.onClick {
+            this.onClick()
+        }
+    }
+
+    fun setData(data: Data<T>) {
+        this.slotData = data
+        this.count = data.count
+        this.grade = data.grade
+        tooltip {
+            with(data) {
+                tooltip(data)
+            }
+        }
+        setIcon(data.icon)
+    }
+
+    fun setIcon(drawable: Drawable?) {
+        slot.setIcon(drawable)
+    }
+
+
+    fun tooltip(content: KTable.() -> Unit) {
+        this.tooltip.content {
+            content()
+        }
+    }
+
+    override fun clean() {
+        setIcon(null)
+        grade = null
+        count = null
+        isDisabled = false
+        slotData = null
+        tooltip.clean()
+    }
+
+    fun remove() {
+        table.remove()
+        onRemoved()
     }
 }
 
-@Scene2dDsl
-context(gui: GuiContext)
-fun <S> KWidget<S>.inventory(
-    init: (@Scene2dDsl Inventory).() -> Unit = {},
-) =
-    guiWindow(translate { inventory }) { contentCell ->
-        contentCell.top().grow()
-        lateinit var grid: KGrid
-        val inventory = Inventory()
-        val pool = pool(100) {
+fun <T> data(
+    icon: Drawable,
+    grade: ItemGrade? = null,
+    count: Int? = null,
+    item: T? = null,
+    tooltip: (@Scene2dCallbackDsl KTable).(InventorySlot.Data<T?>) -> Unit = {}
+) = InventorySlot.Data(icon, grade, count, item, tooltip)
+
+
+class Inventory<T>(
+    private val grid: KGrid,
+    private val context: GuiContext
+) {
+    var maxSlots: Int by Delegates.observable(0) { _, _, _ ->
+        updateSlots()
+    }
+
+    val slots: List<InventorySlot<T>>
+        get() = grid.children.map {
+            it.userObject.cast()
+        }
+    val pool = context(context) {
+        pool(100) {
             {
-                inventorySlot {
-                    isDisabled = Random.nextBoolean()
+                inventorySlot(this@Inventory) {
                     onClick {
-                        inventory.invokeClick(this)
+                        invokeClick(this)
+                    }
+                    tooltip = it.popup {
+                        hideCursor = true
+                        followCursor = true
+                        visible = { this@inventorySlot.occupied }
                     }
                 }
             }
         }
+    }
 
-        @Scene2dCallbackDsl
-        fun removeSlot(actor: KTable) {
-            with(pool) {
-                if(grid.children.size > MinCells) {
-                    pool.push(actor)
-                }
-            }
+    init {
+        repeat(MinCells) { // fill inventory with minimal cells to display
+            addSlot()
         }
+    }
 
-        @Scene2dCallbackDsl
-        fun addSlot() {
+    private fun updateSlots() {
+        slots.forEachIndexed { index, slot ->
+            slot.isDisabled = index > maxSlots - 1
+        }
+    }
+
+    private val slotListeners: MutableList<InventorySlot<T>.() -> Unit> = mutableListOf()
+
+    @Scene2dCallbackDsl
+    fun onSlotClick(onClick: InventorySlot<T>.() -> Unit) {
+        slotListeners.add(onClick)
+    }
+
+    internal fun invokeClick(slot: InventorySlot<T>) {
+        slotListeners.forEach {
+            slot.it()
+        }
+    }
+
+    internal fun onSlotRemoved() {
+        updateSlots()
+    }
+
+    @Scene2dCallbackDsl
+    fun addItem(data: InventorySlot.Data<T>): InventorySlot<T> {
+        var available = slots.find {
+            !it.occupied
+        }
+        if (available == null)
+            available = addSlot()
+
+        available.setData(data)
+        return available
+    }
+
+    @Scene2dCallbackDsl
+    fun setData(data: List<InventorySlot.Data<T>>) {
+        clean()
+        data.forEach(::addItem)
+        updateSlots()
+    }
+
+    @Scene2dCallbackDsl
+    fun clean() {
+        slots.forEach(InventorySlot<T>::clean)
+    }
+
+    @Scene2dCallbackDsl
+    internal fun addSlot(): InventorySlot<T> {
+        val slot = context(context) {
             with(pool) {
                 grid.pull()
             }
         }
+        updateSlots()
+        return slot.userObject.cast()
+    }
+}
+
+data class SortAction<T>(
+    val text: TextManager,
+    val action: (Inventory<T>) -> Unit
+)
+
+fun <T> sort(
+    text: TextManager,
+    action: (Inventory<T>) -> Unit
+) = SortAction(text, action)
+
+@Scene2dDsl
+context(gui: GuiContext)
+fun <S, T> KWidget<S>.inventory(
+    sortActions: List<SortAction<T>>,
+    init: (@Scene2dDsl Inventory<T>).() -> Unit = {},
+) =
+    guiWindow(translate { inventory }) { contentCell ->
+        contentCell.top().grow()
+        lateinit var grid: KGrid
         table {
             scroll({
                 it.width(GridWidth)
-                    .height(GridHeight+10)
+                    .height(GridHeight + 10)
                     .align(Align.topLeft)
                     .fill()
             }) {
@@ -82,29 +240,22 @@ fun <S> KWidget<S>.inventory(
                     pad(15f)
                     align(Align.topLeft)
                     grid = this
-                    repeat(MinCells) {
-                        addSlot()
+                }
+            }
+        }
+        val inventory = Inventory<T>(grid, gui)
+        row()
+        buttons {
+            sortActions.forEach { sort ->
+                mainButton(sort.text) {
+                    it.left().expand()
+                    onClick {
+                        sort.action(inventory)
                     }
                 }
             }
         }
-        row()
-        buttons {
-            mainButton(string { "Remove" }) {
-                it.left().expand()
-                onClick {
-                    removeSlot(grid.children.first() as KTable)
-                    println("peak: ${pool.peak}, free: ${pool.free}")
-                }
-            }
-            mainButton(string { "Add" }) {
-                it.right().expand()
-                onClick {
-                    addSlot()
-                    println("peak: ${pool.peak}, free: ${pool.free}")
-                }
-            }
-        }
+
         inventory.init()
     }
 
@@ -122,91 +273,55 @@ private fun KTable.buttons(build: (@Scene2dDsl KTable).() -> Unit = {}) {
     }
 }
 
-
-@Scene2dCallbackDsl
-data class InventorySlot(
-    private val slot: Slot,
-    private val setGrade: (String, Color) -> Unit,
-    private val setCount: (String) -> Unit
-) {
-    var isDisabled: Boolean
-        get() = slot.isDisabled
-        set(value) {
-            slot.isDisabled = value
-        }
-
-    var grade: ItemGrade? by Delegates.observable(null) { _, _, newValue ->
-        newValue?.let {
-            setGrade(newValue.name, newValue.color)
-        } ?: setGrade("", Color.WHITE)
-    }
-    var count: Int? by Delegates.observable(null) { _, _, newValue ->
-        newValue?.let {
-            setCount(newValue.clampToString())
-        } ?: setCount("")
-    }
-
-    private fun Int.clampToString() =
-        when (this > MaxCountDisplay) {
-            true -> "99+"
-            false -> toString()
-        }
-
-    fun onClick(onClick: InventorySlot.() -> Unit) {
-        slot.onClick {
-            this.onClick()
-        }
-    }
-
-    fun setIcon(drawable: Drawable?) {
-        slot.setIcon(drawable)
-    }
-
-    fun clean() {
-        setIcon(null)
-        grade = null
-        count = null
-    }
-}
-
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.inventorySlot(ref: (@Scene2dDsl InventorySlot).(KTable) -> Unit = {}) =
+fun <S, T> KWidget<S>.inventorySlot(
+    inventory: Inventory<T>,
+    ref: (@Scene2dDsl InventorySlot<T>).(KTable) -> Unit = {}
+) =
     slot { slotTable ->
-        var gradeText = ""
-        var countText = ""
-        lateinit var label: KLabel
-        val slot = InventorySlot(this, { name, color ->
-            label.color = color
-            gradeText = name
-        }, {
-            countText = it
-        })
+        lateinit var grade: ImperativeHandler<KLabel, ImperativeActionDelegate>
+        lateinit var count: ImperativeHandler<KLabel, ImperativeActionValue<String>>
 
+        val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
+            grade {
+                set(igrade)
+            }
+        }, {
+            count {
+                value = it
+            }
+        })
+        slotTable.userObject = slot
         content {
             align(Align.right)
             //grade
-            label(string { gradeText }, params = {
-                size = 30
-                color = Color.WHITE
-                borderWidth = 3f
-                borderColor = Color.BLACK
-                borderStraight = false
-            }) {
-                label = this
-                it.expandY().top().right()
-                autoupdate()
+            grade = delegate {
+                label(string { get<ItemGrade?>()?.name ?: "" }, params = {
+                    size = 30
+                    borderWidth = 3f
+                    borderColor = Color.BLACK
+                    borderStraight = false
+                }) {
+                    onChange<ItemGrade?> { grade ->
+                        color = grade?.color ?: Color.WHITE
+                    }
+                    autoupdate()
+                    it.expandY().top().right()
+                }
             }
             row()
             //count
-            label(string { countText }, params = {
-                size = 30
-                borderWidth = 3f
-                borderColor = Color.BLACK
-                borderStraight = false
-            }) {
-                it.expandY().bottom().right()
-                autoupdate()
+            count = value("") {
+                label(string { value }, params = {
+                    size = 30
+                    borderWidth = 3f
+                    borderColor = Color.BLACK
+                    borderStraight = false
+                }) {
+                    it.expandY().bottom().right()
+                    autoupdate()
+                }
             }
         }
         slot.ref(slotTable)
