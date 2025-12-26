@@ -131,6 +131,15 @@ fun <A> windowHeaderOverlay(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { Window_Header_Overlay }, ninePatchParams(42), element)
 
 
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> slotHover(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Slot_Hover }, ninePatchParams(26), element)
+
+
+
+
+
 
 
 

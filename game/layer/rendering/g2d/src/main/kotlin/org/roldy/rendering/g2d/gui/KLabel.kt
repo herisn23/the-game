@@ -8,7 +8,7 @@ import kotlin.contracts.contract
 
 @Scene2dDsl
 class KLabel(
-    val text: () -> String,
+    private var text: () -> String,
     style: LabelStyle
 ) : Label(text(), style), TextActor {
     override fun updateText() {
@@ -16,6 +16,11 @@ class KLabel(
         if (!textEquals(newText)) {//update text only when its changed
             setText(newText)
         }
+    }
+
+    fun setText(newText: () -> String) {
+        text = newText
+        updateText()
     }
 }
 

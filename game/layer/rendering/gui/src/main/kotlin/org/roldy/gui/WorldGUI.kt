@@ -13,7 +13,6 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
     lateinit var tileTooltip: Pair<KStandardPopup, GuiContext>
 
     val stage = gui(1f) { gui ->
-        val stage = this
         stack {
             setLayoutEnabled(false)
             this@WorldGUI.worldTooltip = globalPopup() to gui

@@ -98,6 +98,17 @@ fun mask(
     KMaskedImage(content, color, true).apply {
         init()
     }
+
+@DrawableDsl
+fun KStackDrawable.maskable(
+    content: Drawable,
+    color: Color = Color.WHITE,
+    init: @DrawableDsl KMaskedImage.() -> Unit = {}
+): KMaskedImage =
+    KMaskedImage(content, color, false).apply {
+        init()
+        add(this)
+    }
 @DrawableDsl
 @JvmName("stackmask")
 fun KStackDrawable.mask(

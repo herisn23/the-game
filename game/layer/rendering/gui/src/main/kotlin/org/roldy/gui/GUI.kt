@@ -37,15 +37,16 @@ data class GuiContext(
         textures.get()
 
     fun region(get: GUITextures.() -> GUITexture): TextureAtlas.AtlasRegion =
-        textures.get().region()
+        this(get).region()
 
     fun drawable(get: GUITextures.() -> GUITexture): TextureRegionDrawable =
-        textures.get().drawable()
+        this(get).drawable()
 
 }
 
 @Scene2dDsl
-fun Gui.gui(scale: Float = 1f, build: context(GuiContext) (@Scene2dDsl KStage).(GuiContext) -> Unit): KStage {
+fun Gui.gui(scale: Float = 1f,
+            build: context(GuiContext) (@Scene2dDsl KStage).(GuiContext) -> Unit): KStage {
     val atlas by disposable { AtlasLoader.gui }
     val colors = GUIColors(
         primary = hex("FF463D"),//FF463D

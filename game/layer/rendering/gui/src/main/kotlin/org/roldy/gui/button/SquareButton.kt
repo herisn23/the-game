@@ -12,8 +12,8 @@ context(gui: GuiContext)
 fun <S> KWidget<S>.squareButton(
     icon: Drawable,
     init: (@Scene2dDsl KImageButton).(S) -> Unit = {}
-): KTable {
-    return table(true) { cell ->
+): KTable =
+    table(true) { cell ->
         image(gui.region { Button_Square_Background })
         table(true) {
             pad(18f)
@@ -35,4 +35,3 @@ fun <S> KWidget<S>.squareButton(
             }
         }
     }
-}

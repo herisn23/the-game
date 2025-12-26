@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 class KWindow : Table(), KTableWidget {
     var keepWithinStage = true
     var draggable = true
-    var closingAlpha = 0f
+
     // Simplified: just define the Y position and height, width auto-calculates
     var dragBoxTopOffset = 0f      // Distance from top
     var dragBoxHeight = 0f         // Height of draggable area
@@ -75,6 +75,7 @@ class KWindow : Table(), KTableWidget {
             }
         )
     }
+
     @Scene2dCallbackDsl
     context(_: C)
     fun <C : KContext> header(build: @Scene2dCallbackDsl KTable.() -> Unit) =
@@ -144,6 +145,10 @@ class KWindow : Table(), KTableWidget {
             open(onComplete)
         }
     }
+
+//    override fun <T : Actor> add(actor: T): Cell<T> {
+//        return this.actor.add(actor)
+//    }
 }
 
 
