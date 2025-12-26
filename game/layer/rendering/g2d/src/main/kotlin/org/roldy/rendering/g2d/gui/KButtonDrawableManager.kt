@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.utils.alpha
 
-class KButtonManager(
+class KButtonDrawableManager(
     val background: KButtonOverlayDrawable,
     val button: Button
 ) {
@@ -20,6 +20,7 @@ class KButtonManager(
         val targetColor = when {
             button.isPressed -> background.transition.pressedColor
             button.isOver -> background.transition.overColor
+            button.isDisabled -> background.transition.disabledColor
             else -> background.transition.normalColor
         }
 
@@ -75,13 +76,17 @@ class KButtonOverlayDrawable(
         val speed: Float = 8f,
         val normalColor: Color = Color.WHITE alpha 0f,
         val pressedColor: Color = Color.WHITE alpha .25f,
-        val overColor: Color = Color.WHITE alpha .5f
+        val overColor: Color = Color.WHITE alpha .5f,
+        val disabledColor: Color = alpha(0f)
     ) {
     }
 }
 
 @DrawableDsl
-fun buttonDrawable(drawable:Drawable, transition: KButtonOverlayDrawable.Transition = KButtonOverlayDrawable.Transition()) =
+fun buttonDrawable(
+    drawable: Drawable,
+    transition: KButtonOverlayDrawable.Transition = KButtonOverlayDrawable.Transition()
+) =
     KButtonOverlayDrawable(drawable, transition)
 
 @DrawableDsl
@@ -89,5 +94,6 @@ fun transition(
     speed: Float = 8f,
     normalColor: Color,
     pressedColor: Color,
-    overColor: Color
-) = KButtonOverlayDrawable.Transition(speed, normalColor, pressedColor, overColor)
+    overColor: Color,
+    disabledColor: Color = alpha(0f)
+) = KButtonOverlayDrawable.Transition(speed, normalColor, pressedColor, overColor, disabledColor)

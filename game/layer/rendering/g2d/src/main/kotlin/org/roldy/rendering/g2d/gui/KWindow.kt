@@ -40,27 +40,29 @@ class KWindow : Table(), KTableWidget {
             object : InputListener() {
                 var startX: Float = 0f
                 var startY: Float = 0f
+                var canDrag = false
 
                 override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     toFront()
-                    if (button != Input.Buttons.LEFT) return false
-                    if (!draggable) return false
+                    if (button != Input.Buttons.LEFT) return true
+                    if (!draggable) return true
                     // Calculate drag box bounds
                     val boxLeft = dragBoxLeftOffset
                     val boxRight = width - dragBoxRightOffset
                     val boxBottom = height - dragBoxTopOffset - dragBoxHeight
                     val boxTop = height - dragBoxTopOffset
-
+                    canDrag = false
                     // Check if touch is within drag box
                     if (dragBoxHeight == .0f || x in boxLeft..boxRight && y in boxBottom..boxTop) {
                         startX = x
                         startY = y
-                        return true
+                        canDrag = true
                     }
-                    return false
+                    return true
                 }
 
                 override fun touchDragged(event: InputEvent?, x: Float, y: Float, pointer: Int) {
+                    if(canDrag)
                     if (keepWithinStage && stage != null) {
                         val newX = this@KWindow.x + (x - startX)
                         val newY = this@KWindow.y + (y - startY)
@@ -92,7 +94,6 @@ class KWindow : Table(), KTableWidget {
     context(_: C)
     fun <C : KContext> content(build: @Scene2dCallbackDsl KTable.(Cell<*>) -> Unit) =
         table {
-            touchable = Touchable.enabled
             debug = this@KWindow.debug
             padLeft(0f)
             padRight(0f)

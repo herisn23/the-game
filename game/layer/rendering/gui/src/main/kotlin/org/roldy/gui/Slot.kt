@@ -7,6 +7,7 @@ import org.roldy.core.utils.alpha
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import slotHover
+import kotlin.properties.Delegates
 
 const val SlotSize = 126f
 
@@ -28,6 +29,11 @@ data class Slot(
     fun content(cnt: KTable.() -> Unit) {
         additionalContent.cnt()
     }
+
+    var isDisabled by Delegates.observable(false) { _, _, newValue ->
+        button.isDisabled = newValue
+        button.touchable = if (!newValue) Touchable.enabled else Touchable.disabled
+    }
 }
 
 @Scene2dDsl
@@ -40,6 +46,7 @@ fun <S> KWidget<S>.slot(
         image(gui.region { Slot_Background })
         lateinit var icon: KImage
         lateinit var content: KTable
+        lateinit var button: KImageButton
         table(true) {
             pad(8f)
             image(emptyImage(alpha(0f))) {
@@ -51,12 +58,6 @@ fun <S> KWidget<S>.slot(
             content = this
         }
         table(true) {
-            pad(-9f)
-            image(gui.region { Slot_Border }) {
-                touchable = Touchable.disabled
-            }
-        }
-        table(true) {
             pad(-3f)
 
             imageButton(
@@ -65,11 +66,27 @@ fun <S> KWidget<S>.slot(
                     transition = transition(
                         normalColor = Color.WHITE alpha 0f,
                         pressedColor = Color.WHITE alpha .4f,
-                        overColor = Color.WHITE alpha 1f
+                        overColor = Color.WHITE alpha 1f,
                     )
                 )
             ) {
-                Slot(this, icon, content).init(slotTable)
+                button = this
+                Slot(button, icon, content).init(slotTable)
+            }
+        }
+        table(true) {
+            image(
+                emptyImage(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
+                    if (button.isDisabled) {
+
+                        draw(x, y, width, height)
+                    }
+                })
+        }
+        table(true) {
+            pad(-9f)
+            image(gui.region { Slot_Border }) {
+                touchable = Touchable.disabled
             }
         }
     }

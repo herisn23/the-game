@@ -21,7 +21,7 @@ class KTextButton(
     val label = KLabel(text, labelStyle {
         font = style.font
     })
-    private val manager = KButtonManager(style.background, this)
+    private val manager = KButtonDrawableManager(style.background, this)
 
     init {
         label.setAlignment(Align.center)

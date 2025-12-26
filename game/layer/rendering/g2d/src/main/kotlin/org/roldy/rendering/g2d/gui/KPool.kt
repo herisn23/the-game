@@ -3,19 +3,13 @@ package org.roldy.rendering.g2d.gui
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.Pool
 
-class KPoolActor {
-
-}
-
 @Scene2dCallbackDsl
 class KPool<A : Actor>(
-    val getActor: KPool<A>.() -> KWidget<Unit>.() -> Unit,
+    val getActor: KPool<A>.() -> KWidget<Unit>.() -> A,
     initialSize: Int,
 ) : Pool<A>(initialSize), KWidget<Unit> {
-    lateinit var latestActor: A
     override fun newObject(): A {
-        getActor()()
-        return latestActor
+        return getActor()()
     }
 
     init {
@@ -35,7 +29,7 @@ class KPool<A : Actor>(
         }
 
     override fun <T : Actor> storeActor(actor: T) {
-        this.latestActor = actor as A
+        //we can keep it empty
     }
 }
 
@@ -43,6 +37,6 @@ class KPool<A : Actor>(
 context(_: C)
 fun <A : Actor, C : KContext> pool(
     initialSize: Int = 16,
-    newActor: KPool<A>.() -> KWidget<Unit>.() -> Unit
+    newActor: KPool<A>.() -> KWidget<Unit>.() -> A
 ): KPool<A> =
     KPool(newActor, initialSize)

@@ -35,7 +35,7 @@ class KGrid(
     }
 
     override fun removeActor(actor: Actor, unfocus: Boolean): Boolean {
-        if(!storing) {
+        if (!storing) {
             actors.remove(actor)
             rebuild()
             return true
@@ -47,6 +47,7 @@ class KGrid(
     fun removeAll() {
         actors.toList().forEach(Actor::remove)
     }
+
     @Scene2dCallbackDsl
     fun remove(range: IntRange) {
         actors.subList(range.first, range.last).toList().forEach(Actor::remove)
@@ -71,4 +72,3 @@ fun <S, C : KContext> KWidget<S>.grid(
         build(it)
         pack()
     }
-

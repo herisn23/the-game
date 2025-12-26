@@ -1,7 +1,6 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.data.item.ItemGrade
@@ -9,26 +8,59 @@ import org.roldy.gui.button.mainButton
 import org.roldy.rendering.g2d.gui.*
 import separatorHorizontal
 import kotlin.properties.Delegates
+import kotlin.random.Random
 
 private const val MaxCountDisplay = 99
 private const val Columns = 8
 private const val Rows = 8
 private const val CellPadding = 5f
 private const val GridWidth = Columns * SlotSize + Columns * (CellPadding * 2) + SlotSize + CellPadding * 2 + 55
-private const val GridHeight = Rows * SlotSize - SlotSize / 2 - 2
+private const val GridHeight = Rows * SlotSize - SlotSize / 2
+private const val MinCells = 48
+
+@Scene2dCallbackDsl
+class Inventory(
+//    private val grid: KGrid
+) {
+
+    private val slotListeners: MutableList<InventorySlot.() -> Unit> = mutableListOf()
+
+    fun onSlotClick(onClick: InventorySlot.() -> Unit) {
+        slotListeners.add(onClick)
+    }
+
+    internal fun invokeClick(slot: InventorySlot) {
+        slotListeners.forEach {
+            slot.it()
+        }
+    }
+}
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.inventory() =
+fun <S> KWidget<S>.inventory(
+    init: (@Scene2dDsl Inventory).() -> Unit = {},
+) =
     guiWindow(translate { inventory }) { contentCell ->
         contentCell.top().grow()
         lateinit var grid: KGrid
-        val pool = pool<Actor, GuiContext>(100) {
+        val inventory = Inventory()
+        val pool = pool(100) {
             {
                 inventorySlot {
+                    isDisabled = Random.nextBoolean()
                     onClick {
-
+                        inventory.invokeClick(this)
                     }
+                }
+            }
+        }
+
+        @Scene2dCallbackDsl
+        fun removeSlot(actor: KTable) {
+            with(pool) {
+                if(grid.children.size > MinCells) {
+                    pool.push(actor)
                 }
             }
         }
@@ -42,7 +74,7 @@ fun <S> KWidget<S>.inventory() =
         table {
             scroll({
                 it.width(GridWidth)
-                    .height(GridHeight)
+                    .height(GridHeight+10)
                     .align(Align.topLeft)
                     .fill()
             }) {
@@ -50,7 +82,7 @@ fun <S> KWidget<S>.inventory() =
                     pad(15f)
                     align(Align.topLeft)
                     grid = this
-                    repeat(49) {
+                    repeat(MinCells) {
                         addSlot()
                     }
                 }
@@ -61,24 +93,26 @@ fun <S> KWidget<S>.inventory() =
             mainButton(string { "Remove" }) {
                 it.left().expand()
                 onClick {
-                    pool.push(grid.children.first())
+                    removeSlot(grid.children.first() as KTable)
+                    println("peak: ${pool.peak}, free: ${pool.free}")
                 }
             }
             mainButton(string { "Add" }) {
                 it.right().expand()
                 onClick {
                     addSlot()
-
+                    println("peak: ${pool.peak}, free: ${pool.free}")
                 }
             }
         }
+        inventory.init()
     }
 
 @Scene2dDsl
 context(gui: GuiContext)
 private fun KTable.buttons(build: (@Scene2dDsl KTable).() -> Unit = {}) {
     image(separatorHorizontal { this }) {
-        it.fillX().pad(-30f).padTop(1f).padBottom(1f)
+        it.fillX().padTop(1f).padBottom(1f).padLeft(10f).padRight(30f).growX()
     }
     row()
     table { bottomCell ->
@@ -95,6 +129,12 @@ data class InventorySlot(
     private val setGrade: (String, Color) -> Unit,
     private val setCount: (String) -> Unit
 ) {
+    var isDisabled: Boolean
+        get() = slot.isDisabled
+        set(value) {
+            slot.isDisabled = value
+        }
+
     var grade: ItemGrade? by Delegates.observable(null) { _, _, newValue ->
         newValue?.let {
             setGrade(newValue.name, newValue.color)
@@ -112,8 +152,10 @@ data class InventorySlot(
             false -> toString()
         }
 
-    fun onClick(onClick: () -> Unit) {
-        slot.onClick(onClick)
+    fun onClick(onClick: InventorySlot.() -> Unit) {
+        slot.onClick {
+            this.onClick()
+        }
     }
 
     fun setIcon(drawable: Drawable?) {
@@ -169,4 +211,3 @@ fun <S> KWidget<S>.inventorySlot(ref: (@Scene2dDsl InventorySlot).(KTable) -> Un
         }
         slot.ref(slotTable)
     }
-
