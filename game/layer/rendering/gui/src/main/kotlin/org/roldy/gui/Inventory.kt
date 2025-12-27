@@ -131,13 +131,13 @@ class Inventory<D>(
     internal val sortActions: MutableList<SortAction<D>> = mutableListOf()
     var dragging by Delegates.observable(false) { _, _, newValue ->
         scroll.setFlickScroll(!newValue)
-        if(newValue) {
+        if (newValue) {
             scroll.cancel()
         }
     }
     var maxSlots: Int by Delegates.observable(0) { _, _, _ ->
         updateSlots()
-        if(slots.size < maxSlots) {
+        if (slots.size < maxSlots) {
             addSlot()
         }
     }
@@ -327,9 +327,8 @@ fun <S, D> KWidget<S>.inventorySlot(
     ref: (@Scene2dDsl InventorySlot<D>).(KTable) -> Unit = {}
 ) =
     slot { slotTable ->
-
-        lateinit var grade: ImperativeHandler<KLabel, ImperativeActionValue<ItemGrade?>>
-        lateinit var count: ImperativeHandler<KLabel, ImperativeActionValue<String>>
+        lateinit var grade: Value<KLabel, ItemGrade?>
+        lateinit var count: Value<KLabel, String>
 
         val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
             grade {
