@@ -7,7 +7,10 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @Scene2dDsl
-class KScrollPane(actor: Actor, style: ScrollPaneStyle) : ScrollPane(actor, style) {
+class KScrollPane(
+    actor: Actor,
+    style: ScrollPaneStyle
+) : ScrollPane(actor, style) {
 }
 
 

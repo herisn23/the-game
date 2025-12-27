@@ -7,6 +7,7 @@ import org.roldy.core.utils.sequencer
 import org.roldy.data.item.ItemGrade
 import org.roldy.gui.button.mainButton
 import org.roldy.gui.button.smallButton
+import org.roldy.gui.button.squareButton
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import kotlin.contracts.ExperimentalContracts
@@ -20,19 +21,32 @@ fun <S> KWidget<S>.example() {
     image(emptyImage(Color.BLACK brighter 1.5f)) {
         setSize(stage.width, stage.height)
     }
-    val playerInventory = (0..30).map {
-        Random.nextInt(0, 200) to ItemGrade.entries.random()
+
+    data class InventoryItem(
+        var index: Int,
+        val grade: ItemGrade,
+        val count: Int
+    )
+
+    val playerInventory = (0..3).mapIndexed { index, item ->
+        InventoryItem(
+            index,
+            ItemGrade.entries.random(),
+            Random.nextInt(0, 200)
+
+        )
     }.toMutableList()
 
     fun data() =
-        playerInventory.map {
+        playerInventory.map { item ->
             data(
                 gui.drawable { Icon_Sword_128 },
-                it.second,
-                it.first,
-                "Item tooltip: ${it.second}"
-            ) { data->
-                pad(400f)
+                item.grade,
+                item.count,
+                item.index,
+                item
+            ) { data ->
+                pad(200f)
                 label(string { data.grade?.name ?: "" }, 60) {
                     color = data.grade?.color ?: Color.WHITE
                 }
@@ -40,38 +54,58 @@ fun <S> KWidget<S>.example() {
         }
 
     val seq by sequencer(1, 2)
+    lateinit var inv: Inventory<InventoryItem>
+    val window = inventory {
+        setData(data(), false)
+        inv = this
+        maxSlots = 58
 
-    val window = inventory(
-        listOf(
-            sort(string { "Sort 1" }) {
+        onSlotPositionChanged { from, to ->
+            // from is always not null by design
+            val fromIndex = from.slotData!!.index
 
-                playerInventory.sortBy {
-                    if (seq.current == 1) {
-                        it.second.ordinal
-                    } else {
-                        -it.second.ordinal
-                    }
-                }
-                it.setData(data())
-                seq.next()
-            },
-            sort(string { "Sort 2" }) {
-                playerInventory.sortBy {
-                    if (seq.current == 2) {
-                        it.first
-                    } else {
-                        -it.first
-                    }
-                }
-                it.setData(data())
-                seq.next()
-            }
-        )
-    ) {
-        setData(data())
-        maxSlots = 50
+            // when slot has data, pick index from existing item else pick index from grid
+            val targetIndex = to.slotData?.data?.index ?: to.gridIndex
+
+            from.slotData!!.data.index = targetIndex
+            to.slotData?.data?.index = fromIndex
+        }
+
         onSlotClick {
-
+            println("click")
+        }
+        sort(string { "Sort 1" }) {
+            playerInventory.sortBy {
+                if (seq.current == 1) {
+                    it.grade.ordinal
+                } else {
+                    -it.grade.ordinal
+                }
+            }
+            it.setData(data())
+            seq.next()
+        }
+        sort(string { "Sort 2" }) {
+            playerInventory.sortBy {
+                if (seq.current == 2) {
+                    it.count
+                } else {
+                    -it.count
+                }
+            }
+            it.setData(data())
+            seq.next()
+        }
+        sort(string { "Reset" }) {
+            playerInventory.sortBy {
+                if (seq.current == 2) {
+                    it.count
+                } else {
+                    -it.count
+                }
+            }
+            it.setData(data(), false)
+            seq.next()
         }
     }
 
@@ -84,7 +118,11 @@ fun <S> KWidget<S>.example() {
                 window.open()
             }
         }
-//        squareButton(gui.drawable { Ico_Plus })
+        squareButton(gui.drawable { Ico_Plus }) {
+            onClick {
+                inv.maxSlots += 1
+            }
+        }
 //        circularButton(gui.drawable { Ico_Plus })
 //        circularButton(gui.drawable { Ico_Plus }, CircularButtonSize.S)
 //        circularButton(gui.drawable { Ico_Plus }, CircularButtonSize.L)

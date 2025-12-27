@@ -36,6 +36,7 @@ class ImperativeActionDelegate : ImperativeActions {
     }
 }
 
+@Scene2dCallbackDsl
 class ImperativeActionValue<Value>(initial: Value) : ImperativeActions {
     var listener: DelegatedImperativeActionListener<Value>? = null
 

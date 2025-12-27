@@ -23,6 +23,7 @@ class KContextualPopup(
     private var currentAnchor: AnchorPosition = AnchorPosition.BOTTOM_RIGHT
     private var isShowing = false
     var hideCursor = false
+    var touched: Boolean = false
     var visible: () -> Boolean = { false }
     private val content: KTable = KTable()
     private val container = object : Container<KTable>(content) {
@@ -38,7 +39,17 @@ class KContextualPopup(
     }
     private var targetActor: Actor? = null
 
+    override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+        touched = true
+        hide()
+        return true
+    }
+
+    override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+        touched = false
+    }
     override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
+        if(touched) return
         targetActor = event?.listenerActor
         val stage = targetActor?.stage ?: return
 
@@ -75,6 +86,7 @@ class KContextualPopup(
     fun hide() {
         isShowing = false
         container.isVisible = false
+        CursorManager.show()
     }
 
     fun show(stage: Stage) {
