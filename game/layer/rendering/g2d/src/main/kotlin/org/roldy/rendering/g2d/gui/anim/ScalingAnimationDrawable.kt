@@ -9,14 +9,50 @@ class ScalingAnimationDrawable(
     val drawable: Drawable,
     private val resolver: AnimationDrawableStateResolver,
     private val transition: Transition
-) : BaseDrawable() {
+) : BaseDrawable(), AnimationDrawable {
     data class Transition(
         val speed: Float = 8f,
-        val colors: Map<AnimationDrawableState, Float>
+        val scales: Map<AnimationDrawableState, Float>
     )
 
+    private var currentScale: Float = 1f
+    private var targetScale: Float = 1f
+
+    /**
+     * Updates the scale animation. Should be called every frame.
+     * @param delta Time elapsed since last update in seconds
+     */
+    override fun update(delta: Float) {
+        // Get current state from resolver
+        val state = resolver.state
+
+        // Get target scale for current state (default to 1.0 if not defined)
+        targetScale = transition.scales[state] ?: 1f
+
+        // Smoothly animate current scale towards target
+        if (currentScale != targetScale) {
+            val diff = targetScale - currentScale
+            val change = transition.speed * delta
+
+            currentScale = when {
+                kotlin.math.abs(diff) <= change -> targetScale
+                diff > 0 -> currentScale + change
+                else -> currentScale - change
+            }
+        }
+    }
+
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
-        drawable.draw(batch, x, y, width, height)
+        // Calculate scaled dimensions
+        val scaledWidth = width * currentScale
+        val scaledHeight = height * currentScale
+
+        // Center the scaled drawable within the original bounds
+        val offsetX = (width - scaledWidth) / 2f
+        val offsetY = (height - scaledHeight) / 2f
+
+        // Draw the scaled drawable
+        drawable.draw(batch, x + offsetX, y + offsetY, scaledWidth, scaledHeight)
     }
 }
 

@@ -2,8 +2,21 @@ package org.roldy.gui.general
 
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import org.roldy.core.utils.hex
+import org.roldy.gui.GuiContext
+import org.roldy.gui.TextManager
 import org.roldy.gui.general.button.squareButton
+import org.roldy.gui.generalContainer
+import org.roldy.gui.generalContainerBorder2
+import org.roldy.gui.windowHeaderBackground
+import org.roldy.gui.windowHeaderBorder
+import org.roldy.gui.windowHeaderMiddleGlow
+import org.roldy.gui.windowHeaderOrnament
+import org.roldy.gui.windowHeaderOrnamentEffect
+import org.roldy.gui.windowHeaderOverlay
+import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.el.UITable
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
 import org.roldy.rendering.g2d.gui.el.uiWindow
@@ -16,57 +29,57 @@ private const val CloseButtonSize = 110f
 private const val OrnamentEffectWidth = 512f
 
 @Scene2dDsl
-context(gui: org.roldy.gui.GuiContext)
+context(gui: GuiContext)
 fun <S> UIWidget<S>.window(
-    title: org.roldy.gui.TextManager,
-    init: context(org.roldy.gui.GuiContext) (@Scene2dDsl org.roldy.rendering.g2d.gui.el.UITable).(Cell<*>) -> Unit = {}
+    title: TextManager,
+    init: context(GuiContext) (@Scene2dDsl UITable).(Cell<*>) -> Unit = {}
 ) = uiWindow {
     touchable = Touchable.enabled
-    animationDuration = 0.1f
+    animationDuration = .1f
     dragBoxHeight = HeaderHeight
     dragBoxRightOffset = CloseButtonSize
-    background = _root_ide_package_.org.roldy.gui.generalContainer {
+    background = generalContainer {
         setMinSize(MinWidth, HeaderHeight)
         var containerWidth = 0f
-        this traverse _root_ide_package_.org.roldy.gui.windowHeaderBackground {
+         this traverse windowHeaderBackground {
             tint(gui.colors.primary) redraw { x, y, width, height, draw ->
                 containerWidth = width
                 draw(x, y + height - HeaderHeight, width, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderOverlay {
+        } traverse windowHeaderOverlay {
             redraw { x, y, width, _, draw ->
                 draw(x, y + height - HeaderHeight, width, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderMiddleGlow { //left side
+        } traverse windowHeaderMiddleGlow { //left side
             tint(gui.colors.secondary) redraw { x, y, width, height, draw ->
                 draw(x, y + height - HeaderHeight, width / 2, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderMiddleGlow { //right side
+        } traverse windowHeaderMiddleGlow { //right side
             tint(gui.colors.secondary) redraw { x, y, width, height, draw ->
                 draw(x + width, y + height - HeaderHeight, -width / 2, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderOrnamentEffect { //left side
+        } traverse windowHeaderOrnamentEffect { //left side
             tint(gui.colors.secondary) redraw { x, y, _, height, draw ->
                 draw(x, y + height - HeaderHeight, OrnamentEffectWidth, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderOrnamentEffect { //right side
+        } traverse windowHeaderOrnamentEffect { //right side
             tint(gui.colors.secondary) redraw { x, y, _, height, draw ->
                 draw(x + containerWidth, y + height - HeaderHeight, -OrnamentEffectWidth, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderOrnament { //left side
+        } traverse windowHeaderOrnament { //left side
             redraw { x, y, _, height, draw ->
                 draw(x, y + height - HeaderHeight, containerWidth / 2, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderOrnament { //right side
+        } traverse windowHeaderOrnament { //right side
             patch.scale(-1f, 1f)
             redraw { x, y, _, height, draw ->
                 draw(x + containerWidth, y + height - HeaderHeight, -containerWidth / 2, HeaderHeight)
             }
-        } traverse _root_ide_package_.org.roldy.gui.windowHeaderBorder {
+        } traverse windowHeaderBorder {
             redraw { x, y, width, height, draw ->
                 draw(x - 20f, y + height - HeaderHeight - BorderPadding + 10, width + 40f, 44f)
             }
-        } traverse _root_ide_package_.org.roldy.gui.generalContainerBorder2 {
+        } traverse generalContainerBorder2 {
             redraw { x, y, width, height, draw ->
                 draw(x - BorderPadding, y - BorderPadding, width + BorderPadding * 2, height + BorderPadding * 2)
             }
@@ -87,7 +100,6 @@ fun <S> UIWidget<S>.window(
     }
     content {
         pad(BorderPadding)
-//        padTop(HeaderHeight + BorderPadding)
         init(it)
     }
     pack()

@@ -29,14 +29,15 @@ class SlotDragListener<T : Any>(
     var prev: T? = null
 
     fun alphaDrawable(drawable: Drawable): Drawable =
-        AlphaAnimationDrawable(
-            drawable, this, transition(
-                colors = mapOf(
+        alpha(
+            drawable,
+            transition(
+                mapOf(
                     Over to (Color.WHITE alpha .3f),
                     Normal to (Color.WHITE alpha 1f)
                 )
             )
-        )
+        ).delta()
 
     override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int) {
         if (!delegate.canDrag()) return
@@ -64,7 +65,7 @@ class SlotDragListener<T : Any>(
         draggingIcon?.touchable = Touchable.disabled
         val hit = slot.root.stage.hit(event.stageX, event.stageY, true)
 
-        val targetActor = hit.traverseUserObject()
+        val targetActor = hit?.traverseUserObject()
         if (targetActor != null) {
             state = Over
             delegate.onSlotEnter?.invoke(targetActor, prev)
@@ -132,10 +133,10 @@ class SlotDragDelegate<T> {
 
 @Scene2dCallbackDsl
 data class Slot(
-    val root: org.roldy.rendering.g2d.gui.el.UITable,
+    val root: UITable,
     private val button: UIImageButton,
     val icon: UIImage,
-    private val additionalContent: org.roldy.rendering.g2d.gui.el.UITable
+    private val additionalContent: UITable
 ) {
 
     fun onClick(onClick: () -> Unit) {
@@ -146,7 +147,7 @@ data class Slot(
         icon.drawable = drawable
     }
 
-    fun content(cnt: org.roldy.rendering.g2d.gui.el.UITable.() -> Unit) {
+    fun content(cnt: UITable.() -> Unit) {
         additionalContent.cnt()
     }
 
@@ -169,14 +170,14 @@ data class Slot(
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.slot(
-    init: (@Scene2dDsl Slot).(org.roldy.rendering.g2d.gui.el.UITable) -> Unit = {}
-): org.roldy.rendering.g2d.gui.el.UITable =
+    init: (@Scene2dDsl Slot).(UITable) -> Unit = {}
+): UITable =
     table(true) {
         val root = this
         image(gui.region { Slot_Background })
 
         lateinit var icon: UIImage
-        lateinit var content: org.roldy.rendering.g2d.gui.el.UITable
+        lateinit var content: UITable
         lateinit var button: UIImageButton
 
         table(true) {

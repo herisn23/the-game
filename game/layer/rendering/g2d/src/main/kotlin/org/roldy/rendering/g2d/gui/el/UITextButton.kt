@@ -12,13 +12,14 @@ import org.roldy.rendering.g2d.gui.anim.AnimationDrawableStateResolver
 import org.roldy.rendering.g2d.gui.anim.Disabled
 import org.roldy.rendering.g2d.gui.DrawableDsl
 import org.roldy.rendering.g2d.gui.anim.AlphaAnimationDrawable
-import org.roldy.rendering.g2d.gui.UIButtonDrawableManager
 import org.roldy.rendering.g2d.gui.anim.Normal
 import org.roldy.rendering.g2d.gui.anim.Over
 import org.roldy.rendering.g2d.gui.anim.Pressed
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.TextActor
 import org.roldy.rendering.g2d.gui.UIContext
+import org.roldy.rendering.g2d.gui.anim.alpha
+import org.roldy.rendering.g2d.gui.anim.delta
 import org.roldy.rendering.g2d.gui.el.UITextButton.KTextButtonStyle
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -34,13 +35,7 @@ class UITextButton(
     val label = UILabel(text, labelStyle {
         font = style.font
     })
-    private val manager = UIButtonDrawableManager(
-        AlphaAnimationDrawable(
-            style.background,
-            this,
-            style.transition
-        ), this
-    )
+    private val drawable = alpha(style.background, style.transition).delta()
 
     init {
         label.setAlignment(Align.center)
@@ -53,7 +48,7 @@ class UITextButton(
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        manager.draw(batch, parentAlpha)
+        drawable.draw(batch, x, y, width, height)
         super.draw(batch, parentAlpha)
     }
 

@@ -9,9 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
+import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.UIContext
 
-@org.roldy.rendering.g2d.gui.Scene2dDsl
+@Scene2dDsl
 class UIWindow : Table(), UITableWidget {
     var keepWithinStage = true
     var draggable = true
@@ -22,7 +23,11 @@ class UIWindow : Table(), UITableWidget {
     var dragBoxLeftOffset = 0f     // Left margin
     var dragBoxRightOffset = 0f    // Right margin (e.g., for close button)
     var animationDuration = 0.1f  // Duration in seconds
+    private val childrenAnimationMultiplier = .5f
     private var isAnimating = false
+
+    private val content = UITable()
+    private val header = UITable()
 
     override fun drawDebug(shapes: ShapeRenderer) {
         shapes.color = Color.PINK
@@ -83,10 +88,11 @@ class UIWindow : Table(), UITableWidget {
     @Scene2dCallbackDsl
     context(_: C)
     fun <C : UIContext> header(build: @Scene2dCallbackDsl UITable.(Cell<*>) -> Unit) =
-        table {
+        actor(header) {
             debug = this@UIWindow.debug
             it.growX().minWidth(0f)
             build(it)
+            rebuild()
         }.also {
             row()
         }
@@ -94,12 +100,12 @@ class UIWindow : Table(), UITableWidget {
     @Scene2dCallbackDsl
     context(_: C)
     fun <C : UIContext> content(build: @Scene2dCallbackDsl UITable.(Cell<*>) -> Unit) =
-        table {
+        actor(content) {
             debug = this@UIWindow.debug
             padLeft(0f)
             padRight(0f)
-//            setFillParent(true)
             build(it)
+            rebuild()
         }
 
     fun open(onComplete: (() -> Unit)? = null) {
@@ -114,6 +120,9 @@ class UIWindow : Table(), UITableWidget {
         addAction(
             Actions.sequence(
                 Actions.fadeIn(animationDuration),
+                Actions.run {
+                    content.addAction(Actions.fadeIn(animationDuration * childrenAnimationMultiplier)) // 2x faster
+                },
                 Actions.run {
                     isAnimating = false
                     touchable = Touchable.enabled
@@ -131,13 +140,18 @@ class UIWindow : Table(), UITableWidget {
 
         clearActions()
         addAction(
-            Actions.sequence(
-                Actions.fadeOut(animationDuration),
+            Actions.parallel(
                 Actions.run {
-                    isVisible = false
-                    isAnimating = false
-                    onComplete?.invoke()
-                }
+                    content.addAction(Actions.fadeOut(animationDuration * childrenAnimationMultiplier)) // 2x faster
+                },
+                Actions.sequence(
+                    Actions.fadeOut(animationDuration),
+                    Actions.run {
+                        isVisible = false
+                        isAnimating = false
+                        onComplete?.invoke()
+                    }
+                )
             )
         )
     }
@@ -149,10 +163,6 @@ class UIWindow : Table(), UITableWidget {
             open(onComplete)
         }
     }
-
-//    override fun <T : Actor> add(actor: T): Cell<T> {
-//        return this.actor.add(actor)
-//    }
 }
 
 

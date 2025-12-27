@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import org.roldy.rendering.g2d.gui.el.UIWidget
 
 @Scene2dDsl
-class KTableProxy(val table: Table) : UIWidget<Cell<*>> {
+class UITableProxy(val table: Table) : UIWidget<Cell<*>> {
     override fun <T : Actor> storeActor(actor: T): Cell<*> {
         return table.add(actor)
     }
@@ -16,8 +16,8 @@ class KTableProxy(val table: Table) : UIWidget<Cell<*>> {
 context(_: C)
 fun <S, C : UIContext> UIWidget<S>.proxy(
     table: Table,
-    init: context(C) (@Scene2dDsl KTableProxy).() -> Unit = {}
-): KTableProxy =
-    KTableProxy(table).apply {
+    init: context(C) (@Scene2dDsl UITableProxy).() -> Unit = {}
+): UITableProxy =
+    UITableProxy(table).apply {
         init()
     }

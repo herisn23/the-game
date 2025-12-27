@@ -98,25 +98,3 @@ fun mask(
     MaskedImage(content, color, true).apply {
         init()
     }
-
-@DrawableDsl
-fun StackDrawable.maskable(
-    content: Drawable,
-    color: Color = Color.WHITE,
-    init: @DrawableDsl MaskedImage.() -> Unit = {}
-): MaskedImage =
-    MaskedImage(content, color, false).apply {
-        init()
-        add(this)
-    }
-@DrawableDsl
-@JvmName("stackmask")
-fun StackDrawable.mask(
-    content: Drawable,
-    color: Color = Color.WHITE,
-    init: @DrawableDsl MaskedImage.() -> Unit = {}
-): MaskedImage =
-    MaskedImage(content, color, true).apply {
-        init()
-        add(this)
-    }

@@ -9,12 +9,13 @@ import org.roldy.rendering.g2d.gui.anim.AnimationDrawableState
 import org.roldy.rendering.g2d.gui.anim.AnimationDrawableStateResolver
 import org.roldy.rendering.g2d.gui.anim.Disabled
 import org.roldy.rendering.g2d.gui.anim.AlphaAnimationDrawable
-import org.roldy.rendering.g2d.gui.UIButtonDrawableManager
 import org.roldy.rendering.g2d.gui.anim.Normal
 import org.roldy.rendering.g2d.gui.anim.Over
 import org.roldy.rendering.g2d.gui.anim.Pressed
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.UIContext
+import org.roldy.rendering.g2d.gui.anim.alpha
+import org.roldy.rendering.g2d.gui.anim.delta
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -29,12 +30,12 @@ class UIImageButton(
         imageUp = emptyImage(alpha(0f))
     }
 ), UITableWidget, UIButton, AnimationDrawableStateResolver {
-    val normalState = UIButtonDrawableManager(AlphaAnimationDrawable(drawable, this, transition), this)
+    val normalState = alpha(drawable, transition).delta()
     override fun draw(batch: Batch, parentAlpha: Float) {
         if (this.isDisabled) {
             disabledDrawable.draw(batch, x, y, width, height)
         } else {
-            normalState.draw(batch, parentAlpha)
+            normalState.draw(batch, x, y, width, height)
         }
         super.draw(batch, parentAlpha)
     }

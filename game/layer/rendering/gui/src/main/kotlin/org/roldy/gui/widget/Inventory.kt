@@ -92,7 +92,7 @@ data class InventorySlot<D>(
     }
 
 
-    fun tooltip(content: org.roldy.rendering.g2d.gui.el.UITable.() -> Unit) {
+    fun tooltip(content: UITable.() -> Unit) {
         this.tooltip.content {
             content()
         }
@@ -327,7 +327,7 @@ private fun org.roldy.rendering.g2d.gui.el.UITable.buttons(build: (@Scene2dDsl o
 context(gui: GuiContext)
 fun <S, D> UIWidget<S>.inventorySlot(
     inventory: Inventory<D>,
-    ref: (@Scene2dDsl InventorySlot<D>).(org.roldy.rendering.g2d.gui.el.UITable) -> Unit = {}
+    ref: (@Scene2dDsl InventorySlot<D>).(UITable) -> Unit = {}
 ) =
     slot { slotTable ->
         lateinit var grade: Value<UILabel, ItemGrade?>
@@ -335,6 +335,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
 
         val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
             grade {
+                println("setGrade $igrade")
                 value = igrade
             }
         }, {
