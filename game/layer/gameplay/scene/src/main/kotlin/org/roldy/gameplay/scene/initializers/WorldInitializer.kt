@@ -26,7 +26,7 @@ import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.processor.RefreshingProcessor
 import org.roldy.gui.WorldGUI
-import org.roldy.gui.popup.data.minePopupContent
+import org.roldy.gui.general.popup.data.minePopupContent
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable

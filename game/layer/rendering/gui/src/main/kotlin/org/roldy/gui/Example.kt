@@ -2,14 +2,18 @@ package org.roldy.gui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import org.roldy.core.utils.brighter
 import org.roldy.core.utils.sequencer
 import org.roldy.data.item.ItemGrade
-import org.roldy.gui.button.mainButton
-import org.roldy.gui.button.smallButton
-import org.roldy.gui.button.squareButton
-import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.*
+import org.roldy.gui.general.button.mainButton
+import org.roldy.gui.general.button.smallButton
+import org.roldy.gui.general.button.squareButton
+import org.roldy.gui.general.label
+import org.roldy.gui.widget.Inventory
+import org.roldy.gui.widget.inventory
+import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.el.UIWidget
+import org.roldy.rendering.g2d.gui.el.onClick
+import org.roldy.rendering.g2d.gui.el.table
 import kotlin.contracts.ExperimentalContracts
 import kotlin.random.Random
 import kotlin.system.exitProcess
@@ -17,10 +21,10 @@ import kotlin.system.exitProcess
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> KWidget<S>.example() {
-    image(emptyImage(Color.BLACK brighter 1.5f)) {
-        setSize(stage.width, stage.height)
-    }
+fun <S> UIWidget<S>.example() {
+//    image(emptyImage(Color.BLACK brighter 1.5f)) {
+//        setSize(stage.width, stage.height)
+//    }
 
     data class InventoryItem(
         var index: Int,
@@ -39,7 +43,7 @@ fun <S> KWidget<S>.example() {
 
     fun data() =
         playerInventory.map { item ->
-            data(
+            org.roldy.gui.widget.data(
                 gui.drawable { Icon_Sword_128 },
                 item.grade,
                 item.count,
@@ -58,7 +62,7 @@ fun <S> KWidget<S>.example() {
     val window = inventory {
         setData(data(), false)
         inv = this
-        maxSlots = 58
+        maxSlots = 10
 
         onSlotPositionChanged { from, to ->
             // from is always not null by design

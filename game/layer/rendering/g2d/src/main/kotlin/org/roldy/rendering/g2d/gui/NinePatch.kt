@@ -15,7 +15,7 @@ data class NinePatchParams(
 
 @NinePatchDsl
 context(_: C)
-fun <A, C : KContext> ninePatch(
+fun <A, C : UIContext> ninePatch(
     region: TextureRegion,
     params: NinePatchParams,
     element: @NinePatchDsl NinePatchDrawable.() -> A
@@ -24,7 +24,7 @@ fun <A, C : KContext> ninePatch(
 
 @NinePatchDsl
 context(_: C)
-fun <C : KContext> ninePatch(
+fun <C : UIContext> ninePatch(
     region: TextureRegion,
     params: NinePatchParams
 ): NinePatchDrawable =
@@ -32,7 +32,7 @@ fun <C : KContext> ninePatch(
 
 @NinePatchDsl
 context(_: C)
-fun <A, C : KContext> ninePatch(
+fun <A, C : UIContext> ninePatch(
     region: TextureRegion,
     left: Int = 0,
     right: Int = 0,
@@ -47,7 +47,7 @@ fun <A, C : KContext> ninePatch(
 
 @NinePatchDsl
 context(_: C)
-fun <C : KContext> ninePatch(
+fun <C : UIContext> ninePatch(
     region: TextureRegion,
     left: Int = 0,
     right: Int = 0,

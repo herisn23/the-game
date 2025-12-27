@@ -12,11 +12,10 @@ import org.roldy.core.x
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.g2d.gameFont
 import org.roldy.rendering.g2d.gui.Gui
-import org.roldy.rendering.g2d.gui.KStage
 import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.el.UIStage
+import org.roldy.rendering.g2d.gui.el.stage
 import org.roldy.rendering.g2d.gui.i18n.I18NContext
-import org.roldy.rendering.g2d.gui.stage
-
 
 data class GUIColors(
     val primary: Color,
@@ -46,7 +45,7 @@ data class GuiContext(
 
 @Scene2dDsl
 fun Gui.gui(scale: Float = 1f,
-            build: context(GuiContext) (@Scene2dDsl KStage).(GuiContext) -> Unit): KStage {
+            build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit): UIStage {
     val atlas by disposable { AtlasLoader.gui }
     val colors = GUIColors(
         primary = hex("FF463D"),//FF463D
