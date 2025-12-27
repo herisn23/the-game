@@ -26,24 +26,22 @@ class SlotDragListener<T : Any>(
     var draggingIcon: UIImage? = null
     var prev: T? = null
 
-    fun alphaDrawable(drawable: Drawable): Drawable =
-        scale(
-            alpha(
-                drawable
-            ) {
+    fun anim(drawable: Drawable): Drawable =
+        mix(drawable) {
+            add(::scale) {
+                Over to .6f
+            }
+            add(::alpha) {
                 Normal to 1f
                 Over to .3f
-            }.delta()
-        ) {
-            Over to .6f
+            }
         }
-            .delta()
 
     override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int) {
         if (!delegate.canDrag()) return
         event.stop()
         // Create dragging icon
-        draggingIcon = UIImage(alphaDrawable(slot.icon.drawable)).apply {
+        draggingIcon = UIImage(anim(slot.icon.drawable)).apply {
             touchable = Touchable.enabled
             setSize(slot.icon.width, slot.icon.height)
             color = slot.icon.color alpha 1f

@@ -166,10 +166,10 @@ class UIWindow : Table(), UITableWidget {
 }
 
 
-@org.roldy.rendering.g2d.gui.Scene2dDsl
+@Scene2dDsl
 context(_: C)
 fun <S, C : UIContext> UIWidget<S>.uiWindow(
-    init: context(C) (@org.roldy.rendering.g2d.gui.Scene2dDsl UIWindow).(S) -> Unit = {}
+    init: context(C) (@Scene2dDsl UIWindow).(S) -> Unit = {}
 ): UIWindow =
     actor(UIWindow()) {
         init(it)

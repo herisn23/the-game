@@ -9,7 +9,7 @@ class ScalingAnimationDrawable<S : AnimationDrawableState>(
     override val drawable: Drawable,
     override val resolver: AnimationDrawableStateResolver,
     override val animation: DefaultAnimationConfiguration<S, Float>
-) : BaseDrawable(), AnimationDrawable<S, Float> {
+) : BaseDrawable(), ConfiguredAnimationDrawable<S, Float> {
     private var currentScale: Float = 1f
     private var targetScale: Float = 1f
 

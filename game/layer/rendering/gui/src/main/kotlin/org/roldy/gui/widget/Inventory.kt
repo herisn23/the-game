@@ -41,7 +41,7 @@ data class InventorySlot<D>(
         val count: Int? = null,
         val index: Int,
         val data: D,
-        val tooltip: (@Scene2dCallbackDsl org.roldy.rendering.g2d.gui.el.UITable).(Data<D>) -> Unit
+        val tooltip: (@Scene2dCallbackDsl UITable).(Data<D>) -> Unit
     )
 
     val occupied get() = slotData != null

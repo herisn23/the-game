@@ -2,10 +2,7 @@ package org.roldy.rendering.g2d.gui.el
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.TextActor
-import org.roldy.rendering.g2d.gui.UIContext
-import org.roldy.rendering.g2d.gui.updateTextAction
+import org.roldy.rendering.g2d.gui.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -40,7 +37,7 @@ fun <S, C : UIContext> UIWidget<S>.label(
     return actor(UILabel(text, style), init)
 }
 
-@Scene2dDsl
+@Scene2dCallbackDsl
 fun UILabel.autoupdate() =
     addAction(updateTextAction())
 

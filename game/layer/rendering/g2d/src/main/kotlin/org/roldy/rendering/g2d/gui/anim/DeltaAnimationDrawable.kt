@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 
-class DeltaAnimationDrawable<S : AnimationDrawableState, V>(
-    val drawable: AnimationDrawable<S, V>,
+class DeltaAnimationDrawable(
+    val drawable: AnimationDrawable,
 ) : BaseDrawable() {
     override fun draw(
         batch: Batch,
@@ -19,5 +19,5 @@ class DeltaAnimationDrawable<S : AnimationDrawableState, V>(
     }
 }
 
-fun <S : AnimationDrawableState, V> AnimationDrawable<S, V>.delta() =
+fun AnimationDrawable.delta() =
     DeltaAnimationDrawable(this)

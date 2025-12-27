@@ -13,7 +13,7 @@ class AlphaAnimationDrawable<S : AnimationDrawableState>(
     override val drawable: Drawable,
     override val resolver: AnimationDrawableStateResolver,
     override val animation: AlphaAnimationConfiguration<S>
-) : BaseDrawable(), AnimationDrawable<S, Float> {
+) : BaseDrawable(), ConfiguredAnimationDrawable<S, Float> {
     private val color = animation.color.cpy()
     val mask by lazy {
         when (drawable) {
