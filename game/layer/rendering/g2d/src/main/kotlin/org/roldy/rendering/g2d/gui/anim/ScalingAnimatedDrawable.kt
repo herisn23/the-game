@@ -5,11 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.rendering.g2d.gui.DrawableDsl
 
-class ScalingAnimationDrawable<S : AnimationDrawableState>(
+class ScalingAnimatedDrawable<S : AnimationDrawableState>(
     override val drawable: Drawable,
     override val resolver: AnimationDrawableStateResolver,
     override val animation: DefaultAnimationConfiguration<S, Float>
-) : BaseDrawable(), ConfiguredAnimationDrawable<S, Float> {
+) : BaseDrawable(), ConfigurableAnimatedDrawable<S, Float> {
     private var currentScale: Float = 1f
     private var targetScale: Float = 1f
 
@@ -55,7 +55,7 @@ fun <S : AnimationDrawableState> AnimationDrawableStateResolver.scale(
     drawable: Drawable,
     configure: @DrawableDsl DefaultAnimationConfiguration<S, Float>.() -> Unit
 ) =
-    ScalingAnimationDrawable(
+    ScalingAnimatedDrawable(
         drawable,
         this,
         DefaultAnimationConfiguration<S, Float>().apply {

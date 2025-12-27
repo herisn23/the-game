@@ -16,7 +16,7 @@ class MixAnim(
         animation: (
             Drawable,
             AnimationConfiguration<S, V>.() -> Unit
-        ) -> AnimationDrawable,
+        ) -> AnimatedDrawable,
         configure: @AnimationDsl AnimationConfiguration<S, V>.() -> Unit
     ) {
         drawable = animation(drawable, configure).delta()
@@ -27,7 +27,7 @@ class MixAnim(
         animation: (
             Drawable,
             S
-        ) -> AnimationDrawable,
+        ) -> AnimatedDrawable,
         configure: @DrawableDsl S
     ) {
         drawable = animation(drawable, configure).delta()

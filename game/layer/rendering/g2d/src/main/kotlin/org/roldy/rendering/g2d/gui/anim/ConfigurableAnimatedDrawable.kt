@@ -8,13 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class AnimationDsl
 
-interface AnimationDrawable {
+interface AnimatedDrawable {
     val drawable: Drawable
     fun update(delta: Float)
     fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float)
 }
 
-interface ConfiguredAnimationDrawable<S : AnimationDrawableState, V> : AnimationDrawable {
+interface ConfigurableAnimatedDrawable<S : AnimationDrawableState, V> : AnimatedDrawable {
     val resolver: AnimationDrawableStateResolver
     val animation: AnimationConfiguration<S, V>
 

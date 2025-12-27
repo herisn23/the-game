@@ -9,11 +9,11 @@ import org.roldy.core.utils.copyTo
 import org.roldy.rendering.g2d.gui.DrawableDsl
 import org.roldy.rendering.g2d.gui.MaskedImage
 
-class AlphaAnimationDrawable<S : AnimationDrawableState>(
+class AlphaAnimatedDrawable<S : AnimationDrawableState>(
     override val drawable: Drawable,
     override val resolver: AnimationDrawableStateResolver,
     override val animation: AlphaAnimationConfiguration<S>
-) : BaseDrawable(), ConfiguredAnimationDrawable<S, Float> {
+) : BaseDrawable(), ConfigurableAnimatedDrawable<S, Float> {
     private val color = animation.color.cpy()
     val mask by lazy {
         when (drawable) {
@@ -55,7 +55,7 @@ fun <S : AnimationDrawableState> AnimationDrawableStateResolver.alpha(
     drawable: Drawable,
     configure: @DrawableDsl AlphaAnimationConfiguration<S>.() -> Unit
 ) =
-    AlphaAnimationDrawable(
+    AlphaAnimatedDrawable(
         drawable,
         this,
         AlphaAnimationConfiguration<S>().apply {
