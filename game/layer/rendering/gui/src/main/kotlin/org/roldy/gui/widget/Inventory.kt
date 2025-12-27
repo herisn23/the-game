@@ -8,7 +8,7 @@ import org.roldy.data.item.ItemGrade
 import org.roldy.gui.*
 import org.roldy.gui.general.*
 import org.roldy.gui.general.button.mainButton
-import org.roldy.gui.general.popup.popup
+import org.roldy.gui.general.tooltip.tooltip
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.*
 import kotlin.properties.Delegates
@@ -33,7 +33,7 @@ data class InventorySlot<D>(
     val gridIndex get() = inventory.slots.indexOf(this)
 
     var slotData: Data<D>? = null
-    internal lateinit var tooltip: UIContextualPopup
+    internal lateinit var tooltip: UIContextualTooltip
 
     data class Data<D>(
         val icon: Drawable,
@@ -119,13 +119,13 @@ fun <D> data(
     count: Int? = null,
     index: Int,
     data: D,
-    tooltip: (@Scene2dCallbackDsl org.roldy.rendering.g2d.gui.el.UITable).(InventorySlot.Data<D>) -> Unit = {}
+    tooltip: (@Scene2dCallbackDsl UITable).(InventorySlot.Data<D>) -> Unit = {}
 ) = InventorySlot.Data(icon, grade, count, index, data, tooltip)
 
 
 class Inventory<D>(
     private val grid: UIGrid,
-    private val scroll: org.roldy.rendering.g2d.gui.el.UIScrollPane,
+    private val scroll: UIScrollPane,
     private val context: GuiContext
 ) {
     private val slotListeners: MutableList<InventorySlot<D>.() -> Unit> = mutableListOf()
@@ -156,7 +156,9 @@ class Inventory<D>(
                     onClick {
                         invokeClick(this)
                     }
-                    tooltip = it.popup {
+
+                    tooltip = it.tooltip {
+                        animate = false
                         hideCursor = true
                         followCursor = true
                         visible = { this@inventorySlot.occupied && !dragging }
@@ -335,7 +337,6 @@ fun <S, D> UIWidget<S>.inventorySlot(
 
         val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
             grade {
-                println(igrade)
                 value = igrade
             }
         }, {

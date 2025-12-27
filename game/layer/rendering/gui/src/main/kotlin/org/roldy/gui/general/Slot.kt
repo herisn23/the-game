@@ -172,7 +172,9 @@ fun <S> UIWidget<S>.slot(
 ): UITable =
     table(true) {
         val root = this
-        image(gui.region { Slot_Background })
+        image(gui.region { Slot_Background }) {
+            touchable = Touchable.disabled
+        }
 
         lateinit var icon: UIImage
         lateinit var content: UITable
@@ -181,6 +183,7 @@ fun <S> UIWidget<S>.slot(
         table(true) {
             pad(8f)
             image(emptyImage(alpha(0f))) {
+                touchable = Touchable.disabled
                 icon = this
             }
         }

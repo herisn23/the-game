@@ -6,40 +6,48 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.CursorManager
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.UIContext
-import org.roldy.rendering.g2d.gui.el.UIContextualPopup.Backgrounds
+import org.roldy.rendering.g2d.gui.el.UIContextualTooltip.Backgrounds
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @Scene2dDsl
-class UIContextualPopup(
-    val backgrounds: Backgrounds
+class UIContextualTooltip(
+    val backgrounds: Backgrounds,
 ) : InputListener() {
+    var animate = false
     var followCursor: Boolean = false
     private var currentAnchor: AnchorPosition = AnchorPosition.BOTTOM_RIGHT
     private var isShowing = false
     var hideCursor = false
     var touched: Boolean = false
     var visible: () -> Boolean = { false }
+    var animationDuration = .1f
+    var offsetX = 0f
+    var offsetY = 0f
+    var edgeDistance = 5f
+
+    private val childrenAnimationMultiplier = .8f
     private val content: UITable = UITable()
     private val container = object : Container<UITable>(content) {
         override fun draw(batch: Batch, parentAlpha: Float) {
-            backgrounds.pick(currentAnchor).draw(batch, x, y, width, height)
+            batch.color = color
+            backgrounds.pick(currentAnchor).draw(batch, x, y, width * scaleX, height * scaleY)
             super.draw(batch, parentAlpha)
         }
-
-        override fun act(delta: Float) {
-            isVisible = visible() && isShowing
-            super.act(delta)
-        }
     }
-    private var targetActor: Actor? = null
+
+    init {
+        container.touchable = Touchable.disabled
+        container.isVisible = false
+    }
 
     override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
         touched = true
@@ -50,22 +58,15 @@ class UIContextualPopup(
     override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
         touched = false
     }
-    override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
-        if(touched) return
-        targetActor = event?.listenerActor
-        val stage = targetActor?.stage ?: return
 
-        // Add container to stage if not already added
+    override fun enter(event: InputEvent, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
         if (!container.hasParent()) {
-            stage.addActor(container)
+            event.listenerActor.stage.addActor(container)
         }
-
-        container.isVisible = true
-        container.toFront()
-        isShowing = true
-        show(stage)
+        if (touched) return
+        show()
         // Initial position
-        updatePosition(stage)
+        updatePosition(event.listenerActor)
         if (hideCursor && visible()) {
             CursorManager.hide()
         }
@@ -80,48 +81,114 @@ class UIContextualPopup(
 
     override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
         if (followCursor && isShowing) {
-            targetActor?.stage?.let { updatePosition(it) }
+            updatePosition()
         }
         return false
     }
 
     fun hide() {
-        isShowing = false
-        container.isVisible = false
+        if (!visible()) return
+        fun finish() {
+            container.isTransform = false
+            container.isVisible = false
+            isShowing = false
+        }
+        if(animate) {
+            container.isTransform = true
+            container.setScale(1f)
+            container.clearActions()
+            container.addAction(
+                Actions.parallel(
+                    Actions.run {
+                        content.addAction(Actions.fadeOut(animationDuration * childrenAnimationMultiplier)) // 2x faster
+                    },
+                    Actions.sequence(
+                        Actions.delay(animationDuration * childrenAnimationMultiplier),
+                        Actions.sequence(
+                            Actions.parallel(
+                                Actions.scaleTo(0f, 0f, animationDuration),
+                                Actions.fadeOut(animationDuration)
+                            ),
+                            Actions.run {
+                                finish()
+                            }
+                        )
+                    )
+                )
+            )
+        } else {
+            finish()
+        }
+
         CursorManager.show()
     }
 
-    fun show(stage: Stage) {
-        if (!container.hasParent()) {
-            stage.addActor(container)
-        }
-        container.isVisible = true
-        container.toFront()
+    fun show() {
+        if (!visible()) return
         isShowing = true
+        container.toFront()
+        container.isVisible = true
+        fun finish() {
+            container.isTransform = false
+        }
+        if(animate) {
+            container.isTransform = true
+            container.setScale(0f)
+            container.clearActions()
+            container.color.a = 0f  // Start transparent
+            container.addAction(
+                Actions.sequence(
+                    Actions.parallel(
+                        Actions.scaleTo(1f, 1f, animationDuration),
+                        Actions.fadeIn(animationDuration)
+                    ),
+                    Actions.run {
+                        content.addAction(Actions.fadeIn(animationDuration * childrenAnimationMultiplier)) // 2x faster
+                    },
+                    Actions.run {
+                       finish()
+                    }
+                )
+            )
+        } else {
+            finish()
+        }
+
     }
 
-    private fun updatePosition(stage: Stage) {
+    private fun updatePosition() {
         // Get mouse position in stage coordinates
-        val mousePos = stage.screenToStageCoordinates(
+        val mousePos = container.stage.screenToStageCoordinates(
             Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
         )
+        updatePosition(mousePos.x, mousePos.y)
+    }
 
-        val cursorX = mousePos.x
-        val cursorY = mousePos.y
+    private fun updatePosition(actor: Actor) {
+        val pos = actor.localToStageCoordinates(
+            Vector2()
+        )
+        val width = actor.width
+        val height = actor.height
+        updatePosition(pos.x + width / 2, pos.y + height / 2)
+    }
+
+    private fun updatePosition(x: Float, y: Float) {
+
 
         // Pack to get actual size
         container.pack()
 
         val tooltipWidth = container.width
         val tooltipHeight = container.height
-        val stageWidth = stage.width
-        val stageHeight = stage.height
+        val stageWidth = container.stage.width
+        val stageHeight = container.stage.height
 
         // Calculate space available on each side of the cursor
-        val spaceRight = stageWidth - cursorX - edgeDistance
-        val spaceLeft = cursorX - edgeDistance
-        val spaceAbove = stageHeight - cursorY - edgeDistance
-        val spaceBelow = cursorY - edgeDistance
+        val spaceRight = stageWidth - x - edgeDistance
+        val spaceLeft = x - edgeDistance
+        val spaceAbove = stageHeight - y - edgeDistance
+        val spaceBelow = y - edgeDistance
 
         // Determine horizontal position and direction
         val isRight = if (spaceRight >= tooltipWidth + offsetX) {
@@ -158,12 +225,12 @@ class UIContextualPopup(
         val posX = when {
             isRight && spaceRight >= tooltipWidth + offsetX -> {
                 // Fits on right with offset
-                cursorX + offsetX
+                x + offsetX
             }
 
             !isRight && spaceLeft >= tooltipWidth + offsetX -> {
                 // Fits on left with offset
-                cursorX - offsetX - tooltipWidth
+                x - offsetX - tooltipWidth
             }
 
             spaceRight > spaceLeft -> {
@@ -180,12 +247,12 @@ class UIContextualPopup(
         val posY = when {
             isBelow && spaceBelow >= tooltipHeight + offsetY -> {
                 // Fits below with offset
-                cursorY - offsetY - tooltipHeight
+                y - offsetY - tooltipHeight
             }
 
             !isBelow && spaceAbove >= tooltipHeight + offsetY -> {
                 // Fits above with offset
-                cursorY + offsetY
+                y + offsetY
             }
 
             spaceAbove > spaceBelow -> {
@@ -225,73 +292,6 @@ class UIContextualPopup(
         BOTTOM_RIGHT   // Tooltip is left and above cursor
     }
 
-    var offsetX = 0f
-    var offsetY = 0f
-
-    var edgeDistance = 5f
-
-//    fun updatePosition() {
-//        val vec = popup.position()
-//        val x = vec.x
-//        val y = vec.y
-//
-//        val popupWidth = popup.width
-//        val popupHeight = popup.height
-//        val stageWidth = popup.stage.width
-//        val stageHeight = popup.stage.height
-//
-//        // Calculate space available on each side of the cursor
-//        val spaceRight = stageWidth - x - edgeDistance
-//        val spaceLeft = x - edgeDistance
-//        val spaceAbove = stageHeight - y - edgeDistance
-//        val spaceBelow = y - edgeDistance
-//
-//        // Determine horizontal position and direction
-//        val isRight = if (spaceRight >= popupWidth + offsetX) {
-//            true  // Fits on right
-//        } else if (spaceLeft >= popupWidth + offsetX) {
-//            false  // Fits on left
-//        } else {
-//            spaceRight > spaceLeft  // Use side with more space
-//        }
-//
-//        // Determine vertical position and direction
-//        val isBelow = if (spaceBelow >= popupHeight + offsetY) {
-//            true  // Fits below
-//        } else if (spaceAbove >= popupHeight + offsetY) {
-//            false  // Fits above
-//        } else {
-//            spaceAbove > spaceBelow  // Use side with more space
-//        }
-//
-//        // Set anchor based on position relative to cursor
-
-//        popup.background = backgrounds.pick(anchorPosition)
-//
-//        // Calculate position
-//        val posX = if (isRight) {
-//            x + offsetX
-//        } else if (spaceLeft >= popupWidth + offsetX) {
-//            x - offsetX - popupWidth
-//        } else if (spaceRight > spaceLeft) {
-//            stageWidth - edgeDistance - popupWidth
-//        } else {
-//            edgeDistance
-//        }
-//
-//        val posY = if (isBelow) {
-//            y - offsetY - popupHeight
-//        } else if (spaceAbove >= popupHeight + offsetY) {
-//            y + offsetY
-//        } else if (spaceAbove > spaceBelow) {
-//            stageHeight - edgeDistance - popupHeight
-//        } else {
-//            edgeDistance
-//        }
-//
-//        container.setPosition(posX, posY)
-//    }
-
     fun minWidth(width: Float) {
         container.minWidth(width)
     }
@@ -300,7 +300,7 @@ class UIContextualPopup(
         container.minHeight(height)
     }
 
-    fun content(content: UITable.(UIContextualPopup) -> Unit) {
+    fun content(content: UITable.(UIContextualTooltip) -> Unit) {
         this.content.content(this)
         this.content.pack()
     }
@@ -313,12 +313,12 @@ class UIContextualPopup(
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(_: C)
-fun <C : UIContext> Actor.contextualPopup(
+fun <C : UIContext> contextualTooltip(
     backgrounds: Backgrounds,
-    init: context(C) (@Scene2dDsl UIContextualPopup).() -> Unit = {}
-): UIContextualPopup {
+    init: context(C) (@Scene2dDsl UIContextualTooltip).() -> Unit = {}
+): UIContextualTooltip {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return UIContextualPopup(backgrounds).apply {
+    return UIContextualTooltip(backgrounds).apply {
         init()
     }
 }

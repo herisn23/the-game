@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
@@ -43,7 +44,7 @@ class UIWindow : Table(), UITableWidget {
         touchable = Touchable.enabled
         pad(0f)
         addListener(
-            object : com.badlogic.gdx.scenes.scene2d.InputListener() {
+            object : InputListener() {
                 var startX: Float = 0f
                 var startY: Float = 0f
                 var canDrag = false
@@ -110,7 +111,7 @@ class UIWindow : Table(), UITableWidget {
 
     fun open(onComplete: (() -> Unit)? = null) {
         if (isAnimating || isVisible) return
-
+        toFront()
         isAnimating = true
         isVisible = true
         touchable = Touchable.disabled  // Disable during animation

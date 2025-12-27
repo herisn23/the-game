@@ -9,6 +9,7 @@ import org.roldy.gui.general.button.smallButton
 import org.roldy.gui.general.button.squareButton
 import org.roldy.gui.general.label
 import org.roldy.gui.widget.Inventory
+import org.roldy.gui.widget.data
 import org.roldy.gui.widget.inventory
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIWidget
@@ -43,7 +44,7 @@ fun <S> UIWidget<S>.example() {
 
     fun data() =
         playerInventory.map { item ->
-            org.roldy.gui.widget.data(
+            data(
                 gui.drawable { Icon_Sword_128 },
                 item.grade,
                 item.count,
@@ -60,6 +61,7 @@ fun <S> UIWidget<S>.example() {
     val seq by sequencer(1, 2)
     lateinit var inv: Inventory<InventoryItem>
     val window = inventory {
+
         setData(data(), false)
         inv = this
         maxSlots = 10
