@@ -1,17 +1,10 @@
 package org.roldy.gui.general.button
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
-import org.roldy.core.utils.alpha
 import org.roldy.gui.GuiContext
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.anim.Normal
-import org.roldy.rendering.g2d.gui.anim.Over
-import org.roldy.rendering.g2d.gui.anim.Pressed
-import org.roldy.rendering.g2d.gui.anim.transition
+import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.*
-import org.roldy.rendering.g2d.gui.mask
 
 enum class CircularButtonSize(
     val background: GuiContext.() -> TextureRegion,
@@ -49,13 +42,11 @@ fun <S> UIWidget<S>.circularButton(
             }
             imageButton(
                 drawable = mask(gui.drawable { Button_Circular_Overlay }),
-                transition = transition(
-                    colors = mapOf(
-                        Normal to (Color.WHITE alpha 0f),
-                        Pressed to (Color.WHITE alpha .4f),
-                        Over to (Color.WHITE alpha .4f),
-                    )
-                )
+                transition = {
+                    Normal to 0f
+                    Pressed to .4f
+                    Over to 1f
+                }
             ) {
                 image(icon)
                 button = this

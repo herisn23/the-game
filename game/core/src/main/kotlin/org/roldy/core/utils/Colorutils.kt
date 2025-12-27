@@ -21,6 +21,14 @@ infix fun Color.alpha(alpha: Float): Color {
     )
 }
 
+infix fun Color.copyTo(color: Color): Color =
+    color.also {
+        it.r = r
+        it.g = g
+        it.b = b
+        it.a = a
+    }
+
 fun randomColor(random: Random) =
     Color(
         Random(random.nextInt() + 1).nextFloat(),

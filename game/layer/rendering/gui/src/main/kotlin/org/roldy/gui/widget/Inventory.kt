@@ -24,7 +24,7 @@ private const val MinCells = 48
 @Scene2dCallbackDsl
 data class InventorySlot<D>(
     private val inventory: Inventory<D>,
-    val table: org.roldy.rendering.g2d.gui.el.UITable,
+    val table: UITable,
     private val slot: Slot,
     private val onRemoved: () -> Unit,
     private val setGrade: (ItemGrade?) -> Unit,
@@ -335,7 +335,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
 
         val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
             grade {
-                println("setGrade $igrade")
+                println(igrade)
                 value = igrade
             }
         }, {

@@ -10,11 +10,9 @@ import org.roldy.core.utils.alpha
 import org.roldy.gui.GuiContext
 import org.roldy.gui.slotHover
 import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
-import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.*
 import org.roldy.rendering.g2d.gui.el.*
-import org.roldy.rendering.g2d.gui.redraw
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -29,15 +27,17 @@ class SlotDragListener<T : Any>(
     var prev: T? = null
 
     fun alphaDrawable(drawable: Drawable): Drawable =
-        alpha(
-            drawable,
-            transition(
-                mapOf(
-                    Over to (Color.WHITE alpha .3f),
-                    Normal to (Color.WHITE alpha 1f)
-                )
-            )
-        ).delta()
+        scale(
+            alpha(
+                drawable
+            ) {
+                Normal to 1f
+                Over to .3f
+            }.delta()
+        ) {
+            Over to .6f
+        }
+            .delta()
 
     override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int) {
         if (!delegate.canDrag()) return
@@ -195,13 +195,11 @@ fun <S> UIWidget<S>.slot(
 
             imageButton(
                 drawable = slotHover { this },
-                transition = transition(
-                    colors = mapOf(
-                        Normal to (Color.WHITE alpha 0f),
-                        Pressed to (Color.WHITE alpha .4f),
-                        Over to (Color.WHITE alpha 1f)
-                    )
-                )
+                transition = {
+                    Normal to 0f
+                    Pressed to .4f
+                    Over to 1f
+                }
             ) {
                 button = this
                 Slot(root, button, icon, content).init(root)

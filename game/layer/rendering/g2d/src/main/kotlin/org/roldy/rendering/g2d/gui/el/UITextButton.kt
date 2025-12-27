@@ -7,19 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.utils.alpha
 import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.anim.AnimationDrawableState
-import org.roldy.rendering.g2d.gui.anim.AnimationDrawableStateResolver
-import org.roldy.rendering.g2d.gui.anim.Disabled
-import org.roldy.rendering.g2d.gui.DrawableDsl
-import org.roldy.rendering.g2d.gui.anim.AlphaAnimationDrawable
-import org.roldy.rendering.g2d.gui.anim.Normal
-import org.roldy.rendering.g2d.gui.anim.Over
-import org.roldy.rendering.g2d.gui.anim.Pressed
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.TextActor
-import org.roldy.rendering.g2d.gui.UIContext
-import org.roldy.rendering.g2d.gui.anim.alpha
-import org.roldy.rendering.g2d.gui.anim.delta
+import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.anim.*
 import org.roldy.rendering.g2d.gui.el.UITextButton.KTextButtonStyle
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -64,7 +53,7 @@ class UITextButton(
     data class KTextButtonStyle(
         val font: BitmapFont,
         val background: Drawable,
-        val transition: AlphaAnimationDrawable.Transition
+        val transition: AlphaAnimationConfiguration<UIAnimationState>.() -> Unit = {}
     )
 }
 
@@ -85,7 +74,7 @@ fun <S, C : UIContext> UIWidget<S>.textButton(
 fun textButtonStyle(
     font: BitmapFont,
     background: Drawable,
-    transition: AlphaAnimationDrawable.Transition
+    transition: AlphaAnimationConfiguration<UIAnimationState>.() -> Unit
 ) =
     KTextButtonStyle(font, background, transition)
 

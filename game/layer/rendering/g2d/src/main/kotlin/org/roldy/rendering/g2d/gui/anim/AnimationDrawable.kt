@@ -1,8 +1,34 @@
 package org.roldy.rendering.g2d.gui.anim
 
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 
-interface AnimationDrawable {
+
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class AnimationDsl
+
+interface AnimationDrawable<S : AnimationDrawableState, V> {
+    val drawable: Drawable
+    val resolver: AnimationDrawableStateResolver
+    val animation: AnimationConfiguration<S, V>
     fun update(delta: Float)
     fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float)
 }
+
+interface AnimationConfiguration<S : AnimationDrawableState, V> {
+    var speed: Float
+    val config: MutableMap<S, V>
+
+    @AnimationDsl
+    infix fun S.to(s: V) {
+        config[this] = s
+    }
+}
+
+class DefaultAnimationConfiguration<S : AnimationDrawableState, V> : AnimationConfiguration<S, V> {
+    override var speed: Float = 8f
+    override val config: MutableMap<S, V> = mutableMapOf()
+}
+
+

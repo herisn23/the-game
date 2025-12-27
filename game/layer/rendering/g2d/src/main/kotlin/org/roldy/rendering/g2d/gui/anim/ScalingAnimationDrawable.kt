@@ -5,16 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.rendering.g2d.gui.DrawableDsl
 
-class ScalingAnimationDrawable(
-    val drawable: Drawable,
-    private val resolver: AnimationDrawableStateResolver,
-    private val transition: Transition
-) : BaseDrawable(), AnimationDrawable {
-    data class Transition(
-        val speed: Float = 8f,
-        val scales: Map<AnimationDrawableState, Float>
-    )
-
+class ScalingAnimationDrawable<S : AnimationDrawableState>(
+    override val drawable: Drawable,
+    override val resolver: AnimationDrawableStateResolver,
+    override val animation: DefaultAnimationConfiguration<S, Float>
+) : BaseDrawable(), AnimationDrawable<S, Float> {
     private var currentScale: Float = 1f
     private var targetScale: Float = 1f
 
@@ -27,12 +22,12 @@ class ScalingAnimationDrawable(
         val state = resolver.state
 
         // Get target scale for current state (default to 1.0 if not defined)
-        targetScale = transition.scales[state] ?: 1f
+        targetScale = animation.config[state] ?: 1f
 
         // Smoothly animate current scale towards target
         if (currentScale != targetScale) {
             val diff = targetScale - currentScale
-            val change = transition.speed * delta
+            val change = animation.speed * delta
 
             currentScale = when {
                 kotlin.math.abs(diff) <= change -> targetScale
@@ -56,11 +51,14 @@ class ScalingAnimationDrawable(
     }
 }
 
-@DrawableDsl
-fun transition(
-    speed: Float = 8f,
-    scaling: Map<AnimationDrawableState, Float>
-) = ScalingAnimationDrawable.Transition(
-    speed,
-    scaling
-)
+fun <S : AnimationDrawableState> AnimationDrawableStateResolver.scale(
+    drawable: Drawable,
+    configure: @DrawableDsl DefaultAnimationConfiguration<S, Float>.() -> Unit
+) =
+    ScalingAnimationDrawable(
+        drawable,
+        this,
+        DefaultAnimationConfiguration<S, Float>().apply {
+            configure()
+        }
+    )

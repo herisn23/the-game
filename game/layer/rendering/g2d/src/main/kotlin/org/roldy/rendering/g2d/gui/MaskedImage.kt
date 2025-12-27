@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import org.roldy.core.utils.copyTo
 
 class MaskedImage(
     private val drawable: Drawable,
@@ -58,13 +59,15 @@ class MaskedImage(
         minHeight = drawable.minHeight
     }
 
+    private val oldColor = Color()
+
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
         batch.flush()
 
         val oldSrcFunc = batch.blendSrcFunc
         val oldDstFunc = batch.blendDstFunc
         val oldShader = batch.shader
-        val oldColor = batch.color.cpy()
+        batch.color copyTo oldColor
 
         if (!mask) {
             // First layer uses normal alpha blending
@@ -75,7 +78,7 @@ class MaskedImage(
         }
 
         batch.shader = shader
-        batch.setColor(color)
+        batch.color = color
         drawable.draw(batch, x, y, width, height)
 
         batch.color = oldColor

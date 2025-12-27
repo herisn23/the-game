@@ -4,13 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import org.roldy.core.utils.alpha
 import org.roldy.core.utils.brighter
 import org.roldy.gui.*
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.anim.Normal
-import org.roldy.rendering.g2d.gui.anim.Over
-import org.roldy.rendering.g2d.gui.anim.Pressed
-import org.roldy.rendering.g2d.gui.anim.transition
+import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.*
-import org.roldy.rendering.g2d.gui.mask
 
 
 @Scene2dDsl
@@ -45,13 +40,11 @@ fun <S> UIWidget<S>.mainButton(
                         background = buttonRLHover {
                             mask(this)
                         },
-                        transition = transition(
-                            colors = mapOf(
-                                Normal to (gui.colors.primary alpha 0f),
-                                Pressed to (gui.colors.primary alpha .5f),
-                                Over to (gui.colors.primary alpha 1f)
-                            )
-                        )
+                        transition = {
+                            Normal to 0f
+                            Pressed to .5f
+                            Over to 1f
+                        }
                     )
                 ) {
                     init(cell)
