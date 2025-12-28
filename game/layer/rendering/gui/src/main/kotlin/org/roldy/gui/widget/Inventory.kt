@@ -1,6 +1,9 @@
 package org.roldy.gui.widget
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.cast
@@ -13,7 +16,7 @@ import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.*
 import kotlin.properties.Delegates
 
-private const val MaxCountDisplay = 99
+private const val MaxamountDisplay = 99
 private const val Columns = 8
 private const val Rows = 8
 private const val CellPadding = 5f
@@ -28,21 +31,36 @@ data class InventorySlot<D>(
     private val slot: Slot,
     private val onRemoved: () -> Unit,
     private val setGrade: (ItemGrade?) -> Unit,
-    private val setCount: (String) -> Unit
+    private val setamount: (String) -> Unit,
+    private val setLock: (Boolean) -> Unit
 ) : PoolItem {
-    val gridIndex get() = inventory.slots.indexOf(this)
-
-    var slotData: Data<D>? = null
-    internal lateinit var tooltip: UIContextualTooltip
 
     data class Data<D>(
         val icon: Drawable,
         val grade: ItemGrade? = null,
-        val count: Int? = null,
+        val amount: Int? = null,
+        val lock: Boolean = false,
         val index: Int,
         val data: D,
         val tooltip: (@Scene2dCallbackDsl UITable).(Data<D>) -> Unit
     )
+
+    val gridIndex get() = inventory.slots.indexOf(this)
+
+    var slotData: Data<D>? by Delegates.observable<Data<D>?>(null) { _, _, newValue ->
+        if (newValue != null) {
+            setGrade(newValue.grade)
+            setLock(newValue.lock)
+            setamount(newValue.amount.clampToString())
+            setIcon(newValue.icon)
+        } else {
+            setGrade(null)
+            setLock(false)
+            setamount("")
+            setIcon(null)
+        }
+    }
+    internal lateinit var tooltip: UIContextualTooltip
 
     val occupied get() = slotData != null
 
@@ -52,39 +70,27 @@ data class InventorySlot<D>(
             slot.isDisabled = value
         }
 
-    var grade: ItemGrade? by Delegates.observable(null) { _, _, newValue ->
-        newValue?.let {
-            setGrade(newValue)
-        } ?: setGrade(null)
-    }
-    var count: Int? by Delegates.observable(null) { _, _, newValue ->
-        newValue?.let {
-            setCount(newValue.clampToString())
-        } ?: setCount("")
-    }
+    private fun Int?.clampToString() =
+        this?.let {
+            when (this > MaxamountDisplay) {
+                true -> "99+"
+                false -> toString()
+            }
+        } ?: ""
 
-    private fun Int.clampToString() =
-        when (this > MaxCountDisplay) {
-            true -> "99+"
-            false -> toString()
-        }
-
-    fun onClick(onClick: InventorySlot<D>.() -> Unit) {
+    fun onClick(onClick: InventorySlot<D>.(InputEvent) -> Unit) {
         slot.onClick {
-            this.onClick()
+            this.onClick(it)
         }
     }
 
     fun setData(data: Data<D>) {
         this.slotData = data
-        this.count = data.count
-        this.grade = data.grade
         tooltip {
             with(data) {
                 tooltip(data)
             }
         }
-        setIcon(data.icon)
     }
 
     fun setIcon(drawable: Drawable?) {
@@ -99,9 +105,6 @@ data class InventorySlot<D>(
     }
 
     override fun clean() {
-        setIcon(null)
-        grade = null
-        count = null
         isDisabled = false
         slotData = null
         tooltip.clean()
@@ -116,11 +119,12 @@ data class InventorySlot<D>(
 fun <D> data(
     icon: Drawable,
     grade: ItemGrade? = null,
-    count: Int? = null,
+    amount: Int? = null,
+    lock: Boolean = false,
     index: Int,
     data: D,
     tooltip: (@Scene2dCallbackDsl UITable).(InventorySlot.Data<D>) -> Unit = {}
-) = InventorySlot.Data(icon, grade, count, index, data, tooltip)
+) = InventorySlot.Data(icon, grade, amount, lock, index, data, tooltip)
 
 
 class Inventory<D>(
@@ -128,7 +132,7 @@ class Inventory<D>(
     private val scroll: UIScrollPane,
     private val context: GuiContext
 ) {
-    private val slotListeners: MutableList<InventorySlot<D>.() -> Unit> = mutableListOf()
+    private val slotListeners: MutableList<D.(InputEvent) -> Unit> = mutableListOf()
     private val slotPositionChangedListeners: MutableList<(from: InventorySlot<D>, to: InventorySlot<D>) -> Unit> =
         mutableListOf()
     internal val sortActions: MutableList<SortAction<D>> = mutableListOf()
@@ -152,12 +156,13 @@ class Inventory<D>(
     val pool = context(context) {
         pool(100) {
             {
-                inventorySlot(this@Inventory) {
+                inventorySlot(this@Inventory) { slot ->
                     onClick {
-                        invokeClick(this)
+                        slotData?.run {
+                            invokeClick(data, it)
+                        }
                     }
-
-                    tooltip = it.tooltip {
+                    tooltip = slot.tooltip {
                         animate = false
                         hideCursor = true
                         followCursor = true
@@ -181,7 +186,7 @@ class Inventory<D>(
     }
 
     @Scene2dCallbackDsl
-    fun onSlotClick(onClick: InventorySlot<D>.() -> Unit) {
+    fun onSlotClick(onClick: D.(InputEvent) -> Unit) {
         slotListeners.add(onClick)
     }
 
@@ -198,25 +203,19 @@ class Inventory<D>(
         sortActions.add(SortAction(text, action))
     }
 
-    internal fun invokeClick(slot: InventorySlot<D>) {
-        slotListeners.forEach {
-            slot.it()
-        }
-    }
-
     internal fun onSlotRemoved() {
         updateSlots()
     }
 
-    fun findSuitableSlot(data: InventorySlot.Data<D>, sorted: Boolean): InventorySlot<D>? {
+    fun findSuitableSlot(data: InventorySlot.Data<D>): InventorySlot<D>? {
         val available = slots.filterIndexed { index, slot ->
-            !slot.occupied && (index == data.index || sorted)
+            !slot.occupied && index == data.index
         }
         return available.firstOrNull()
     }
 
-    private fun addItem(data: InventorySlot.Data<D>, sorted: Boolean): InventorySlot<D> {
-        var suitable = findSuitableSlot(data, sorted)
+    private fun addItem(data: InventorySlot.Data<D>): InventorySlot<D> {
+        var suitable = findSuitableSlot(data)
         if (suitable == null)
             suitable = addSlot()
 
@@ -224,10 +223,10 @@ class Inventory<D>(
         return suitable
     }
 
-    fun setData(data: List<InventorySlot.Data<D>>, sorted: Boolean = true) {
+    fun setData(data: List<InventorySlot.Data<D>>) {
         clean()
         data.forEach {
-            addItem(it, sorted)
+            addItem(it)
         }
         updateSlots()
     }
@@ -246,7 +245,7 @@ class Inventory<D>(
         return slot.userObject.cast()
     }
 
-    fun move(original: InventorySlot<D>, target: InventorySlot<D>) {
+    internal fun move(original: InventorySlot<D>, target: InventorySlot<D>) {
         if (target.isDisabled) return
         slotPositionChangedListeners.forEach {
             it(original, target)
@@ -262,6 +261,12 @@ class Inventory<D>(
         }
         originalData?.let {
             target.setData(it)
+        }
+    }
+
+    internal fun invokeClick(slot: D, event: InputEvent) {
+        slotListeners.forEach {
+            slot.it(event)
         }
     }
 }
@@ -333,27 +338,56 @@ fun <S, D> UIWidget<S>.inventorySlot(
 ) =
     slot { slotTable ->
         lateinit var grade: Value<UILabel, ItemGrade?>
-        lateinit var count: Value<UILabel, String>
+        lateinit var amount: Value<UILabel, String>
+        lateinit var lock: Value<UILabel, Boolean>
 
-        val slot = InventorySlot(inventory, slotTable, this, inventory::onSlotRemoved, { igrade ->
-            grade {
-                value = igrade
+        val slot = InventorySlot(
+            inventory, slotTable, this, inventory::onSlotRemoved,
+            { igrade ->
+                grade {
+                    value = igrade
+                }
+            },
+            {
+                amount {
+                    value = it
+                }
+            }, {
+                lock {
+                    value = it
+                }
+            })
+
+        inputListener {
+            type(InputEvent.Type.enter) {
+                slotTable.isTransform = true
+                slotTable.setOrigin(Align.center)
+                if (inventory.dragging)
+                    action(
+                        Actions.sequence(
+                            Actions.scaleTo(1.1f, 1.1f, 0.2f, Interpolation.smooth)
+                        )
+                    )
             }
-        }, {
-            count {
-                value = it
+            type(InputEvent.Type.exit, InputEvent.Type.touchUp) {
+                action(
+                    Actions.sequence(
+                        Actions.scaleTo(1f, 1f, 0.2f, Interpolation.smooth)
+                    )
+                )
             }
-        })
+        }
         draggable<InventorySlot<D>> {
             fun highlight(alpha: Float) {
                 this@slot.icon.color.a = alpha
-                count.ref.color.a = alpha
+                amount.ref.color.a = alpha
                 grade.ref.color.a = alpha
+                lock.ref.color.a = alpha
             }
 
             val prevData = slot.slotData
             canDrag = {
-                slot.occupied
+                slot.occupied// && slot.slotData?.lock == false
             }
             onStart = {
                 inventory.dragging = true
@@ -373,7 +407,18 @@ fun <S, D> UIWidget<S>.inventorySlot(
 
         slotTable.userObject = slot
         content {
-            align(Align.right)
+            //amount
+            lock = value(false) {
+                label(string { if (value) "L" else "" }, params = {
+                    size = 30
+                    borderWidth = 3f
+                    borderColor = Color.BLACK
+                    borderStraight = false
+                }) {
+                    it.expand().top().left()
+                    autoupdate()
+                }
+            }
             //grade
             grade = value(null) {
                 label(string { value?.name ?: "" }, params = {
@@ -386,19 +431,19 @@ fun <S, D> UIWidget<S>.inventorySlot(
                         color = grade?.color ?: Color.WHITE
                     }
                     autoupdate()
-                    it.expandY().top().right()
+                    it.expand().top().right()
                 }
             }
             row()
-            //count
-            count = value("") {
+            //amount
+            amount = value("") {
                 label(string { value }, params = {
                     size = 30
                     borderWidth = 3f
                     borderColor = Color.BLACK
                     borderStraight = false
                 }) {
-                    it.expandY().bottom().right()
+                    it.expand().colspan(2).right().bottom()
                     autoupdate()
                 }
             }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.UIContext
 
 @Scene2dDsl
 class UITable(
@@ -55,7 +56,7 @@ interface UITableWidget : UIWidget<Cell<*>> {
 
 @Scene2dDsl
 context(_: C)
-fun <S, C : org.roldy.rendering.g2d.gui.UIContext> UIWidget<S>.table(
+fun <S, C : UIContext> UIWidget<S>.table(
     stackable: Boolean = false,
     build: context(C) (@Scene2dDsl UITable).(S) -> Unit
 ): UITable =

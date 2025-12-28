@@ -1,5 +1,7 @@
 package org.roldy.gui
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.utils.sequencer
@@ -23,31 +25,30 @@ import kotlin.system.exitProcess
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.example() {
-//    image(emptyImage(Color.BLACK brighter 1.5f)) {
-//        setSize(stage.width, stage.height)
-//    }
-
     data class InventoryItem(
         var index: Int,
-        val grade: ItemGrade,
-        val count: Int
+        var grade: ItemGrade,
+        var amount: Int,
+        var lock: Boolean
     )
 
-    val playerInventory = (0..3).mapIndexed { index, item ->
+    val list = (0..3).map { index ->
         InventoryItem(
             index,
             ItemGrade.entries.random(),
-            Random.nextInt(0, 200)
+            Random.nextInt(0, 20),
+            index == 1
 
         )
     }.toMutableList()
 
     fun data() =
-        playerInventory.map { item ->
+        list.map { item ->
             data(
                 gui.drawable { Icon_Sword_128 },
                 item.grade,
-                item.count,
+                item.amount,
+                item.lock,
                 item.index,
                 item
             ) { data ->
@@ -58,17 +59,43 @@ fun <S> UIWidget<S>.example() {
             }
         }
 
-    val seq by sequencer(1, 2)
+    fun <R : Comparable<R>> sort(dir: Int, selector: (InventoryItem) -> R?) {
+        // Get locked items with their indices
+        val lockedByIndex = list.filter { it.lock }.associateBy { it.index }
+
+        // Sort unlocked items
+        val unlockedSorted = list.filterNot { it.lock }.sortedBy(selector).let {
+            if(dir == 1) {
+                it.reversed()
+            } else {
+                it
+            }
+        }
+        var nextIndex = 0
+        // Generate available indices starting from 1, skipping locked indices
+        unlockedSorted.forEachIndexed { i, item ->
+            val lockedIndex = lockedByIndex[i]
+            if(lockedIndex != null) {
+                nextIndex++
+            }
+            item.index = i + nextIndex
+        }
+    }
+
+    val seq by sequencer(0, 1)
     lateinit var inv: Inventory<InventoryItem>
     val window = inventory {
 
-        setData(data(), false)
+        setData(data())
         inv = this
         maxSlots = 10
 
         onSlotPositionChanged { from, to ->
+            //TODO be careful: when changing position on sorted inventory then from can take index if another item
+            //In real implementation it is necessary to handle sorting vs position changing carefully
+            //Best way in future is locking item in position then, when inv is sorted then change position for each item in inventory except locked items
             // from is always not null by design
-            val fromIndex = from.slotData!!.index
+            val fromIndex = from.slotData!!.data.index
 
             // when slot has data, pick index from existing item else pick index from grid
             val targetIndex = to.slotData?.data?.index ?: to.gridIndex
@@ -78,40 +105,23 @@ fun <S> UIWidget<S>.example() {
         }
 
         onSlotClick {
-            println("click")
+           if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+               lock = !lock
+               setData(data())
+           }
         }
-        sort(string { "Sort 1" }) {
-            playerInventory.sortBy {
-                if (seq.current == 1) {
-                    it.grade.ordinal
-                } else {
-                    -it.grade.ordinal
-                }
+        sort(string { "Grade" }) {
+            sort(seq.next()) { item ->
+                item.grade
             }
             it.setData(data())
-            seq.next()
+
         }
-        sort(string { "Sort 2" }) {
-            playerInventory.sortBy {
-                if (seq.current == 2) {
-                    it.count
-                } else {
-                    -it.count
-                }
+        sort(string { "Count" }) {
+            sort(seq.next()) { item ->
+                item.amount
             }
             it.setData(data())
-            seq.next()
-        }
-        sort(string { "Reset" }) {
-            playerInventory.sortBy {
-                if (seq.current == 2) {
-                    it.count
-                } else {
-                    -it.count
-                }
-            }
-            it.setData(data(), false)
-            seq.next()
         }
     }
 

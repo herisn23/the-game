@@ -1,6 +1,7 @@
 package org.roldy.gui.general
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -29,11 +30,12 @@ class SlotDragListener<T : Any>(
     fun anim(drawable: Drawable): Drawable =
         mix(drawable) {
             add(::scale) {
-                Over to .6f
+                Normal to .8f
+                Over to .8f
             }
             add(::alpha) {
-                Normal to 1f
-                Over to .3f
+                Normal to .8f
+                Over to .8f
             }
         }
 
@@ -137,8 +139,8 @@ data class Slot(
     private val additionalContent: UITable
 ) {
 
-    fun onClick(onClick: () -> Unit) {
-        button.onClick(onClick)
+    fun onClick(onClick: (InputEvent) -> Unit) {
+        button.onClick(onClick = onClick)
     }
 
     fun setIcon(drawable: Drawable?) {
@@ -147,6 +149,14 @@ data class Slot(
 
     fun content(cnt: UITable.() -> Unit) {
         additionalContent.cnt()
+    }
+
+    fun action(action: Action) {
+        root.addAction(action)
+    }
+
+    fun inputListener(consuming: Boolean = true, listener: InputListenerProxy.() -> Unit) {
+        button.inputListener(consuming, listener)
     }
 
     var isDisabled by Delegates.observable(false) { _, _, newValue ->
