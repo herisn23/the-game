@@ -3,7 +3,8 @@ package org.roldy.gui
 import org.roldy.core.Vector2Int
 import org.roldy.gui.general.popup.tilePopup
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
-import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.Gui
+import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIPopup
 import org.roldy.rendering.g2d.gui.el.UIStandardPopup
 import org.roldy.rendering.g2d.gui.el.stack
@@ -15,6 +16,7 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
 
     val stage = gui(1f) { gui ->
         stack {
+            name = "TilePopupStack"
             setLayoutEnabled(false)
             this@WorldGUI.tileTooltip = tilePopup() to gui
         }

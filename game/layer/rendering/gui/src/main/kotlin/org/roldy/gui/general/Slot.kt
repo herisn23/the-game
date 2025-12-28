@@ -156,7 +156,7 @@ data class Slot(
     }
 
     fun inputListener(consuming: Boolean = true, listener: InputListenerProxy.() -> Unit) {
-        button.inputListener(consuming, listener)
+        button.addInputListener(consuming, listener)
     }
 
     var isDisabled by Delegates.observable(false) { _, _, newValue ->
@@ -212,6 +212,7 @@ fun <S> UIWidget<S>.slot(
                     Over to 1f
                 }
             ) {
+                name = "SlotButton"
                 button = this
                 Slot(root, button, icon, content).init(root)
             }

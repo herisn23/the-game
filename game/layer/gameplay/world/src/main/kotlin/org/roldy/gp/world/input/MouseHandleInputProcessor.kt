@@ -21,9 +21,7 @@ class MouseHandleInputProcessor(
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         logger.info { "Received touch up $screenX, $screenY, $pointer" }
         return button.onTouch(KeybindName.MoveTo, screenX, screenY, moveTo) ||
-                button.onTouch(KeybindName.TileFocus, screenX, screenY) {
-                    focusOn(it)
-                }
+                button.onTouch(KeybindName.TileFocus, screenX, screenY, focusOn)
     }
 
     fun Int.onTouch(keybind: KeybindName, screenX: Int, screenY: Int, coords: (Vector2Int) -> Unit): Boolean {

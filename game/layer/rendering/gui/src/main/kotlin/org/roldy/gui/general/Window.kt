@@ -2,24 +2,15 @@ package org.roldy.gui.general
 
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
-import org.roldy.core.utils.hex
-import org.roldy.gui.GuiContext
-import org.roldy.gui.TextManager
+import org.roldy.gui.*
 import org.roldy.gui.general.button.squareButton
-import org.roldy.gui.generalContainer
-import org.roldy.gui.generalContainerBorder2
-import org.roldy.gui.windowHeaderBackground
-import org.roldy.gui.windowHeaderBorder
-import org.roldy.gui.windowHeaderMiddleGlow
-import org.roldy.gui.windowHeaderOrnament
-import org.roldy.gui.windowHeaderOrnamentEffect
-import org.roldy.gui.windowHeaderOverlay
-import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UITable
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
 import org.roldy.rendering.g2d.gui.el.uiWindow
+import org.roldy.rendering.g2d.gui.redraw
+import org.roldy.rendering.g2d.gui.traverse
 
 
 private const val HeaderHeight = 140f
@@ -32,9 +23,11 @@ private const val OrnamentEffectWidth = 512f
 context(gui: GuiContext)
 fun <S> UIWidget<S>.window(
     title: TextManager,
+    name: String = "Window",
     init: context(GuiContext) (@Scene2dDsl UITable).(Cell<*>) -> Unit = {}
 ) = uiWindow {
-    touchable = Touchable.enabled
+    this.name = name
+    touchable = Touchable.enabled //block events to prevent touching behind window
     animationDuration = .1f
     dragBoxHeight = HeaderHeight
     dragBoxRightOffset = CloseButtonSize

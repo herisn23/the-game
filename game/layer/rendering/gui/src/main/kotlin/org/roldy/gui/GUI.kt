@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.i18n.I18N
@@ -32,6 +33,7 @@ data class GuiContext(
     override val i18n: I18N,
     val font: (Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
 ) : I18NContext {
+    lateinit var stage: Stage
     operator fun <A> invoke(get: GUITextures.() -> A) =
         textures.get()
 
@@ -41,11 +43,14 @@ data class GuiContext(
     fun drawable(get: GUITextures.() -> GUITexture): TextureRegionDrawable =
         this(get).drawable()
 
+    override fun stage(): Stage = stage
 }
 
 @Scene2dDsl
-fun Gui.gui(scale: Float = 1f,
-            build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit): UIStage {
+fun Gui.gui(
+    scale: Float = 1f,
+    build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit
+): UIStage {
     val atlas by disposable { AtlasLoader.gui }
     val colors = GUIColors(
         primary = hex("FF463D"),//FF463D
@@ -63,6 +68,8 @@ fun Gui.gui(scale: Float = 1f,
     val stage by disposable {
         context(guiContext) {
             stage(scale, 3840 x 2160) {
+
+                guiContext.stage = this
                 build(guiContext)
             }
         }

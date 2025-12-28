@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import org.roldy.core.Vector2Int
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.UIContext
-import kotlin.properties.Delegates
 
 @Scene2dDsl
 class UIStage(
@@ -15,14 +14,11 @@ class UIStage(
     private val referenceResolution: Vector2Int
 ) : Stage(), UIWidget<Unit> {
 
-    var scale: Float by Delegates.observable(scale) { prop, old, new ->
-        updateViewport(new)
-    }
-
     val defaultWidth get() = Gdx.graphics.width.toFloat() / Gdx.graphics.density
     val defaultHeight get() = Gdx.graphics.height.toFloat() / Gdx.graphics.density
 
     init {
+        root.name = "Stage"
         viewport = FitViewport(defaultWidth, defaultHeight)
         updateViewport(scale)
     }
@@ -47,6 +43,18 @@ class UIStage(
     fun resize(width: Int, height: Int) {
         viewport.update(width, height, true)
 //        updateViewport(scale)
+    }
+    private var touchDownHandled = false
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        touchDownHandled = super.touchDown(screenX, screenY, pointer, button)
+        return touchDownHandled
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        val handled = super.touchUp(screenX, screenY, pointer, button)
+        // If touchDown was handled, consume touchUp too
+        return handled || touchDownHandled.also { touchDownHandled = false }
     }
 }
 

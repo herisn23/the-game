@@ -31,12 +31,14 @@ class UIWindow : Table(), UITableWidget {
     private val header = UITable()
 
     override fun drawDebug(shapes: ShapeRenderer) {
-        shapes.color = Color.PINK
-        // Calculate width based on current window width
-        val boxWidth = width - dragBoxLeftOffset - dragBoxRightOffset
-        val boxX = x + dragBoxLeftOffset
-        val boxY = y + height - dragBoxTopOffset - dragBoxHeight
-        shapes.rect(boxX, boxY, boxWidth, dragBoxHeight)
+        if(debug) {
+            shapes.color = Color.PINK
+            // Calculate width based on current window width
+            val boxWidth = width - dragBoxLeftOffset - dragBoxRightOffset
+            val boxX = x + dragBoxLeftOffset
+            val boxY = y + height - dragBoxTopOffset - dragBoxHeight
+            shapes.rect(boxX, boxY, boxWidth, dragBoxHeight)
+        }
         super.drawDebug(shapes)
     }
 

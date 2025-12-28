@@ -2,7 +2,7 @@ package org.roldy.gui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.utils.sequencer
 import org.roldy.data.item.ItemGrade
@@ -10,32 +10,32 @@ import org.roldy.gui.general.button.mainButton
 import org.roldy.gui.general.button.smallButton
 import org.roldy.gui.general.button.squareButton
 import org.roldy.gui.general.label
+import org.roldy.gui.general.tooltip.tooltip
 import org.roldy.gui.widget.Inventory
 import org.roldy.gui.widget.data
+import org.roldy.gui.widget.gradeLabel
 import org.roldy.gui.widget.inventory
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
 import org.roldy.rendering.g2d.gui.el.table
-import kotlin.contracts.ExperimentalContracts
 import kotlin.random.Random
 import kotlin.system.exitProcess
 
-@OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.example() {
     data class InventoryItem(
         var index: Int,
-        var grade: ItemGrade,
+        var grade: ItemGrade?,
         var amount: Int,
         var lock: Boolean
     )
 
-    val list = (0..3).map { index ->
+    val list = (0..6).map { index ->
         InventoryItem(
             index,
-            ItemGrade.entries.random(),
+            if (index == 2) null else ItemGrade.entries.random(),
             Random.nextInt(0, 20),
             index == 1
 
@@ -53,8 +53,31 @@ fun <S> UIWidget<S>.example() {
                 item
             ) { data ->
                 pad(200f)
-                label(string { data.grade?.name ?: "" }, 60) {
-                    color = data.grade?.color ?: Color.WHITE
+                gradeLabel(60) {
+                    touchable = Touchable.enabled
+                    setGrade(data.grade)
+                    tooltip(label) {
+                        content {
+                            pad(300f)
+                            label(string { "second tooltip" }) {
+                                this@content.tooltip(this) {
+                                    content {
+                                        pad(400f)
+                                        label("third tooltip") {
+                                            this@content.tooltip(this) {
+                                                content {
+                                                    pad(500f)
+                                                    label("fourth tooltip") {
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -65,7 +88,7 @@ fun <S> UIWidget<S>.example() {
 
         // Sort unlocked items
         val unlockedSorted = list.filterNot { it.lock }.sortedBy(selector).let {
-            if(dir == 1) {
+            if (dir == 1) {
                 it.reversed()
             } else {
                 it
@@ -75,7 +98,7 @@ fun <S> UIWidget<S>.example() {
         // Generate available indices starting from 1, skipping locked indices
         unlockedSorted.forEachIndexed { i, item ->
             val lockedIndex = lockedByIndex[i]
-            if(lockedIndex != null) {
+            if (lockedIndex != null) {
                 nextIndex++
             }
             item.index = i + nextIndex
@@ -91,10 +114,6 @@ fun <S> UIWidget<S>.example() {
         maxSlots = 10
 
         onSlotPositionChanged { from, to ->
-            //TODO be careful: when changing position on sorted inventory then from can take index if another item
-            //In real implementation it is necessary to handle sorting vs position changing carefully
-            //Best way in future is locking item in position then, when inv is sorted then change position for each item in inventory except locked items
-            // from is always not null by design
             val fromIndex = from.slotData!!.data.index
 
             // when slot has data, pick index from existing item else pick index from grid
@@ -105,10 +124,10 @@ fun <S> UIWidget<S>.example() {
         }
 
         onSlotClick {
-           if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-               lock = !lock
-               setData(data())
-           }
+            if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                lock = !lock
+                setData(data())
+            }
         }
         sort(string { "Grade" }) {
             sort(seq.next()) { item ->
@@ -126,6 +145,7 @@ fun <S> UIWidget<S>.example() {
     }
 
     table {
+        name = "ExampleTable"
         align(Align.top)
         setFillParent(true)
 

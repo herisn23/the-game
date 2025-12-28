@@ -3,11 +3,12 @@ package org.roldy.rendering.g2d.gui.el
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import org.roldy.rendering.g2d.gui.Scene2dDsl
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-@org.roldy.rendering.g2d.gui.Scene2dDsl
+@Scene2dDsl
 class UIStandardPopup(
     background: Drawable,
     private val anchor: Image

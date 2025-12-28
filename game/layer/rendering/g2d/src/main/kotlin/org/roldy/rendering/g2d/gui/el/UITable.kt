@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import org.roldy.core.cast
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.UIContext
 
@@ -17,6 +18,7 @@ class UITable(
             row()
         }
     }
+
 
     override fun <T : Actor> storeActor(actor: T): Cell<T> {
         if (stackable) {
@@ -65,4 +67,11 @@ fun <S, C : UIContext> UIWidget<S>.table(
         rebuild()
     }
 
+
+fun <D> Actor.setData(data: D) {
+    userObject = data
+}
+
+inline fun <reified D> Actor.getData() =
+    userObject.cast<D>()
 

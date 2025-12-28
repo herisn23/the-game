@@ -107,7 +107,7 @@ class RoadsPopulator(
 
             // If no variants found, return [0] as fallback
             if (variants.isEmpty()) {
-                println("Warning: No variants found for bitmask $bitmask")
+                logger.debug("Warning: No variants found for bitmask $bitmask")
                 listOf(0)
             } else {
                 variants

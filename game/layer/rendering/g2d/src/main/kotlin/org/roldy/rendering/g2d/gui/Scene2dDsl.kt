@@ -15,3 +15,7 @@ annotation class NinePatchDsl
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class DrawableDsl
+
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class InputDsl
