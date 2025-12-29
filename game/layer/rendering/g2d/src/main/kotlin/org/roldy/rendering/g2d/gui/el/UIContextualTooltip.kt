@@ -136,14 +136,16 @@ class UIContextualTooltip(
     // UI components
     private val content: UIContextualTooltipContent = UIContextualTooltipContent(this)
 
-    private val pinProgressAction get() = Actions.sequence(
-        floatAction(0f, 1f, pinPrepareDuration) {
-            pinScaleY = it
-        },
-        action {
-            pinned = true
-        }
-    )
+    private val pinProgressAction
+        get() = Actions.sequence(
+            floatAction(0f, 1f, pinPrepareDuration) {
+                pinScaleY = it
+            },
+            action {
+                pinned = true
+            }
+        )
+
     /** Container with custom draw logic to render background with proper transformations */
     private val container = object : Container<UIContextualTooltipContent>(content) {
         override fun draw(batch: Batch, parentAlpha: Float) {
@@ -176,6 +178,7 @@ class UIContextualTooltip(
     }
 
     private val tmpCoords = Vector2()
+
     init {
         name = "UIContextualTooltip"
         container.touchable = Touchable.disabled
@@ -198,7 +201,7 @@ class UIContextualTooltip(
                     val cursorActorIsNotThis = hit?.let {
                         nestedTooltip?.let {
                             hit.isDescendantOf(it.container)
-                        }?:false
+                        } ?: false
                     } ?: false
                     // Keep visible when cursor is on nested tooltip
                     if (cursorActorIsNotThis)
@@ -314,15 +317,6 @@ class UIContextualTooltip(
     fun hide() {
         if (!visible()) return
 
-        fun finish() {
-            pinScaleY = 0f
-            container.isVisible = false
-            isShowing = false
-            container.clearActions()
-            pinned = false
-            focused = false
-        }
-
         if (animate) {
             // Animate scale and fade out
             setOriginByAnchor()
@@ -343,14 +337,14 @@ class UIContextualTooltip(
                                 Actions.fadeOut(animationDuration)
                             ),
                             Actions.run {
-                                finish()
+                                reset()
                             }
                         )
                     )
                 )
             )
         } else {
-            finish()
+            reset()
         }
 
         CursorManager.show()
@@ -591,6 +585,16 @@ class UIContextualTooltip(
     /** Clears all content from the tooltip */
     fun clean() {
         content.clear()
+        reset()
+    }
+
+    fun reset() {
+        pinScaleY = 0f
+        container.isVisible = false
+        isShowing = false
+        container.clearActions()
+        pinned = false
+        focused = false
     }
 }
 
