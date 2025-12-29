@@ -57,14 +57,17 @@ fun <S> UIWidget<S>.example() {
                     touchable = Touchable.enabled
                     setGrade(data.grade)
                     tooltip(label) {
+                        name = "Second"
                         content {
                             pad(300f)
                             label(string { "second tooltip" }) {
                                 this@content.tooltip(this) {
+                                    name = "Third"
                                     content {
                                         pad(400f)
                                         label("third tooltip") {
                                             this@content.tooltip(this) {
+                                                name = "Fourth"
                                                 content {
                                                     pad(500f)
                                                     label("fourth tooltip") {

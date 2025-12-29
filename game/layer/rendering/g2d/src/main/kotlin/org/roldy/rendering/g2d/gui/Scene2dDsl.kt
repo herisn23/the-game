@@ -18,4 +18,8 @@ annotation class DrawableDsl
 
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class ReDrawableDsl
+
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class InputDsl

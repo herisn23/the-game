@@ -1,6 +1,7 @@
 package org.roldy.rendering.g2d.gui.el
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -44,6 +45,7 @@ class UIStage(
         viewport.update(width, height, true)
 //        updateViewport(scale)
     }
+
     private var touchDownHandled = false
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -56,6 +58,24 @@ class UIStage(
         // If touchDown was handled, consume touchUp too
         return handled || touchDownHandled.also { touchDownHandled = false }
     }
+
+    val tmpMouseCoords = Vector2()
+
+    fun updateMouseCoords() {
+        tmpMouseCoords.x = Gdx.input.x.toFloat()
+        tmpMouseCoords.y = Gdx.input.y.toFloat()
+    }
+
+    fun cursorActor(): Actor? {
+        updateMouseCoords()
+        // Convert screen to stage coordinates
+        val stageCoords = screenToStageCoordinates(tmpMouseCoords)
+
+// Get actor at that position
+        return hit(stageCoords.x, stageCoords.y, true)
+
+    }
+
 }
 
 

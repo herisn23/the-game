@@ -11,10 +11,12 @@ fun emptyImage(
     color: Color = alpha(1f),
     width: Int = 1,
     height: Int = 1,
+    closure: TextureRegionDrawable.() -> Unit = {}
 ) = Pixmap(width, height, Pixmap.Format.RGBA8888).run {
     setColor(color)
     fill()
     TextureRegionDrawable(Texture(this)).also {
         dispose()
+        it.setPadding(-10f)
     }
 }

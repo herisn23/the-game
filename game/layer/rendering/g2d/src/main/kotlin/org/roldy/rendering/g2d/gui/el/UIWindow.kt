@@ -145,10 +145,11 @@ class UIWindow : Table(), UITableWidget {
         addAction(
             Actions.parallel(
                 Actions.run {
-                    content.addAction(Actions.fadeOut(animationDuration * childrenAnimationMultiplier)) // 2x faster
+                    content.addAction(Actions.fadeOut(animationDuration)) // 2x faster
                 },
                 Actions.sequence(
-                    Actions.fadeOut(animationDuration),
+                    Actions.delay(animationDuration),
+                    Actions.fadeOut(animationDuration * childrenAnimationMultiplier),
                     Actions.run {
                         isVisible = false
                         isAnimating = false

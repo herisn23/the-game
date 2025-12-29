@@ -1,21 +1,28 @@
 package org.roldy.rendering.g2d.gui.el
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.*
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.*
+import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
-import org.roldy.rendering.g2d.gui.el.UIContextualTooltip.Backgrounds
+import org.roldy.rendering.g2d.gui.el.UIContextualTooltip.Drawables
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.properties.Delegates
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Table container for the actual tooltip content.
@@ -48,13 +55,13 @@ class UIContextualTooltipContent(
  * - While Alt is held or tooltip is focused, it remains visible
  * - Supports nested tooltips that keep parent visible
  *
- * @param backgrounds Four different background drawables for each anchor position
+ * @param drawables Four different background drawables for each anchor position
  * @param stage The stage to add the tooltip to
  */
 @Scene2dDsl
 class UIContextualTooltip(
-    val backgrounds: Backgrounds,
-    val stage: Stage
+    val drawables: Drawables,
+    val stage: UIStage
 ) : InputListener() {
 
     // Animation settings
@@ -86,12 +93,25 @@ class UIContextualTooltip(
     // State tracking
     /** Whether the tooltip is currently visible */
     private var isShowing = false
+    private var closing = false
 
-    /** Whether interaction mode is active (Alt key held or tooltip focused) */
-    private var interaction = false
+    /** Whether the tooltip currently is pinned (mouse enter on tooltip when pinnable) */
+    private var pinned: Boolean by Delegates.observable(false) { _, _, newValue ->
+        if (newValue) {
+            container.touchable = Touchable.enabled
+        } else {
+            container.touchable = Touchable.disabled
+        }
+    }
 
-    /** Whether the tooltip currently has focus (mouse is over it) */
+
     private var focused = false
+
+    private var pinPrepareDuration = 1.seconds
+
+    private var delayCloseDuration = 50.milliseconds
+
+    private var pinScaleY = 0f
 
     /** Whether a touch/click is currently active on this tooltip */
     var touched: Boolean = false
@@ -116,18 +136,32 @@ class UIContextualTooltip(
     // UI components
     private val content: UIContextualTooltipContent = UIContextualTooltipContent(this)
 
+    private val pinProgressAction get() = Actions.sequence(
+        floatAction(0f, 1f, pinPrepareDuration) {
+            pinScaleY = it
+        },
+        action {
+            pinned = true
+        }
+    )
     /** Container with custom draw logic to render background with proper transformations */
     private val container = object : Container<UIContextualTooltipContent>(content) {
         override fun draw(batch: Batch, parentAlpha: Float) {
-            validate()
-
             // Apply transformations to batch for scale/rotation animations
             applyTransform(batch, computeTransform())
 
-            // Draw background matching current anchor position
-            batch.color = color
-            backgrounds.pick(currentAnchor).draw(batch, 0f, 0f, width, height)
 
+            //start draw pin progress from .3f
+
+
+            drawables.background.draw(batch, 0f, 0f, width, height)
+            if (pinScaleY > 0.1f)
+                drawables.pinProgressBackground.draw(batch, 0f, 0f, width, height * pinScaleY)
+            if (pinned) {
+                drawables.pinBorder?.draw(batch, 0f, 0f, width, height)
+            }
+            // Draw anchors matching current anchor position
+            drawables.pickAnchor(currentAnchor)?.draw(batch, 0f, 0f, width, height)
             // Reset batch transformation
             resetTransform(batch)
 
@@ -137,10 +171,11 @@ class UIContextualTooltip(
     }
 
     /** Name for debugging purposes */
-    var name by Delegates.observable("") { _, old, new ->
+    var name by Delegates.observable("") { _, _, new ->
         container.name = new
     }
 
+    private val tmpCoords = Vector2()
     init {
         name = "UIContextualTooltip"
         container.touchable = Touchable.disabled
@@ -148,39 +183,27 @@ class UIContextualTooltip(
         content.name = "UIContextualTooltipContent"
         stage.addActor(container)
 
-        // Set up Alt key interaction mode
-        // When Alt is pressed, tooltip becomes interactable (can click/hover without hiding)
-        stage.addInputListener {
-            key(eventKeyDown, keyAltLeft, keySym) {
-                interaction = true
-                container.touchable = Touchable.enabled
-            }
-            key(eventKeyUp, keyAltLeft, keySym) {
-                if (!focused) {
-                    interaction = false
-                    container.touchable = Touchable.disabled
-                }
-            }
-        }
-
         // Handle interaction with the tooltip container itself
         container.addInputListener {
             // Block touch events from propagating through tooltip
             block(eventTouchUp, eventTouchDown)
-
             type(eventEnter) {
                 focused = true
             }
-
             type(eventExit) {
-                // Only hide if we're actually leaving the tooltip (not moving to a child)
+                // Only hide if we're actually leaving the tooltip (not moving to a container)
                 whenNotDescendantOf(container) {
-                    // Keep visible if nested tooltip is showing
-                    if (nestedTooltip?.isShowing == true)
+                    event.toCoordinates(event.listenerActor, tmpCoords)
+                    val hit = stage.cursorActor()
+                    val cursorActorIsNotThis = hit?.let {
+                        nestedTooltip?.let {
+                            hit.isDescendantOf(it.container)
+                        }?:false
+                    } ?: false
+                    // Keep visible when cursor is on nested tooltip
+                    if (cursorActorIsNotThis)
                         return@whenNotDescendantOf
-                    event.relatedActor?.isDescendantOf(container)
-                    interaction = false
-                    focused = false
+
                     hide()
 
                     // When exiting from nested tooltip, check if also exiting parent
@@ -192,6 +215,24 @@ class UIContextualTooltip(
                 }
             }
         }
+        container.isTransform = true
+        container.setOrigin(Align.center)
+    }
+
+    private fun preparePin() {
+        if (nestedTooltip != null && !pinned) {
+            container.addAction(pinProgressAction)
+        }
+
+    }
+
+    private fun delayClose() {
+        closing = true
+        container.addAction(delay(delayCloseDuration) {
+            closing = false
+            if (!focused)
+                hide()
+        })
     }
 
     /**
@@ -201,7 +242,6 @@ class UIContextualTooltip(
     override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
         touched = true
         hide()
-        println("Touch down on tooltip")
         return true
     }
 
@@ -210,7 +250,6 @@ class UIContextualTooltip(
      */
     override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
         touched = false
-        println("Touch up on tooltip")
     }
 
     /**
@@ -228,6 +267,7 @@ class UIContextualTooltip(
         if (hideCursor && visible()) {
             CursorManager.hide()
         }
+        preparePin()
     }
 
     /**
@@ -236,13 +276,10 @@ class UIContextualTooltip(
      */
     override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
         // Keep visible if in interaction mode or nested tooltip is showing
-        if (interaction || nestedTooltip?.isShowing == true) {
-            return
-        }
         if (hideCursor) {
             CursorManager.show()
         }
-        hide()
+        delayClose()
     }
 
     /**
@@ -275,18 +312,19 @@ class UIContextualTooltip(
      * Disables interaction and restores cursor visibility.
      */
     fun hide() {
-        container.touchable = Touchable.disabled
         if (!visible()) return
 
         fun finish() {
-            container.isTransform = false
+            pinScaleY = 0f
             container.isVisible = false
             isShowing = false
+            container.clearActions()
+            pinned = false
+            focused = false
         }
 
         if (animate) {
             // Animate scale and fade out
-            container.isTransform = true
             setOriginByAnchor()
             container.setScale(1f)
             container.clearActions()
@@ -338,16 +376,12 @@ class UIContextualTooltip(
     fun show() {
         if (!visible()) return
         isShowing = true
+
         container.toFront()
+
         container.isVisible = true
-
-        fun finish() {
-            container.isTransform = false
-        }
-
         if (animate) {
             // Animate scale and fade in
-            container.isTransform = true
             setOriginByAnchor()
             container.setScale(0f)
             container.clearActions()
@@ -362,14 +396,9 @@ class UIContextualTooltip(
                     // Then fade content in (faster)
                     Actions.run {
                         content.addAction(Actions.fadeIn(animationDuration * childrenAnimationMultiplier))
-                    },
-                    Actions.run {
-                        finish()
                     }
                 )
             )
-        } else {
-            finish()
         }
     }
 
@@ -511,18 +540,21 @@ class UIContextualTooltip(
      * Container for four background drawables, one for each anchor position.
      * The appropriate background is selected based on where the tooltip appears relative to the cursor.
      */
-    class Backgrounds(
-        val topLeft: Drawable,
-        val topRight: Drawable,
-        val bottomLeft: Drawable,
-        val bottomRight: Drawable
+    class Drawables(
+        val background: Drawable,
+        val pinBorder: Drawable? = null,
+        val anchorTopLeft: Drawable? = null,
+        val anchorTopRight: Drawable? = null,
+        val anchorBottomLeft: Drawable? = null,
+        val anchorBottomRight: Drawable? = null,
+        val pinProgressBackground: Drawable = emptyImage(Color.WHITE)
     ) {
-        fun pick(position: AnchorPosition) =
+        fun pickAnchor(position: AnchorPosition) =
             when (position) {
-                TOP_LEFT -> topLeft
-                TOP_RIGHT -> topRight
-                BOTTOM_LEFT -> bottomLeft
-                BOTTOM_RIGHT -> bottomRight
+                TOP_LEFT -> anchorTopLeft
+                TOP_RIGHT -> anchorTopRight
+                BOTTOM_LEFT -> anchorBottomLeft
+                BOTTOM_RIGHT -> anchorBottomRight
             }
     }
 
@@ -565,7 +597,7 @@ class UIContextualTooltip(
 /**
  * DSL builder function for creating a contextual tooltip.
  *
- * @param backgrounds Four background drawables for different anchor positions
+ * @param drawables Four background drawables for different anchor positions
  * @param init Initialization lambda for configuring the tooltip
  * @return The created UIContextualTooltip instance
  */
@@ -573,11 +605,11 @@ class UIContextualTooltip(
 @Scene2dDsl
 context(context: C)
 fun <C : UIContext> contextualTooltip(
-    backgrounds: Backgrounds,
+    drawables: Drawables,
     init: context(C) (@Scene2dDsl UIContextualTooltip).() -> Unit = {}
 ): UIContextualTooltip {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return UIContextualTooltip(backgrounds, context.stage()).apply {
+    return UIContextualTooltip(drawables, context.stage()).apply {
         init()
     }
 }

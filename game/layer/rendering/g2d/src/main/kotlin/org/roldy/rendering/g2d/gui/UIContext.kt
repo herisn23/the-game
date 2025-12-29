@@ -1,7 +1,7 @@
 package org.roldy.rendering.g2d.gui
 
-import com.badlogic.gdx.scenes.scene2d.Stage
+import org.roldy.rendering.g2d.gui.el.UIStage
 
 interface UIContext {
-    fun stage(): Stage
+    fun stage(): UIStage
 }

@@ -3,12 +3,11 @@ package org.roldy.gui
 import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import org.roldy.rendering.g2d.gui.NinePatchDsl
-import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
 import org.roldy.rendering.g2d.gui.ninePatch
 import org.roldy.rendering.g2d.gui.ninePatchParams
 
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRLBackground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(
@@ -17,7 +16,7 @@ fun <A> buttonRLBackground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
         element
     )
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRLForeground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(
@@ -26,42 +25,35 @@ fun <A> buttonRLForeground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
         element
     )
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRLHover(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Button_RL_Hover }, left = 56, right = 56, element = element)
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRLOverlay1(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Button_RL_Overlay1 }, 0, 0, 13, 0, element)
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRLOverlay2(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Button_RL_Overlay2 }, 30, 46, 27, 30, element)
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRSBackgroundGrayscale(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Button_RS_Background_Grayscale }, ninePatchParams(18), element)
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> buttonRSBorder2(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Button_RS_Border2 }, ninePatchParams(16), element)
 
-@Scene2dCallbackDsl
+@NinePatchDsl
 context(gui: GuiContext)
 fun <A> tooltipBackground(element: @NinePatchDsl NinePatchDrawable.() -> A): A =
     ninePatch(gui.region { Tooltip_Background }, ninePatchParams(25), element)
-
-@NinePatchDsl
-context(gui: GuiContext)
-fun popupNinePatch(texture: GUITextures.() -> GUITexture) =
-    ninePatch(gui.textures.texture().region(), ninePatchParams(60)) {
-        this
-    }
 
 @NinePatchDsl
 context(gui: GuiContext)
