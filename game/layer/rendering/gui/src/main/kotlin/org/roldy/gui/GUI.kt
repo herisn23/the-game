@@ -25,6 +25,7 @@ data class GUIColors(
     val window: Color,
     val primaryText: Color,
     val secondaryText: Color,
+    val disabled: Color
 )
 
 data class GuiContext(
@@ -49,20 +50,23 @@ data class GuiContext(
     override fun stage(): UIStage = stage
 }
 
+var colorSchema = GUIColors(
+    primary = hex("FF463D"),//FF463D
+    secondary = hex("FF6363FF"),
+    button = hex("FFEDCF"),
+    window = hex("c7ac66"),
+    primaryText = hex("8B7E6EFF"),
+    secondaryText = hex("C1B197FF"),
+    disabled = Color.GRAY
+)
+
 @Scene2dDsl
 fun Gui.gui(
     scale: Float = 1f,
     build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit
 ): UIStage {
     val atlas by disposable { AtlasLoader.gui }
-    val colors = GUIColors(
-        primary = hex("FF463D"),//FF463D
-        secondary = hex("FF6363FF"),
-        button = hex("FFEDCF"),
-        window = hex("c7ac66"),
-        primaryText = hex("8B7E6EFF"),
-        secondaryText = hex("C1B197FF")
-    )
+    val colors = colorSchema
     val bundle = I18N()
     val guiContext = GuiContext(colors, GUITextures(atlas), bundle) { size, initialize ->
         gameFont(size = size, color = colors.button, initialize = initialize).disposable()
@@ -71,7 +75,6 @@ fun Gui.gui(
     val stage by disposable {
         context(guiContext) {
             stage(scale, 3840 x 2160) {
-
                 guiContext.stage = this
                 build(guiContext)
             }

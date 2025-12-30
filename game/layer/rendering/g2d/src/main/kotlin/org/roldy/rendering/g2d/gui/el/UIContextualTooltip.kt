@@ -578,6 +578,7 @@ class UIContextualTooltip(
      * @param content Lambda to build the tooltip content table
      */
     fun content(content: UIContextualTooltipContent.(UIContextualTooltip) -> Unit) {
+        this.content.clear()
         this.content.content(this)
         this.content.pack()
     }

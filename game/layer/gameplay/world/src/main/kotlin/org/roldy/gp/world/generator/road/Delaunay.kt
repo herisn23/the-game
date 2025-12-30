@@ -1,7 +1,7 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 
 object Delaunay: RoadNetworkAlgorithm {
     /**
@@ -10,12 +10,12 @@ object Delaunay: RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementData>,
+        settlements: List<SettlementTileData>,
         config: Map<String, Any>
-    ): List<Pair<SettlementData, SettlementData>> {
+    ): List<Pair<SettlementTileData, SettlementTileData>> {
         val pruningFactor:Float by config
         // Step 1: Create Delaunay triangulation (connects nearby settlements)
-        val allEdges = mutableListOf<Pair<SettlementData, SettlementData>>()
+        val allEdges = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
 
         // Simple approach: connect each settlement to its Voronoi neighbors
         settlements.forEach { from ->

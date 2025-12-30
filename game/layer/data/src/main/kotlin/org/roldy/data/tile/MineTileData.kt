@@ -1,11 +1,10 @@
-package org.roldy.gp.world.generator.data
+package org.roldy.data.tile
 
 import org.roldy.core.Vector2Int
 import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.data.tile.TileData
 
-data class MineData(
+data class MineTileData(
     override val coords: Vector2Int,
     val harvestable: Harvestable,
-    val settlementData: SettlementData?
+    val settlementData: SettlementTileData?
 ) : TileData

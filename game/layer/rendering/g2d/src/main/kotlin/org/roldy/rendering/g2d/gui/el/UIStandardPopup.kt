@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.rendering.g2d.gui.Scene2dDsl
+import org.roldy.rendering.g2d.gui.UIContext
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -38,12 +39,12 @@ class UIStandardPopup(
 
 
 @OptIn(ExperimentalContracts::class)
-@org.roldy.rendering.g2d.gui.Scene2dDsl
+@Scene2dDsl
 context(_: C)
-fun <C : org.roldy.rendering.g2d.gui.UIContext, S> UIWidget<S>.standardPopup(
+fun <C : UIContext, S> UIWidget<S>.standardPopup(
     background: Drawable,
     anchor: Image,
-    init: context(C) (@org.roldy.rendering.g2d.gui.Scene2dDsl UIStandardPopup).(S) -> Unit = {}
+    init: context(C) (@Scene2dDsl UIStandardPopup).(S) -> Unit = {}
 ): UIStandardPopup {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
     return actor(UIStandardPopup(background, anchor), init)

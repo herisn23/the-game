@@ -1,23 +1,58 @@
 package org.roldy.rendering.g2d.gui.el
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.scenes.scene2d.EventListener
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import org.roldy.core.utils.alpha
+import org.roldy.rendering.g2d.emptyImage
+import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.anim.core.AnimatedDrawable
+import org.roldy.rendering.g2d.gui.anim.core.AnimationDrawableStateResolver
+import org.roldy.rendering.g2d.gui.anim.core.delta
 import kotlin.contracts.ExperimentalContracts
 
-interface UIButton {
-    fun addListener(listener: EventListener): Boolean
+abstract class UIButton : Button(ButtonStyle().apply { up = emptyImage(alpha(0f)) }),
+    AnimationDrawableStateResolver<UIAnimationState> {
+    val graphics = ButtonDrawable(this)
+    private var drawable: Drawable = emptyImage(Color.WHITE)
+
+    class ButtonDrawable(
+        private val button: UIButton
+    ) {
+        operator fun invoke(drawable: () -> Drawable) {
+            button.drawable = drawable().run {
+                when (this) {
+                    is AnimatedDrawable -> delta()
+                    else -> this
+                }
+            }
+        }
+    }
+
+    override fun getBackgroundDrawable(): Drawable {
+        return drawable
+    }
+
+    override val state: UIAnimationState
+        get() = when {
+            isDisabled -> Disabled
+            isPressed -> Pressed
+            isOver -> Over
+            else -> Normal
+        }
 }
 
 
 @Scene2dCallbackDsl
 @OptIn(ExperimentalContracts::class)
-fun UIButton.onClick(button:Int = Input.Buttons.LEFT, onClick: (InputEvent) -> Unit) {
+fun UIButton.onClick(button: Int = Input.Buttons.LEFT, onClick: (InputEvent) -> Unit) {
     addListener(object : ClickListener(button) {
         override fun clicked(event: InputEvent, x: Float, y: Float) {
-            onClick(event)
+            if (state != Disabled)
+                onClick(event)
         }
     })
 }

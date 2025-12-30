@@ -1,38 +1,40 @@
-package org.roldy.rendering.g2d.gui.anim
+package org.roldy.rendering.g2d.gui.anim.core
 
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 
 
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class AnimationDsl
 
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class AnimationCallbackDsl
+
 interface AnimatedDrawable {
-    val drawable: Drawable
     fun update(delta: Float)
     fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float)
 }
 
-interface ConfigurableAnimatedDrawable<S : AnimationDrawableState, V> : AnimatedDrawable {
-    val resolver: AnimationDrawableStateResolver
+interface StatefulAnimatedDrawable<S : AnimationDrawableState, V> : AnimatedDrawable {
+    val resolver: AnimationDrawableStateResolver<S>
     val animation: AnimationConfiguration<S, V>
 
 }
 
 interface AnimationConfiguration<S : AnimationDrawableState, V> {
     var speed: Float
-    val config: MutableMap<S, V>
+    val state: MutableMap<S, V>
 
-    @AnimationDsl
-    infix fun S.to(s: V) {
-        config[this] = s
+    @AnimationCallbackDsl
+    infix fun S.have(s: V) {
+        state[this] = s
     }
 }
 
 class DefaultAnimationConfiguration<S : AnimationDrawableState, V> : AnimationConfiguration<S, V> {
     override var speed: Float = 8f
-    override val config: MutableMap<S, V> = mutableMapOf()
+    override val state: MutableMap<S, V> = mutableMapOf()
 }
 
 

@@ -1,5 +1,7 @@
 package org.roldy.rendering.g2d.gui
 
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+
 
 /**
  * Stretch modes similar to Unity's RectTransform anchor presets
@@ -288,4 +290,17 @@ fun stretch(
         x + w, y + h,
         mode, left, right, top, bottom, w, h
     )
+}
+
+fun Drawable.pad(
+    uniform: Float = 0f
+) = pad(uniform * 2, uniform, uniform, uniform * 2)
+
+fun Drawable.pad(
+    top: Float = 0f,
+    left: Float = 0f,
+    bottom: Float = 0f,
+    right: Float = 0f
+) = redraw { x, y, w, h, draw ->
+    draw(x + left, y + bottom, w - right, h - top)
 }

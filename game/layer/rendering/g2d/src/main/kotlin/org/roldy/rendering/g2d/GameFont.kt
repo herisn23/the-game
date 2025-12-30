@@ -12,7 +12,7 @@ fun gameFont(
     borderColor: Color = Color.WHITE,
     initialize: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {}
 ): BitmapFont {
-    val generator = FreeTypeFontGenerator(loadAsset("font/DragonHunter-9Ynxj.otf"))
+    val generator = FreeTypeFontGenerator(loadAsset("font/CambriaMath.ttf"))
 
     val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
     parameter.size = size  // Font size in pixels

@@ -1,7 +1,7 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 
 object HubAndSpoke: RoadNetworkAlgorithm {
     /**
@@ -10,11 +10,11 @@ object HubAndSpoke: RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementData>,
+        settlements: List<SettlementTileData>,
         config: Map<String, Any>
-    ): List<Pair<SettlementData, SettlementData>> {
+    ): List<Pair<SettlementTileData, SettlementTileData>> {
        val hubCount: Int by config
-        val edges = mutableListOf<Pair<SettlementData, SettlementData>>()
+        val edges = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
 
         // Identify major hubs (largest/most central settlements)
         val hubs = settlements

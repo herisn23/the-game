@@ -80,7 +80,7 @@ fun <S> UIWidget<S>.window(
     }
     //header
     header {
-        pad(10f)
+        this.pad(10f)
         label(title, 60) {
             it.center().expand().padRight(-CloseButtonSize - 7)
             color = gui.colors.window
@@ -92,7 +92,7 @@ fun <S> UIWidget<S>.window(
         }
     }
     content {
-        pad(BorderPadding)
+        this.pad(BorderPadding)
         init(it)
     }
     pack()

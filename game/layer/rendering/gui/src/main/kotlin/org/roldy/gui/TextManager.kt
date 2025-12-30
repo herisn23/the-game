@@ -5,7 +5,6 @@ import org.roldy.core.i18n.I18N
 import org.roldy.core.i18n.Strings
 import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
 import org.roldy.rendering.g2d.gui.TextActor
-import org.roldy.rendering.g2d.gui.i18n.localizable
 
 typealias TextManagerClosure<S> = () -> S
 
@@ -17,15 +16,21 @@ data class TextManager(
 
     @Scene2dCallbackDsl
     context(gui: GuiContext)
-    operator fun <A> invoke(button: (() -> String) -> A): A where A : TextActor, A : Actor =
-        when {
-            translate != null -> localizable(translate) { string ->
-                button(string)
+    operator fun <A> invoke(set: (() -> String) -> A): A where A : TextActor, A : Actor =
+        set(getText)
+
+    context(gui: GuiContext)
+    val getText get(): () -> String =
+        {
+            when {
+                translate != null -> translate().run {
+                    gui.i18n[this]
+                }
+
+                text != null -> text()
+
+                else -> error("ButtonText must contain text or translate")
             }
-
-            text != null -> button(text)
-
-            else -> error("ButtonText must contain text or translate")
         }
 }
 

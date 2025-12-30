@@ -36,10 +36,10 @@ class TraverseDrawable(
 
 }
 
-@Scene2dDsl
+@Scene2dCallbackDsl
 infix fun Drawable.traverse(drawable: () -> Drawable) =
     TraverseDrawable(this, drawable())
 
-@Scene2dDsl
+@Scene2dCallbackDsl
 infix fun Drawable.traverse(drawable: Drawable) =
     TraverseDrawable(this, drawable)

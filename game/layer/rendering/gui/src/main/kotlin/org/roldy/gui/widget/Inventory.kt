@@ -46,23 +46,28 @@ data class InventorySlot<D>(
 ) : PoolItem {
 
     data class Data<D>(
-        val icon: Drawable,
-        val grade: ItemGrade? = null,
-        val amount: Int? = null,
-        val lock: Boolean = false,
-        val index: Int,
-        val data: D,
-        val tooltip: SlotTooltip<D>
+        var icon: Drawable,
+        var grade: ItemGrade? = null,
+        var amount: Int? = null,
+        var lock: Boolean = false,
+        var index: Int,
+        var item: D,
+        var tooltip: SlotTooltip<D>
     )
 
     val gridIndex get() = inventory.slots.indexOf(this)
 
-    var slotData: Data<D>? by Delegates.observable<Data<D>?>(null) { _, _, newValue ->
+    var data: Data<D>? by Delegates.observable<Data<D>?>(null) { _, _, newValue ->
         if (newValue != null) {
             setGrade(newValue.grade)
             setLock(newValue.lock)
             setAmount(newValue.amount.clampToString())
             setIcon(newValue.icon)
+            tooltip {
+                with(newValue) {
+                    tooltip(this)
+                }
+            }
         } else {
             setGrade(null)
             setLock(false)
@@ -72,7 +77,7 @@ data class InventorySlot<D>(
     }
     internal lateinit var tooltip: UIContextualTooltip
 
-    val occupied get() = slotData != null
+    val occupied get() = data != null
 
     var isDisabled: Boolean
         get() = slot.isDisabled
@@ -94,15 +99,6 @@ data class InventorySlot<D>(
         }
     }
 
-    fun setData(data: Data<D>) {
-        this.slotData = data
-        tooltip {
-            with(data) {
-                tooltip(data)
-            }
-        }
-    }
-
     fun setIcon(drawable: Drawable?) {
         slot.setIcon(drawable)
     }
@@ -116,8 +112,16 @@ data class InventorySlot<D>(
 
     override fun clean() {
         isDisabled = false
-        slotData = null
+        data = null
         tooltip.clean()
+    }
+
+    fun reload(
+    ) {
+        data?.let {
+            clean()
+            data = it
+        }
     }
 
     fun remove() {
@@ -142,7 +146,7 @@ class Inventory<D>(
     private val scroll: UIScrollPane,
     private val context: GuiContext
 ) {
-    private val slotListeners: MutableList<D.(InputEvent) -> Unit> = mutableListOf()
+    private val slotListeners: MutableList<D.(Pair<InventorySlot<D>, InputEvent>) -> Unit> = mutableListOf()
     private val slotPositionChangedListeners: MutableList<(from: InventorySlot<D>, to: InventorySlot<D>) -> Unit> =
         mutableListOf()
     internal val sortActions: MutableList<SortAction<D>> = mutableListOf()
@@ -168,9 +172,7 @@ class Inventory<D>(
             {
                 inventorySlot(this@Inventory) { table ->
                     onClick {
-                        slotData?.run {
-                            invokeClick(data, it)
-                        }
+                        invokeClick(this, it)
                     }
                     tooltip = table.tooltip {
                         visible = { this@inventorySlot.occupied && !dragging }
@@ -193,7 +195,7 @@ class Inventory<D>(
     }
 
     @Scene2dCallbackDsl
-    fun onSlotClick(onClick: D.(InputEvent) -> Unit) {
+    fun onSlotClick(onClick: D.(Pair<InventorySlot<D>, InputEvent>) -> Unit) {
         slotListeners.add(onClick)
     }
 
@@ -226,11 +228,11 @@ class Inventory<D>(
         if (suitable == null)
             suitable = addSlot()
 
-        suitable.setData(data)
+        suitable.data = data
         return suitable
     }
 
-    fun setData(data: List<InventorySlot.Data<D>>) {
+    fun setData(data: List<Data<D>>) {
         clean()
         data.forEach {
             addItem(it)
@@ -257,23 +259,23 @@ class Inventory<D>(
         slotPositionChangedListeners.forEach {
             it(original, target)
         }
-        val targetData = target.slotData
-        val originalData = original.slotData
+        val targetData = target.data
+        val originalData = original.data
 
         original.clean()
         target.clean()
 
         targetData?.let {
-            original.setData(it)
+            original.data = it
         }
         originalData?.let {
-            target.setData(it)
+            target.data = it
         }
     }
 
-    internal fun invokeClick(slot: D, event: InputEvent) {
-        slotListeners.forEach {
-            slot.it(event)
+    internal fun invokeClick(slot: InventorySlot<D>, event: InputEvent) {
+        slotListeners.forEach { call ->
+            slot.data?.item?.call(slot to event)
         }
     }
 }
@@ -302,7 +304,7 @@ fun <S, D> UIWidget<S>.inventory(
             }) {
 
                 grid(Columns, CellPadding) {
-                    pad(15f)
+                    this.pad(15f)
                     align(Align.topLeft)
                     grid = this
                 }
@@ -400,7 +402,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
                 lock.ref.color.a = alpha
             }
 
-            val prevData = slot.slotData
+            val prevData = slot.data
             canDrag = {
                 slot.occupied// && slot.slotData?.lock == false
             }
@@ -412,7 +414,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
                 inventory.dragging = false
                 highlight(1f)
                 prevData?.let {
-                    slot.setData(it)
+                    slot.data = it
                 }
             }
             onDrop = {

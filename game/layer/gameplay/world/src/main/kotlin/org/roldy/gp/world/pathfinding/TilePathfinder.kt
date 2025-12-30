@@ -6,6 +6,10 @@ import org.roldy.rendering.map.WorldMap
 import java.util.*
 import kotlin.math.abs
 
+/**
+ * Pathfinding is calculating by tile walk cost.
+ * 0 - means tile is immovable
+ */
 class TilePathfinder(
     private val worldMap: WorldMap,
     private val walkCost: (tile: Vector2Int, goal: Vector2Int) -> Float = { _, _ -> 1f }

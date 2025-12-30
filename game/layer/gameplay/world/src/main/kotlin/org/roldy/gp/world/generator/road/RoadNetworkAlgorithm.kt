@@ -1,13 +1,13 @@
 package org.roldy.gp.world.generator.road
 
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 
 
 interface RoadNetworkAlgorithm {
 
     fun generate(
         seed: Long,
-        settlements: List<SettlementData>,
+        settlements: List<SettlementTileData>,
         config: Map<String, Any>
-    ): List<Pair<SettlementData, SettlementData>>
+    ): List<Pair<SettlementTileData, SettlementTileData>>
 }

@@ -1,26 +1,29 @@
 package org.roldy.gui.general.button
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.anim.alphaAnimation
+import org.roldy.rendering.g2d.gui.anim.colorAnimation
+import org.roldy.rendering.g2d.gui.anim.noneAnimation
+import org.roldy.rendering.g2d.gui.anim.stackedAnimation
 import org.roldy.rendering.g2d.gui.el.*
 
 enum class CircularButtonSize(
-    val background: GuiContext.() -> TextureRegion,
-    val foreground: GuiContext.() -> TextureRegion,
+    val background: GuiContext.() -> Drawable,
+    val foreground: GuiContext.() -> Drawable,
 ) {
     S(
-        { region { Button_Circular_S_Background } },
-        { region { Button_Circular_S_Foreground } }
+        { drawable { Button_Circular_S_Background } },
+        { drawable { Button_Circular_S_Foreground } }
     ),
     M(
-        { region { Button_Circular_Background } },
-        { region { Button_Circular_Foreground } }
+        { drawable { Button_Circular_Background } },
+        { drawable { Button_Circular_Foreground } }
     ),
     L(
-        { region { Button_Circular_L_Background } },
-        { region { Button_Circular_L_Foreground } }
+        { drawable { Button_Circular_L_Background } },
+        { drawable { Button_Circular_L_Foreground } }
     ),
 }
 
@@ -29,29 +32,36 @@ context(gui: GuiContext)
 fun <S> UIWidget<S>.circularButton(
     icon: Drawable,
     size: CircularButtonSize = CircularButtonSize.M,
-    init: (@Scene2dDsl UIImageButton).() -> Unit = {}
-): UIImageButton {
-    lateinit var button: UIImageButton
-    table(true) {
-        image(size.background(gui))
-
-        table(true) {
-            pad(18f)
-            image(size.foreground(gui)) {
+    init: (@Scene2dDsl UIPlainButton).(S) -> Unit = {}
+): UIPlainButton {
+    lateinit var button: UIPlainButton
+    val padding = 18f
+    table { storage ->
+        pad(padding)
+        plainButton { cell ->
+            val background = noneAnimation(size.background(gui).pad(-padding))
+            val foreground = colorAnimation(size.foreground(gui).apply {
+                cell.minWidth(minWidth).minHeight(minHeight)
+            }) {
                 color = gui.colors.primary
+                Disabled have gui.colors.disabled
             }
-            imageButton(
-                drawable = mask(gui.drawable { Button_Circular_Overlay }),
-                transition = {
-                    Normal to 0f
-                    Pressed to .4f
-                    Over to 1f
+            val hover = alphaAnimation(mask(gui.drawable { Button_Circular_Overlay })) {
+                Normal have 0f
+                Pressed have .4f
+                Over have 1f
+                Disabled have 0f
+            }
+            graphics {
+                stackedAnimation {
+                    add(background)
+                    add(foreground)
+                    add(hover)
                 }
-            ) {
-                image(icon)
-                button = this
-                init()
             }
+            image(icon)
+            button = this
+            init(storage)
         }
     }
     return button

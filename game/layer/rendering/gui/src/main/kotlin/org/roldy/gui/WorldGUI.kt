@@ -7,6 +7,7 @@ import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIPopup
 import org.roldy.rendering.g2d.gui.el.UIStandardPopup
+import org.roldy.rendering.g2d.gui.el.UITable
 import org.roldy.rendering.g2d.gui.el.stack
 
 
@@ -14,7 +15,7 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
 
     lateinit var tileTooltip: Pair<UIStandardPopup, GuiContext>
 
-    val stage = gui(1f) { gui ->
+    override val stage = gui(1f) { gui ->
         stack {
             name = "TilePopupStack"
             setLayoutEnabled(false)
@@ -24,29 +25,22 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
     }
 
     @Scene2dDsl
+    fun hideTileInfo() {
+        tileTooltip.first.hide()
+    }
+
+    @Scene2dDsl
     fun showTileInfo(
-        content: context(GuiContext) org.roldy.rendering.g2d.gui.el.UITable.(UIPopup) -> Unit,
+        content: context(GuiContext) UITable.(UIPopup) -> Unit,
         follow: () -> Vector2Int
     ): UIStandardPopup {
         val (popup, context) = tileTooltip
-        context(context, popup) {
-            with(popup) {
-                show {
-                    content(it)
-                }
-                position = follow
+        context(context) {
+            popup.show {
+                content(it)
             }
+            popup.position = follow
         }
         return popup
-    }
-
-    override fun resize(width: Int, height: Int) {
-        stage.resize(width, height)
-    }
-
-    context(delta: Float)
-    override fun render() {
-        stage.act(delta)
-        stage.draw()
     }
 }

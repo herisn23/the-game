@@ -14,20 +14,22 @@ import org.roldy.data.state.PawnState
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
+import org.roldy.rendering.g2d.disposable.disposable
 import kotlin.properties.Delegates
 
 class PawnFigure(
     val data: PawnState,
     val camera: Camera,
     val walkCost: (Vector2Int) -> Float,
-    onPathEnd: (Vector2Int) -> Unit
+    var onPathEnd: (Vector2Int) -> Unit = {}
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
     val pathWalkerManager = PathWalkerManager(this, {
         data.defaultTileSpeed * data.speed * walkCost(it)
     }, {
         this.coords = it
     }, onPathEnd)
-    val tex = Texture("purple_circle.png").disposable()
+    val tex by disposable { Texture("purple_circle.png") }
+
     val sprite = Sprite(tex).apply {
         setSize(100f, 100f)
         setOriginCenter()

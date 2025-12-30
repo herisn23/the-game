@@ -1,63 +1,73 @@
 package org.roldy.gui.general.button
 
+import com.badlogic.gdx.graphics.Color
 import org.roldy.core.utils.alpha
 import org.roldy.gui.GuiContext
 import org.roldy.gui.TextManager
 import org.roldy.gui.buttonRSBackgroundGrayscale
 import org.roldy.gui.buttonRSBorder2
 import org.roldy.rendering.g2d.emptyImage
-import org.roldy.rendering.g2d.gui.Normal
-import org.roldy.rendering.g2d.gui.Over
-import org.roldy.rendering.g2d.gui.Pressed
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.el.*
+import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.anim.alphaAnimation
+import org.roldy.rendering.g2d.gui.anim.colorAnimation
+import org.roldy.rendering.g2d.gui.anim.noneAnimation
+import org.roldy.rendering.g2d.gui.anim.stackedAnimation
+import org.roldy.rendering.g2d.gui.el.UITextButton
+import org.roldy.rendering.g2d.gui.el.UIWidget
+import org.roldy.rendering.g2d.gui.el.table
+import org.roldy.rendering.g2d.gui.el.textButton
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.smallButton(
     text: TextManager,
+    fontColor: Color = gui.colors.button,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {
-    val font = gui.font(25) {
+    val font = gui.font(50) {
         padTop = 0
         padBottom = 0
+        color = fontColor
     }
 
-    val padding = 20f
+    val padding = 10f
     lateinit var button: UITextButton
-    table(true) { cell ->
-        //background
-        buttonRSBackgroundGrayscale {
-            image(this) {
-                color = gui.colors.primary
-            }
-        }
-        table(true) {
-            pad(padding)
-            //border
-            buttonRSBorder2 {
-                image(this)
-            }
-        }
-        table(true) {
-            pad(padding - 3) //pad to parent
-            text { string ->
-                textButton(
-                    string, textButtonStyle(
-                        font = font,
-                        background = emptyImage(alpha(.2f)),
-                        transition = {
-                            Normal to 0f
-                            Pressed to .4f
-                            Over to 1f
-                        }
-                    )
-                ) {
-                    padLeft(padding)
-                    padRight(padding)
-                    init(cell)
-                    button = this
+    table { storage ->
+        pad(padding)
+        text { string ->
+            textButton(
+                { string().uppercase() }, font
+            ) { cell ->
+                padLeft(padding*7)
+                padRight(padding*7)
+                padTop(-padding)
+                padBottom(-padding)
+
+                val background = colorAnimation(buttonRSBackgroundGrayscale {
+                    cell.minWidth(minWidth).minHeight(minHeight)
+                    pad(-padding * 2)
+                }) {
+                    color = gui.colors.primary
+                    Disabled have gui.colors.disabled
                 }
+                val border = noneAnimation(buttonRSBorder2 { pad(-3f) })
+
+                val hover = alphaAnimation(emptyImage(alpha(.2f)).pad(-padding/2)) {
+                    Normal have 0f
+                    Pressed have .4f
+                    Over have 1f
+                    Disabled have 0f
+                }
+
+                graphics {
+                    stackedAnimation {
+                        add(background)
+                        add(border)
+                        add(hover)
+                    }
+                }
+                init(storage)
+                button = this
             }
         }
     }

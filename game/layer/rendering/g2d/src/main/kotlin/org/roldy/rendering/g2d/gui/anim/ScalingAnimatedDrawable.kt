@@ -3,13 +3,13 @@ package org.roldy.rendering.g2d.gui.anim
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
-import org.roldy.rendering.g2d.gui.DrawableDsl
+import org.roldy.rendering.g2d.gui.anim.core.*
 
 class ScalingAnimatedDrawable<S : AnimationDrawableState>(
-    override val drawable: Drawable,
-    override val resolver: AnimationDrawableStateResolver,
+    val drawable: Drawable,
+    override val resolver: AnimationDrawableStateResolver<S>,
     override val animation: DefaultAnimationConfiguration<S, Float>
-) : BaseDrawable(), ConfigurableAnimatedDrawable<S, Float> {
+) : BaseDrawable(), StatefulAnimatedDrawable<S, Float> {
     private var currentScale: Float = 1f
     private var targetScale: Float = 1f
 
@@ -22,7 +22,7 @@ class ScalingAnimatedDrawable<S : AnimationDrawableState>(
         val state = resolver.state
 
         // Get target scale for current state (default to 1.0 if not defined)
-        targetScale = animation.config[state] ?: 1f
+        targetScale = animation.state[state] ?: 1f
 
         // Smoothly animate current scale towards target
         if (currentScale != targetScale) {
@@ -51,9 +51,9 @@ class ScalingAnimatedDrawable<S : AnimationDrawableState>(
     }
 }
 
-fun <S : AnimationDrawableState> AnimationDrawableStateResolver.scale(
+fun <S : AnimationDrawableState> AnimationDrawableStateResolver<S>.scaleAnimation(
     drawable: Drawable,
-    configure: @DrawableDsl DefaultAnimationConfiguration<S, Float>.() -> Unit
+    configure: @AnimationDsl DefaultAnimationConfiguration<S, Float>.() -> Unit
 ) =
     ScalingAnimatedDrawable(
         drawable,

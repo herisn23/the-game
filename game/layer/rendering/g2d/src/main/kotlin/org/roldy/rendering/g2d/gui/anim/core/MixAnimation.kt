@@ -1,7 +1,6 @@
-package org.roldy.rendering.g2d.gui.anim
+package org.roldy.rendering.g2d.gui.anim.core
 
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
-import org.roldy.rendering.g2d.gui.DrawableDsl
 
 
 class MixAnim(
@@ -11,7 +10,7 @@ class MixAnim(
     private var drawable: Drawable = baseDrawable
 
 
-    @AnimationDsl
+    @AnimationCallbackDsl
     fun <S : AnimationDrawableState, V> add(
         animation: (
             Drawable,
@@ -22,13 +21,13 @@ class MixAnim(
         drawable = animation(drawable, configure).delta()
     }
 
-    @AnimationDsl
+    @AnimationCallbackDsl
     fun <S> add(
         animation: (
             Drawable,
             S
         ) -> AnimatedDrawable,
-        configure: @DrawableDsl S
+        configure: @AnimationDsl S
     ) {
         drawable = animation(drawable, configure).delta()
     }
@@ -36,7 +35,7 @@ class MixAnim(
     fun drawable(): Drawable = drawable
 }
 
-fun mix(
+fun mixAnimation(
     drawable: Drawable,
     configure: MixAnim.() -> Unit
 ) =

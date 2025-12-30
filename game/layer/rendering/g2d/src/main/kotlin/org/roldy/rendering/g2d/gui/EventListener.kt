@@ -8,7 +8,7 @@ data class InputListenerProxy(
 ) {
     internal var consumed = false
 
-    @InputDsl
+    @Scene2dInputDsl
     fun isDescendantOf(other: Actor): Boolean {
         if (event.relatedActor != null) {
             return event.relatedActor.isDescendantOf(other)
@@ -16,14 +16,14 @@ data class InputListenerProxy(
         return false
     }
 
-    @InputDsl
+    @Scene2dInputDsl
     fun whenDescendantOf(other: Actor, consume: (Actor) -> Unit) {
         if (isDescendantOf(other)) {
             consume(event.relatedActor)
         }
     }
 
-    @InputDsl
+    @Scene2dInputDsl
     fun whenNotDescendantOf(other: Actor, consume: () -> Unit) {
         if (!isDescendantOf(other)) {
             consume()

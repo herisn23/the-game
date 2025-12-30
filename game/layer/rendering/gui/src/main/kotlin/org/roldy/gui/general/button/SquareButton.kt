@@ -1,35 +1,46 @@
 package org.roldy.gui.general.button
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.gui.GuiContext
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.anim.alphaAnimation
+import org.roldy.rendering.g2d.gui.anim.colorAnimation
+import org.roldy.rendering.g2d.gui.anim.noneAnimation
+import org.roldy.rendering.g2d.gui.anim.stackedAnimation
 import org.roldy.rendering.g2d.gui.el.*
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.squareButton(
     icon: Drawable,
-    init: (@Scene2dDsl UIImageButton).(S) -> Unit = {}
+    init: (@Scene2dDsl UIPlainButton).(S) -> Unit = {}
 ): UITable =
-    table(true) { cell ->
-        image(gui.region { Button_Square_Background })
-        table(true) {
-            pad(18f)
-            image(gui.region { Button_Square_Foreground }) {
+    table { storage ->
+        val padding = 18f
+        pad(padding)
+        plainButton { cell ->
+            pad(padding)
+            val background = noneAnimation(gui.drawable { Button_Square_Background }.pad(-padding))
+            val foreground = colorAnimation(gui.drawable { Button_Square_Foreground }) {
+                cell.minWidth(minWidth).minHeight(minHeight)
                 color = gui.colors.primary
+                Disabled have gui.colors.disabled
             }
-            imageButton(
-                drawable = mask(emptyImage(Color.WHITE)),
-                transition = {
-                    Normal to 0f
-                    Pressed to .4f
-                    Over to .7f
+            val hover = alphaAnimation(mask(emptyImage())) {
+                Normal have 0f
+                Pressed have .1f
+                Over have .7f
+                Disabled have 0f
+            }
+            graphics {
+                stackedAnimation {
+                    add(background)
+                    add(foreground)
+                    add(hover)
                 }
-            ) {
-                image(icon)
-                init(cell)
             }
+            image(icon)
+            init(storage)
         }
     }

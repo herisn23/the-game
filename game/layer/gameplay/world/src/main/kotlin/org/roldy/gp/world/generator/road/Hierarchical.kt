@@ -1,7 +1,7 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 
 object Hierarchical : RoadNetworkAlgorithm {
     /**
@@ -12,11 +12,11 @@ object Hierarchical : RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementData>,
+        settlements: List<SettlementTileData>,
         config: Map<String, Any>
-    ): List<Pair<SettlementData, SettlementData>> {
+    ): List<Pair<SettlementTileData, SettlementTileData>> {
         val tierLevels: Int by config
-        val allEdges = mutableListOf<Pair<SettlementData, SettlementData>>()
+        val allEdges = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
 
         // Tier 1: Major highways (MST of distant settlements)
         val tier1Settlements = settlements

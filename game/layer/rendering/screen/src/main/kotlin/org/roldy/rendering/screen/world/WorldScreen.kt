@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import org.roldy.core.TimeManager
 import org.roldy.rendering.g2d.Diagnostics
-import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
+import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunkManager
 import org.roldy.rendering.screen.world.debug.DebugRenderer
@@ -53,13 +53,21 @@ class WorldScreen(
             camera.zoom += zoom * delta
             camera.zoom = MathUtils.clamp(camera.zoom, min, max)
         }
+        camera.update()
+
+        //Time scaled delta
         context(timeManager.getDelta(delta)) {
-            camera.update()
+
             map.render()
             chunkRenderer.render(batch)
+
             if (debugEnabled) {
                 debugRenderer.render()
             }
+        }
+
+        //Standard delta
+        context(delta) {
             diagnostics.render()
             gui.render()
         }

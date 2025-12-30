@@ -4,6 +4,10 @@ import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 
+@DslMarker
+@Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
+annotation class NinePatchDsl
+
 data class NinePatchParams(
     val left: Int = 0,
     val right: Int = 0,

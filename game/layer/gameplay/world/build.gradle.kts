@@ -5,6 +5,8 @@ dependencies {
     implementation(projects.game.layer.rendering.environment)
     implementation(projects.game.layer.rendering.screen)
     implementation(projects.game.layer.rendering.g2d)
+    implementation(projects.game.layer.rendering.pawn)
+    implementation(projects.game.layer.rendering.gui)
 
     implementation(projects.game.layer.gameplay.state)
 }

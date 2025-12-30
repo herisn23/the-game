@@ -12,7 +12,10 @@ import org.roldy.gui.GuiContext
 import org.roldy.gui.slotHover
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
-import org.roldy.rendering.g2d.gui.anim.*
+import org.roldy.rendering.g2d.gui.anim.alphaAnimation
+import org.roldy.rendering.g2d.gui.anim.core.AnimationDrawableStateResolver
+import org.roldy.rendering.g2d.gui.anim.core.mixAnimation
+import org.roldy.rendering.g2d.gui.anim.scaleAnimation
 import org.roldy.rendering.g2d.gui.el.*
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
@@ -23,19 +26,19 @@ class SlotDragListener<T : Any>(
     val target: KClass<T>,
     val slot: Slot,
     val delegate: SlotDragDelegate<T>
-) : DragListener(), AnimationDrawableStateResolver {
+) : DragListener(), AnimationDrawableStateResolver<UIAnimationState> {
     var draggingIcon: UIImage? = null
     var prev: T? = null
 
     fun anim(drawable: Drawable): Drawable =
-        mix(drawable) {
-            add(::scale) {
-                Normal to .8f
-                Over to .8f
+        mixAnimation(drawable) {
+            add(::scaleAnimation) {
+                Normal have .8f
+                Over have .8f
             }
-            add(::alpha) {
-                Normal to .8f
-                Over to .8f
+            add(::alphaAnimation) {
+                Normal have .8f
+                Over have .8f
             }
         }
 
@@ -117,7 +120,7 @@ class SlotDragListener<T : Any>(
             userObject as T
         }
 
-    override var state: AnimationDrawableState = Normal
+    override var state: UIAnimationState = Normal
 }
 
 @Scene2dCallbackDsl
@@ -134,7 +137,7 @@ class SlotDragDelegate<T> {
 @Scene2dCallbackDsl
 data class Slot(
     val root: UITable,
-    private val button: UIImageButton,
+    private val button: UIPlainButton,
     val icon: UIImage,
     private val additionalContent: UITable
 ) {
@@ -188,30 +191,31 @@ fun <S> UIWidget<S>.slot(
 
         lateinit var icon: UIImage
         lateinit var content: UITable
-        lateinit var button: UIImageButton
+        lateinit var button: UIPlainButton
 
         table(true) {
-            pad(8f)
+            this.pad(8f)
             image(emptyImage(alpha(0f))) {
                 touchable = Touchable.disabled
                 icon = this
             }
         }
         table {
-            pad(8f)
+            this.pad(8f)
             content = this
         }
         table(true) {
-            pad(3f)
+            this.pad(3f)
 
-            imageButton(
-                drawable = slotHover { this },
-                transition = {
-                    Normal to 0f
-                    Pressed to .4f
-                    Over to 1f
+            plainButton {
+                graphics {
+                    alphaAnimation(slotHover { this }) {
+                        Normal have 0f
+                        Pressed have .4f
+                        Over have 1f
+                        Disabled have 0f
+                    }
                 }
-            ) {
                 name = "SlotButton"
                 button = this
                 Slot(root, button, icon, content).init(root)
@@ -227,7 +231,7 @@ fun <S> UIWidget<S>.slot(
                 })
         }
         table(true) {
-            pad(-9f)
+            this.pad(-9f)
             image(gui.region { Slot_Border }) {
                 touchable = Touchable.disabled
             }

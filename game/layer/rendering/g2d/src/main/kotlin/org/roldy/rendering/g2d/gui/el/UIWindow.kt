@@ -44,7 +44,7 @@ class UIWindow : Table(), UITableWidget {
 
     init {
         touchable = Touchable.enabled
-        pad(0f)
+        this@UIWindow.pad(0f)
         addListener(
             object : InputListener() {
                 var startX: Float = 0f

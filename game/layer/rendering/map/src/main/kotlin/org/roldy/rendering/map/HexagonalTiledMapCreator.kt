@@ -1,7 +1,6 @@
 package org.roldy.rendering.map
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
@@ -11,13 +10,10 @@ import org.roldy.core.logger
 import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeData
 import org.roldy.data.configuration.biome.BiomeType
-import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.tile.TileData
-import org.roldy.rendering.g2d.disposable.AutoDisposable
-import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 
 data class MapTerrainData(
     val terrain: Terrain,
@@ -30,26 +26,21 @@ data class MapTerrainData(
 class HexagonalTiledMapCreator(
     val data: MapData,
     val noiseData: Map<Vector2Int, NoiseData>,
-    configuration: BiomesConfiguration,
+    val biomes: List<Biome>,
+    val dirtUnderTextureRegion: TextureRegion,
+    val waterUnderTextureRegion: TextureRegion,
     val generateColorsLayer: Boolean = false
-) : AutoDisposableAdapter() {
-
-    val biomesData = configuration.biomes
+) {
 
     // Cache for terrain at each position
     private val terrainCache = mutableMapOf<Vector2Int, MapTerrainData>()
     private val fallbackTerrain = createFallbackTerrain()
-
-    private val dirtUnderTextureRegion by lazy { TextureRegion(Texture("terrain/HexUnderDirt.png").disposable()) }
-    private val waterUnderTextureRegion by lazy { TextureRegion(Texture("terrain/HexUnderWater.png").disposable()) }
-
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
      */
     fun create(): Pair<TiledMap, Map<Vector2Int, MapTerrainData>> {
         val tiledMap = TiledMap()
-        val biomes = readBiomes(biomesData, data.tileSize)
         // Generate base terrain layer
         val baseLayer = generateBaseLayer(biomes)
         val underLayer = generateUnderLayer()
@@ -60,7 +51,7 @@ class HexagonalTiledMapCreator(
         if (generateColorsLayer)
         // Generate colors layer
             tiledMap.layers.add(generateBiomeLayer())
-        return tiledMap.disposable() to terrainCache
+        return tiledMap to terrainCache
     }
 
     private fun generateUnderLayer(): TiledMapTileLayer {
@@ -177,13 +168,5 @@ class HexagonalTiledMapCreator(
             data.tileSize
         ).terrains.first()
     }
-
-
-    internal fun AutoDisposable.readBiomes(biomes: List<BiomeData>, tileSize: Int): List<Biome> =
-        biomes.map {
-            Biome(it, tileSize).apply {
-                atlas?.let(disposables::add)
-            }.disposable()
-        }
 
 }

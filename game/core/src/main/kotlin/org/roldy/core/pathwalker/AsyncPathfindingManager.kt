@@ -4,10 +4,10 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.singleTask
 
 /**
- * Asynchronous proxy that converts coordinate assignments into background pathfinding tasks.
+ * Asynchronous pathfinding manager that converts coordinate assignments into background pathfinding tasks.
  * Delegates computed paths via [onPathFound] when complete.
  */
-class AsyncPathfindingProxy(
+class AsyncPathfindingManager(
     private val findPath: FindPath,
     private val fromPosition: () -> Vector2Int,
     private val onPathFound: (PathWalker.Path) -> Unit

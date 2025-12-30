@@ -47,15 +47,22 @@ fun <S> UIWidget<S>.label(
 
 class LabelActions(
     val label: UILabel,
+    val gui: GuiContext
 ) {
 
     fun setText(text: String?) {
         if (text != null) {
             label.isVisible = true
-            label.setText({ text })
+            label.setText { text }
             label.updateText()
         } else {
             label.isVisible = false
+        }
+    }
+
+    fun setText(text: TextManager) {
+        context(gui) {
+            setText(text.getText())
         }
     }
 
@@ -80,6 +87,6 @@ fun <S> UIWidget<S>.label(
     build: LabelActions.(@Scene2dDsl S) -> Unit,
 ) =
     label("", fontSize, params) { storage ->
-        val actions = LabelActions(this)
+        val actions = LabelActions(this, gui)
         actions.build(storage)
     }

@@ -8,16 +8,13 @@ import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
 import org.roldy.data.configuration.biome.BiomeData
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
-import org.roldy.rendering.g2d.disposable.disposable
 
 data class Biome(
     val data: BiomeData,
     val tileSize: Int
 ) : AutoDisposableAdapter() {
 
-    val atlas by disposable {
-        AtlasLoader.load("terrain/${data.type.name}.atlas")
-    }
+    val atlas = AtlasLoader.load("terrain/${data.type.name}.atlas").disposable()
     val terrains by lazy {
         data.terrains.map {
             Terrain(this, data.color, it).disposable()

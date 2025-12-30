@@ -1,7 +1,7 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 
 object KNearest : RoadNetworkAlgorithm {
 
@@ -13,12 +13,12 @@ object KNearest : RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementData>,
+        settlements: List<SettlementTileData>,
         config: Map<String, Any>
-    ): List<Pair<SettlementData, SettlementData>> {
+    ): List<Pair<SettlementTileData, SettlementTileData>> {
         val k: Int by config
-        val edges = mutableListOf<Pair<SettlementData, SettlementData>>()
-        val processedPairs = mutableSetOf<Set<SettlementData>>()
+        val edges = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
+        val processedPairs = mutableSetOf<Set<SettlementTileData>>()
 
         settlements.forEach { from ->
             val nearest = settlements

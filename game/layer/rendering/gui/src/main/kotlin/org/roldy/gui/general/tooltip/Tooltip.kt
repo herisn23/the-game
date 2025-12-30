@@ -81,7 +81,7 @@ fun Actor.tooltip(
         }
     }
     val padding = 30f
-    val pinProgress = emptyImage(Color.BLACK alpha .4f) redraw { x, y, width, height, draw ->
+    val pinProgress = emptyImage(Color.BLACK alpha .1f) redraw { x, y, width, height, draw ->
         draw(x + padding, y + padding, width - padding * 2, height - padding * 2)
     }
     return contextualTooltip(

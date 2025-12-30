@@ -5,7 +5,7 @@ import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.x
 import org.roldy.data.tile.RoadTileData
-import org.roldy.gp.world.generator.data.SettlementData
+import org.roldy.data.tile.SettlementTileData
 import org.roldy.gp.world.generator.road.*
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
@@ -13,17 +13,22 @@ import kotlin.random.Random
 
 class RoadGenerator(
     val map: WorldMap,
-    val settlements: List<org.roldy.gp.world.generator.data.SettlementData>
-) {
+    val settlements: () -> List<SettlementTileData>,
+    val algorithm: Algorithm = Algorithm.MST,
+    override val occupied: (Vector2Int) -> Boolean
+) : WorldGenerator<RoadTileData> {
     val pathfinder = TilePathfinder(map) { tile, goal ->
         //calculate walkCost from terrainData and add some noise to make roads more natural(not so straight)
-        map.terrainData.getValue(tile).walkCost * Random(map.data.seed + tile.sum + goal.sum).nextFloat()
+        //also when tile is occupied
+        map.terrainData.getValue(tile).walkCost *
+                Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
+                (0f.takeIf { occupied(tile) } ?: 1f)
     }
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex
 
     enum class Algorithm(
-        val alg: org.roldy.gp.world.generator.road.RoadNetworkAlgorithm,
+        val alg: RoadNetworkAlgorithm,
         val config: Map<String, Any> = emptyMap()
     ) {
         HIERARCHICAL(
@@ -50,16 +55,15 @@ class RoadGenerator(
             KNearest, mapOf("k" to 3)
         );
 
-        fun generate(seed: Long, settlements: List<SettlementData>) =
+        fun generate(seed: Long, settlements: List<SettlementTileData>) =
             alg.generate(seed, settlements, config)
     }
 
     /**
      * Generates road network using specified algorithm.
      */
-    fun generate(
-        algorithm: Algorithm = Algorithm.MST,
-    ): List<RoadTileData> {
+    override fun generate(): List<RoadTileData> {
+        val settlements = settlements()
         if (settlements.size < 2) return emptyList()
 
         // Build network edges
@@ -89,7 +93,7 @@ class RoadGenerator(
     private fun getConnectedDirections(
         coords: Vector2Int,
         roadCoords: Set<Vector2Int>
-    ): List<org.roldy.gp.world.generator.HexEdgeDirection> {
+    ): List<HexEdgeDirection> {
         return HexEdgeDirection.entries.filter { direction ->
             val neighbor = getHexNeighbor(coords, direction)
             neighbor in roadCoords
@@ -100,7 +104,7 @@ class RoadGenerator(
      * Gets the neighboring hex coordinate in the given direction.
      * Accounts for stagger offset on flat-top hexagons.
      */
-    private fun getHexNeighbor(coords: Vector2Int, direction: org.roldy.gp.world.generator.HexEdgeDirection): Vector2Int {
+    private fun getHexNeighbor(coords: Vector2Int, direction: HexEdgeDirection): Vector2Int {
         if (staggerAxis != "y") {
             // Handle x-axis stagger if needed
             return coords + direction.getOffset(false)
@@ -132,7 +136,7 @@ class RoadGenerator(
      * - EAST + WEST = 001001
      * - WEST + EAST + SOUTHWEST = 001011
      */
-    private fun connectionsToBitmask(connections: List<org.roldy.gp.world.generator.HexEdgeDirection>): String {
+    private fun connectionsToBitmask(connections: List<HexEdgeDirection>): String {
         var mask = 0
 
         connections.forEach { dir ->

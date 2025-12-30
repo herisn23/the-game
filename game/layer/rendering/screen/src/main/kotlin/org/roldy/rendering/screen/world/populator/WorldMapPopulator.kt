@@ -1,20 +1,17 @@
 package org.roldy.rendering.screen.world.populator
 
-import com.badlogic.gdx.utils.Disposable
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.chunk.ChunkPopulator
-import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 
 class WorldMapPopulator(
     override val map: WorldMap,
-    populators: List<WorldChunkPopulator>,
+    val populators: List<WorldChunkPopulator>,
     val persistentItems: List<Layered>
-) : AutoDisposableAdapter(), ChunkPopulator<TileObject.Data, WorldMapChunk>, Disposable, WorldPopulator {
+) : ChunkPopulator<TileObject.Data, WorldMapChunk>, WorldPopulator {
 
-    private val populators = populators.map { it.disposable() }
     override fun populate(
         chunk: WorldMapChunk
     ): List<TileObject.Data> =
