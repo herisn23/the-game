@@ -1,10 +1,6 @@
 package org.roldy.data.mine
 
-import org.roldy.data.mine.harvestable.Fiber
-import org.roldy.data.mine.harvestable.Gem
-import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.data.mine.harvestable.Metal
-import org.roldy.data.mine.harvestable.Wood
+import org.roldy.data.mine.harvestable.*
 
 enum class MineType(
     val texture: String,
@@ -18,4 +14,5 @@ enum class MineType(
     companion object {
         val harvestable get() = entries.flatMap { it.harvestable() }
     }
+    val locKey = name.lowercase()
 }

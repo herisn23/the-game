@@ -3,9 +3,10 @@ package org.roldy.core.coroutines
 import org.roldy.core.TimeManager
 
 class DeltaProcessingLoop(
-    val timeManager: TimeManager
+    val timeManager: TimeManager,
+    autoStart: Boolean = false
 ) {
-    private val task = ConcurrentLoop(emitter = ::calculateDelta)
+    private val task = ConcurrentLoop(::calculateDelta, autoStart)
 
     private var lastLoopTime = -1L
     private var deltaTime = 0f
@@ -34,4 +35,7 @@ class DeltaProcessingLoop(
         task.cancel()
     }
 
+    fun start() {
+        task.start()
+    }
 }

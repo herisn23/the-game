@@ -12,5 +12,7 @@ enum class Gem(
     Diopside,
     Eudialyte,
     Hematite,
-    Jadeite
+    Jadeite;
+
+    override val locKey: String = name.lowercase()
 }

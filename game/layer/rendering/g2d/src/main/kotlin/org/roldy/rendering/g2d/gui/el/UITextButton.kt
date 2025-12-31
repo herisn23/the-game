@@ -11,10 +11,10 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 class UITextButton(
-    text: () -> String,
+    initialText: String? = null,
     val style: KTextButtonStyle
 ) : UIButton(), UITableWidget, TextActor {
-    val label = UILabel(text, labelStyle {
+    val label = UILabel(initialText, labelStyle {
         font = style.font
     })
 
@@ -25,7 +25,14 @@ class UITextButton(
 
     override fun updateText() {
         label.updateText()
+    }
 
+    fun setText(text: String?) {
+        label.setText(text)
+    }
+
+    fun setText(text: () -> String) {
+        label.setText(text)
     }
 
     data class KTextButtonStyle(
@@ -38,7 +45,7 @@ class UITextButton(
 @Scene2dDsl
 context(_: C)
 fun <S, C : UIContext> UIWidget<S>.textButton(
-    text: () -> String,
+    text: String? = null,
     font: BitmapFont,
     init: context(C) (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {

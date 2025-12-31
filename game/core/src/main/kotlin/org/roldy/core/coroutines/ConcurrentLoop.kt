@@ -8,7 +8,8 @@ fun interface ConcurrentLoopConsumer<D> {
 
 class ConcurrentLoop<D>(
     val emitter: suspend () -> D,
-) : Loop() {
+    autoStart: Boolean = true
+) : Loop(autoStart = autoStart) {
     private val consumers = mutableListOf<ConcurrentLoopConsumer<D>>()
 
     override fun start() {

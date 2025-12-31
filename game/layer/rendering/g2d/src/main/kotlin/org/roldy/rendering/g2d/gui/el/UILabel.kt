@@ -9,18 +9,21 @@ import kotlin.contracts.contract
 
 @Scene2dDsl
 class UILabel(
-    private var text: () -> String,
+    initialText: String? = null,
     style: LabelStyle
-) : Label(text(), style), TextActor {
+) : Label(initialText, style), TextActor {
+    private var textAction: (() -> String)? = null
     override fun updateText() {
-        val newText = text()
-        if (!textEquals(newText)) {//update text only when its changed
-            setText(newText)
+        textAction?.let {
+            val newText = it()
+            if (!textEquals(newText)) {//update text only when its changed
+                setText(newText)
+            }
         }
     }
 
     fun setText(newText: () -> String) {
-        text = newText
+        textAction = newText
         updateText()
     }
 }
@@ -29,24 +32,23 @@ class UILabel(
 @Scene2dDsl
 context(_: C)
 fun <S, C : UIContext> UIWidget<S>.label(
-    text: () -> String,
     style: LabelStyle,
     init: context(C) (@Scene2dDsl UILabel).(S) -> Unit = {}
 ): UILabel {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return actor(UILabel(text, style), init)
+    return actor(UILabel(style = style), init)
 }
 
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(_: C)
 fun <S, C : UIContext> UIWidget<S>.label(
-    text: String,
+    text: String? = null,
     style: LabelStyle,
     init: context(C) (@Scene2dDsl UILabel).(S) -> Unit = {}
 ): UILabel {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return actor(UILabel({ text }, style), init)
+    return actor(UILabel(text, style), init)
 }
 
 @Scene2dCallbackDsl

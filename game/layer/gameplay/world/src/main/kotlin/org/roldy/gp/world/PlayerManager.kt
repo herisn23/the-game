@@ -1,15 +1,13 @@
 package org.roldy.gp.world
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import org.roldy.core.Vector2Int
+import org.roldy.core.coroutines.ConcurrentLoopConsumer
 import org.roldy.core.pathwalker.AsyncPathfindingManager
-import org.roldy.core.utils.project
-import org.roldy.core.x
 import org.roldy.data.state.GameState
 import org.roldy.gp.world.pathfinding.TilePathfinder
+import org.roldy.gp.world.utils.Mining
 import org.roldy.gui.WorldGUI
-import org.roldy.gui.general.popup.data.minePopupContent
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.pawn.PawnFigure
 
@@ -20,50 +18,55 @@ class PlayerManager(
     val camera: OrthographicCamera,
     val map: WorldMap,
     val currentPawn: PawnFigure
-) {
+) : ConcurrentLoopConsumer<Float> {
     init {
         currentPawn.apply {
             position = map.tilePosition.resolve(data.coords)
         }
+        currentPawn.onPathEnd = ::onTileAction
     }
 
-    var lastFocus: Vector2Int? = null
+
     val pathFinderManager = AsyncPathfindingManager(pathfinder::findPath, currentPawn::coords) { path ->
         currentPawn.pathWalking(path)
     }
 
-    fun moveTo(position: Vector2Int) {
+    fun focusTile(position: Vector2Int) {
         pathFinderManager.findPath(position)
+        if (currentPawn.coords != position)
+            movingAwayFromPosition()
+        if (currentPawn.coords == position)
+            moveToSamePosition()
     }
 
-    fun tileFocus(coords: Vector2Int) {
-        //TODO this function shouldn't be here
 
-        gui.hideTileInfo()
+    fun onTileAction(coords: Vector2Int) {
+        findMine(coords)
+    }
 
-        if (lastFocus != null && lastFocus == coords) {
-            lastFocus = null
-            return
+    fun findMine(coords: Vector2Int) {
+        Mining.findMine(gameState, coords) {
+            gui.harvestingWindow.open()
+            gui.harvestingWindow.mineState = it
+            gui.harvestingWindow.onMine = {
+                Mining.startMine(it)
+            }
         }
+    }
 
-        lastFocus = coords
-
-        fun follow(): Vector2Int {
-            val world = map.tilePosition.resolve(coords)
-            camera.project(world)
-            val flippedY = Gdx.graphics.height - world.y
-            return world.x.toInt() x flippedY.toInt()
+    private fun movingAwayFromPosition() {
+        gui.harvestingWindow.close {
+            it.clean()
         }
+    }
+
+    private fun moveToSamePosition() {
+        onTileAction(currentPawn.coords)
+    }
 
 
-        val mine = gameState.mines.find { mine -> mine.coords == coords }
-        mine?.let {
-            gui
-                .showTileInfo(
-                    { minePopupContent(it, mine) },
-                    ::follow
-                )
-        }
+    context(delta: Float)
+    override suspend fun update() {
 
     }
 }

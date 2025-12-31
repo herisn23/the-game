@@ -17,7 +17,7 @@ class LoadingGUI : AutoDisposableAdapter(), Gui {
             align(Align.center)
             label(translate { loading }, 100)
             row()
-            label(100) {
+            label(fontSize = 100) {
                 this@LoadingGUI.loadingText = this
                 setText("Loading...")
             }

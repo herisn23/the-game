@@ -24,6 +24,21 @@ fun <S> UIWidget<S>.smallButton(
     text: TextManager,
     fontColor: Color = gui.colors.button,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
+): UITextButton =
+    text { text ->
+        smallButton(fontColor = fontColor) {
+            setText(text)
+            init(it)
+        }
+    }
+
+
+@Scene2dDsl
+context(gui: GuiContext)
+fun <S> UIWidget<S>.smallButton(
+    text: String? = null,
+    fontColor: Color = gui.colors.button,
+    init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {
     val font = gui.font(FontStyle.Default, 50) {
         padTop = 0
@@ -35,41 +50,39 @@ fun <S> UIWidget<S>.smallButton(
     lateinit var button: UITextButton
     table { storage ->
         pad(padding)
-        text { string ->
-            textButton(
-                { string().uppercase() }, font
-            ) { cell ->
-                padLeft(padding*7)
-                padRight(padding*7)
-                padTop(-padding)
-                padBottom(-padding)
+        textButton(
+            text, font
+        ) { cell ->
+            padLeft(padding * 7)
+            padRight(padding * 7)
+            padTop(-padding)
+            padBottom(-padding)
 
-                val background = colorAnimation(buttonRSBackgroundGrayscale {
-                    cell.minWidth(minWidth).minHeight(minHeight)
-                    pad(-padding * 2)
-                }) {
-                    color = gui.colors.primary
-                    Disabled have gui.colors.disabled
-                }
-                val border = noneAnimation(buttonRSBorder2 { pad(-3f) })
-
-                val hover = alphaAnimation(emptyImage(alpha(.2f)).pad(-padding/2)) {
-                    Normal have 0f
-                    Pressed have .4f
-                    Over have 1f
-                    Disabled have 0f
-                }
-
-                graphics {
-                    stackedAnimation {
-                        add(background)
-                        add(border)
-                        add(hover)
-                    }
-                }
-                init(storage)
-                button = this
+            val background = colorAnimation(buttonRSBackgroundGrayscale {
+                cell.minWidth(minWidth).minHeight(minHeight)
+                pad(-padding * 2)
+            }) {
+                color = gui.colors.primary
+                Disabled have gui.colors.disabled
             }
+            val border = noneAnimation(buttonRSBorder2 { pad(-3f) })
+
+            val hover = alphaAnimation(emptyImage(alpha(.2f)).pad(-padding / 2)) {
+                Normal have 0f
+                Pressed have .4f
+                Over have 1f
+                Disabled have 0f
+            }
+
+            graphics {
+                stackedAnimation {
+                    add(background)
+                    add(border)
+                    add(hover)
+                }
+            }
+            init(storage)
+            button = this
         }
     }
     return button

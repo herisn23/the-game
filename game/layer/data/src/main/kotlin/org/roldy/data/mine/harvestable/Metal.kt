@@ -12,5 +12,7 @@ enum class Metal(
     Uranium,
     Zirconium,
     Chromium,
-    Vanadium
+    Vanadium;
+
+    override val locKey: String = name.lowercase()
 }

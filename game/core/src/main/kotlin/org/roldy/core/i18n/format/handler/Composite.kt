@@ -10,7 +10,7 @@ fun LocalizedStringProxy.composite(
         arguments.map { (key, selector) ->
             key to when (selector.type) {
                 //resolve value by Selector.Type
-                CompositeLocalizedString.Selector.Type.LocalizedInflectionText -> {
+                LocalizedInflectionText -> {
                     val type = Inflection.ofCode(selector.arguments.first())
                     val inflectionText = LocalizedString(
                         selector.key,
@@ -19,7 +19,16 @@ fun LocalizedStringProxy.composite(
                     copy(localizedString = inflectionText).inflection(context, type)
                 }
 
-                CompositeLocalizedString.Selector.Type.LocalizedText -> {
+                SelectionText -> {
+                    val selection = Selection(listOfNotNull(context.selection()))
+                    val text = LocalizedString(
+                        selector.key,
+                        selection
+                    )
+                    copy(localizedString = text, argumentDelegate = argumentDelegate).selection(context, selection)
+                }
+
+                LocalizedText -> {
                     val text = LocalizedString(
                         selector.key,
                         Simple
@@ -27,11 +36,11 @@ fun LocalizedStringProxy.composite(
                     copy(localizedString = text).simple(context)
                 }
 
-                CompositeLocalizedString.Selector.Type.Argument -> argumentDelegate?.invoke(
+                Argument -> argumentDelegate?.invoke(
                     selector
                 )
 
-                CompositeLocalizedString.Selector.Type.CompositeText -> {
+                CompositeText -> {
                     val inflectionText = LocalizedString(
                         selector.key,
                         Composite

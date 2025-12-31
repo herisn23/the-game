@@ -18,6 +18,7 @@ class CompositeLocalizedString(
             Argument("arg"),
             LocalizedInflectionText("lit"),
             CompositeText("ct"),
+            SelectionText("st"),
             LocalizedText("lt");
         }
     }

@@ -218,14 +218,14 @@ class Inventory<D>(
         updateSlots()
     }
 
-    fun findSuitableSlot(data: InventorySlot.Data<D>): InventorySlot<D>? {
+    fun findSuitableSlot(data: Data<D>): InventorySlot<D>? {
         val available = slots.filterIndexed { index, slot ->
             !slot.occupied && index == data.index
         }
         return available.firstOrNull()
     }
 
-    private fun addItem(data: InventorySlot.Data<D>): InventorySlot<D> {
+    private fun addItem(data: Data<D>): InventorySlot<D> {
         var suitable = findSuitableSlot(data)
         if (suitable == null)
             suitable = addSlot()
@@ -291,7 +291,7 @@ data class SortAction<D>(
 context(gui: GuiContext)
 fun <S, D> UIWidget<S>.inventory(
     init: (@Scene2dDsl Inventory<D>).() -> Unit = {},
-) =
+): WindowActions =
     window(translate { inventory }, "Inventory") { contentCell ->
         contentCell.top().grow()
         lateinit var grid: UIGrid
@@ -306,7 +306,7 @@ fun <S, D> UIWidget<S>.inventory(
             }) {
 
                 grid(Columns, CellPadding) {
-                    this.pad(15f)
+                    pad(15f)
                     align(Align.topLeft)
                     grid = this
                 }
@@ -460,7 +460,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
             row()
             //amount
             amount = value(null) {
-                label(FontStyle.Marking, slotDefaults()) {
+                label(style = FontStyle.Marking, params = slotDefaults()) {
                     onChange {
                         setText(value)
                     }

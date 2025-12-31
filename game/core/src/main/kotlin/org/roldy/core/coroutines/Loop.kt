@@ -6,7 +6,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 abstract class Loop(
-    val delay: Duration = 16.milliseconds
+    val delay: Duration = 16.milliseconds,
+    autoStart: Boolean = true
 ) {
     protected val logger by logger()
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -18,10 +19,11 @@ abstract class Loop(
         scope.cancel()
     }
 
-    protected abstract fun start()
+    abstract fun start()
 
     init {
-        start()
+        if (autoStart)
+            start()
     }
 
     protected fun start(process: suspend () -> Unit) {

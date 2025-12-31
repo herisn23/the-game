@@ -27,12 +27,16 @@ class PawnFigure(
         data.defaultTileSpeed * data.speed * walkCost(it)
     }, {
         this.coords = it
-    }, onPathEnd)
+    }, ::pathEnd)
     val tex by disposable { Texture("purple_circle.png") }
 
     val sprite = Sprite(tex).apply {
         setSize(100f, 100f)
         setOriginCenter()
+    }
+
+    fun pathEnd(coords:Vector2Int) {
+        onPathEnd(coords)
     }
 
 

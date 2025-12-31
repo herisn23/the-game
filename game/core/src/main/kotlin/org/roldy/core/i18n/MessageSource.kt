@@ -1,7 +1,5 @@
 package org.roldy.core.i18n
 
-import org.roldy.core.i18n.format.LocalizedString
-
 typealias I18NSource = Map<String, Map<String, String>>
 
 interface MessageSource {
@@ -15,19 +13,4 @@ operator fun MessageSource.get(
 ) =
     i18n[locale]?.get(key) ?: defaultText
 
-
-typealias LocalizedTextConfiguration = Map<String, LocalizedString>
-
 class DefaultMessageSource(override val i18n: I18NSource) : MessageSource
-
-
-fun main() {
-//    context(context) {
-//        val translated = t {
-//            LocalizedStringProxy(config["compositeText"]!!, {
-//                "MALY"
-//            })
-//        }
-//        println(translated)
-//    }
-}

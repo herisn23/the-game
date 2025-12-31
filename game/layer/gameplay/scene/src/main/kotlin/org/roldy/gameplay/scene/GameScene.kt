@@ -22,7 +22,7 @@ class GameScene : AutoDisposableGameAdapter() {
         Logger.level = Logger.Level.Debug
         CursorManager.initialize()
         loadingScreen { setProgress ->
-            worldScreen(timeManager, processingLoop, setProgress)
+            worldScreen(setProgress)
         }
 
     }

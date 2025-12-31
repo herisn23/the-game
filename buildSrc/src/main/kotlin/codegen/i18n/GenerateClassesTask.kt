@@ -3,6 +3,8 @@ package codegen.i18n
 import codegen.ClassInfo
 import codegen.generateKotlinClasses
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
+import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.yamlMap
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -27,7 +29,15 @@ abstract class GenerateClassesTask : DefaultTask() {
         val rootDir = project.rootProject.rootDir
 
         val i18n = rootDir.toPath().resolve("assets").resolve("i18n_config.yaml").readText()
-        val nodes = Yaml.default.parseToYamlNode(i18n)
+        val yaml = Yaml(
+            configuration = YamlConfiguration(
+                allowAnchorsAndAliases = true
+            )
+        )
+        val nodes = yaml.parseToYamlNode(i18n).yamlMap.let {
+            println(it)
+            it.get<YamlMap>("strings")!!
+        }
 
         val info = ClassInfo(
             "Strings",

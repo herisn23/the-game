@@ -1,32 +1,49 @@
 package org.roldy.gui
 
 import org.roldy.core.Vector2Int
+import org.roldy.gui.general.button.mainButton
 import org.roldy.gui.general.popup.tilePopup
+import org.roldy.gui.widget.HarvestingWindow
+import org.roldy.gui.widget.PlayerInventory
+import org.roldy.gui.widget.harvestingWindow
+import org.roldy.gui.widget.playerInventory
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.gui.Gui
 import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.el.UIPopup
-import org.roldy.rendering.g2d.gui.el.UIStandardPopup
-import org.roldy.rendering.g2d.gui.el.UITable
-import org.roldy.rendering.g2d.gui.el.stack
+import org.roldy.rendering.g2d.gui.el.*
 
 
 class WorldGUI : AutoDisposableAdapter(), Gui {
 
-    lateinit var tileTooltip: Pair<UIStandardPopup, GuiContext>
-
+    lateinit var tileTooltip: UIStandardPopup
+    lateinit var harvestingWindow: HarvestingWindow
+    lateinit var inventory: PlayerInventory
+    lateinit var guiContext: GuiContext
     override val stage = gui(1f) { gui ->
+        this@WorldGUI.guiContext = gui
         stack {
             name = "TilePopupStack"
             setLayoutEnabled(false)
-            this@WorldGUI.tileTooltip = tilePopup() to gui
+            this@WorldGUI.tileTooltip = tilePopup()
+
         }
-        example()
+        harvestingWindow {
+            this@WorldGUI.harvestingWindow = it
+        }
+        playerInventory {
+            this@WorldGUI.inventory = it
+        }
+        mainButton("Inv") {
+            onClick {
+                this@WorldGUI.inventory.actions.toggle()
+            }
+        }
+//        example()
     }
 
     @Scene2dDsl
     fun hideTileInfo() {
-        tileTooltip.first.hide()
+        tileTooltip.hide()
     }
 
     @Scene2dDsl
@@ -34,13 +51,12 @@ class WorldGUI : AutoDisposableAdapter(), Gui {
         content: context(GuiContext) UITable.(UIPopup) -> Unit,
         follow: () -> Vector2Int
     ): UIStandardPopup {
-        val (popup, context) = tileTooltip
-        context(context) {
-            popup.show {
+        context(guiContext) {
+            tileTooltip.show {
                 content(it)
             }
-            popup.position = follow
+            tileTooltip.position = follow
         }
-        return popup
+        return tileTooltip
     }
 }

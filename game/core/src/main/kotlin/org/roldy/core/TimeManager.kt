@@ -1,7 +1,9 @@
 package org.roldy.core
 
-class TimeManager {
-    var timeScale = 1.0f
+class TimeManager(
+    val initialScale: Float = 1f,
+) {
+    var timeScale = initialScale
 
     fun getDelta(delta: Float) = delta * timeScale
 

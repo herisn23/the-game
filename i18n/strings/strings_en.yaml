@@ -1,36 +1,49 @@
-story-name: Zombie apokalypsa
-shit: hovno
-enemy-name-1: ZombÍk
-enemy-name-2: ZOMBÍK 2
-composite-text: |
-  Je to zlé, {lit(genus):lower:inflection-text}.
-  Ivy {lt:lower:is-dead-f}.
-  Všichni {lt:lower:is-dead-plural-m}.
-  [{arg:color}]Srdce[] ti buší jako o závod a má puls {arg:lower:pulse}.
-  Před tebou stojí {lt:decap:enemy-name-1} a za tebou je {lt:lower:cap:enemy-name-2}
-  [#ffaadd]Health:[] 0
-  [#33B5FF]Mana:[] 0
-  {ct:lower:composite-2}
-
-composite-2: A toto je hodnota {arg:hodnota}
-
-inflection-text-f: Byla jsi unesena
-inflection-text-m: Byl jsi unesen
-inflection-text-n: Bylo jsi uneseno
-
-is-dead-f: Je mrtvá
-is-dead-m: Je mrtví
-is-dead-n: Je mrtvý
-is-dead-plural-f: Jsou mrtvé
-is-dead-plural-m: Jsou mrtví
-is-dead-plural-n: Jsou mrtvý
-
-selective-text-a: Option a
-selective-text-b: Option b
-
 lang: English
+
+harvesting-metal: Mining
+harvesting-wood: Choping
+harvesting-fiber: Gathering
+harvesting-gem: Mining
+
+harvestable-osmium: Osmium
+harvestable-titanium: Titanium
+harvestable-uranium: Uranium
+harvestable-zirconium: Zirconium
+harvestable-chromium: Chromium
+harvestable-vanadium: Vanadium
+harvestable-alder: Alder
+harvestable-aspen: Aspen
+harvestable-ebony: Ebony
+harvestable-mahogany: Mahogany
+harvestable-maple: Maple
+harvestable-oak: Oak
+harvestable-flax: Flax
+harvestable-hemp: Hemp
+harvestable-kenaf: Kenaf
+harvestable-jute: Jute
+harvestable-coir: Coir
+harvestable-cotton: Cotton
+harvestable-amazonite: Amazonite
+harvestable-carnelian: Carnelian
+harvestable-diopside: Diopside
+harvestable-eudialyte: Eudialyte
+harvestable-hematite: Hematite
+harvestable-jadeite: Jadeite
+
+harvesting_begin-metal: Mine
+harvesting_begin-wood: Chop
+harvesting_begin-fiber: Gather
+harvesting_begin-gem: Mine
+harvesting_collect: Collect
+harvesting_harvested-metal: Mined
+harvesting_harvested-fiber: Gathered
+harvesting_harvested-wood: Choped
+harvesting_harvested-gem: Mined
+harvesting_amount: |
+  {st:harvesting_harvested}: {arg:amount}
+
 mine_supplies: |
-  Supplies: {arg:supplies}
+  Supplies: {arg:amount}
 
 close: Close
 inventory: Inventory

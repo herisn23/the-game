@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlayerState(
-    val pawn: PawnState
+    val pawn: PawnState,
+    val inventory: InventoryState = InventoryState()
 )

@@ -2,9 +2,11 @@ package org.roldy.core.i18n
 
 import com.badlogic.gdx.utils.I18NBundle
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.yamlMap
 import com.charleskorn.kaml.yamlScalar
 import io.github.classgraph.ClassGraph
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.i18n.format.*
@@ -14,6 +16,12 @@ import kotlin.properties.Delegates
 @DslMarker
 @Target(CLASS, TYPE_PARAMETER, FUNCTION, TYPE, TYPEALIAS)
 annotation class I18NDsl
+
+@Serializable
+data class I18NConfig(
+    val references: Map<String, List<String>>,
+    val strings: Map<String, LocalizedString>
+)
 
 @I18NDsl
 class I18N(
@@ -40,7 +48,12 @@ class I18N(
 
     val stringsConfig by lazy {
         val strings = File("assets/i18n_config.yaml").readText()
-        Yaml.default.decodeFromString<LocalizedTextConfiguration>(strings)
+        val yaml = Yaml(
+            configuration = YamlConfiguration(
+                allowAnchorsAndAliases = true
+            )
+        )
+        yaml.decodeFromString<I18NConfig>(strings)
     }
 
 
@@ -77,7 +90,7 @@ class I18N(
         val ctx = DefaultContext(messageSource, { key.genus }, locale, { key.selection })
         return with(ctx) {
             translate {
-                LocalizedStringProxy(stringsConfig.getValue(key.key)) {
+                LocalizedStringProxy(stringsConfig.strings.getValue(key.key)) {
                     key.arguments[it.key] ?: "_MISSING_ARGUMENT_${it.key}_"
                 }
             }
@@ -88,7 +101,7 @@ class I18N(
         selections(Strings.key())
 
     fun selections(key: Key): List<String> =
-        when (val handler = stringsConfig.getValue(key.key).handler) {
+        when (val handler = stringsConfig.strings.getValue(key.key).handler) {
             is Selection -> handler.selections.map { get(key[it]) }
             else -> emptyList()
         }

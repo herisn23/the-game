@@ -12,5 +12,7 @@ enum class Fiber(
     Kenaf,
     Jute,
     Coir,
-    Cotton
+    Cotton;
+
+    override val locKey: String = name.lowercase()
 }

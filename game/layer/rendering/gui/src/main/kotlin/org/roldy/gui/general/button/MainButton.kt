@@ -19,7 +19,19 @@ context(gui: GuiContext)
 fun <S> UIWidget<S>.mainButton(
     text: TextManager,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
-): UITextButton {
+): TextButtonActions =
+    mainButton {
+        init(it)
+    }.apply {
+        setText(text)
+    }
+
+@Scene2dDsl
+context(gui: GuiContext)
+fun <S> UIWidget<S>.mainButton(
+    text: String? = null,
+    init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
+): TextButtonActions {
     val font = gui.font(FontStyle.Default, 60) {
         padTop = 0
         padBottom = 0
@@ -28,54 +40,53 @@ fun <S> UIWidget<S>.mainButton(
     lateinit var button: UITextButton
     table { storage ->
         pad(padding / 2)
-        text { string ->
-            textButton(
-                { string().uppercase() }, font
-            ) { cell ->
-                pad(padding)
-                val background = noneAnimation(buttonRLBackground {
-                    pad(-padding)
-                })
-                val foreground = colorAnimation(buttonRLForeground {
-                    apply {
-                        cell.minWidth(minWidth).minHeight(minHeight)
-                    }
-                }) {
-                    color = gui.colors.primary
-                    Disabled have gui.colors.disabled
-                }
-                val overlay = noneAnimation(buttonRLOverlay1 {
-                    mask(tint(alpha(.7f))) redraw { x, y, width, height, draw ->
-                        draw(x, y + (height) / 2, width, 76f)
-                    }
-                })
-                val decor = noneAnimation(buttonRLOverlay2 {
-                    mask(tint(alpha(.4f)))
-                        .pad(5f, -1f, 5f, -1f)
-                })
-                val hover = alphaAnimation(buttonRLHover {
-                    mask(pad(2f))
-                }) {
-                    Normal have 0f
-                    Pressed have .1f
-                    Over have .6f
-                    Disabled have 0f
-                }
+        textButton(
+            text, font
+        ) { cell ->
 
-                graphics {
-                    stackedAnimation {
-                        add(background)
-                        add(foreground)
-                        add(overlay)
-                        add(decor)
-                        add(hover)
-                    }
+            pad(padding)
+            val background = noneAnimation(buttonRLBackground {
+                pad(-padding)
+            })
+            val foreground = colorAnimation(buttonRLForeground {
+                apply {
+                    cell.minWidth(minWidth).minHeight(minHeight)
                 }
-
-                init(storage)
-                button = this
+            }) {
+                color = gui.colors.primary
+                Disabled have gui.colors.disabled
             }
+            val overlay = noneAnimation(buttonRLOverlay1 {
+                mask(tint(alpha(.7f))) redraw { x, y, width, height, draw ->
+                    draw(x, y + (height) / 2, width, 76f)
+                }
+            })
+            val decor = noneAnimation(buttonRLOverlay2 {
+                mask(tint(alpha(.4f)))
+                    .pad(5f, -1f, 5f, -1f)
+            })
+            val hover = alphaAnimation(buttonRLHover {
+                mask(pad(2f))
+            }) {
+                Normal have 0f
+                Pressed have .1f
+                Over have .6f
+                Disabled have 0f
+            }
+
+            graphics {
+                stackedAnimation {
+                    add(background)
+                    add(foreground)
+                    add(overlay)
+                    add(decor)
+                    add(hover)
+                }
+            }
+
+            init(storage)
+            button = this
         }
     }
-    return button
+    return TextButtonActions(button, gui)
 }

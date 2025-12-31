@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.*
+import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.coroutines.async
 import org.roldy.core.coroutines.onGPUThreadBlocking
 import org.roldy.core.i18n.I18N
@@ -21,6 +22,7 @@ import org.roldy.data.tile.RoadTileData
 import org.roldy.data.tile.SettlementTileData
 import org.roldy.data.tile.TileData
 import org.roldy.gp.world.PlayerManager
+import org.roldy.gp.world.TileFocusManager
 import org.roldy.gp.world.generator.MineGenerator
 import org.roldy.gp.world.generator.ProceduralMapGenerator
 import org.roldy.gp.world.generator.RoadGenerator
@@ -32,6 +34,7 @@ import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.pathfinding.calculateTileWalkCost
+import org.roldy.gp.world.processor.MineRefreshingProcessor
 import org.roldy.gui.WorldGUI
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposable
@@ -54,7 +57,6 @@ class GameLoader(
     val mapData: MapData,
     val parent: AutoDisposable,
     val camera: OrthographicCamera,
-    val timeManager: TimeManager,
     saveFile: File,
     val progress: (Float, I18N.Key) -> Unit,
     val finished: GameLoader.() -> Unit
@@ -91,6 +93,10 @@ class GameLoader(
     val playerManager = GameLoaderProperty<PlayerManager>()
     val persistentObjects = GameLoaderProperty<List<Layered>>()
     val playerFigure = GameLoaderProperty<PawnFigure>()
+    val timeManager = GameLoaderProperty<TimeManager>()
+    val processingLoop = GameLoaderProperty<DeltaProcessingLoop>()
+    val gameTime = GameLoaderProperty<GameTime>()
+    val tileFocusManager = GameLoaderProperty<TileFocusManager>()
 
     init {
 
@@ -100,6 +106,14 @@ class GameLoader(
         }
         addLoader(Strings.loading_configuration, harvestableConfiguration) {
             loadHarvestableConfiguration()
+        }
+
+        addLoader(Strings.loading_configuration, timeManager) {
+            TimeManager()
+        }
+
+        addLoader(Strings.loading_configuration, processingLoop) {
+            DeltaProcessingLoop(timeManager.value)
         }
 
         // MAP LOADERS
@@ -164,6 +178,9 @@ class GameLoader(
                 gameSaveManager.load()
             }
         }
+        addLoader(Strings.loading_game_state, gameTime) {
+            GameTime(gameState.value.time)
+        }
 
         // SCREEN LOADER
 
@@ -208,12 +225,31 @@ class GameLoader(
                 FoliagePopulator(worldMap.value)
             )
         }
+        addLoader(Strings.loading_finalize, tileFocusManager) {
+            TileFocusManager(
+                gui.value,
+                gameState.value,
+                camera,
+                worldMap.value
+            )
+        }
+        // Add processors
+        addLoader(Strings.loading_finalize) {
+            with(processingLoop.value) {
+                addConsumer(playerManager.value)
+                addConsumer(MineRefreshingProcessor(gameState.value))
+                addConsumer {
+                    gameTime.value.update()
+                    gameState.value.time = gameTime.value.time
+                }
+            }
+        }
 
         addLoader(Strings.loading_finalize, screen) {
             val zoom = ZoomInputProcessor(keybinds, camera, 2f, 10f)
             WorldScreen(
                 gui.value,
-                timeManager,
+                timeManager.value,
                 camera,
                 worldMap.value,
                 WorldMapPopulator(worldMap.value, populators.value, persistentObjects.value),
@@ -225,8 +261,8 @@ class GameLoader(
                             keybinds,
                             worldMap.value,
                             camera,
-                            playerManager.value::moveTo,
-                            playerManager.value::tileFocus,
+                            playerManager.value::focusTile,
+                            tileFocusManager.value::focusTile,
                         ),
                         GameSaveInputProcessor(keybinds, gameState.value, gameSaveManager)
                     )
@@ -242,15 +278,18 @@ class GameLoader(
         async { onMain ->
             val size = loaders.size
 
-            loaders.forEachIndexed { i, loader ->
-                onGPUThreadBlocking {
-                    progress((i + 1).toFloat() / size, loader.name)
+            val total = measureTimeMillis {
+                loaders.forEachIndexed { i, loader ->
+                    onGPUThreadBlocking {
+                        progress((i + 1).toFloat() / size, loader.name)
+                    }
+                    val took = measureTimeMillis {
+                        loader.load()
+                    }
+                    logger.debug { "Loader[$i] ${loader.name.key} (took $took ms)" }
                 }
-                val took = measureTimeMillis {
-                    loader.load()
-                }
-                logger.debug { "Loader[$i] ${loader.name.key} (took $took ms)" }
             }
+            logger.debug { "Loaded in $total ms" }
             onMain {
                 finished()
             }

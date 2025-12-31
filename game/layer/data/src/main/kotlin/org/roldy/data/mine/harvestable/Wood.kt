@@ -12,5 +12,7 @@ enum class Wood(
     Ebony,
     Mahogany,
     Maple,
-    Oak
+    Oak;
+
+    override val locKey: String = name.lowercase()
 }

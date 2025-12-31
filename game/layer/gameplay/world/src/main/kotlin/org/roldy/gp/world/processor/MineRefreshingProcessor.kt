@@ -2,11 +2,10 @@ package org.roldy.gp.world.processor
 
 import org.roldy.core.coroutines.ConcurrentLoopConsumer
 import org.roldy.data.state.GameState
-import org.roldy.data.state.MineState
 import org.roldy.data.state.RefreshingState
 import kotlin.time.Duration.Companion.seconds
 
-class RefreshingProcessor(
+class MineRefreshingProcessor(
     val state: GameState
 ) : ConcurrentLoopConsumer<Float> {
 
