@@ -2,12 +2,14 @@ package codegen.i18n
 
 import codegen.ClassInfo
 import codegen.generateKotlinClasses
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.yamlMap
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.util.Properties
-import kotlin.io.path.inputStream
+import kotlin.io.path.readText
+
 const val pack = "package org.roldy.core.i18n"
 abstract class GenerateClassesTask : DefaultTask() {
 
@@ -24,19 +26,15 @@ abstract class GenerateClassesTask : DefaultTask() {
 
         val rootDir = project.rootProject.rootDir
 
-        val i18n = rootDir.toPath().resolve("i18n").resolve("strings")
-
-        val props = i18n.resolve("i18n_en.properties").inputStream().let {
-            Properties().apply {
-                load(it)
-            }
-        }
+        val i18n = rootDir.toPath().resolve("assets").resolve("i18n_config.yaml").readText()
+        val nodes = Yaml.default.parseToYamlNode(i18n)
 
         val info = ClassInfo(
             "Strings",
             "org.roldy.core.i18n",
-            templateKeys(props.keys.map {
-                """val $it = I18N.Key("$it")""".trimIndent()
+            templateKeys(nodes.yamlMap.entries.map {(entry, _)->
+                val key = entry.content
+                """val $key = I18N.Key("$key")""".trimIndent()
             })
 
         )

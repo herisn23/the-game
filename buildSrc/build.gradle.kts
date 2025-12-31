@@ -1,7 +1,3 @@
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.plugins
-
-
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
@@ -11,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.yaml)
 }
 
 repositories {

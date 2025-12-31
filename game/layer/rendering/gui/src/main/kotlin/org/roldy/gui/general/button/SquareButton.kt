@@ -22,8 +22,9 @@ fun <S> UIWidget<S>.squareButton(
         plainButton { cell ->
             pad(padding)
             val background = noneAnimation(gui.drawable { Button_Square_Background }.pad(-padding))
-            val foreground = colorAnimation(gui.drawable { Button_Square_Foreground }) {
-                cell.minWidth(minWidth).minHeight(minHeight)
+            val foreground = colorAnimation(gui.drawable { Button_Square_Foreground }.apply {
+                cell.width(minWidth).height(minHeight)
+            }) {
                 color = gui.colors.primary
                 Disabled have gui.colors.disabled
             }

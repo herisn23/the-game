@@ -20,6 +20,7 @@ import org.roldy.gui.general.tooltip.tooltip
 import org.roldy.gui.separatorHorizontal
 import org.roldy.gui.translate
 import org.roldy.gui.widget.InventorySlot.Data
+import org.roldy.rendering.g2d.FontStyle
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.*
 import kotlin.properties.Delegates
@@ -77,6 +78,8 @@ data class InventorySlot<D>(
     }
     internal lateinit var tooltip: UIContextualTooltip
 
+    internal var tooltipContent: UIContextualTooltipContent.() -> Unit = {}
+
     val occupied get() = data != null
 
     var isDisabled: Boolean
@@ -105,9 +108,7 @@ data class InventorySlot<D>(
 
 
     fun tooltip(content: UIContextualTooltipContent.() -> Unit) {
-        this.tooltip.content {
-            content()
-        }
+        tooltipContent = content
     }
 
     override fun clean() {
@@ -177,6 +178,7 @@ class Inventory<D>(
                     tooltip = table.tooltip {
                         visible = { this@inventorySlot.occupied && !dragging }
                     }
+                    tooltip.clean()
                 }
             }
         }
@@ -341,10 +343,13 @@ private fun UITable.buttons(build: (@Scene2dDsl UITable).() -> Unit = {}) {
 
 private fun slotDefaults(): FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit =
     {
-        size = 30
-        borderWidth = 3f
+        size = 35
+        borderWidth = 4f
         borderColor = Color.BLACK
-        borderStraight = false
+//        borderStraight = false
+//        shadowColor = Color.BLACK
+//        shadowOffsetX = 2
+//        shadowOffsetY = 2
     }
 
 @Scene2dDsl
@@ -379,6 +384,13 @@ fun <S, D> UIWidget<S>.inventorySlot(
             type(eventEnter) {
                 slotTable.isTransform = true
                 slotTable.setOrigin(Align.center)
+                slot.tooltip.clean()
+                val content = slot.tooltipContent
+                with(slot.tooltip) {
+                    content {
+                        content()
+                    }
+                }
                 if (inventory.dragging)
                     action(
                         Actions.sequence(
@@ -427,7 +439,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
         content {
             //amount
             lock = value(false) {
-                label(slotDefaults()) {
+                label(params = slotDefaults()) {
                     onChange {
                         if (value) {
                             setText("L")
@@ -440,7 +452,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
             }
             //grade
             grade = value(null) {
-                gradeLabel(slotDefaults()) {
+                gradeLabel(FontStyle.Marking, slotDefaults()) {
                     onChange(::setGrade)
                     it.expand().top().right()
                 }
@@ -448,7 +460,7 @@ fun <S, D> UIWidget<S>.inventorySlot(
             row()
             //amount
             amount = value(null) {
-                label(slotDefaults()) {
+                label(FontStyle.Marking, slotDefaults()) {
                     onChange {
                         setText(value)
                     }

@@ -4,9 +4,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import org.roldy.core.i18n.format.Genus
+import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
 import org.roldy.data.item.ItemGrade
 import org.roldy.gui.general.button.*
+import org.roldy.gui.general.label
+import org.roldy.gui.general.tooltip.tooltip
 import org.roldy.gui.widget.Inventory
 import org.roldy.gui.widget.data
 import org.roldy.gui.widget.gradeLabel
@@ -30,7 +34,7 @@ fun <S> UIWidget<S>.example() {
         var lock: Boolean
     )
 
-    val list = (0..6).map { index ->
+    val list = (0..60).map { index ->
         InventoryItem(
             index,
             if (index == 2) null else ItemGrade.entries.random(),
@@ -49,9 +53,13 @@ fun <S> UIWidget<S>.example() {
             index,
             this
         ) { data ->
-            this.pad(200f)
-            gradeLabel(60) {
+            gradeLabel {
                 setGrade(data.grade)
+                label.tooltip(this@data.root) {
+                    content {
+                        label("Grade affects 1234")
+                    }
+                }
             }
         }
 
@@ -104,7 +112,7 @@ fun <S> UIWidget<S>.example() {
             to.data?.item?.index = fromIndex
         }
 
-        onSlotClick {(slot, _)->
+        onSlotClick { (slot, _) ->
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                 lock = !lock
                 slot.data = toData()
@@ -141,7 +149,7 @@ fun <S> UIWidget<S>.example() {
                 window.close()
             }
         }
-        mainButton(string { "Open window" }) {
+        mainButton(string { "ěščřžýáíé" }) {
             onClick {
                 window.open()
             }
@@ -156,7 +164,7 @@ fun <S> UIWidget<S>.example() {
         }
         circularButton(gui.drawable { Ico_Plus }, CircularButtonSize.S)
         circularButton(gui.drawable { Ico_Plus })
-        circularButton(gui.drawable { Ico_Plus }, CircularButtonSize.L) {
+        circularButton(gui.drawable { Ico_Back }, CircularButtonSize.L) {
             isDisabled = true
         }
         smallButton(translate { close }) {
@@ -168,6 +176,17 @@ fun <S> UIWidget<S>.example() {
             isDisabled = true
         }
         row()
-
+        label(translate { compositeText
+            .arg("pulse", 120)
+            .arg("color", gui.colors.secondary.hex)
+            .arg("hodnota", "hodnota")
+            .genus(Genus.Masculine)
+        })
+        label(translate { mine_supplies.arg("supplies", 1) })
+        row()
+        gui.i18n.selections({selectiveText}).forEach {
+            label(string { it })
+            row()
+        }
     }
 }

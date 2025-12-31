@@ -6,6 +6,7 @@ import org.roldy.gui.GuiContext
 import org.roldy.gui.TextManager
 import org.roldy.gui.buttonRSBackgroundGrayscale
 import org.roldy.gui.buttonRSBorder2
+import org.roldy.rendering.g2d.FontStyle
 import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.alphaAnimation
@@ -24,7 +25,7 @@ fun <S> UIWidget<S>.smallButton(
     fontColor: Color = gui.colors.button,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {
-    val font = gui.font(50) {
+    val font = gui.font(FontStyle.Default, 50) {
         padTop = 0
         padBottom = 0
         color = fontColor

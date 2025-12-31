@@ -5,16 +5,12 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.utils.Disposable
-import kotlinx.coroutines.delay
-import org.roldy.core.InputProcessorDelegate
-import org.roldy.core.TimeManager
-import org.roldy.core.Vector2Int
+import org.roldy.core.*
 import org.roldy.core.coroutines.async
-import org.roldy.core.coroutines.onGPUThread
+import org.roldy.core.coroutines.onGPUThreadBlocking
 import org.roldy.core.i18n.I18N
 import org.roldy.core.i18n.Strings
 import org.roldy.core.keybind.keybinds
-import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
@@ -51,9 +47,8 @@ import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.GameSaveManager
 import java.io.File
-import java.util.concurrent.CountDownLatch
 import kotlin.reflect.KProperty
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.system.measureTimeMillis
 
 class GameLoader(
     val mapData: MapData,
@@ -64,6 +59,7 @@ class GameLoader(
     val progress: (Float, I18N.Key) -> Unit,
     val finished: GameLoader.() -> Unit
 ) {
+    val logger by logger()
     val gameSaveManager: GameSaveManager = GameSaveManager(saveFile)
 
     class Loader(
@@ -169,31 +165,30 @@ class GameLoader(
             }
         }
 
-        // PERSISTENT OBJECTS LOADER
-        addLoader(Strings.loading_finalize, playerFigure) {
+        // SCREEN LOADER
+
+        addLoader(Strings.loading_gui, gui) {
+            WorldGUI()
+        }
+
+        addLoader(Strings.loading_player, playerFigure) {
             PawnFigure(gameState.value.player.pawn, camera, { tile ->
                 calculateTileWalkCost(screen.value, worldMap.value)(tile)
             })
         }
-        addLoader(Strings.loading_finalize, persistentObjects) {
+        addLoader(Strings.loading_player, persistentObjects) {
             listOf(
                 playerFigure.value
             )
         }
 
-
-        // SCREEN LOADER
-        addLoader(Strings.loading_finalize, tilePathFinder) {
+        addLoader(Strings.loading_player, tilePathFinder) {
             TilePathfinder(worldMap.value) { tile, _ ->
                 calculateTileWalkCost(screen.value, worldMap.value)(tile)
             }
         }
 
-        addLoader(Strings.loading_finalize, gui) {
-            WorldGUI()
-        }
-
-        addLoader(Strings.loading_finalize, playerManager) {
+        addLoader(Strings.loading_player, playerManager) {
             PlayerManager(
                 tilePathFinder.value,
                 gui.value,
@@ -204,7 +199,7 @@ class GameLoader(
             )
         }
 
-        addLoader(Strings.loading_finalize, populators) {
+        addLoader(Strings.loading_player, populators) {
             listOf(
                 SettlementPopulator(worldMap.value, gameState.value.settlements),
                 RoadsPopulator(worldMap.value, roads.value),
@@ -246,12 +241,15 @@ class GameLoader(
     fun load() {
         async { onMain ->
             val size = loaders.size
+
             loaders.forEachIndexed { i, loader ->
-                onMain {
+                onGPUThreadBlocking {
                     progress((i + 1).toFloat() / size, loader.name)
                 }
-                loader.load()
-                delay(100.milliseconds)
+                val took = measureTimeMillis {
+                    loader.load()
+                }
+                logger.debug { "Loader[$i] ${loader.name.key} (took $took ms)" }
             }
             onMain {
                 finished()
@@ -262,7 +260,7 @@ class GameLoader(
     private fun <A> addLoader(name: I18N.Key, load: () -> A) {
         loaders.add(Loader(name) {
             // run loader on GPU Thread due to Gdx context related references like textures loading
-            gdx {
+            onGPUThreadBlocking {
                 load()
             }
         })
@@ -315,19 +313,6 @@ class GameLoader(
     private fun <A : Disposable> A.addDisposable() =
         parent.disposable(this)
 
-
-    private fun <A : Any> gdx(load: () -> A): A {
-        lateinit var data: A
-        val latch = CountDownLatch(1)
-
-        onGPUThread {
-            data = load()
-            latch.countDown()
-        }
-
-        latch.await() // Blocks efficiently without spinning
-        return data
-    }
 }
 
 class GameLoaderProperty<P : Any> {

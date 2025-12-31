@@ -96,6 +96,7 @@ fun Actor.tooltip(
         )
     ) {
         parent?.nestedTooltip = this
+        pad(60f, 40f, 60f, 40f)
         minWidth(128f)
         minHeight(128f)
         addListener(this)

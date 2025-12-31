@@ -1,0 +1,54 @@
+text:
+  key: shit
+
+inflectionText:
+  key: inflection-text
+  handler: !<inflection>
+    type: !<genus>
+
+compositeText:
+  key: composite-text
+  handler: !<composite>
+
+composite2:
+  key: composite-2
+  handler: !<composite>
+
+selectiveText:
+  key: selective-text
+  handler: !<selection>
+    selections:
+      - a
+      - b
+
+lang:
+  key: lang
+mine_supplies:
+  key: mine_supplies
+  handler: !<composite>
+close:
+  key: close
+inventory:
+  key: inventory
+
+#loading strings
+loading:
+  key: loading
+loading_configuration:
+  key: loading_configuration
+loading_generate_map:
+  key: loading_generate_map
+loading_settlements:
+  key: loading_settlements
+loading_roads:
+  key: loading_roads
+loading_mines:
+  key: loading_mines
+loading_game_state:
+  key: loading_game_state
+loading_gui:
+  key: loading_gui
+loading_player:
+  key: loading_player
+loading_finalize:
+  key: loading_finalize

@@ -1,9 +1,14 @@
 package org.roldy.core.i18n
 
 import com.badlogic.gdx.utils.I18NBundle
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.yamlMap
+import com.charleskorn.kaml.yamlScalar
 import io.github.classgraph.ClassGraph
+import kotlinx.serialization.decodeFromString
 import org.roldy.core.asset.loadAsset
-import java.util.Locale
+import org.roldy.core.i18n.format.*
+import java.io.File
 import kotlin.properties.Delegates
 
 @DslMarker
@@ -12,7 +17,7 @@ annotation class I18NDsl
 
 @I18NDsl
 class I18N(
-    defaultLocale: Locale = Locale.ENGLISH
+    defaultLocale: String = "en"
 ) {
 
     init {
@@ -20,10 +25,22 @@ class I18N(
     }
 
 
-    var locale by Delegates.observable(defaultLocale) { _, _, newValue ->
+    class DefaultContext(
+        override val messageSource: MessageSource,
+        override val genus: () -> Genus?,
+        override val locale: () -> String,
+        override val selection: () -> String?
+    ) : ILocalizedContext
+
+    var locale by Delegates.observable({ defaultLocale }) { _, _, newValue ->
         listeners.forEach {
             it()
         }
+    }
+
+    val stringsConfig by lazy {
+        val strings = File("assets/i18n_config.yaml").readText()
+        Yaml.default.decodeFromString<LocalizedTextConfiguration>(strings)
     }
 
 
@@ -31,33 +48,54 @@ class I18N(
         getLocalesFromClasspath()
     }
 
-    private val bundles: Map<Locale, I18NBundle> by lazy {
-        languages.associateWith { i ->
-            I18NBundle.createBundle(asset, i)
+    private val messageSource: DefaultMessageSource by lazy {
+        val all = languages.associateWith { i ->
+            Yaml.default.parseToYamlNode(loadAsset("strings/strings_$i.yaml").readString()).yamlMap.entries
+                .map { (messageKey, localization) ->
+                    messageKey.content to localization.yamlScalar.content
+                }.toMap()
         }
+        DefaultMessageSource(all)
     }
 
     val listeners: MutableList<() -> Unit> = mutableListOf()
 
-    val asset by lazy { loadAsset("strings/i18n") }
 
-
-    private fun getLocalesFromClasspath(): List<Locale> {
-        val pattern = "i18n_([^.]+)\\.properties".toRegex()
+    private fun getLocalesFromClasspath(): List<String> {
+        val pattern = "strings_([^.]+)\\.yaml".toRegex()
         return ClassGraph()
             .acceptPaths("strings")
             .scan()
             .use { scanResult ->
                 scanResult.allResources.mapNotNull { resource ->
-                    pattern.find(resource.path)?.let {
-                        Locale.forLanguageTag(it.groupValues[1])
-                    }
+                    pattern.find(resource.path)?.groupValues[1]
                 }
             }
     }
 
-    operator fun get(key: Key): String =
-        bundles.getValue(locale).format(key.key, *key.formatArguments)
+    operator fun get(key: Key): String {
+        val ctx = DefaultContext(messageSource, { key.genus }, locale, { key.selection })
+        return with(ctx) {
+            translate {
+                LocalizedStringProxy(stringsConfig.getValue(key.key)) {
+                    key.arguments[it.key] ?: "_MISSING_ARGUMENT_${it.key}_"
+                }
+            }
+        }
+    }
+
+    fun selections(key: Strings.() -> Key): List<String> =
+        selections(Strings.key())
+
+    fun selections(key: Key): List<String> =
+        when (val handler = stringsConfig.getValue(key.key).handler) {
+            is Selection -> handler.selections.map { get(key[it]) }
+            else -> emptyList()
+        }
+
+    context(ctx: T)
+    fun <T : ILocalizedContext> translate(block: StringProvider<T>): String =
+        block.translate(ctx)
 
     fun addOnLocaleChangedListener(listener: () -> Unit) {
         listeners.add(listener)
@@ -67,10 +105,27 @@ class I18N(
         listeners.remove(listener)
     }
 
-    class Key(val key: String, vararg val formatArguments: Any) {
+    class Key(
+        val key: String,
+        val arguments: Map<String, String> = emptyMap(),
+        val genus: Genus? = null,
+        val selection: String? = null
+    ) {
 
-        fun format(vararg args: Any) =
-            Key(key = key, formatArguments = args)
+
+        fun genus(genus: Genus) =
+            Key(key = key, arguments = arguments, genus = genus, selection = selection)
+
+        inline fun <reified V> arg(key: String, value: V): Key {
+            val arguments = mapOf(key to value.toString()) + arguments
+            return Key(key = this.key, arguments = arguments, genus = genus, selection = selection)
+        }
+
+        operator fun get(selection: String) =
+            Key(key = key, arguments = arguments, genus = genus, selection = selection)
+
+        operator fun invoke(arguments: Map<String, String>) =
+            Key(key = key, genus = genus, arguments = arguments, selection = selection)
     }
 
 }

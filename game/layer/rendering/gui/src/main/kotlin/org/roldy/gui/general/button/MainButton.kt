@@ -2,6 +2,7 @@ package org.roldy.gui.general.button
 
 import org.roldy.core.utils.alpha
 import org.roldy.gui.*
+import org.roldy.rendering.g2d.FontStyle
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.alphaAnimation
 import org.roldy.rendering.g2d.gui.anim.colorAnimation
@@ -19,7 +20,7 @@ fun <S> UIWidget<S>.mainButton(
     text: TextManager,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {
-    val font = gui.font(60) {
+    val font = gui.font(FontStyle.Default, 60) {
         padTop = 0
         padBottom = 0
     }

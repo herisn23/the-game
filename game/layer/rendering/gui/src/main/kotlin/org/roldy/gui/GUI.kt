@@ -10,6 +10,7 @@ import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.i18n.I18N
 import org.roldy.core.utils.hex
 import org.roldy.core.x
+import org.roldy.rendering.g2d.FontStyle
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.g2d.gameFont
 import org.roldy.rendering.g2d.gui.Gui
@@ -32,7 +33,7 @@ data class GuiContext(
     val colors: GUIColors,
     val textures: GUITextures,
     override val i18n: I18N,
-    val font: (Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
+    val font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
 ) : I18NContext {
     lateinit var stage: UIStage
     operator fun <A> invoke(get: GUITextures.() -> A) =
@@ -68,8 +69,8 @@ fun Gui.gui(
     val atlas by disposable { AtlasLoader.gui }
     val colors = colorSchema
     val bundle = I18N()
-    val guiContext = GuiContext(colors, GUITextures(atlas), bundle) { size, initialize ->
-        gameFont(size = size, color = colors.button, initialize = initialize).disposable()
+    val guiContext = GuiContext(colors, GUITextures(atlas), bundle) { style, size, initialize ->
+        gameFont(size = size, style = style, color = colors.button, initialize = initialize).disposable()
     }
 
     val stage by disposable {

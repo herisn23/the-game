@@ -104,6 +104,8 @@ class UIContextualTooltip(
         }
     }
 
+    private var padding = Padding()
+
 
     private var focused = false
 
@@ -260,7 +262,7 @@ class UIContextualTooltip(
      * Shows the tooltip and positions it relative to the actor.
      */
     override fun enter(event: InputEvent, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
-        if (touched) return
+        if (touched || content.children.isEmpty) return
 
         // Position tooltip relative to the actor being hovered
         updatePosition(event.listenerActor)
@@ -579,6 +581,7 @@ class UIContextualTooltip(
      */
     fun content(content: UIContextualTooltipContent.(UIContextualTooltip) -> Unit) {
         this.content.clear()
+        this.content.pad(padding.top, padding.left, padding.bottom, padding.right)
         this.content.content(this)
         this.content.pack()
     }
@@ -597,6 +600,21 @@ class UIContextualTooltip(
         pinned = false
         focused = false
     }
+
+    data class Padding(
+        var left: Float = 0f,
+        var top: Float = 0f,
+        var right: Float = 0f,
+        var bottom: Float = 0f
+    )
+
+    fun pad(uniform: Float) =
+        pad(uniform, uniform, uniform, uniform)
+
+    fun pad(left: Float = 0f, top: Float = 0f, right: Float = 0f, bottom: Float = 0f) {
+        this.padding = Padding(left, top, right, bottom)
+    }
+
 }
 
 /**

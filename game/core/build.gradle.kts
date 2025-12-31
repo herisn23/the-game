@@ -7,4 +7,5 @@ dependencies {
     api(libs.kotlin.coroutines)
     api(libs.gdx.spine)
     implementation(libs.classgraph)
+    implementation(libs.kotlinx.serialization.yaml)
 }

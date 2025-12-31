@@ -19,10 +19,10 @@ fun UITable.minePopupContent(popup: UIPopup, mine: MineState) {
 
     row()
 
-    label(translate { mine_supplies.format(mine.refreshing.current) })
+    label(translate { mine_supplies.arg("supplies", mine.refreshing.current) })
 
     row()
 
-    label(translate { mine_supplies.format(mine.refreshing.max) })
+    label(translate { mine_supplies.arg("supplies", mine.refreshing.max) })
 
 }

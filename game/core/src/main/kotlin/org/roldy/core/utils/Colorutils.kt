@@ -29,6 +29,10 @@ infix fun Color.copyTo(color: Color): Color =
         it.a = a
     }
 
+val Color.hex
+    get() =
+        "#${toString()}"
+
 fun randomColor(random: Random) =
     Color(
         Random(random.nextInt() + 1).nextFloat(),

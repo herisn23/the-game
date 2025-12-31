@@ -41,7 +41,7 @@ fun <S> UIWidget<S>.circularButton(
         plainButton { cell ->
             val background = noneAnimation(size.background(gui).pad(-padding))
             val foreground = colorAnimation(size.foreground(gui).apply {
-                cell.minWidth(minWidth).minHeight(minHeight)
+                cell.width(minWidth).height(minHeight)
             }) {
                 color = gui.colors.primary
                 Disabled have gui.colors.disabled
