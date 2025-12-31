@@ -2,17 +2,17 @@ package org.roldy.core.pathwalker
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
+import org.roldy.core.defaultWalkSpeed
 import org.roldy.core.utils.MoveUtils
 
 class PathWalkerManager(
     val worldPositioned: WorldPositioned,
-    val speed: (Vector2Int) -> Float,
-    val onCoordsChanged: (Vector2Int) -> Unit,
-    val onPathEnd: (Vector2Int) -> Unit
+    val walkCost: (Vector2Int) -> Float,
+    val walker: TileWalker
 ) {
     private var currentPath: List<PathWalker.Node> = emptyList()
     private var currentPathIndex = 0
-    private var coords: Vector2Int = Vector2Int(0, 0)
+    private var tmpCoords: Vector2Int = walker.coords
 
     var path: List<PathWalker.Node>
         get() = currentPath
@@ -23,20 +23,32 @@ class PathWalkerManager(
             currentPathIndex = 0
         }
 
+    fun calculateSpeed(coords: Vector2Int): Float {
+        return defaultWalkSpeed * walker.speed * walkCost(coords)
+    }
+
     context(deltaTime: Float)
     fun walk() {
         if (currentPathIndex < path.size) {
             val nextWorldPos = path[currentPathIndex]
-            onCoordsChanged(coords)
+            if (nextWorldPos != tmpCoords) {
+                walker.onTileLeave(tmpCoords)
+                walker.nextTile(nextWorldPos.coords)
+            }
             //always set coords by nextPosition to correct resolving of next path if current path is still processing
-            coords = nextWorldPos.coords
-            MoveUtils.moveTowards(worldPositioned.position, nextWorldPos.position, speed(coords), deltaTime) {
+            tmpCoords = nextWorldPos.coords
+            MoveUtils.moveTowards(
+                worldPositioned.position,
+                nextWorldPos.position,
+                calculateSpeed(tmpCoords),
+                deltaTime
+            ) {
                 worldPositioned.position = nextWorldPos.position
                 currentPathIndex++
-
+                walker.onTileEnter(tmpCoords)
                 // Reached end of path
                 if (currentPathIndex >= path.size) {
-                    onPathEnd(coords)
+                    walker.onPathEnd(tmpCoords)
                     currentPath = emptyList()
                     currentPathIndex = 0
                 }

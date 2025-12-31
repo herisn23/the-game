@@ -1,6 +1,5 @@
 package org.roldy.rendering.pawn
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,24 +9,17 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.WorldPositioned
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.pathwalker.PathWalkerManager
-import org.roldy.data.state.PawnState
+import org.roldy.core.pathwalker.TileWalker
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.disposable.disposable
-import kotlin.properties.Delegates
 
 class PawnFigure(
-    val data: PawnState,
-    val camera: Camera,
+    val walker: TileWalker,
     val walkCost: (Vector2Int) -> Float,
-    var onPathEnd: (Vector2Int) -> Unit = {}
 ) : AutoDisposableAdapter(), Renderable, WorldPositioned, PathWalker, TilePositioned {
-    val pathWalkerManager = PathWalkerManager(this, {
-        data.defaultTileSpeed * data.speed * walkCost(it)
-    }, {
-        this.coords = it
-    }, ::pathEnd)
+    val pathWalkerManager = PathWalkerManager(this, { walkCost(it) }, walker)
     val tex by disposable { Texture("purple_circle.png") }
 
     val sprite = Sprite(tex).apply {
@@ -35,17 +27,11 @@ class PawnFigure(
         setOriginCenter()
     }
 
-    fun pathEnd(coords:Vector2Int) {
-        onPathEnd(coords)
-    }
-
-
     override var walkable: Boolean = false
 
 
     context(deltaTime: Float)
     override fun render(batch: SpriteBatch) {
-        camera.position.set(position.x, position.y, 0f)
         sprite.draw(batch)
         pathWalkerManager.walk()
     }
@@ -57,11 +43,11 @@ class PawnFigure(
         get() = sprite.y - sprite.height / 2
 
 
-    var _position = Vector2()
+    var positionTmp = Vector2()
     override var position: Vector2
-        get() = _position.cpy()  // Return copy
+        get() = positionTmp.cpy()  // Return copy
         set(value) {
-            _position.set(value)
+            positionTmp.set(value)
             sprite.setCenter(value.x, value.y)
         }
 
@@ -69,7 +55,9 @@ class PawnFigure(
         pathWalkerManager.path = path.tiles
     }
 
-    override var coords: Vector2Int by Delegates.observable(data.coords) { _, _, newValue ->
-        data.coords = newValue
-    }
+    override var coords: Vector2Int
+        get() = walker.coords
+        set(value) {
+            walker.coords = value
+        }
 }

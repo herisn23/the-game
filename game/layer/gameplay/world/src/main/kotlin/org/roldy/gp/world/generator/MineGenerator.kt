@@ -7,7 +7,7 @@ import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
-import org.roldy.data.mine.MineType
+import org.roldy.data.mine.HarvestableType
 import org.roldy.data.mine.harvestable.Harvestable
 import org.roldy.data.tile.MineTileData
 import org.roldy.data.tile.SettlementTileData
@@ -23,7 +23,7 @@ class MineGenerator(
 ) : WorldGenerator<MineTileData> {
     val rules = harvestableConfiguration.rules
     val logger by logger()
-    val allHarvestable by lazy { MineType.harvestable }
+    val allHarvestable by lazy { HarvestableType.harvestable }
 
     override fun generate(): List<MineTileData> =
         generateMinesInSettlements() + generateMinesOutsideSettlements()

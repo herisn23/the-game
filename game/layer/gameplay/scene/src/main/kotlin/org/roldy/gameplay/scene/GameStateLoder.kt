@@ -1,6 +1,5 @@
 package org.roldy.gameplay.scene
 
-import org.roldy.core.Vector2Int
 import org.roldy.data.map.MapData
 import org.roldy.data.state.*
 import org.roldy.data.tile.MineTileData
@@ -11,14 +10,17 @@ fun createGameState(
     mapData: MapData,
     settlements: List<SettlementTileData>,
     mines: List<MineTileData>,
-    findSuitableSpotForPlayer: () -> Vector2Int
+    hero: HeroState
 ): GameState = GameState(
     mapData = mapData,
     settlements = settlements.map(SettlementTileData::toState),
     mines = mines.map(MineTileData::toState),
     player = PlayerState(
-        pawn = PawnState(
-            coords = findSuitableSpotForPlayer()
+        mutableListOf(
+            SquadState(
+                hero,
+                emptyList()
+            )
         )
     )
 )
@@ -32,7 +34,7 @@ private fun SettlementTileData.toState() =
         texture = texture,
     )
 
-private fun MineTileData.toState() = MineState(
+private fun MineTileData.toState() = HarvestableState(
     coords = coords,
     harvestable = harvestable,
     settlement = settlementData?.id,

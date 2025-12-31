@@ -1,7 +1,7 @@
 package org.roldy.gui.general.popup.data
 
 import com.badlogic.gdx.utils.Align
-import org.roldy.data.state.MineState
+import org.roldy.data.state.HarvestableState
 import org.roldy.gui.GuiContext
 import org.roldy.gui.general.label
 import org.roldy.gui.string
@@ -12,14 +12,14 @@ import org.roldy.rendering.g2d.gui.el.UITable
 
 @Scene2dCallbackDsl
 context(guiContext: GuiContext)
-fun UITable.minePopupContent(popup: UIPopup, mine: MineState) {
+fun UITable.minePopupContent(popup: UIPopup, mine: HarvestableState) {
     align(Align.left)
 
     label(string { mine.harvestable.name }, 35)
 
     row()
 
-    label(translate { mine_supplies.arg("amount", mine.refreshing.current) }) {
+    label(translate { mine_supplies.arg("amount", mine.refreshing.supplies) }) {
         autoupdate()
     }
 

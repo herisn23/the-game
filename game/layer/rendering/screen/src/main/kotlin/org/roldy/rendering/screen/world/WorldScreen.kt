@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.TimeManager
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.g2d.chunk.ChunkRenderer
@@ -17,13 +18,14 @@ import org.roldy.rendering.screen.world.debug.DebugRenderer
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 
 class WorldScreen(
-    val gui: Gui,
-    val timeManager: TimeManager,
+    private val gui: Gui,
+    private val timeManager: TimeManager,
     private val camera: OrthographicCamera,
-    private val map: WorldMap,
+    val map: WorldMap,
     populator: WorldMapPopulator,
-    val inputProcessor: InputProcessor,
-    val zoom: ((Float, Float, Float) -> Unit) -> Unit,
+    private val inputProcessor: InputProcessor,
+    private val zoom: ((Float, Float, Float) -> Unit) -> Unit,
+    private val followCamera: () -> Vector2?,
     private val debugEnabled: Boolean = false
 ) : AutoDisposableScreenAdapter() {
     val batch by disposable { SpriteBatch() }
@@ -53,6 +55,11 @@ class WorldScreen(
             camera.zoom += zoom * delta
             camera.zoom = MathUtils.clamp(camera.zoom, min, max)
         }
+
+        followCamera()?.let {
+            camera.position.set(it.x, it.y, 0f)
+        }
+
         camera.update()
 
         //Time scaled delta

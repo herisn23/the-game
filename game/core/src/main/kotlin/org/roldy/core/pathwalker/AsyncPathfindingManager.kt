@@ -5,18 +5,15 @@ import org.roldy.core.coroutines.singleTask
 
 /**
  * Asynchronous pathfinding manager that converts coordinate assignments into background pathfinding tasks.
- * Delegates computed paths via [onPathFound] when complete.
  */
 class AsyncPathfindingManager(
-    private val findPath: FindPath,
-    private val fromPosition: () -> Vector2Int,
-    private val onPathFound: (PathWalker.Path) -> Unit
+    private val findPath: FindPath
 ) {
     val task by singleTask()
-
-    fun findPath(coords: Vector2Int) {
+    fun findPath(from: Vector2Int, to: Vector2Int, onPathFound: (PathWalker.Path) -> Unit) {
+        stop()
         task { main ->
-            val path = findPath(fromPosition(), coords)
+            val path = this.findPath(from, to)
             main {
                 if (path.isComplete) {
                     onPathFound(path)

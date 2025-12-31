@@ -1,11 +1,11 @@
 package org.roldy.data.mine.harvestable
 
 import kotlinx.serialization.SerialName
-import org.roldy.data.mine.MineType
+import org.roldy.data.mine.HarvestableType
 
 @SerialName("Gem")
 enum class Gem(
-    override val mineType: MineType = MineType.GEM
+    override val type: HarvestableType = HarvestableType.GEM
 ) : Harvestable {
     Amazonite,
     Carnelian,

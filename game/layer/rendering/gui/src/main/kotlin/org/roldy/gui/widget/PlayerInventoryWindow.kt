@@ -14,9 +14,9 @@ import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import kotlin.properties.Delegates
 
-class PlayerInventory(
+class PlayerInventoryWindow(
     private val invActions: () -> WindowActions,
-    val inventory: Inventory<InventoryItemState>,
+    val inventory: InventoryWindow<InventoryItemState>,
     val gui: GuiContext
 ) {
     val seq by sequencer(0, 1)
@@ -114,11 +114,11 @@ class PlayerInventory(
 
 @Scene2dDsl
 context(gui: GuiContext)
-fun <S> UIWidget<S>.playerInventory(init: (PlayerInventory) -> Unit) {
+fun <S> UIWidget<S>.playerInventory(init: (PlayerInventoryWindow) -> Unit) {
     lateinit var act: WindowActions
     val actions = inventory {
 
-        init(PlayerInventory({ act }, this, gui))
+        init(PlayerInventoryWindow({ act }, this, gui))
     }
     act = actions
     actions.setPosition(gui.stage.width, 0f, Align.bottomRight)

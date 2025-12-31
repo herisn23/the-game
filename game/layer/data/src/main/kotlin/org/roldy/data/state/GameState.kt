@@ -8,6 +8,6 @@ data class GameState(
     val mapData: MapData,
     var time: Float = 0f,
     val settlements: List<SettlementState>,
-    val mines: List<MineState>, //free mines, it means outside of settlement radius
+    val mines: List<HarvestableState>, //free mines, it means outside of settlement radius
     val player: PlayerState
 )

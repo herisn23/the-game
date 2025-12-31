@@ -3,6 +3,7 @@ package org.roldy.gameplay.scene.initializers
 import org.roldy.core.i18n.I18N
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
+import org.roldy.data.state.HeroState
 import org.roldy.gameplay.scene.GameLoader
 import org.roldy.gameplay.scene.GameScene
 import org.roldy.gameplay.scene.camera
@@ -20,6 +21,7 @@ fun GameScene.worldScreen(
         mapData,
         this,
         camera,
+        HeroState(),
         saveFile,
         progress
     ) {

@@ -1,11 +1,11 @@
 package org.roldy.data.mine.harvestable
 
 import kotlinx.serialization.SerialName
-import org.roldy.data.mine.MineType
+import org.roldy.data.mine.HarvestableType
 
 @SerialName("Fiber")
 enum class Fiber(
-    override val mineType: MineType = MineType.FIBER,
+    override val type: HarvestableType = HarvestableType.FIBER,
 ) : Harvestable {
     Flax,
     Hemp,

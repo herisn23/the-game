@@ -37,7 +37,7 @@ typealias SlotTooltip<D> = (@Scene2dCallbackDsl UIContextualTooltipContent).(Dat
 
 @Scene2dCallbackDsl
 data class InventorySlot<D>(
-    private val inventory: Inventory<D>,
+    private val inventory: InventoryWindow<D>,
     val table: UITable,
     private val slot: Slot,
     private val onRemoved: () -> Unit,
@@ -142,7 +142,7 @@ fun <D> data(
 ) = Data(icon, grade, amount, lock, index, data, tooltip)
 
 
-class Inventory<D>(
+class InventoryWindow<D>(
     private val grid: UIGrid,
     private val scroll: UIScrollPane,
     private val context: GuiContext
@@ -171,7 +171,7 @@ class Inventory<D>(
     val pool = context(context) {
         pool(100) {
             {
-                inventorySlot(this@Inventory) { table ->
+                inventorySlot(this@InventoryWindow) { table ->
                     onClick {
                         invokeClick(this, it)
                     }
@@ -209,7 +209,7 @@ class Inventory<D>(
     @Scene2dCallbackDsl
     fun sort(
         text: TextManager,
-        action: (Inventory<D>) -> Unit
+        action: (InventoryWindow<D>) -> Unit
     ) {
         sortActions.add(SortAction(text, action))
     }
@@ -284,13 +284,13 @@ class Inventory<D>(
 
 data class SortAction<D>(
     val text: TextManager,
-    val action: (Inventory<D>) -> Unit
+    val action: (InventoryWindow<D>) -> Unit
 )
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S, D> UIWidget<S>.inventory(
-    init: (@Scene2dDsl Inventory<D>).() -> Unit = {},
+    init: (@Scene2dDsl InventoryWindow<D>).() -> Unit = {},
 ): WindowActions =
     window(translate { inventory }, "Inventory") { contentCell ->
         contentCell.top().grow()
@@ -312,7 +312,7 @@ fun <S, D> UIWidget<S>.inventory(
                 }
             }
         }
-        val inventory = Inventory<D>(grid, scroll, gui)
+        val inventory = InventoryWindow<D>(grid, scroll, gui)
         inventory.init()
         row()
         buttons {
@@ -355,7 +355,7 @@ private fun slotDefaults(): FreeTypeFontGenerator.FreeTypeFontParameter.() -> Un
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S, D> UIWidget<S>.inventorySlot(
-    inventory: Inventory<D>,
+    inventory: InventoryWindow<D>,
     ref: (@Scene2dDsl InventorySlot<D>).(UITable) -> Unit = {}
 ) =
     slot { slotTable ->

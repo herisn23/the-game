@@ -5,9 +5,10 @@ import org.roldy.core.Vector2Int
 import org.roldy.data.mine.harvestable.Harvestable
 
 @Serializable
-data class MineState(
+data class HarvestableState(
     val coords: Vector2Int,
     val harvestable: Harvestable,
     val refreshing: RefreshingState,
+    var harvested: Int = 0,//harvesting progress until collected
     val settlement: Int?
 )

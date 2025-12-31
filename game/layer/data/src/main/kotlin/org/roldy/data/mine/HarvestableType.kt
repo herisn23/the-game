@@ -2,7 +2,7 @@ package org.roldy.data.mine
 
 import org.roldy.data.mine.harvestable.*
 
-enum class MineType(
+enum class HarvestableType(
     val texture: String,
     val harvestable: () -> List<Harvestable>
 ) {

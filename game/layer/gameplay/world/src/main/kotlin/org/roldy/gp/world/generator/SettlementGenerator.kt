@@ -7,7 +7,7 @@ import org.roldy.core.utils.hexRadius
 import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.map.MapData
-import org.roldy.data.mine.MineType
+import org.roldy.data.mine.HarvestableType
 import org.roldy.data.tile.SettlementTileData
 import org.roldy.rendering.map.MapTerrainData
 import kotlin.math.min
@@ -19,7 +19,7 @@ class SettlementGenerator(
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<SettlementTileData> {
     val logger by logger()
-    val harvestable = MineType.harvestable
+    val harvestable = HarvestableType.harvestable
 
     val maxRegionSize = mapData.size.width / mapData.size.settlements
     val minRegionSize = minOf(10, maxRegionSize)

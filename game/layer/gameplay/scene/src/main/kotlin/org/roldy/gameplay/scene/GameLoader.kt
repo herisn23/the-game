@@ -17,11 +17,11 @@ import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.state.GameState
+import org.roldy.data.state.HeroState
 import org.roldy.data.tile.MineTileData
 import org.roldy.data.tile.RoadTileData
 import org.roldy.data.tile.SettlementTileData
 import org.roldy.data.tile.TileData
-import org.roldy.gp.world.PlayerManager
 import org.roldy.gp.world.TileFocusManager
 import org.roldy.gp.world.generator.MineGenerator
 import org.roldy.gp.world.generator.ProceduralMapGenerator
@@ -32,9 +32,10 @@ import org.roldy.gp.world.input.MouseHandleInputProcessor
 import org.roldy.gp.world.input.ZoomInputProcessor
 import org.roldy.gp.world.loadBiomesConfiguration
 import org.roldy.gp.world.loadHarvestableConfiguration
+import org.roldy.gp.world.manager.player.PlayerManager
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.pathfinding.calculateTileWalkCost
-import org.roldy.gp.world.processor.MineRefreshingProcessor
+import org.roldy.gp.world.processor.HarvestableRefreshingProcessor
 import org.roldy.gui.WorldGUI
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposable
@@ -43,7 +44,6 @@ import org.roldy.rendering.map.Biome
 import org.roldy.rendering.map.HexagonalTiledMapCreator
 import org.roldy.rendering.map.MapTerrainData
 import org.roldy.rendering.map.WorldMap
-import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
@@ -57,6 +57,7 @@ class GameLoader(
     val mapData: MapData,
     val parent: AutoDisposable,
     val camera: OrthographicCamera,
+    val heroStateForNewGame: HeroState? = null,
     saveFile: File,
     val progress: (Float, I18N.Key) -> Unit,
     val finished: GameLoader.() -> Unit
@@ -91,8 +92,7 @@ class GameLoader(
     val gui = GameLoaderProperty<WorldGUI>()
     val tilePathFinder = GameLoaderProperty<TilePathfinder>()
     val playerManager = GameLoaderProperty<PlayerManager>()
-    val persistentObjects = GameLoaderProperty<List<Layered>>()
-    val playerFigure = GameLoaderProperty<PawnFigure>()
+    val persistentObjects = GameLoaderProperty<MutableList<Layered>>()
     val timeManager = GameLoaderProperty<TimeManager>()
     val processingLoop = GameLoaderProperty<DeltaProcessingLoop>()
     val gameTime = GameLoaderProperty<GameTime>()
@@ -102,7 +102,11 @@ class GameLoader(
 
         // CONFIGURATION LOADERS
         addLoader(Strings.loading_configuration, biomesConfiguration) {
-            loadBiomesConfiguration()
+            loadBiomesConfiguration().apply {
+                biomes.forEach {
+                    logger.debug { "Biome walk-cost: ${it.type} = ${it.walkCost}" }
+                }
+            }
         }
         addLoader(Strings.loading_configuration, harvestableConfiguration) {
             loadHarvestableConfiguration()
@@ -170,9 +174,14 @@ class GameLoader(
         // GAME STATE Loader
         addLoader(Strings.loading_game_state, gameState) {
             if (!saveFile.exists()) {
-                createGameState(mapData, settlements.value, mines.value) {
-                    //TODO set player initial coordinates for new game
-                    worldMap.value.data.size.width / 2 x worldMap.value.data.size.height / 2
+                if (heroStateForNewGame != null) {
+                    createGameState(mapData, settlements.value, mines.value, heroStateForNewGame).apply {
+                        //TODO find suitable spot for new game
+                        heroStateForNewGame.coords =
+                            worldMap.value.data.size.width / 2 x worldMap.value.data.size.height / 2
+                    }
+                } else {
+                    error("Cannot create game state without default HeroState")
                 }
             } else {
                 gameSaveManager.load()
@@ -182,41 +191,31 @@ class GameLoader(
             GameTime(gameState.value.time)
         }
 
-        // SCREEN LOADER
+        // GUI Loader
 
         addLoader(Strings.loading_gui, gui) {
-            WorldGUI()
+            WorldGUI {
+                gameSaveManager.save(gameState.value)
+            }
         }
 
-        addLoader(Strings.loading_player, playerFigure) {
-            PawnFigure(gameState.value.player.pawn, camera, { tile ->
-                calculateTileWalkCost(screen.value, worldMap.value)(tile)
-            })
-        }
-        addLoader(Strings.loading_player, persistentObjects) {
-            listOf(
-                playerFigure.value
-            )
-        }
-
-        addLoader(Strings.loading_player, tilePathFinder) {
+        // Player data loader
+        addLoader(Strings.loading_finalize, tilePathFinder) {
             TilePathfinder(worldMap.value) { tile, _ ->
                 calculateTileWalkCost(screen.value, worldMap.value)(tile)
             }
         }
 
-        addLoader(Strings.loading_player, playerManager) {
-            PlayerManager(
-                tilePathFinder.value,
-                gui.value,
-                gameState.value,
-                camera,
-                worldMap.value,
-                playerFigure.value,
-            )
+        addLoader(Strings.loading_finalize, persistentObjects) {
+            mutableListOf()
         }
+//        addLoader(Strings.loading_player, persistentObjects) {
+//            listOf(
+//                playerFigure.value
+//            )
+//        }
 
-        addLoader(Strings.loading_player, populators) {
+        addLoader(Strings.loading_finalize, populators) {
             listOf(
                 SettlementPopulator(worldMap.value, gameState.value.settlements),
                 RoadsPopulator(worldMap.value, roads.value),
@@ -232,17 +231,6 @@ class GameLoader(
                 camera,
                 worldMap.value
             )
-        }
-        // Add processors
-        addLoader(Strings.loading_finalize) {
-            with(processingLoop.value) {
-                addConsumer(playerManager.value)
-                addConsumer(MineRefreshingProcessor(gameState.value))
-                addConsumer {
-                    gameTime.value.update()
-                    gameState.value.time = gameTime.value.time
-                }
-            }
         }
 
         addLoader(Strings.loading_finalize, screen) {
@@ -261,14 +249,39 @@ class GameLoader(
                             keybinds,
                             worldMap.value,
                             camera,
-                            playerManager.value::focusTile,
+                            {
+                                playerManager.value.move(it)
+                            },
                             tileFocusManager.value::focusTile,
                         ),
                         GameSaveInputProcessor(keybinds, gameState.value, gameSaveManager)
                     )
                 ),
-                zoom::invoke
+                zoom::invoke,
+                {
+                    playerManager.value.currentPosition
+                }
             )
+        }
+        // Add processors
+        addLoader(Strings.loading_finalize, playerManager) {
+            PlayerManager(
+                tilePathFinder.value,
+                gui.value,
+                gameState.value,
+                screen.value,
+                persistentObjects.value
+            )
+        }
+        addLoader(Strings.loading_finalize) {
+            with(processingLoop.value) {
+                addConsumer(playerManager.value)
+                addConsumer(HarvestableRefreshingProcessor(gameState.value))
+                addConsumer {
+                    gameTime.value.update()
+                    gameState.value.time = gameTime.value.time
+                }
+            }
         }
 
         load()

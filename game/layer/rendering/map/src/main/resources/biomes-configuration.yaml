@@ -26,7 +26,7 @@ biomes:
   - type: ExtremeCold
     temperature: '0.15'
     moisture: '0.5'
-    walkCost: 0.1
+    walkCost: 0.25
     color: 3dc5c5
     mountains:
       - name: hexMountainSnow00
@@ -48,7 +48,7 @@ biomes:
   - type: Cold
     temperature: '0.3'
     moisture: '0.8'
-    walkCost: 0.2
+    walkCost: 0.5
     color: a9c5c5
     mountains:
       - name: hexHillsColdSnowCovered00
@@ -92,7 +92,7 @@ biomes:
       - name: hexPlainsCold03
   - type: Jungle
     color: 197a33
-    walkCost: 1
+    walkCost: 0.9
     temperature: '>0.65'
     moisture: '>0.65'
     terrains:
@@ -116,7 +116,7 @@ biomes:
         moisture: 0.96
       - name: hexJungle03
   - type: DeepDesert
-    walkCost: 0.2
+    walkCost: 0.35
     moisture: '<0.4'
     temperature: '>0.75'
     color: ed9a21
@@ -151,7 +151,7 @@ biomes:
         temperature: 0.95
       - name: hexDesertDunes03
   - type: Desert
-    walkCost: 0.3
+    walkCost: 0.5
     moisture: '<0.4'
     temperature: '>0.55'
     color: ebdb2b
@@ -185,7 +185,7 @@ biomes:
         moisture: 0.1
       - name: hexDesertYellowDirt03
   - type: Savanna
-    walkCost: 1
+    walkCost: 0.9
     moisture: '>0.2'
     temperature: '>0.6'
     color: 8a4807

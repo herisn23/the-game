@@ -6,7 +6,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.utils.project
 import org.roldy.core.x
 import org.roldy.data.state.GameState
-import org.roldy.gp.world.utils.Mining
+import org.roldy.gp.world.utils.Harvesting
 import org.roldy.gui.WorldGUI
 import org.roldy.gui.general.popup.data.minePopupContent
 import org.roldy.rendering.map.WorldMap
@@ -36,7 +36,7 @@ class TileFocusManager(
             return world.x.toInt() x flippedY.toInt()
         }
 
-        Mining.findMine(gameState, coords) { mine ->
+        Harvesting.findMine(gameState, coords) { mine ->
             gui
                 .showTileInfo(
                     { minePopupContent(it, mine) },

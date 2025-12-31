@@ -11,7 +11,7 @@ interface IVector2Int {
 data class MutableVector2Int(override var x: Int, override var y: Int) : IVector2Int
 
 @Serializable
-data class Vector2Int(override val x: Int, override val y: Int) : IVector2Int, Comparable<Vector2Int> {
+data class Vector2Int(override val x: Int=0, override val y: Int=0) : IVector2Int, Comparable<Vector2Int> {
     val sum get() = x + y
     override fun compareTo(other: Vector2Int): Int =
         this.x.compareTo(other.x).takeIf { it != 0 } ?: this.y.compareTo(other.y)

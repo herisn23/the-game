@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import org.roldy.gui.GuiContext
 import org.roldy.gui.TextManager
 import org.roldy.rendering.g2d.FontStyle
+import org.roldy.rendering.g2d.gui.Scene2dCallbackDsl
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.*
 
@@ -28,7 +29,7 @@ class LabelActions(
 
     fun setText(text: TextManager) {
         context(gui) {
-            setText(text.getText())
+            label.setText(text.getText)
         }
     }
 
@@ -36,6 +37,7 @@ class LabelActions(
         setText(number?.toString())
     }
 
+    @Scene2dCallbackDsl
     fun autoupdate() {
         label.autoupdate()
     }
