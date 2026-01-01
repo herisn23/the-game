@@ -6,6 +6,7 @@ import org.roldy.data.mine.harvestable.Harvestable
 
 @Serializable
 data class InventoryState(
+    val defaultSize: Int,
     val items: MutableList<InventoryItemState> = mutableListOf(),
 )
 

@@ -1,4 +1,4 @@
-package org.roldy.gp.world.manager.player
+package org.roldy.gp.world.manager
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.AsyncPathfindingManager
@@ -12,13 +12,12 @@ import org.roldy.rendering.pawn.PawnFigure
 import org.roldy.rendering.screen.world.WorldScreen
 
 class SquadManager(
-    private val player: PlayerManager,
     val squad: SquadState,
+    val tileLandMarkManagers:List<TileLandmarkManager>,
     private val screen: WorldScreen,
     private val persistentObjects: MutableList<Layered>,
     private val pathfinder: TilePathfinder,
-) : TileWalker {
-
+): TileWalker {
     val pathFinderManager = AsyncPathfindingManager(pathfinder::findPath)
 
     val figure = PawnFigure(this) { tile ->
@@ -54,7 +53,9 @@ class SquadManager(
 
     override fun onPathEnd(coords: Vector2Int) {
         nextCoords = coords
-        player.harvestingManager.enter(coords)
+        tileLandMarkManagers.forEach {
+            it.onTileReached(coords)
+        }
     }
 
     override fun onTileEnter(coords: Vector2Int) {
@@ -63,11 +64,12 @@ class SquadManager(
 
     override fun onTileLeave(coords: Vector2Int) {
         if (this.coords != coords)
-            player.harvestingManager.leave()
+            tileLandMarkManagers.forEach {
+                it.onTileExit()
+            }
     }
 
     override fun nextTile(coords: Vector2Int) {
         nextCoords = coords
     }
-
 }

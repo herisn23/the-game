@@ -21,6 +21,7 @@ class WorldGUI(
     lateinit var harvestingWindow: HarvestingWindowDelegate
     lateinit var inventory: PlayerInventoryWindow
     lateinit var guiContext: GuiContext
+    lateinit var inventoryButton: UITextButton
     override val stage = gui(1f) { gui ->
         this@WorldGUI.guiContext = gui
         stack {
@@ -37,9 +38,7 @@ class WorldGUI(
         }
         table {
             mainButton("Inventory") {
-                onClick {
-                    this@WorldGUI.inventory.actions.toggle()
-                }
+                this@WorldGUI.inventoryButton = this
             }
             mainButton("Save") {
                 onClick {

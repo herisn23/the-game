@@ -24,12 +24,10 @@ fun <S> UIWidget<S>.smallButton(
     text: TextManager,
     fontColor: Color = gui.colors.button,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
-): UITextButton =
-    text { text ->
-        smallButton(fontColor = fontColor) {
-            setText(text)
-            init(it)
-        }
+): TextButtonActions =
+    smallButton(fontColor = fontColor) {
+        setText(text.getText)
+        init(it)
     }
 
 
@@ -39,7 +37,7 @@ fun <S> UIWidget<S>.smallButton(
     text: String? = null,
     fontColor: Color = gui.colors.button,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
-): UITextButton {
+): TextButtonActions {
     val font = gui.font(FontStyle.Default, 50) {
         padTop = 0
         padBottom = 0
@@ -85,5 +83,5 @@ fun <S> UIWidget<S>.smallButton(
             button = this
         }
     }
-    return button
+    return TextButtonActions(button, gui)
 }

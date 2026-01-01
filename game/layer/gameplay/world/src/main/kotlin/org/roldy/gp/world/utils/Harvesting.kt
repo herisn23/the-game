@@ -2,6 +2,7 @@ package org.roldy.gp.world.utils
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.async
+import org.roldy.core.utils.toDuration
 import org.roldy.data.state.GameState
 import org.roldy.data.state.HarvestableState
 import org.roldy.data.state.RefreshingState
@@ -50,19 +51,31 @@ object Harvesting {
         }
     }
 
+    fun calculateProgress(data: Data) =
+        (data.harvestable.currentHarvestingProgress / data.harvestSpeed).toFloat().coerceIn(0f, 1f)
+
+    /**
+     * Harvest resource
+     * @return True if harvested, False when supplies running out
+     */
     context(delta: Float)
     fun harvest(
-        data: Data
-    ) {
-        with(data.harvestable.refreshing) {
-            if (supplies > 0) {
-                data.harvestable.currentHarvestingProgress += delta.toDouble().seconds
-                if (data.harvestable.currentHarvestingProgress >= data.harvestSpeed) {
-                    supplies--
-                    data.onHarvest()
-                    data.harvestable.currentHarvestingProgress = 0.seconds
-                }
+        data: Data,
+        progress: (Float) -> Unit = {}
+    ): Boolean = with(data.harvestable.refreshing) {
+        if (supplies > 0) {
+            data.harvestable.currentHarvestingProgress += delta.toDuration()
+            progress(calculateProgress(data))
+            if (data.harvestable.currentHarvestingProgress >= data.harvestSpeed) {
+                supplies--
+                data.onHarvest()
+                data.harvestable.currentHarvestingProgress = 0.seconds
+                progress(0f)
             }
+            true
+        } else {
+            data.harvestable.currentHarvestingProgress = 0.seconds
+            false
         }
     }
 }

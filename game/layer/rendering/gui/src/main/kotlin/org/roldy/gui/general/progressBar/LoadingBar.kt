@@ -16,10 +16,11 @@ import org.roldy.rendering.g2d.gui.el.uiProgressBar
 import kotlin.math.abs
 import kotlin.math.ceil
 
+object LoadingBarAction: ImperativeAction
 
-class LoadingBarDelegate : ImperativeActionDelegate() {
-    object LoadingText : ImperativeValue<TextManager>
-    object Progress : ImperativeValue<Float>
+class LoadingBarDelegate : ImperativeActionDelegate<LoadingBarAction>() {
+    object LoadingText : ImperativeValue<TextManager, LoadingBarAction>
+    object Progress : ImperativeValue<Float, LoadingBarAction>
 
     val loadingText = LoadingText
     val progress = Progress

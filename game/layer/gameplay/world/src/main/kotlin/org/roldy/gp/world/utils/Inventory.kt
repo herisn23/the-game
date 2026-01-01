@@ -24,17 +24,39 @@ object Inventory {
         return item
     }
 
-    fun add(inventory: InventoryState, harvestable: Harvestable, amount: Int): InventoryItemState {
-        return inventory
+    fun add(
+        hero: HeroState, harvestable: Harvestable, amount: Int,
+        inventoryIsFull: () -> Unit = {},
+        added: (InventoryItemState) -> Unit = { _ -> }
+    ) {
+        if (amount == 0) return
+        val item = hero.inventory
             .items
             .find {
                 it.harvestable == harvestable
             }?.also {
                 it.amount += amount
-            } ?: add(inventory, InventoryItemState(index = 0, harvestable = harvestable, amount = amount))
+            } ?: run {
+            if (hasSpace(hero)) {
+                add(hero.inventory, InventoryItemState(index = 0, harvestable = harvestable, amount = amount))
+            } else {
+                null
+            }
+        }
+
+        if (item == null) {
+            inventoryIsFull()
+        } else {
+            added(item)
+        }
     }
 
 
-    fun slots(heroState: HeroState) = 10f
+    /**
+     * TODO Calculate real inventory size by default size, abilities, mounts, states, etc.
+     */
+    fun size(heroState: HeroState) = heroState.inventory.defaultSize
+
+    fun hasSpace(hero: HeroState) = size(hero) > hero.inventory.items.size
 
 }

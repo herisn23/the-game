@@ -2,52 +2,52 @@ package org.roldy.rendering.g2d.gui
 
 import org.roldy.core.cast
 import kotlin.properties.Delegates
-
+interface ImperativeAction
 interface ImperativeActions
-interface ImperativeFunction<Data, Return>
-interface ImperativeValue<V>
+interface ImperativeFunction<Data, Return, A:ImperativeAction>
+interface ImperativeValue<V, A:ImperativeAction>
 
 typealias ImperativeRunnableValue = () -> Unit
 typealias ImperativeValueHandler<Value> = (Value) -> Unit
 typealias ImperativeActionHandler<Data, Return> = (Data) -> Return
 typealias Value<Ref, V> = ImperativeHandler<Ref, ImperativeActionValue<V>>
-typealias Delegate<Ref, E> = ImperativeHandler<Ref, ImperativeActionDelegate>
+typealias Delegate<Ref, E, A> = ImperativeHandler<Ref, ImperativeActionDelegate<A>>
 
 @Scene2dCallbackDsl
-abstract class ImperativeActionDelegate : ImperativeActions {
+abstract class ImperativeActionDelegate<A:ImperativeAction> : ImperativeActions {
 
-    val valueListeners: MutableMap<ImperativeValue<*>, MutableList<ImperativeValueHandler<*>>> = mutableMapOf()
+    val valueListeners: MutableMap<ImperativeValue<*, *>, MutableList<ImperativeValueHandler<*>>> = mutableMapOf()
 
 
-    val functionListeners: MutableMap<ImperativeFunction<*, *>, MutableList<ImperativeActionHandler<*, *>>> =
+    val functionListeners: MutableMap<ImperativeFunction<*, *, *>, MutableList<ImperativeActionHandler<*, *>>> =
         mutableMapOf()
 
-    val stored: MutableMap<ImperativeValue<*>, Any?> = mutableMapOf()
+    val stored: MutableMap<ImperativeValue<*, *>, Any?> = mutableMapOf()
 
     fun <Value, I> value(
         value: I,
         listener: ImperativeValueHandler<Value>
-    ) where I : ImperativeValue<Value> {
+    ) where I : ImperativeValue<Value, A>{
         valueListeners.getOrPut(value) { mutableListOf() }.add(listener)
     }
 
     fun <D, R, F> function(
         action: F,
         listener: ImperativeActionHandler<D, R>
-    ) where F : ImperativeFunction<D, R> {
+    ) where F : ImperativeFunction<D, R, A> {
         functionListeners.getOrPut(action) { mutableListOf() }.add(listener)
     }
 
 
-    inline fun <reified Value, I> get(value: I) where I : ImperativeValue<Value> =
+    inline fun <reified Value, I> get(value: I) where I : ImperativeValue<Value, A> =
         stored[value].cast<Value>()
 
-    fun <R, D, F> call(function: F, data: D) where F : ImperativeFunction<D, R> =
+    fun <R, D, F> call(function: F, data: D) where F : ImperativeFunction<D, R, A> =
         functionListeners[function]?.forEach {
             it.cast<ImperativeActionHandler<D, R>>().invoke(data)
         }
 
-    fun <Value, I> set(valueType: I, value: Value) where I : ImperativeValue<Value> {
+    fun <Value, I> set(valueType: I, value: Value) where I : ImperativeValue<Value, A> {
         stored[valueType] = value
         valueListeners[valueType]?.forEach {
             it.cast<ImperativeValueHandler<Value>> { handler ->
@@ -57,15 +57,15 @@ abstract class ImperativeActionDelegate : ImperativeActions {
     }
 
     @JvmName("getValue")
-    inline fun <reified Value, I> I.get() where I : ImperativeValue<Value> =
+    inline fun <reified Value, I> I.get() where I : ImperativeValue<Value, A> =
         get(this)
 
     @JvmName("getCallableValue")
-    inline operator fun <reified Value : ImperativeRunnableValue, I> I.invoke() where I : ImperativeValue<Value> =
+    inline operator fun <reified Value : ImperativeRunnableValue, I> I.invoke() where I : ImperativeValue<Value, A> =
         get(this).invoke()
 
     @JvmName("setValue")
-    infix fun <Value, I> I.set(value: Value) where I : ImperativeValue<Value> =
+    infix fun <Value, I> I.set(value: Value) where I : ImperativeValue<Value, A> =
         set(this, value)
 
     /**
@@ -74,18 +74,18 @@ abstract class ImperativeActionDelegate : ImperativeActions {
 
     infix fun <Value, I> I.init(
         value: Value
-    ) where I : ImperativeValue<Value> {
+    ) where I : ImperativeValue<Value, A> {
         stored[this] = value
     }
 
-    operator fun <Value, I> I.invoke(listener: ImperativeValueHandler<Value>) where I : ImperativeValue<Value> {
+    operator fun <Value, I> I.invoke(listener: ImperativeValueHandler<Value>) where I : ImperativeValue<Value, A> {
         value(this, listener)
     }
 
-    operator fun <D, R, F> F.invoke(data: D) where F : ImperativeFunction<D, R> =
+    operator fun <D, R, F> F.invoke(data: D) where F : ImperativeFunction<D, R, A> =
         call(this, data)
 
-    operator fun <D, R, F> F.invoke(callback: (D) -> R) where F : ImperativeFunction<D, R> {
+    operator fun <D, R, F> F.invoke(callback: (D) -> R) where F : ImperativeFunction<D, R, A> {
         function(this, callback)
     }
 }

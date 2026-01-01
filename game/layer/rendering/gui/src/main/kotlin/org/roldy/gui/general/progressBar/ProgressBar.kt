@@ -12,8 +12,10 @@ enum class ProgressBarSize {
     Small, Medium
 }
 
-class ProgressBarDelegate : ImperativeActionDelegate() {
-    object Amount : ImperativeValue<Float>
+object ProgressBarAction: ImperativeAction
+
+class ProgressBarDelegate : ImperativeActionDelegate<ProgressBarAction>() {
+    object Amount : ImperativeValue<Float, ProgressBarAction>
     val amount = Amount
 }
 
