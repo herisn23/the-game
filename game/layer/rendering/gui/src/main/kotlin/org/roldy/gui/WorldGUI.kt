@@ -3,7 +3,7 @@ package org.roldy.gui
 import org.roldy.core.Vector2Int
 import org.roldy.gui.general.button.mainButton
 import org.roldy.gui.general.popup.tilePopup
-import org.roldy.gui.widget.HarvestingWindow
+import org.roldy.gui.widget.HarvestingWindowDelegate
 import org.roldy.gui.widget.PlayerInventoryWindow
 import org.roldy.gui.widget.harvestingWindow
 import org.roldy.gui.widget.playerInventory
@@ -18,7 +18,7 @@ class WorldGUI(
 ) : AutoDisposableAdapter(), Gui {
 
     lateinit var tileTooltip: UIStandardPopup
-    lateinit var harvestingWindow: HarvestingWindow
+    lateinit var harvestingWindow: HarvestingWindowDelegate
     lateinit var inventory: PlayerInventoryWindow
     lateinit var guiContext: GuiContext
     override val stage = gui(1f) { gui ->

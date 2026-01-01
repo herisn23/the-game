@@ -5,6 +5,7 @@ import org.roldy.data.state.GameState
 import org.roldy.gp.world.utils.Harvesting
 import org.roldy.gp.world.utils.Inventory
 import org.roldy.gui.WorldGUI
+import org.roldy.gui.widget.*
 import kotlin.properties.Delegates
 import kotlin.time.Duration
 
@@ -23,33 +24,41 @@ class PlayerHarvestingManager(
     val hero get() = playerManager.current.squad.leader
 
     fun findMine(coords: Vector2Int) {
-        gui.harvestingWindow.clean()
-        Harvesting.findMine(gameState, coords) {
-            with(gui.harvestingWindow) {
-                // Configure harvesting window
-                open()
-                state = it
-                startHarvest = {
-                    inProgress = true
-                }
-                collect = {
-                    Inventory.add(hero.inventory, it.harvestable, it.harvested)
-                    //TODO update inventory window should be here
-                    gui.inventory.inventory.maxSlots = 20
-                    gui.inventory.items = hero.inventory.items
-                    it.harvested = 0
+        harvestingWindow {
+            Clean(Unit)
+            Harvesting.findMine(gameState, coords) {
+                with(gui.harvestingWindow) {
+                    // Configure harvesting window
+                    Open(Unit)
+                    State.set(it)
+//                    Harvest.set {
+//                        inProgress = true
+//                    }
+                    Collect.set {
+                        Inventory.add(hero.inventory, it.harvestable, it.harvested)
+                        //TODO update inventory window should be here
+                        gui.inventory.inventory.maxSlots = 20
+                        gui.inventory.items = hero.inventory.items
+                        it.harvested = 0
+                    }
                 }
 
+                // Configure data for harvesting
+                data = Harvesting.Data(
+                    it,
+                    hero.harvestingSpeed,
+                    1f
+                ) {
+                    it.harvested++
+                }
             }
+        }
 
-            // Configure data for harvesting
-            data = Harvesting.Data(
-                it,
-                hero.harvestingSpeed,
-                1f
-            ) {
-                it.harvested++
-            }
+    }
+
+    fun harvestingWindow(run: HarvestingWindowDelegate.() -> Unit) {
+        with(gui.harvestingWindow) {
+            run()
         }
     }
 
@@ -72,8 +81,9 @@ class PlayerHarvestingManager(
     fun leave() {
         stop()
         data = null
-        gui.harvestingWindow.close {
-            it.clean()
+        harvestingWindow {
+            Close(Unit)
+            Clean(Unit)
         }
     }
 }

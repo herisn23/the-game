@@ -16,14 +16,15 @@ import org.roldy.rendering.g2d.gui.el.uiProgressBar
 import kotlin.math.abs
 import kotlin.math.ceil
 
+interface LoadingBarAction: ImperativeAction
 
-object LoadingText : ImperativeValue<TextManager>
-object Progress : ImperativeValue<Float>
+object LoadingText : ImperativeValue<TextManager, LoadingBarAction>
+object Progress : ImperativeValue<Float, LoadingBarAction>
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.loadingBar(
-    init: context(GuiContext) (@Scene2dDsl ImperativeActionDelegate).(S) -> Unit = {}
+    init: context(GuiContext) (@Scene2dDsl ImperativeActionDelegate<LoadingBarAction>).(S) -> Unit = {}
 ) {
     delegate {
         table(true) { storage ->
@@ -103,7 +104,7 @@ fun <S> UIWidget<S>.loadingBar(
                         width = backgroundLeft.minWidth
                         height = backgroundLeft.minHeight
                         init(storage)
-                        value(Progress) { progress ->
+                        Progress { progress ->
                             setValue(progress)
                         }
                     }
@@ -117,11 +118,11 @@ fun <S> UIWidget<S>.loadingBar(
                 }
                 label("Loading...") {
                     it.expand().left().top()
-                    value(LoadingText, ::setText)
+                    LoadingText(::setText)
                 }
                 label("0%") {
                     it.expand().right().top()
-                    value(Progress) { progress ->
+                    Progress { progress ->
                         setText("${ceil((progress * 100)).toInt()}%")
                     }
                 }
