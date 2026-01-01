@@ -12,25 +12,42 @@ import org.roldy.gui.translate
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
+// Delegate
+class HarvestingWindowDelegate : ImperativeActionDelegate() {
 
-interface HarvestingWindowAction : ImperativeAction
-typealias HarvestingWindowDelegate = ImperativeActionDelegate<HarvestingWindowAction>
+    object State : ImperativeValue<HarvestableState>
+    object Clean : ImperativeFunction<Unit, Unit>
+    object Open : ImperativeFunction<Unit, Unit>
+    object Close : ImperativeFunction<Unit, Unit>
+    object Harvest : ImperativeValue<ImperativeRunnableValue>
+    object Collect : ImperativeValue<ImperativeRunnableValue>
+    object HarvestableRefreshingProgress : ImperativeValue<Float>
+    object HarvestingRefreshingProgress : ImperativeValue<Float>
 
-// Actions
-object State : ImperativeValue<HarvestableState, HarvestingWindowAction>
-object Clean : ImperativeFunction<Unit, Unit, HarvestingWindowAction>
-object Open : ImperativeFunction<Unit, Unit, HarvestingWindowAction>
-object Close : ImperativeFunction<Unit, Unit, HarvestingWindowAction>
-object Harvest : ImperativeValue<ImperativeRunnableValue, HarvestingWindowAction>
-object Collect : ImperativeValue<ImperativeRunnableValue, HarvestingWindowAction>
+    val state = State
+    val clean = Clean
+    val open = Open
+    val close = Close
+    val harvest = Harvest
+    val collect = Collect
+    val harvestingProgress = HarvestingRefreshingProgress
+    val harvestableProgress = HarvestableRefreshingProgress
+
+    init {
+        harvestingProgress init 0f
+        harvestableProgress init 0f
+    }
+}
+
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
-    lateinit var harvest: TextButtonActions
+    lateinit var harvestButton: TextButtonActions
     lateinit var remaining: LabelActions
     lateinit var harvested: LabelActions
     lateinit var harvestable: LabelActions
-    delegate {
+    delegate(HarvestingWindowDelegate()) {
+
         val window = window {
             setPosition(gui.stage.width / 2, gui.stage.height / 2)
             label {
@@ -47,39 +64,41 @@ fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
             }
             row()
 
-            harvest = mainButton {
+            harvestButton = mainButton {
                 onClick {
-                    Harvest()
+                    harvest()
                 }
             }
             mainButton(translate { harvesting_collect }) {
                 onClick {
-                    Collect()
+                    collect()
                 }
             }
         }
-        State { newValue ->
+        state { newValue ->
             val mineLocKey = newValue.harvestable.type.locKey
             remaining.setText(translate { mine_supplies.arg("amount", newValue.refreshing.supplies) })
             harvestable.setText(translate { Strings.harvestable[newValue.harvestable.locKey] })
             harvested.setText(translate { harvesting_amount[mineLocKey].arg("amount", newValue.harvested) })
             window.title.setText(translate { harvesting[mineLocKey] })
-            harvest.setText(translate { harvesting_begin[mineLocKey] })
+            harvestButton.setText(translate { harvesting_begin[mineLocKey] })
             window.rebuild()
         }
 
-        Clean {
-
+        clean {
+            harvest.set { }
+            collect.set { }
         }
 
-        Open {
+        open {
             window.open()
         }
 
-        Close {
+        close {
             window.close()
         }
 
+        clean(Unit)
         init(this)
     }
 }

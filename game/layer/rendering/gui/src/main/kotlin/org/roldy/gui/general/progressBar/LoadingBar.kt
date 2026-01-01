@@ -16,17 +16,26 @@ import org.roldy.rendering.g2d.gui.el.uiProgressBar
 import kotlin.math.abs
 import kotlin.math.ceil
 
-interface LoadingBarAction: ImperativeAction
 
-object LoadingText : ImperativeValue<TextManager, LoadingBarAction>
-object Progress : ImperativeValue<Float, LoadingBarAction>
+class LoadingBarDelegate : ImperativeActionDelegate() {
+    object LoadingText : ImperativeValue<TextManager>
+    object Progress : ImperativeValue<Float>
+
+    val loadingText = LoadingText
+    val progress = Progress
+
+    init {
+        progress init 0f
+    }
+}
+
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.loadingBar(
-    init: context(GuiContext) (@Scene2dDsl ImperativeActionDelegate<LoadingBarAction>).(S) -> Unit = {}
+    init: context(GuiContext) (@Scene2dDsl LoadingBarDelegate).(S) -> Unit = {}
 ) {
-    delegate {
+    delegate(LoadingBarDelegate()) {
         table(true) { storage ->
             table(true) {
                 val backgroundLeft = gui.drawable { LoadingBar_Background }
@@ -104,9 +113,7 @@ fun <S> UIWidget<S>.loadingBar(
                         width = backgroundLeft.minWidth
                         height = backgroundLeft.minHeight
                         init(storage)
-                        Progress { progress ->
-                            setValue(progress)
-                        }
+                        progress(::setValue)
                     }
                 }
 
@@ -118,16 +125,15 @@ fun <S> UIWidget<S>.loadingBar(
                 }
                 label("Loading...") {
                     it.expand().left().top()
-                    LoadingText(::setText)
+                    loadingText(::setText)
                 }
                 label("0%") {
                     it.expand().right().top()
-                    Progress { progress ->
+                    progress { progress ->
                         setText("${ceil((progress * 100)).toInt()}%")
                     }
                 }
             }
         }
-        set(Progress, 0f)
     }
 }

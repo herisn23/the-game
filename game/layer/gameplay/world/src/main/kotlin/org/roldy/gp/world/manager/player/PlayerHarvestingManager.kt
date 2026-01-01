@@ -5,7 +5,6 @@ import org.roldy.data.state.GameState
 import org.roldy.gp.world.utils.Harvesting
 import org.roldy.gp.world.utils.Inventory
 import org.roldy.gui.WorldGUI
-import org.roldy.gui.widget.*
 import kotlin.properties.Delegates
 import kotlin.time.Duration
 
@@ -24,25 +23,22 @@ class PlayerHarvestingManager(
     val hero get() = playerManager.current.squad.leader
 
     fun findMine(coords: Vector2Int) {
-        harvestingWindow {
-            Clean(Unit)
+        gui.harvestingWindow {
             Harvesting.findMine(gameState, coords) {
-                with(gui.harvestingWindow) {
-                    // Configure harvesting window
-                    Open(Unit)
-                    State.set(it)
-//                    Harvest.set {
-//                        inProgress = true
-//                    }
-                    Collect.set {
-                        Inventory.add(hero.inventory, it.harvestable, it.harvested)
-                        //TODO update inventory window should be here
-                        gui.inventory.inventory.maxSlots = 20
-                        gui.inventory.items = hero.inventory.items
-                        it.harvested = 0
-                    }
-                }
+                // Configure harvesting window
+                open(Unit)
+                state.set(it)
 
+                harvest.set {
+                    inProgress = true
+                }
+                collect.set {
+                    Inventory.add(hero.inventory, it.harvestable, it.harvested)
+                    //TODO update inventory window should be here
+                    gui.inventory.inventory.maxSlots = 20
+                    gui.inventory.items = hero.inventory.items
+                    it.harvested = 0
+                }
                 // Configure data for harvesting
                 data = Harvesting.Data(
                     it,
@@ -54,12 +50,6 @@ class PlayerHarvestingManager(
             }
         }
 
-    }
-
-    fun harvestingWindow(run: HarvestingWindowDelegate.() -> Unit) {
-        with(gui.harvestingWindow) {
-            run()
-        }
     }
 
     private fun stop() {
@@ -81,9 +71,9 @@ class PlayerHarvestingManager(
     fun leave() {
         stop()
         data = null
-        harvestingWindow {
-            Close(Unit)
-            Clean(Unit)
+        gui.harvestingWindow {
+            close(Unit)
+            clean(Unit)
         }
     }
 }

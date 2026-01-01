@@ -33,7 +33,7 @@ class Toggle(
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean =
         state
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) = {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
         state = value
     }
 

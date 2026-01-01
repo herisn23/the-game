@@ -67,4 +67,10 @@ class WorldGUI(
         }
         return tileTooltip
     }
+
+    fun harvestingWindow(run: HarvestingWindowDelegate.() -> Unit) {
+        with(harvestingWindow) {
+            run()
+        }
+    }
 }
