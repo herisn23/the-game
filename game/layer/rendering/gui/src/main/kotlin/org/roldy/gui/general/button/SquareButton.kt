@@ -2,13 +2,13 @@ package org.roldy.gui.general.button
 
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.gui.GuiContext
-import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.alphaAnimation
 import org.roldy.rendering.g2d.gui.anim.colorAnimation
 import org.roldy.rendering.g2d.gui.anim.noneAnimation
 import org.roldy.rendering.g2d.gui.anim.stackedAnimation
 import org.roldy.rendering.g2d.gui.el.*
+import org.roldy.rendering.g2d.pixmap
 
 @Scene2dDsl
 context(gui: GuiContext)
@@ -28,7 +28,7 @@ fun <S> UIWidget<S>.squareButton(
                 color = gui.colors.primary
                 Disabled have gui.colors.disabled
             }
-            val hover = alphaAnimation(mask(emptyImage())) {
+            val hover = alphaAnimation(mask(pixmap())) {
                 Normal have 0f
                 Pressed have .1f
                 Over have .7f

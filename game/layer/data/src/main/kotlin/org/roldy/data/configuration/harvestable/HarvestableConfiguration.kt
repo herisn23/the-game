@@ -4,20 +4,17 @@ import kotlinx.serialization.Serializable
 import org.roldy.data.configuration.ClosedFloatingPointRangeSerializer
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.maxValue
-import org.roldy.data.mine.harvestable.Fiber
-import org.roldy.data.mine.harvestable.Gem
-import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.data.mine.harvestable.Metal
-import org.roldy.data.mine.harvestable.Wood
+import org.roldy.data.mine.harvestable.*
 
 @Serializable
 data class HarvestableConfiguration(
     val wood: Map<Wood, HarvestableData>,
-    val metal: Map<Metal, HarvestableData>,
+    val ore: Map<Ore, HarvestableData>,
     val fiber: Map<Fiber, HarvestableData>,
     val gem: Map<Gem, HarvestableData>,
+    val leather: Map<Leather, HarvestableData>
 ) {
-    val rules: Map<Harvestable, HarvestableData> = wood + metal + fiber + gem
+    val rules: Map<Harvestable, HarvestableData> = wood + ore + fiber + gem + leather
 
     @Serializable
     data class HarvestableData(

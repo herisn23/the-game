@@ -10,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.utils.alpha
 import org.roldy.gui.GuiContext
 import org.roldy.gui.slotHover
-import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.alphaAnimation
 import org.roldy.rendering.g2d.gui.anim.core.AnimationDrawableStateResolver
 import org.roldy.rendering.g2d.gui.anim.core.mixAnimation
 import org.roldy.rendering.g2d.gui.anim.scaleAnimation
 import org.roldy.rendering.g2d.gui.el.*
+import org.roldy.rendering.g2d.pixmap
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -46,7 +46,7 @@ class SlotDragListener<T : Any>(
         if (!delegate.canDrag()) return
         event.stop()
         // Create dragging icon
-        draggingIcon = UIImage(anim(slot.icon.drawable)).apply {
+        draggingIcon = UIImage(anim(slot.dragIcon ?: slot.icon.drawable)).apply {
             touchable = Touchable.enabled
             setSize(slot.icon.width, slot.icon.height)
             color = slot.icon.color alpha 1f
@@ -142,6 +142,8 @@ data class Slot(
     private val additionalContent: UITable
 ) {
 
+    var dragIcon: Drawable? = null
+
     fun onClick(onClick: (InputEvent) -> Unit) {
         button.onClick(onClick = onClick)
     }
@@ -184,8 +186,9 @@ fun <S> UIWidget<S>.slot(
     init: (@Scene2dDsl Slot).(UITable) -> Unit = {}
 ): UITable =
     table(true) {
+
         val root = this
-        image(gui.region { Slot_Background }) {
+        image(gui.drawable { Slot_Background }) {
             touchable = Touchable.disabled
         }
 
@@ -195,7 +198,8 @@ fun <S> UIWidget<S>.slot(
 
         table(true) {
             this.pad(8f)
-            image(emptyImage(alpha(0f))) {
+            image(pixmap(alpha(0f))) {
+                it.width(SlotSize).height(SlotSize)
                 touchable = Touchable.disabled
                 icon = this
             }
@@ -224,7 +228,7 @@ fun <S> UIWidget<S>.slot(
         table(true) {
             touchable = Touchable.disabled
             image(
-                emptyImage(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
+                pixmap(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
                     if (button.isDisabled) {
                         draw(x, y, width, height)
                     }

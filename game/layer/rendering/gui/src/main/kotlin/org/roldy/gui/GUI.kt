@@ -34,6 +34,7 @@ data class GUIColors(
 data class GuiContext(
     val colors: GUIColors,
     val textures: GUITextures,
+    val craftingIcons: CraftingIconTextures,
     override val i18n: I18N,
     val font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
 ) : I18NContext {
@@ -76,9 +77,10 @@ fun Gui.gui(
     build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit
 ): UIStage {
     val atlas by disposable { AtlasLoader.gui }
+    val craftingIcons by disposable { AtlasLoader.craftingIcons }
     val colors = colorSchema
     val bundle = I18N()
-    val guiContext = GuiContext(colors, GUITextures(atlas), bundle) { style, size, initialize ->
+    val guiContext = GuiContext(colors, GUITextures(atlas), CraftingIconTextures(craftingIcons), bundle) { style, size, initialize ->
         gameFont(size = size, style = style, color = colors.button, initialize = initialize).disposable()
     }
 

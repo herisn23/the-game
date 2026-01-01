@@ -3,17 +3,18 @@ package org.roldy.gui.general.progressBar
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import org.roldy.gui.*
-import org.roldy.rendering.g2d.gui.Scene2dDsl
-import org.roldy.rendering.g2d.gui.el.UIProgressBar
+import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.uiProgressBar
-import org.roldy.rendering.g2d.gui.mask
-import org.roldy.rendering.g2d.gui.redraw
-import org.roldy.rendering.g2d.gui.traverse
 
 
 enum class ProgressBarSize {
     Small, Medium
+}
+
+class ProgressBarDelegate : ImperativeActionDelegate() {
+    object Amount : ImperativeValue<Float>
+    val amount = Amount
 }
 
 @Scene2dDsl
@@ -21,14 +22,18 @@ context(gui: GuiContext)
 fun <S> UIWidget<S>.progressBar(
     size: ProgressBarSize,
     color: Color = gui.colors.progressBar,
-    init: context(GuiContext) (@Scene2dDsl UIProgressBar).(S) -> Unit = {}
-) = uiProgressBar(style = {
-    when (size) {
-        Small -> smallStyle(color)
-        Medium -> mediumStyle(color)
+    init: context(GuiContext) (@Scene2dDsl ProgressBarDelegate).(S) -> Unit = {}
+) = delegate(ProgressBarDelegate()) {
+    uiProgressBar(style = {
+        when (size) {
+            Small -> smallStyle(color)
+            Medium -> mediumStyle(color)
+        }
+    }) {
+        amount(::setValue)
+        amount set 0f
+        init(it)
     }
-}) {
-    init(it)
 }
 
 context(gui: GuiContext)

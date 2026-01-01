@@ -1,17 +1,17 @@
 wood:
-  Alder:
+  Pine:
     elevation: 0.1..0.3
     biomes: [Forest, Swamp, Cold]
-  Aspen:
+  Ash:
     elevation: 0.1..0.3
     biomes: [Forest, Cold, ExtremeCold]
-  Ebony:
+  Yew:
     elevation: 0.1..0.3
     biomes: [Jungle, Savanna, Forest]
-  Mahogany:
+  Ironwood:
     elevation: 0.1..0.3
     biomes: [Jungle, Forest, Swamp]
-  Maple:
+  Elderwood:
     elevation: 0.1..0.3
     biomes: [Forest, Cold, Savanna]
   Oak:
@@ -21,56 +21,75 @@ fiber:
   Flax:
     elevation: 0.1..0.3
     biomes: [Forest, Savanna, Cold, Swamp]
-  Hemp:
+  Linen:
     elevation: 0.1..0.3
     biomes: [Forest, Swamp, Savanna, Cold]
-  Kenaf:
+  Silk:
     elevation: 0.1..0.3
     biomes: [Jungle, Swamp, Savanna, Forest]
-  Jute:
+  SpiderSilk:
     elevation: 0.1..0.3
     biomes: [Jungle, Swamp, Savanna, Desert]
-  Coir:
+  MoonWeave:
     elevation: 0.1..0.3
     biomes: [Jungle, Savanna, Swamp, Desert]
   Cotton:
     elevation: 0.1..0.3
     biomes: [Savanna, Desert, Jungle, Forest]
-metal:
-  Osmium:
+ore:
+  Copper:
     elevation: 0.3..0.5
     biomes: [ExtremeCold, Cold, Forest, Swamp]
-  Titanium:
+  Iron:
     elevation: 0.3..0.5
     biomes: [Cold, Forest, Desert, Savanna, ExtremeCold]
-  Uranium:
+  Gold:
     elevation: 0.3..0.5
     biomes: [DeepDesert, Desert, Cold, Swamp]
-  Zirconium:
+  Silver:
     elevation: 0.3..0.5
     biomes: [DeepDesert, Desert, Swamp, Savanna, Forest]
-  Chromium:
+  Mithril:
     elevation: 0.3..0.5
     biomes: [ExtremeCold, Cold, Forest, Desert, Jungle]
-  Vanadium:
+  Adamantine:
     elevation: 0.3..0.5
     biomes: [ExtremeCold, DeepDesert, Cold, Desert, Jungle]
 gem:
-  Amazonite:
+  RoughQuartz:
     elevation: 0.2..0.8
     biomes: [Desert, Cold, ExtremeCold, DeepDesert, Forest]
-  Carnelian:
+  Amber:
     elevation: 0.2..0.8
     biomes: [Desert, Savanna, DeepDesert, Jungle, Forest]
-  Diopside:
+  Emerald:
     elevation: 0.2..0.8
     biomes: [DeepDesert, ExtremeCold, Cold, Desert, Swamp]
-  Eudialyte:
+  Sapphire:
     elevation: 0.2..0.8
     biomes: [DeepDesert, ExtremeCold, Cold, Swamp, Jungle]
-  Hematite:
+  Ruby:
     elevation: 0.2..0.8
     biomes: [Swamp, Desert, Savanna, Forest, Cold, Jungle]
-  Jadeite:
+  Starstone:
     elevation: 0.2..0.8
+    biomes: [Jungle, Swamp, Cold, ExtremeCold, Forest, Desert]
+leather:
+  Rawhide:
+    elevation: 0.1..0.5
+    biomes: [Desert, Cold, ExtremeCold, DeepDesert, Forest]
+  BeastHide:
+    elevation: 0.3..0.8
+    biomes: [Desert, Savanna, DeepDesert, Jungle, Forest]
+  ThickHide:
+    elevation: 0.1..0.8
+    biomes: [DeepDesert, ExtremeCold, Cold, Desert, Swamp]
+  ScaledLeather:
+    elevation: 0.2..0.9
+    biomes: [DeepDesert, ExtremeCold, Cold, Swamp, Jungle]
+  OldLeather:
+    elevation: 0.1..0.8
+    biomes: [Swamp, Desert, Savanna, Forest, Cold, Jungle]
+  FurLeather:
+    elevation: 0.1..0.7
     biomes: [Jungle, Swamp, Cold, ExtremeCold, Forest, Desert]

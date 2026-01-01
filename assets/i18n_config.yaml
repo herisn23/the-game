@@ -1,34 +1,41 @@
 references:
   harvesting_selection: &harvesting_selection
     - gem
-    - metal
+    - ore
     - wood
     - fiber
+    - leather
   harvestable_selection: &harvestable_selection
-    - osmium
-    - titanium
-    - uranium
-    - zirconium
-    - chromium
-    - vanadium
-    - alder
-    - aspen
-    - ebony
-    - mahogany
-    - maple
+    - copper
+    - iron
+    - gold
+    - silver
+    - mithril
+    - adamantine
+    - pine
     - oak
+    - ash
+    - yew
+    - ironwood
+    - elderwood
     - flax
-    - hemp
-    - kenaf
-    - jute
-    - coir
     - cotton
-    - amazonite
-    - carnelian
-    - diopside
-    - eudialyte
-    - hematite
-    - jadeite
+    - linen
+    - silk
+    - spidersilk
+    - moonweave
+    - roughquartz
+    - amber
+    - emerald
+    - sapphire
+    - ruby
+    - starstone
+    - rawhide
+    - beasthide
+    - thickhide
+    - scaledleather
+    - oldleather
+    - furleather
 strings:
   lang:
     key: lang

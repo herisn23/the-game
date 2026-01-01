@@ -7,12 +7,12 @@ import org.roldy.data.mine.HarvestableType
 enum class Wood(
     override val type: HarvestableType = HarvestableType.WOOD
 ): Harvestable {
-    Alder,
-    Aspen,
-    Ebony,
-    Mahogany,
-    Maple,
-    Oak;
+    Pine,
+    Oak,
+    Ash,
+    Yew,
+    Ironwood,
+    Elderwood;
 
-    override val locKey: String = name.lowercase()
+    override val key: String = name.lowercase()
 }

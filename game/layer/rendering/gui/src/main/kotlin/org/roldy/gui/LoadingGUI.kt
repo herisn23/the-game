@@ -21,6 +21,7 @@ class LoadingGUI : AutoDisposableAdapter(), Gui {
             loadingBar {
                 this@LoadingGUI.progressBar = this
             }
+
         }
     }
 

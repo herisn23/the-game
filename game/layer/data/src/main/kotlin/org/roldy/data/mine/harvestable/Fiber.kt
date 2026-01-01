@@ -8,11 +8,11 @@ enum class Fiber(
     override val type: HarvestableType = HarvestableType.FIBER,
 ) : Harvestable {
     Flax,
-    Hemp,
-    Kenaf,
-    Jute,
-    Coir,
-    Cotton;
+    Cotton,
+    Linen,
+    Silk,
+    SpiderSilk,
+    MoonWeave;
 
-    override val locKey: String = name.lowercase()
+    override val key: String = name.lowercase()
 }

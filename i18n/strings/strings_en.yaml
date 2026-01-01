@@ -1,44 +1,54 @@
 lang: English
 
-harvesting-metal: Mining
+harvesting-ore: Mining
 harvesting-wood: Choping
 harvesting-fiber: Gathering
 harvesting-gem: Mining
+harvesting-leather: Skinning
 
-harvestable-osmium: Osmium
-harvestable-titanium: Titanium
-harvestable-uranium: Uranium
-harvestable-zirconium: Zirconium
-harvestable-chromium: Chromium
-harvestable-vanadium: Vanadium
-harvestable-alder: Alder
-harvestable-aspen: Aspen
-harvestable-ebony: Ebony
-harvestable-mahogany: Mahogany
-harvestable-maple: Maple
+harvestable-copper: Copper
+harvestable-iron: Iron
+harvestable-gold: Gold
+harvestable-silver: Silver
+harvestable-mithril: Mithril
+harvestable-adamantine: Adamantine
+harvestable-pine: Pine
 harvestable-oak: Oak
+harvestable-ash: Ash
+harvestable-yew: Yew
+harvestable-ironwood: Ironwood
+harvestable-elderwood: Elderwood
 harvestable-flax: Flax
-harvestable-hemp: Hemp
-harvestable-kenaf: Kenaf
-harvestable-jute: Jute
-harvestable-coir: Coir
 harvestable-cotton: Cotton
-harvestable-amazonite: Amazonite
-harvestable-carnelian: Carnelian
-harvestable-diopside: Diopside
-harvestable-eudialyte: Eudialyte
-harvestable-hematite: Hematite
-harvestable-jadeite: Jadeite
+harvestable-linen: Linen
+harvestable-silk: Silk
+harvestable-spidersilk: Spider silk
+harvestable-moonweave: Moon weave
+harvestable-roughquartz: Rough quartz
+harvestable-amber: Amber
+harvestable-emerald: Emerald
+harvestable-sapphire: Sapphire
+harvestable-ruby: Ruby
+harvestable-starstone: Starstone
+harvestable-rawhide: Rawhide
+harvestable-beasthide: Beast hide
+harvestable-thickhide: Thick hide
+harvestable-scaledleather: Scaled leather
+harvestable-oldleather: Old leather
+harvestable-furleather: Fur leather
 
-harvesting_begin-metal: Mine
+
+harvesting_begin-ore: Mine
 harvesting_begin-wood: Chop
 harvesting_begin-fiber: Gather
 harvesting_begin-gem: Mine
+harvesting_begin-leather: Skin
 harvesting_collect: Collect
-harvesting_harvested-metal: Mined
+harvesting_harvested-ore: Mined
 harvesting_harvested-fiber: Gathered
 harvesting_harvested-wood: Choped
 harvesting_harvested-gem: Mined
+harvesting_harvested-leather: Skinned
 harvesting_amount: |
   {st:harvesting_harvested}: {arg:amount}
 

@@ -173,11 +173,16 @@ context(gui: GuiContext)
 fun <A> progressBarStandardBackgroundM(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { ProgressBar_Standard_Background_M }, ninePatchParams(2), element)
 
-
 @NinePatchDsl
 context(gui: GuiContext)
 fun <A> progressBarStandardFillM(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { ProgressBar_Standard_Fill_M }, ninePatchParams(left = 2, right = 2), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> iconBackground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Icon_Background }, ninePatchParams(16), element)
+
 
 
 

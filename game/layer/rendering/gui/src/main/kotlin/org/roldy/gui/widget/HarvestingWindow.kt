@@ -2,14 +2,17 @@ package org.roldy.gui.widget
 
 import org.roldy.core.i18n.Strings
 import org.roldy.data.state.HarvestableState
+import org.roldy.gui.CraftingIconTexturesType
 import org.roldy.gui.GuiContext
 import org.roldy.gui.general.LabelActions
 import org.roldy.gui.general.button.TextButtonActions
 import org.roldy.gui.general.button.mainButton
+import org.roldy.gui.general.icon
 import org.roldy.gui.general.label
 import org.roldy.gui.general.window
 import org.roldy.gui.translate
 import org.roldy.rendering.g2d.gui.*
+import org.roldy.rendering.g2d.gui.el.UIImage
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
 // Delegate
@@ -32,11 +35,6 @@ class HarvestingWindowDelegate : ImperativeActionDelegate() {
     val collect = Collect
     val harvestingProgress = HarvestingRefreshingProgress
     val harvestableProgress = HarvestableRefreshingProgress
-
-    init {
-        harvestingProgress init 0f
-        harvestableProgress init 0f
-    }
 }
 
 @Scene2dDsl
@@ -46,10 +44,14 @@ fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
     lateinit var remaining: LabelActions
     lateinit var harvested: LabelActions
     lateinit var harvestable: LabelActions
+    lateinit var icon: UIImage
     delegate(HarvestingWindowDelegate()) {
 
         val window = window {
             setPosition(gui.stage.width / 2, gui.stage.height / 2)
+            icon {
+                icon = this
+            }
             label {
                 harvestable = this
             }
@@ -76,12 +78,13 @@ fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
             }
         }
         state { newValue ->
-            val mineLocKey = newValue.harvestable.type.locKey
+            val mineLocKey = newValue.harvestable.type.key
             remaining.setText(translate { mine_supplies.arg("amount", newValue.refreshing.supplies) })
-            harvestable.setText(translate { Strings.harvestable[newValue.harvestable.locKey] })
+            harvestable.setText(translate { Strings.harvestable[newValue.harvestable.key] })
             harvested.setText(translate { harvesting_amount[mineLocKey].arg("amount", newValue.harvested) })
             window.title.setText(translate { harvesting[mineLocKey] })
             harvestButton.setText(translate { harvesting_begin[mineLocKey] })
+            icon.drawable = gui.craftingIcons.drawable(newValue.harvestable, CraftingIconTexturesType.Background)
             window.rebuild()
         }
 

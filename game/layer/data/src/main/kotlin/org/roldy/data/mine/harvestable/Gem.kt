@@ -7,12 +7,12 @@ import org.roldy.data.mine.HarvestableType
 enum class Gem(
     override val type: HarvestableType = HarvestableType.GEM
 ) : Harvestable {
-    Amazonite,
-    Carnelian,
-    Diopside,
-    Eudialyte,
-    Hematite,
-    Jadeite;
+    RoughQuartz,
+    Amber,
+    Emerald,
+    Sapphire,
+    Ruby,
+    Starstone;
 
-    override val locKey: String = name.lowercase()
+    override val key: String = name.lowercase()
 }

@@ -7,7 +7,6 @@ import org.roldy.gui.TextManager
 import org.roldy.gui.buttonRSBackgroundGrayscale
 import org.roldy.gui.buttonRSBorder2
 import org.roldy.rendering.g2d.FontStyle
-import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.alphaAnimation
 import org.roldy.rendering.g2d.gui.anim.colorAnimation
@@ -17,6 +16,7 @@ import org.roldy.rendering.g2d.gui.el.UITextButton
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.table
 import org.roldy.rendering.g2d.gui.el.textButton
+import org.roldy.rendering.g2d.pixmap
 
 @Scene2dDsl
 context(gui: GuiContext)
@@ -67,7 +67,7 @@ fun <S> UIWidget<S>.smallButton(
             }
             val border = noneAnimation(buttonRSBorder2 { pad(-3f) })
 
-            val hover = alphaAnimation(emptyImage(alpha(.2f)).pad(-padding / 2)) {
+            val hover = alphaAnimation(pixmap(alpha(.2f)).pad(-padding / 2)) {
                 Normal have 0f
                 Pressed have .4f
                 Over have 1f

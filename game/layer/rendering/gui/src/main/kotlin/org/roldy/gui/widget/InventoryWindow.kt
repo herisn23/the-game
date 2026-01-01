@@ -47,7 +47,8 @@ data class InventorySlot<D>(
 ) : PoolItem {
 
     data class Data<D>(
-        var icon: Drawable,
+        var icon: Drawable?,
+        val dragIcon:Drawable?,
         var grade: ItemGrade? = null,
         var amount: Int? = null,
         var lock: Boolean = false,
@@ -64,6 +65,7 @@ data class InventorySlot<D>(
             setLock(newValue.lock)
             setAmount(newValue.amount.clampToString())
             setIcon(newValue.icon)
+            slot.dragIcon = newValue.dragIcon
             tooltip {
                 with(newValue) {
                     tooltip(this)
@@ -74,6 +76,7 @@ data class InventorySlot<D>(
             setLock(false)
             setAmount("")
             setIcon(null)
+            slot.dragIcon = null
         }
     }
     internal lateinit var tooltip: UIContextualTooltip
@@ -133,13 +136,14 @@ data class InventorySlot<D>(
 
 fun <D> data(
     icon: Drawable,
+    dragIcon:Drawable?,
     grade: ItemGrade? = null,
     amount: Int? = null,
     lock: Boolean = false,
     index: Int,
     data: D,
     tooltip: SlotTooltip<D> = {}
-) = Data(icon, grade, amount, lock, index, data, tooltip)
+) = Data(icon, dragIcon, grade, amount, lock, index, data, tooltip)
 
 
 class InventoryWindow<D>(

@@ -7,17 +7,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import org.roldy.core.utils.alpha
-import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.anim.core.AnimatedDrawable
 import org.roldy.rendering.g2d.gui.anim.core.AnimationDrawableStateResolver
 import org.roldy.rendering.g2d.gui.anim.core.delta
+import org.roldy.rendering.g2d.pixmap
 import kotlin.contracts.ExperimentalContracts
 
-abstract class UIButton : Button(ButtonStyle().apply { up = emptyImage(alpha(0f)) }),
+abstract class UIButton : Button(ButtonStyle().apply { up = pixmap(alpha(0f)) }),
     AnimationDrawableStateResolver<UIAnimationState> {
     val graphics = ButtonDrawable(this)
-    private var drawable: Drawable = emptyImage(Color.WHITE)
+    private var drawable: Drawable = pixmap(Color.WHITE)
 
     class ButtonDrawable(
         private val button: UIButton

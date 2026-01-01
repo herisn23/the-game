@@ -7,5 +7,5 @@ import org.roldy.data.mine.HarvestableType
 sealed interface Harvestable {
     val type: HarvestableType
     val name: String
-    val locKey: String
+    val key: String
 }

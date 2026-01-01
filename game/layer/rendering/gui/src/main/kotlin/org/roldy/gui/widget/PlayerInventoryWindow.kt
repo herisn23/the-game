@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.utils.sequencer
 import org.roldy.data.state.InventoryItemState
+import org.roldy.gui.CraftingIconTexturesType
 import org.roldy.gui.GuiContext
 import org.roldy.gui.general.WindowActions
 import org.roldy.gui.general.label
@@ -65,7 +66,8 @@ class PlayerInventoryWindow(
     context(gui: GuiContext)
     private fun InventoryItemState.toData() =
         data(
-            gui.drawable { Icon_Sword_128 },
+            gui.craftingIcons.drawable(harvestable!!, CraftingIconTexturesType.Background),
+            gui.craftingIcons.drawable(harvestable!!, CraftingIconTexturesType.Normal),
             grade,
             amount,
             lock,

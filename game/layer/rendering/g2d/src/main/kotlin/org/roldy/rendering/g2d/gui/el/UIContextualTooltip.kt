@@ -14,9 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.*
-import org.roldy.rendering.g2d.emptyImage
 import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.UIContextualTooltip.Drawables
+import org.roldy.rendering.g2d.pixmap
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -543,7 +543,7 @@ class UIContextualTooltip(
         val anchorTopRight: Drawable? = null,
         val anchorBottomLeft: Drawable? = null,
         val anchorBottomRight: Drawable? = null,
-        val pinProgressBackground: Drawable = emptyImage(Color.WHITE)
+        val pinProgressBackground: Drawable = pixmap(Color.WHITE)
     ) {
         fun pickAnchor(position: AnchorPosition) =
             when (position) {
