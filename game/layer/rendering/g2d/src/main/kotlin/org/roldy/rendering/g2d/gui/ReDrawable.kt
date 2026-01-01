@@ -12,7 +12,7 @@ typealias Redraw = Batch.(x: Float, y: Float, width: Float, height: Float, draw:
 
 @ReDrawableDsl
 infix fun Drawable.redraw(redraw: Redraw) =
-    object : BaseDrawable() {
+    object : BaseDrawable(this) {
         val drawable = this@redraw
         override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
             batch.redraw(x, y, width, height) { x, y, width, height ->

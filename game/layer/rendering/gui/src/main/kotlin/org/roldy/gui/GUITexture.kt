@@ -1,6 +1,7 @@
 package org.roldy.gui
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import org.roldy.core.utils.drawable
 
 class GUITexture(
@@ -8,9 +9,10 @@ class GUITexture(
     val atlas: TextureAtlas
 ) {
 
-    fun drawable() =
+    fun drawable(): TextureRegionDrawable =
         region().drawable()
 
-    fun region() =
+    fun region(): TextureAtlas.AtlasRegion =
         atlas.findRegion(name)
+
 }

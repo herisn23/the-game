@@ -15,9 +15,7 @@ object Harvesting {
         val harvestSpeed: Duration,
         val probability: Float,
         val onHarvest: () -> Unit
-    ) {
-        internal var currentHarvestingTime: Duration = 0.seconds
-    }
+    )
 
     fun findMine(
         state: GameState, coords: Vector2Int,
@@ -58,11 +56,11 @@ object Harvesting {
     ) {
         with(data.harvestable.refreshing) {
             if (supplies > 0) {
-                data.currentHarvestingTime += delta.toDouble().seconds
-                if (data.currentHarvestingTime >= data.harvestSpeed) {
+                data.harvestable.currentHarvestingProgress += delta.toDouble().seconds
+                if (data.harvestable.currentHarvestingProgress >= data.harvestSpeed) {
                     supplies--
                     data.onHarvest()
-                    data.currentHarvestingTime = 0.seconds
+                    data.harvestable.currentHarvestingProgress = 0.seconds
                 }
             }
         }

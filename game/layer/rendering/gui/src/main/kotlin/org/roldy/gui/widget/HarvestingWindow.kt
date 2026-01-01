@@ -23,8 +23,8 @@ class HarvestingWindow(
     val harvestButton: TextButtonActions,
     collectButton: TextButtonActions
 ) {
-    var onHarvest: (() -> Unit)? = null
-    var onCollect: (() -> Unit)? = null
+    var startHarvest: (() -> Unit)? = null
+    var collect: (() -> Unit)? = null
     var state: HarvestableState? by Delegates.observable(null) { _, _, newValue ->
         if (newValue != null) {
             val mineLocKey = newValue.harvestable.type.locKey
@@ -39,10 +39,10 @@ class HarvestingWindow(
 
     init {
         harvestButton.button.onClick {
-            onHarvest?.invoke()
+            startHarvest?.invoke()
         }
         collectButton.button.onClick {
-            onCollect?.invoke()
+            collect?.invoke()
         }
     }
 
@@ -57,8 +57,8 @@ class HarvestingWindow(
     }
 
     fun clean() {
-        onHarvest = null
-        onCollect = null
+        startHarvest = null
+        collect = null
         state = null
     }
 }

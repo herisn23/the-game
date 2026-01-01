@@ -157,3 +157,30 @@ fun <A> separatorVertical(element: @NinePatchDsl NinePatchDrawable.() -> A) =
 context(gui: GuiContext)
 fun <A> separatorVertical2(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { Separator_Horizontal }, ninePatchParams(top = 12, bottom = 12), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> progressBarStandardBackgroundS(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { ProgressBar_Standard_Background_S }, ninePatchParams(left = 2, right = 2), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> progressBarStandardFillS(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { ProgressBar_Standard_Fill_S }, ninePatchParams(left = 2, right = 2), element)
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> progressBarStandardBackgroundM(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { ProgressBar_Standard_Background_M }, ninePatchParams(2), element)
+
+
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> progressBarStandardFillM(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { ProgressBar_Standard_Fill_M }, ninePatchParams(left = 2, right = 2), element)
+
+
+
+
+
+

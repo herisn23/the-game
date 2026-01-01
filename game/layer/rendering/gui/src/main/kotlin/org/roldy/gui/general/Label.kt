@@ -78,7 +78,7 @@ fun <S> UIWidget<S>.label(
     params: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {},
     init: context(GuiContext) (@Scene2dDsl LabelActions).(S) -> Unit = {}
 ) =
-    label(text, labelStyle {
+    uiLabel(text, labelStyle {
         font = gui.font(style, fontSize, params)
 
         /* Markup example:

@@ -2,57 +2,67 @@ package org.roldy.gp.world.manager.player
 
 import org.roldy.core.Vector2Int
 import org.roldy.data.state.GameState
-import org.roldy.data.state.HarvestableState
 import org.roldy.gp.world.utils.Harvesting
 import org.roldy.gp.world.utils.Inventory
 import org.roldy.gui.WorldGUI
+import kotlin.properties.Delegates
+import kotlin.time.Duration
 
 class PlayerHarvestingManager(
     val gui: WorldGUI,
     val gameState: GameState,
     val playerManager: PlayerManager,
 ) : ProgressingManager {
-    var currentHarvesting: Harvesting.Data? = null
-
-    val hero get() = playerManager.current.squad.leader
-
-    fun start(harvestable: HarvestableState) {
-        currentHarvesting = Harvesting.Data(
-            harvestable,
-            hero.harvestingSpeed,
-            1f
-        ) {
-            harvestable.harvested++
+    var data: Harvesting.Data? = null
+    var inProgress: Boolean by Delegates.observable(false) { _, _, newValue ->
+        // Reset progress whenever inProgress is set
+        data?.let {
+            it.harvestable.currentHarvestingProgress = Duration.ZERO
         }
     }
+    val hero get() = playerManager.current.squad.leader
 
     fun findMine(coords: Vector2Int) {
         gui.harvestingWindow.clean()
         Harvesting.findMine(gameState, coords) {
-            gui.harvestingWindow.open()
-            gui.harvestingWindow.state = it
-            gui.harvestingWindow.onHarvest = {
-                start(it)
+            with(gui.harvestingWindow) {
+                // Configure harvesting window
+                open()
+                state = it
+                startHarvest = {
+                    inProgress = true
+                }
+                collect = {
+                    Inventory.add(hero.inventory, it.harvestable, it.harvested)
+                    //TODO update inventory window should be here
+                    gui.inventory.inventory.maxSlots = 20
+                    gui.inventory.items = hero.inventory.items
+                    it.harvested = 0
+                }
+
             }
-            gui.harvestingWindow.onCollect = {
-                Inventory.add(hero.inventory, it.harvestable, it.harvested)
-                //TODO update inventory window should be here
-                gui.inventory.inventory.maxSlots = 20
-                gui.inventory.items = hero.inventory.items
-                it.harvested = 0
+
+            // Configure data for harvesting
+            data = Harvesting.Data(
+                it,
+                hero.harvestingSpeed,
+                1f
+            ) {
+                it.harvested++
             }
         }
     }
 
     private fun stop() {
-        currentHarvesting = null
+        inProgress = false
     }
 
     context(delta: Float)
     override suspend fun update() {
-        currentHarvesting?.let {
-            Harvesting.harvest(it)
-        }
+        if (inProgress)
+            data?.let {
+                Harvesting.harvest(it)
+            }
     }
 
     fun enter(coords: Vector2Int) {
@@ -61,6 +71,7 @@ class PlayerHarvestingManager(
 
     fun leave() {
         stop()
+        data = null
         gui.harvestingWindow.close {
             it.clean()
         }

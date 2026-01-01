@@ -2,11 +2,12 @@ package org.roldy.rendering.g2d.gui
 
 import org.roldy.core.cast
 import kotlin.properties.Delegates
-import kotlin.reflect.KClass
 
 interface ImperativeActions
 
-interface ImperativeAction<Data, R>
+interface ImperativeFunction<Data, R>
+
+interface ImperativeValue<V>
 
 typealias ImperativeValueHandler<Value> = (Value) -> Unit
 
@@ -20,42 +21,46 @@ typealias Delegate<Ref> = ImperativeHandler<Ref, ImperativeActionDelegate>
 class ImperativeActionDelegate : ImperativeActions {
 
     val valueListeners =
-        mutableMapOf<KClass<*>, ImperativeValueHandler<*>>()
+        mutableMapOf<ImperativeValue<*>, MutableList<ImperativeValueHandler<*>>>()
 
-    val actionListeners =
-        mutableMapOf<ImperativeAction<*, *>, ImperativeActionHandler<*, *>>()
+    val functionListeners =
+        mutableMapOf<ImperativeFunction<*, *>, MutableList<ImperativeActionHandler<*, *>>>()
 
-    val stored: MutableMap<KClass<*>, Any?> = mutableMapOf()
+    val stored: MutableMap<ImperativeValue<*>, Any?> = mutableMapOf()
 
-    inline fun <reified Value> value(noinline listener: ImperativeValueHandler<Value>) {
-        valueListeners[Value::class] = listener
+    fun <Value> value(value: ImperativeValue<Value>, listener: ImperativeValueHandler<Value>) {
+        valueListeners.getOrPut(value) { mutableListOf() }.add(listener)
     }
 
-    fun <D, R, A : ImperativeAction<D, R>> action(action: A, listener: ImperativeActionHandler<D, R>) {
-        actionListeners[action] = listener
+    fun <D, R, A : ImperativeFunction<D, R>> function(action: A, listener: ImperativeActionHandler<D, R>) {
+        functionListeners.getOrPut(action) { mutableListOf() }.add(listener)
     }
 
 
-    inline fun <reified Value> get() =
-        stored[Value::class] as Value
+    inline fun <reified Value> get(value: ImperativeValue<Value>) =
+        stored[value].cast<Value>()
 
-    fun <R, D, A : ImperativeAction<D, R>> call(action: A, data: D) =
-        actionListeners[action]?.cast<ImperativeActionHandler<D, R>>()?.invoke(data)
+    fun <R, D, A : ImperativeFunction<D, R>> call(action: A, data: D) =
+        functionListeners[action]?.forEach {
+            it.cast<ImperativeActionHandler<D, R>>().invoke(data)
+        }
 
-    inline fun <reified Value> set(value: Value) {
-        valueListeners[Value::class]
-            .cast<ImperativeValueHandler<Value>> {
-                stored[Value::class] = value as? Any
+    fun <Value> set(valueType: ImperativeValue<Value>, value: Value) {
+        stored[valueType] = value as? Any
+        valueListeners[valueType]?.forEach {
+            it.cast<ImperativeValueHandler<Value>> {
                 it(value)
             }
+        }
+
 
     }
 
-    operator fun <D, R> ImperativeAction<D, R>.invoke(data: D) =
+    operator fun <D, R> ImperativeFunction<D, R>.invoke(data: D) =
         call(this, data)
 
-    operator fun <D, R> ImperativeAction<D, R>.invoke(callback: (D) -> R) {
-        action(this, callback)
+    operator fun <D, R> ImperativeFunction<D, R>.invoke(callback: (D) -> R) {
+        function(this, callback)
     }
 }
 
@@ -86,7 +91,7 @@ fun <Value, R> value(init: Value, ref: ImperativeActionValue<Value>.() -> R) =
     imperative(ImperativeActionValue(init), ref)
 
 @Scene2dCallbackDsl
-fun <R> delegate(ref: ImperativeActionDelegate.() -> R) =
+fun <R> delegate(ref: ImperativeActionDelegate.() -> R): ImperativeHandler<R, ImperativeActionDelegate> =
     imperative(ImperativeActionDelegate(), ref)
 
 @Scene2dCallbackDsl

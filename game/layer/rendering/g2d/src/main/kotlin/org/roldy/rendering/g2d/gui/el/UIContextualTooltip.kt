@@ -143,7 +143,7 @@ class UIContextualTooltip(
             floatAction(0f, 1f, pinPrepareDuration) {
                 pinScaleY = it
             },
-            action {
+            function {
                 pinned = true
             }
         )

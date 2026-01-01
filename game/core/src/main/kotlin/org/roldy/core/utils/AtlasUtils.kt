@@ -1,6 +1,7 @@
 package org.roldy.core.utils
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 
 
@@ -12,3 +13,6 @@ infix fun TextureAtlas.drawable(regionName: String) =
 
 fun TextureAtlas.AtlasRegion.drawable() =
     TextureRegionDrawable(this)
+
+fun TextureRegion.new() =
+    TextureRegion(this)

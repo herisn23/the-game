@@ -31,7 +31,7 @@ class UILabel(
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(_: C)
-fun <S, C : UIContext> UIWidget<S>.label(
+fun <S, C : UIContext> UIWidget<S>.uiLabel(
     style: LabelStyle,
     init: context(C) (@Scene2dDsl UILabel).(S) -> Unit = {}
 ): UILabel {
@@ -42,7 +42,7 @@ fun <S, C : UIContext> UIWidget<S>.label(
 @OptIn(ExperimentalContracts::class)
 @Scene2dDsl
 context(_: C)
-fun <S, C : UIContext> UIWidget<S>.label(
+fun <S, C : UIContext> UIWidget<S>.uiLabel(
     text: String? = null,
     style: LabelStyle,
     init: context(C) (@Scene2dDsl UILabel).(S) -> Unit = {}

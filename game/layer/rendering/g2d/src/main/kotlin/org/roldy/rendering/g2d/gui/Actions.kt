@@ -22,9 +22,9 @@ fun Action.forever(): Action =
     Actions.forever(this)
 
 fun delay(duration: Duration, action: Runnable): DelayAction =
-    Actions.delay(duration.toSeconds(), action(action))
+    Actions.delay(duration.toSeconds(), function(action))
 
-fun action(action: Runnable): Action =
+fun function(action: Runnable): Action =
     Actions.run(action)
 
 fun floatAction(

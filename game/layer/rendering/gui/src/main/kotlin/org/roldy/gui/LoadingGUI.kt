@@ -1,31 +1,34 @@
 package org.roldy.gui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Align
 import org.roldy.core.i18n.I18N
-import org.roldy.gui.general.LabelActions
-import org.roldy.gui.general.label
+import org.roldy.gui.general.progressBar.LoadingText
+import org.roldy.gui.general.progressBar.Progress
+import org.roldy.gui.general.progressBar.loadingBar
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.gui.Gui
+import org.roldy.rendering.g2d.gui.ImperativeActionDelegate
 import org.roldy.rendering.g2d.gui.el.table
 
 class LoadingGUI : AutoDisposableAdapter(), Gui {
-    private lateinit var loadingText: LabelActions
-
+    private lateinit var progressBar: ImperativeActionDelegate
     override val stage = gui(1f) { gui ->
+        Gdx.input.inputProcessor = this
         table {
+            pad(100f)
             setFillParent(true)
-            align(Align.center)
-            label(translate { loading }, 100)
+            align(Align.bottom)
             row()
-            label(fontSize = 100) {
-                this@LoadingGUI.loadingText = this
-                setText("Loading...")
+            loadingBar {
+                this@LoadingGUI.progressBar = this
             }
         }
     }
 
     fun setProgress(progress: Float, key: I18N.Key) {
-        loadingText.setText(translate { key })
+        progressBar.set(Progress, progress)
+        progressBar.set(LoadingText, translate { key })
     }
 
 }
