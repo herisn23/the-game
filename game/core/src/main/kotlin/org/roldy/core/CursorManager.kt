@@ -18,7 +18,7 @@ object CursorManager {
     }
     val cursor: Cursor = run {
         val scale = .5f
-        val original = Pixmap(loadAsset("Cursor_Normal.png"))
+        val original = Pixmap(loadAsset("ui/Cursor_Normal.png"))
         val newWidth = (original.width * scale).toInt()
         val newHeight = (original.height * scale).toInt()
         val scaled = Pixmap(newWidth, newHeight, original.format)

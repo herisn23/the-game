@@ -1,6 +1,7 @@
 package org.roldy.rendering.environment
 
 import com.badlogic.gdx.utils.Pool
+import org.roldy.rendering.environment.item.HarvestableTileObject
 import org.roldy.rendering.environment.item.SettlementTileObject
 import org.roldy.rendering.environment.item.SpriteTileObject
 
@@ -11,11 +12,15 @@ object BehaviourPool {
     private val settlementPool = object : Pool<SettlementTileObject>() {
         override fun newObject(): SettlementTileObject = SettlementTileObject()
     }
+    private val harvestablePool = object : Pool<HarvestableTileObject>() {
+        override fun newObject(): HarvestableTileObject = HarvestableTileObject()
+    }
 
     fun obtain(data: TileObject.Data): TileBehaviour {
         return when (data) {
             is SettlementTileObject.Data -> settlementPool.obtain()
             is SpriteTileObject.Data -> spritePools.obtain()
+            is HarvestableTileObject.Data -> harvestablePool.obtain()
             else -> throw Exception("Unsupported data type to obtain behaviour ${data::class}")
         }
     }
@@ -24,6 +29,7 @@ object BehaviourPool {
         when (behaviour) {
             is SettlementTileObject -> settlementPool.free(behaviour)
             is SpriteTileObject -> spritePools.free(behaviour)
+            is HarvestableTileObject -> harvestablePool.free(behaviour)
             else -> throw Exception("Unsupported behaviour to free ${behaviour::class}")
         }
     }

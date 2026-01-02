@@ -1,6 +1,7 @@
 package org.roldy.rendering.map
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
@@ -27,8 +28,7 @@ class HexagonalTiledMapCreator(
     val data: MapData,
     val noiseData: Map<Vector2Int, NoiseData>,
     val biomes: List<Biome>,
-    val dirtUnderTextureRegion: TextureRegion,
-    val waterUnderTextureRegion: TextureRegion,
+    val underTileAtlas: TextureAtlas,
     val generateColorsLayer: Boolean = false
 ) {
 
@@ -88,11 +88,12 @@ class HexagonalTiledMapCreator(
         return layer
     }
 
+    val dirtRegions = listOf("hexUndercliff00", "hexUndercliff01")
     fun resolveUnderTileTexture(mapTerrainData: MapTerrainData?): TextureRegion {
         val isWater = mapTerrainData?.terrain?.biome?.data?.type == BiomeType.Water
         return when {
-            isWater -> waterUnderTextureRegion
-            else -> dirtUnderTextureRegion
+            isWater -> underTileAtlas.findRegion("HexUnderWater")
+            else -> underTileAtlas.findRegion(dirtRegions.random())
         }
     }
 

@@ -11,9 +11,10 @@ fun loadAsset(name: String): FileHandle =
 object AtlasLoader {
     val settlements get() = load("environment/Settlements.atlas")
     val roads get() = load("environment/Roads.atlas")
-    val mines get() = load("environment/Mines.atlas")
-    val gui get() = load("GUI.atlas")
-    val craftingIcons get() = load("CraftingResourceIcons.atlas")
+    val harvestable get() = load("environment/Harvestable.atlas")
+    val gui get() = load("ui/GUI.atlas")
+    val craftingIcons get() = load("ui/CraftingResourceIcons.atlas")
+    val underTile get() = load("terrain/UnderHex.atlas")
 
     fun load(name: String) =
         TextureAtlas(loadAsset(name))

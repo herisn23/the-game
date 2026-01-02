@@ -27,6 +27,15 @@ class PathWalkerManager(
         return defaultWalkSpeed * walker.speed * walkCost(coords)
     }
 
+    fun stop() {
+        if(path.isNotEmpty()) {
+            val current = path[currentPathIndex]
+            currentPath = emptyList()
+            worldPositioned.position = current.position
+            walker.onPathEnd(current.coords)
+        }
+    }
+
     context(deltaTime: Float)
     fun walk() {
         if (currentPathIndex < path.size) {

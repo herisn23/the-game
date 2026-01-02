@@ -30,6 +30,12 @@ class SquadManager(
 
     var nextCoords = squad.leader.coords
 
+    fun teleport(position: Vector2Int) {
+        figure.pathWalkerManager.stop()
+        coords = position
+        figure.position = screen.map.tilePosition.resolve(position)
+        nextCoords = position
+    }
 
     fun move(position: Vector2Int) {
         pathFinderManager.findPath(nextCoords, position) {

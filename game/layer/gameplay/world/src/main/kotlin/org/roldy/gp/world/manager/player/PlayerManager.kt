@@ -2,6 +2,7 @@ package org.roldy.gp.world.manager.player
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.ConcurrentLoopConsumer
+import org.roldy.core.x
 import org.roldy.data.state.GameState
 import org.roldy.gp.world.manager.SquadManager
 import org.roldy.gp.world.pathfinding.TilePathfinder
@@ -23,6 +24,12 @@ class PlayerManager(
     init {
         gui.inventoryButton.onClick {
             gui.inventory.open(current.squad.leader, Inventory.size(current.squad.leader))
+        }
+        gui.teleportToStart.onClick {
+            current.teleport(0 x 0)
+        }
+        gui.teleportToEnd.onClick {
+            current.teleport(screen.map.width /2  x screen.map.height /2)
         }
     }
 

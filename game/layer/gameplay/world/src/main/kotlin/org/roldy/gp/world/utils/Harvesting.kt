@@ -36,13 +36,13 @@ object Harvesting {
     context(delta: Float)
     fun refresh(state: RefreshingState) {
         with(state) {
-            if (supplies < max) {
+            if (supplies == 0) {
                 // Accumulate time (data is delta time in seconds)
                 currentRefreshTime += delta.toDouble().seconds
 
                 // Refresh while we have enough time and haven't reached max
                 if (currentRefreshTime >= timeToRefresh && supplies < max) {
-                    supplies++
+                    supplies = state.max
                     currentRefreshTime = 0.seconds
                 }
             } else {

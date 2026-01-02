@@ -7,12 +7,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.data.state.SettlementState
-import org.roldy.rendering.environment.TileBehaviour
+import org.roldy.rendering.environment.SpriteTileBehaviour
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.g2d.Layered
 
-class SettlementTileObject : TileBehaviour {
-    val spriteObject = SpriteTileObject()
+class SettlementTileObject : SpriteTileBehaviour<SettlementTileObject.Data>() {
 
     data class Data(
         override val position: Vector2,
@@ -27,8 +26,6 @@ class SettlementTileObject : TileBehaviour {
         val inBounds: (Vector2Int) -> Boolean
     ) : SpriteTileObject.ISpriteData
 
-    var data: Data? = null
-
     val borders: MutableList<Sprite> = mutableListOf()
 
     context(delta: Float, camera: Camera)
@@ -36,13 +33,12 @@ class SettlementTileObject : TileBehaviour {
         borders.forEach { spriteObject ->
             spriteObject.draw(batch)
         }
-        spriteObject.draw(batch)
+        super.draw(batch)
     }
 
     override fun bind(data: TileObject.Data) {
-        spriteObject.bind(data)
-        this.data = data as Data
-        data.run {
+        super.bind(data)
+        this.data?.run {
             settlementData.region.map {
                 Sprite(borderTextureRegion).apply {
                     val position = worldPosition(it)
@@ -50,7 +46,7 @@ class SettlementTileObject : TileBehaviour {
                     setSize(borderTextureRegion.regionWidth.toFloat(), borderTextureRegion.regionHeight.toFloat())
                     setOriginCenter()
                     setPosition(position.x, position.y)
-                    setRotation(data.rotation)
+                    setRotation(rotation)
                     setAlpha(0.3f)
                 }
             }.let(borders::addAll)
@@ -58,11 +54,9 @@ class SettlementTileObject : TileBehaviour {
         }
     }
 
-    override val zIndex: Float get() = spriteObject.zIndex
-    override val layer: Int get() = spriteObject.layer
 
     override fun reset() {
-        spriteObject.reset()
+        super.reset()
         borders.clear()
     }
 }

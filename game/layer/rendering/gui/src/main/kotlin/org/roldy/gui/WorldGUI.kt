@@ -2,6 +2,7 @@ package org.roldy.gui
 
 import org.roldy.core.Vector2Int
 import org.roldy.gui.general.button.mainButton
+import org.roldy.gui.general.button.smallButton
 import org.roldy.gui.general.popup.tilePopup
 import org.roldy.gui.widget.HarvestingWindowDelegate
 import org.roldy.gui.widget.PlayerInventoryWindow
@@ -22,6 +23,9 @@ class WorldGUI(
     lateinit var inventory: PlayerInventoryWindow
     lateinit var guiContext: GuiContext
     lateinit var inventoryButton: UITextButton
+    lateinit var teleportToStart: UITextButton
+    lateinit var teleportToEnd: UITextButton
+
     override val stage = gui(1f) { gui ->
         this@WorldGUI.guiContext = gui
         stack {
@@ -44,6 +48,12 @@ class WorldGUI(
                 onClick {
                     this@WorldGUI.onGameSaved()
                 }
+            }
+            smallButton("Teleport to start") {
+                this@WorldGUI.teleportToStart = this
+            }
+            smallButton("Teleport to end") {
+                this@WorldGUI.teleportToEnd = this
             }
         }
     }

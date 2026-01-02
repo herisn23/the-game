@@ -1,11 +1,11 @@
 package org.roldy.gameplay.scene
 
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.*
+import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.coroutines.async
 import org.roldy.core.coroutines.onGPUThreadBlocking
@@ -86,8 +86,7 @@ class GameLoader(
     val biomes = GameLoaderProperty<List<Biome>>()
     val harvestableConfiguration = GameLoaderProperty<HarvestableConfiguration>()
     val populators = GameLoaderProperty<List<WorldChunkPopulator>>()
-    val underDirtTexture = GameLoaderProperty<Texture>()
-    val underWaterTexture = GameLoaderProperty<Texture>()
+    val underTileAtlas = GameLoaderProperty<TextureAtlas>()
     val screen = GameLoaderProperty<WorldScreen>()
     val gui = GameLoaderProperty<WorldGUI>()
     val tilePathFinder = GameLoaderProperty<TilePathfinder>()
@@ -130,11 +129,8 @@ class GameLoader(
             }
         }
 
-        addLoader(Strings.loading_generate_map, underDirtTexture) {
-            Texture("terrain/HexUnderDirt.png")
-        }
-        addLoader(Strings.loading_generate_map, underWaterTexture) {
-            Texture("terrain/HexUnderWater.png")
+        addLoader(Strings.loading_generate_map, underTileAtlas) {
+            AtlasLoader.underTile
         }
 
         addLoader(Strings.loading_generate_map) {
@@ -142,8 +138,7 @@ class GameLoader(
                 mapData,
                 noise.value,
                 biomes.value,
-                TextureRegion(underDirtTexture.value),
-                TextureRegion(underWaterTexture.value)
+                underTileAtlas.value,
             ).create().also { (map, terrainData) ->
                 this.tiledMap.value = map
                 this.terrainData.value = terrainData
@@ -220,7 +215,7 @@ class GameLoader(
                 SettlementPopulator(worldMap.value, gameState.value.settlements),
                 RoadsPopulator(worldMap.value, roads.value),
                 MountainsPopulator(worldMap.value),
-                MinesPopulator(worldMap.value, gameState.value.mines),
+                HarvestablePopulator(worldMap.value, gameState.value.mines),
                 FoliagePopulator(worldMap.value)
             )
         }
