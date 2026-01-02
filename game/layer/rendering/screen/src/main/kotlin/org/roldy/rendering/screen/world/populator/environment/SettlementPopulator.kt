@@ -2,9 +2,10 @@ package org.roldy.rendering.screen.world.populator.environment
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
 import org.roldy.data.state.SettlementState
+import org.roldy.rendering.environment.TileDecorationAtlas
+import org.roldy.rendering.environment.TileDecorationNormal
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SettlementTileObject
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
@@ -15,10 +16,10 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 
 class SettlementPopulator(
     override val map: WorldMap,
+    val atlas: TileDecorationAtlas,
     val settlements: List<SettlementState>
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
-    val atlas = AtlasLoader.settlements.disposable()
     val border = Texture("HexTileHighlighter.png").disposable().let(::TextureRegion)
 
     override fun populate(
@@ -34,7 +35,7 @@ class SettlementPopulator(
             SettlementTileObject.Data(
                 position = position,
                 coords = settle.coords,
-                textureRegion = atlas.findRegion(settle.texture),
+                textureRegion = atlas.region<TileDecorationNormal> { castleFortified },
                 borderTextureRegion = border,
                 settlementData = settle,
                 worldPosition = ::worldPosition,

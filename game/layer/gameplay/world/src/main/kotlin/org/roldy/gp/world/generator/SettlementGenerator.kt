@@ -73,8 +73,7 @@ class SettlementGenerator(
                         "Settlement${settlements.size + 1}",
                         radius,
                         harvestableCount,
-                        randomColor(random),
-                        texture = "hexDirtCastle00_blue"
+                        randomColor(random)
                     )
                 )
             }

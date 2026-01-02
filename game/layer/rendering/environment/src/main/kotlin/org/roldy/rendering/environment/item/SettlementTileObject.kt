@@ -47,7 +47,7 @@ class SettlementTileObject : SpriteTileBehaviour<SettlementTileObject.Data>() {
                     setOriginCenter()
                     setPosition(position.x, position.y)
                     setRotation(rotation)
-                    setAlpha(0.3f)
+                    setAlpha(0.1f)
                 }
             }.let(borders::addAll)
 

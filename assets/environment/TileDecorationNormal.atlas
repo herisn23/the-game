@@ -1,4 +1,4 @@
-TileDecoration.png
+TileDecorationNormal.png
 size:2048,2048
 repeat:none
 banditCamp00
@@ -164,7 +164,7 @@ bounds:1808,236,162,286
 wizardTowerRuins00
 bounds:1808,812,162,286
 
-TileDecoration2.png
+TileDecorationNormal2.png
 size:2048,2048
 repeat:none
 alchemistsLab00
@@ -376,7 +376,7 @@ bounds:260,504,256,384
 wizardTower00
 bounds:1808,1760,162,286
 
-TileDecoration3.png
+TileDecorationNormal3.png
 size:2048,256
 repeat:none
 barn00

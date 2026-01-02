@@ -35,7 +35,6 @@ abstract class GenerateClassesTask : DefaultTask() {
             )
         )
         val nodes = yaml.parseToYamlNode(i18n).yamlMap.let {
-            println(it)
             it.get<YamlMap>("strings")!!
         }
 

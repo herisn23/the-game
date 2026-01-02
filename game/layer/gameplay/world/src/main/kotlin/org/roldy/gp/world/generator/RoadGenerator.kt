@@ -3,6 +3,7 @@ package org.roldy.gp.world.generator
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
+import org.roldy.core.utils.hexDistance
 import org.roldy.core.x
 import org.roldy.data.tile.RoadTileData
 import org.roldy.data.tile.SettlementTileData
@@ -14,18 +15,21 @@ import kotlin.random.Random
 class RoadGenerator(
     val map: WorldMap,
     val settlements: () -> List<SettlementTileData>,
-    val algorithm: Algorithm = Algorithm.MST,
+    val algorithm: Algorithm = Algorithm.K_NEAREST,
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<RoadTileData> {
-    val pathfinder = TilePathfinder(map) { tile, goal ->
-        //calculate walkCost from terrainData and add some noise to make roads more natural(not so straight)
-        //also when tile is occupied
-        map.terrainData.getValue(tile).walkCost *
-                Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
-                (0f.takeIf { occupied(tile) && !settlements().any {it.coords == tile} } ?: 1f)
-    }
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex
+    val pathfinder = TilePathfinder(map, ::baseCost)
+
+    /**
+     *  calculate walkCost from terrainData and add some noise to make roads more natural(not so straight)
+     *  also check when tile is occupied
+     */
+    fun baseCost(tile: Vector2Int, goal: Vector2Int) =
+        map.terrainData.getValue(tile).walkCost *
+                Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
+                (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
 
     enum class Algorithm(
         val alg: RoadNetworkAlgorithm,
@@ -52,7 +56,7 @@ class RoadGenerator(
             mapOf("randomness" to 0.9f)
         ),
         K_NEAREST(
-            KNearest, mapOf("k" to 3)
+            KNearest, mapOf("k" to 3, "randomness" to 0.5f)
         );
 
         fun generate(seed: Long, settlements: List<SettlementTileData>) =
@@ -66,26 +70,79 @@ class RoadGenerator(
         val settlements = settlements()
         if (settlements.size < 2) return emptyList()
 
-        // Build network edges
         val edges = algorithm.generate(map.data.seed + GeneratorSeeds.ROADS_SEED, settlements)
 
-        // Calculate paths for all edges
-        val allPaths = mutableListOf<PathWalker.Node>()
-        edges.forEach { (from, to) ->
-            val path = pathfinder.findPath(from.coords, to.coords)
-            if (path.isComplete) {
-                allPaths.addAll(path.tiles)
-            }
+        // Group edges: A -> [B, C, D]
+        val edgesBySource = edges.groupBy({ it.first }, { it.second })
+
+        val allRoadTiles = mutableSetOf<PathWalker.Node>()
+
+        edgesBySource.forEach { (source, destinations) ->
+            // Build branching network from this source
+            val branchingPaths = buildBranchingNetwork(source, destinations, allRoadTiles)
+            allRoadTiles.addAll(branchingPaths)
         }
-        val roads = allPaths.distinctBy { it.coords }
-        val roadCoordsSet = roads.map { it.coords }.toSet()
-        // Remove duplicates, optionally filter settlements
-        return roads.map {
-            val connections = getConnectedDirections(it.coords, roadCoordsSet)
-            RoadTileData(it, connectionsToBitmask(connections))
+
+        // Convert to RoadTileData with proper connections
+        return allRoadTiles.map { node ->
+            val connections = getConnectedDirections(node.coords, allRoadTiles.map { it.coords }.toSet())
+            RoadTileData(node, connectionsToBitmask(connections))
         }
     }
 
+    /**
+     * Builds a branching road network from source to multiple destinations.
+     * Later destinations can branch off from earlier paths.
+     */
+    /**
+     * Builds optimal branching network by finding best branch points.
+     */
+    private fun buildBranchingNetwork(
+        source: SettlementTileData,
+        destinations: List<SettlementTileData>,
+        existingRoadsNodes: Set<PathWalker.Node>
+    ): Set<PathWalker.Node> {
+        if (destinations.isEmpty()) return emptySet()
+
+        val allRoads = mutableSetOf<PathWalker.Node>()
+        val remainingDests = destinations.toMutableList()
+
+        // Find path to first destination (establishes main trunk)
+        val firstDest = remainingDests.removeAt(0)
+        val mainPath = pathfinder.findPath(source.coords, firstDest.coords)
+        if (mainPath.isComplete) {
+            allRoads.addAll(mainPath.tiles)
+
+            // For remaining destinations, branch from any point on existing roads
+            remainingDests.forEach { dest ->
+                val pathfinder = TilePathfinder(map) { tile, goal ->
+                    val baseCost = map.terrainData.getValue(tile).walkCost *
+                            Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
+                            (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
+
+                    // Existing roads and global roads are nearly free
+                    if (tile in allRoads.map { it.coords } || tile in mainPath.tiles.map { it.coords }) {
+                        baseCost * 0.001f
+                    } else {
+                        baseCost
+                    }
+                }
+
+                // Find closest point on existing roads to this destination
+                val bestBranchPoint = allRoads.minByOrNull { roadTile ->
+                    hexDistance(roadTile.coords, dest.coords)
+                }?.coords ?: source.coords
+
+                // Path from branch point to destination
+                val branchPath = pathfinder.findPath(bestBranchPoint, dest.coords)
+                if (branchPath.isComplete) {
+                    allRoads.addAll(branchPath.tiles)
+                }
+            }
+        }
+
+        return allRoads
+    }
 
     /**
      * Get all hex directions that have roads connected to this tile.

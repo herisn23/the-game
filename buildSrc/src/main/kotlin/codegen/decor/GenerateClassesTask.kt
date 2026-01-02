@@ -1,4 +1,4 @@
-package codegen.gui
+package codegen.decor
 
 import codegen.ClassInfo
 import codegen.generateKotlinClasses
@@ -9,7 +9,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import kotlin.io.path.readLines
 
-const val pack = "package org.roldy.gui"
+const val pack = "org.roldy.rendering.environment"
 
 abstract class GenerateClassesTask : DefaultTask() {
 
@@ -25,31 +25,29 @@ abstract class GenerateClassesTask : DefaultTask() {
         outputDirectory.mkdirs()
 
         val rootDir = project.rootProject.rootDir
+        val assets = listOf("TileDecorationNormal", "TileDecorationTropic", "TileDecorationCold")
 
-        val regions = rootDir.toPath().resolve("assets/ui/GUI.atlas").readLines().let(::getRegionNames)
+        assets.forEach {
+            val names = rootDir.toPath().resolve("assets/environment/${it}.atlas").readLines().let(::getRegionNames)
+            val info = ClassInfo(
+                it,
+                pack,
+                """
+                package $pack
+                object $it: TileDecoration {
+                    ${names.joinToString("\n"){
+                    """val $it = "$it"""".trimIndent()
+                    }}
+                }
+                """.trimIndent()
+            )
+            generateKotlinClasses(outputDirectory, listOf(info))
+        }
 
-        val info = ClassInfo(
-            "GUITextures",
-            "org.roldy.gui",
-            template(regions.map {
-                """val $it = GUITexture("$it", atlas)""".trimIndent()
-            })
 
-        )
-        generateKotlinClasses(outputDirectory, listOf(info))
+
 
         logger.lifecycle("Generated classes in: ${outputDirectory.absolutePath}")
     }
 
-
-    fun template(content: List<String>) =
-        """
-        $pack
-        import com.badlogic.gdx.graphics.g2d.TextureAtlas
-        class GUITextures(
-            val atlas: TextureAtlas
-        ) {
-            ${content.joinToString("\n")}
-        }
-    """.trimIndent()
 }

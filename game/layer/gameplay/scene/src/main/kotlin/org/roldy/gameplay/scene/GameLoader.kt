@@ -37,6 +37,7 @@ import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.pathfinding.calculateTileWalkCost
 import org.roldy.gp.world.processor.HarvestableRefreshingProcessor
 import org.roldy.gui.WorldGUI
+import org.roldy.rendering.environment.TileDecorationAtlas
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -96,6 +97,7 @@ class GameLoader(
     val processingLoop = GameLoaderProperty<DeltaProcessingLoop>()
     val gameTime = GameLoaderProperty<GameTime>()
     val tileFocusManager = GameLoaderProperty<TileFocusManager>()
+    val tileDecorationAtlas = GameLoaderProperty<TileDecorationAtlas>()
 
     init {
 
@@ -127,6 +129,10 @@ class GameLoader(
             biomesConfiguration.value.biomes.map {
                 Biome(it, mapData.tileSize)
             }
+        }
+
+        addLoader(Strings.loading_generate_map, tileDecorationAtlas) {
+            TileDecorationAtlas()
         }
 
         addLoader(Strings.loading_generate_map, underTileAtlas) {
@@ -204,15 +210,10 @@ class GameLoader(
         addLoader(Strings.loading_finalize, persistentObjects) {
             mutableListOf()
         }
-//        addLoader(Strings.loading_player, persistentObjects) {
-//            listOf(
-//                playerFigure.value
-//            )
-//        }
 
         addLoader(Strings.loading_finalize, populators) {
             listOf(
-                SettlementPopulator(worldMap.value, gameState.value.settlements),
+                SettlementPopulator(worldMap.value, tileDecorationAtlas.value, gameState.value.settlements),
                 RoadsPopulator(worldMap.value, roads.value),
                 MountainsPopulator(worldMap.value),
                 HarvestablePopulator(worldMap.value, gameState.value.mines),

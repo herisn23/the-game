@@ -30,8 +30,7 @@ private fun SettlementTileData.toState() =
         id = id,
         coords = coords,
         ruler = RulerState(color = color),
-        region = claims,
-        texture = texture,
+        region = claims
     )
 
 private fun MineTileData.toState() = HarvestableState(
