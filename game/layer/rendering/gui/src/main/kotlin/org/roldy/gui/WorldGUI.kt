@@ -1,5 +1,6 @@
 package org.roldy.gui
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import org.roldy.core.Vector2Int
 import org.roldy.gui.general.button.mainButton
 import org.roldy.gui.general.button.smallButton
@@ -15,6 +16,7 @@ import org.roldy.rendering.g2d.gui.el.*
 
 
 class WorldGUI(
+    craftingIcons: TextureAtlas,
     val onGameSaved: () -> Unit
 ) : AutoDisposableAdapter(), Gui {
 
@@ -26,7 +28,7 @@ class WorldGUI(
     lateinit var teleportToStart: UITextButton
     lateinit var teleportToEnd: UITextButton
 
-    override val stage = gui(1f) { gui ->
+    override val stage = gui(1f, createWorldGuiContext(craftingIcons)) { gui ->
         this@WorldGUI.guiContext = gui
         stack {
             name = "TilePopupStack"

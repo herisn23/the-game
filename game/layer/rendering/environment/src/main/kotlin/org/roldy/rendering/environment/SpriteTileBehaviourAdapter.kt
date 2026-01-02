@@ -2,10 +2,10 @@ package org.roldy.rendering.environment
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import org.roldy.rendering.environment.item.SpriteTileObject
+import org.roldy.rendering.environment.item.SpriteTileBehaviour
 
-abstract class SpriteTileBehaviour<Data : SpriteTileObject.ISpriteData> : TileBehaviour {
-    val spriteObject = SpriteTileObject()
+abstract class SpriteTileBehaviourAdapter<Data : SpriteTileBehaviour.ISpriteData> : TileBehaviour {
+    val spriteObject = SpriteTileBehaviour()
     var data: Data? = null
 
 

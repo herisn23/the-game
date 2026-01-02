@@ -5,7 +5,7 @@ import org.roldy.core.utils.hex
 import org.roldy.core.utils.progress
 import org.roldy.data.state.HarvestableState
 import org.roldy.gui.CraftingIconTexturesType
-import org.roldy.gui.GuiContext
+import org.roldy.gui.WorldGuiContext
 import org.roldy.gui.general.LabelActions
 import org.roldy.gui.general.button.TextButtonActions
 import org.roldy.gui.general.button.smallButton
@@ -46,7 +46,7 @@ class HarvestingWindowDelegate : ImperativeActionDelegate<HarvestingWindowAction
 }
 
 @Scene2dDsl
-context(gui: GuiContext)
+context(gui: WorldGuiContext)
 fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
     lateinit var harvestButton: TextButtonActions
     lateinit var remainingSupplies: LabelActions

@@ -43,5 +43,7 @@ class TileObject : ChunkManagedDrawable<TileObject.Data>, Pool.Poolable {
 
     override fun reset() {
         behaviour?.reset()
+        behaviour = null
+        currentData = null
     }
 }

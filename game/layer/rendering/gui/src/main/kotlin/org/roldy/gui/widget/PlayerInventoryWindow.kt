@@ -7,7 +7,7 @@ import org.roldy.core.utils.sequencer
 import org.roldy.data.state.HeroState
 import org.roldy.data.state.InventoryItemState
 import org.roldy.gui.CraftingIconTexturesType
-import org.roldy.gui.GuiContext
+import org.roldy.gui.WorldGuiContext
 import org.roldy.gui.general.WindowActions
 import org.roldy.gui.general.label
 import org.roldy.gui.general.tooltip.tooltip
@@ -19,7 +19,7 @@ import kotlin.properties.Delegates
 class PlayerInventoryWindow(
     private val windowActions: () -> WindowActions,
     val inventory: InventoryWindow<InventoryItemState>,
-    val gui: GuiContext
+    val gui: WorldGuiContext
 ) {
     val seq by sequencer(0, 1)
     val window get() = windowActions()
@@ -62,7 +62,7 @@ class PlayerInventoryWindow(
         }
     }
 
-    context(gui: GuiContext)
+    context(gui: WorldGuiContext)
     private fun InventoryItemState.toData() =
         data(
             gui.craftingIcons.drawable(harvestable!!, CraftingIconTexturesType.Background),
@@ -83,7 +83,7 @@ class PlayerInventoryWindow(
             }
         }
 
-    context(gui: GuiContext)
+    context(_: WorldGuiContext)
     private fun data() =
         items.map { item ->
             item.toData()
@@ -126,7 +126,7 @@ class PlayerInventoryWindow(
 }
 
 @Scene2dDsl
-context(gui: GuiContext)
+context(gui: WorldGuiContext)
 fun <S> UIWidget<S>.playerInventory(init: (PlayerInventoryWindow) -> Unit) {
     lateinit var act: WindowActions
     val actions = inventory {

@@ -1,4 +1,4 @@
-package org.roldy.rendering.g2d.animation
+package org.roldy.rendering.g2d.animation.skeleton
 
 import com.esotericsoftware.spine.AnimationState
 import com.esotericsoftware.spine.Event

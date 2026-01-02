@@ -7,7 +7,7 @@ import org.roldy.data.state.SettlementState
 import org.roldy.rendering.environment.TileDecorationAtlas
 import org.roldy.rendering.environment.TileDecorationNormal
 import org.roldy.rendering.environment.TileObject
-import org.roldy.rendering.environment.item.SettlementTileObject
+import org.roldy.rendering.environment.item.SettlementTileBehaviour
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
@@ -32,7 +32,7 @@ class SettlementPopulator(
         }
         return settlementsInChunk.map { settle ->
             val position = worldPosition(settle.coords)
-            SettlementTileObject.Data(
+            SettlementTileBehaviour.Data(
                 position = position,
                 coords = settle.coords,
                 textureRegion = atlas.region<TileDecorationNormal> { castleFortified },

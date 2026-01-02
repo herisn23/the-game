@@ -12,7 +12,7 @@ import org.roldy.rendering.equipment.atlas.weapon.ShieldAtlas
 import org.roldy.rendering.equipment.atlas.weapon.WeaponRegion
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.Renderable
-import org.roldy.rendering.g2d.animation.AnimationTypeEventListenerHandler
+import org.roldy.rendering.g2d.animation.skeleton.AnimationTypeEventListenerHandler
 import org.roldy.rendering.pawn.customization.*
 import org.roldy.rendering.pawn.skeleton.attribute.*
 import kotlin.properties.Delegates

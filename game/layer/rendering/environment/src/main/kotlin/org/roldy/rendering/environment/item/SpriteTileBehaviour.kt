@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
-import org.roldy.rendering.environment.TileBehaviour
+import org.roldy.rendering.environment.TileBehaviourAdapter
 import org.roldy.rendering.environment.TileObject
+import org.roldy.rendering.environment.item.SpriteTileBehaviour.ISpriteData
+import org.roldy.rendering.environment.zIndex
 import org.roldy.rendering.g2d.Layered
 
-class SpriteTileObject : TileBehaviour {
+class SpriteTileBehaviour : TileBehaviourAdapter<ISpriteData>() {
 
     class Data(
         override val position: Vector2,
@@ -28,27 +30,26 @@ class SpriteTileObject : TileBehaviour {
     }
 
     val sprite = Sprite()
-    var data: ISpriteData? = null
 
-    override val zIndex: Float get() = sprite.run { y - height / 2f }
+
+    override val zIndex: Float get() = sprite.zIndex
     override val layer: Int get() = data?.layer ?: Layered.LAYER_2
 
     context(delta: Float, camera: Camera)
-    override fun draw(batch: SpriteBatch) {
+    override fun draw(data: ISpriteData, batch: SpriteBatch) {
         sprite.draw(batch)
     }
 
-    override fun bind(data: TileObject.Data) {
-        this.data = data as ISpriteData
-
+    override fun configure(data: ISpriteData) {
         sprite.setRegion(data.textureRegion)
         sprite.setSize(data.textureRegion.regionWidth.toFloat(), data.textureRegion.regionHeight.toFloat())
         sprite.setOriginCenter()
-        sprite.setPosition(data.position.x, data.position.y)
         sprite.setRotation(data.rotation)
+        sprite.setPosition(data.position.x, data.position.y)
     }
 
     override fun reset() {
+        super.reset()
         sprite.setScale(1f)
         sprite.rotation = 0f
     }

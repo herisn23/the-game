@@ -4,7 +4,7 @@ import org.roldy.core.logger
 import org.roldy.data.configuration.match
 import org.roldy.data.tile.MountainTileData
 import org.roldy.rendering.environment.TileObject
-import org.roldy.rendering.environment.item.SpriteTileObject
+import org.roldy.rendering.environment.item.SpriteTileBehaviour
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.MapTerrainData
@@ -26,7 +26,7 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
             terrainData.mountainData().filter {
                 it.elevation.match(terrainData.noiseData.elevation)
             }.randomOrNull(random)?.let { mountain ->
-                SpriteTileObject.Data(
+                SpriteTileBehaviour.Data(
                     layer = Layered.LAYER_4,
                     position = worldPosition(coords),
                     coords = coords,
@@ -37,7 +37,7 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
                             mountain.name
                         }
                     }.getOrThrow(),
-                    data = mapOf("data" to MountainTileData(coords)),
+                    data = mapOf("data" to MountainTileData(coords))
                 )
             }
         }

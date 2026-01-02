@@ -2,7 +2,7 @@ package org.roldy.gui.widget
 
 import org.roldy.data.mine.harvestable.Gem
 import org.roldy.gui.CraftingIconTexturesType
-import org.roldy.gui.GuiContext
+import org.roldy.gui.WorldGuiContext
 import org.roldy.gui.general.LabelActions
 import org.roldy.gui.general.icon
 import org.roldy.gui.general.label
@@ -18,7 +18,7 @@ class ItemInfo(
 )
 
 @Scene2dDsl
-context(gui: GuiContext)
+context(gui: WorldGuiContext)
 fun <S> UIWidget<S>.itemInfo(init: ItemInfo.(UITable, S) -> Unit) =
     table(true) { storage ->
         lateinit var upperText: LabelActions

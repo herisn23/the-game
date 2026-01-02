@@ -1,6 +1,6 @@
 package org.roldy.rendering.pawn.skeleton.attribute
 
-import org.roldy.rendering.g2d.animation.AnimationType
+import org.roldy.rendering.g2d.animation.skeleton.AnimationType
 
 
 abstract class PawnAnimationType(override val name: String) : AnimationType(name)

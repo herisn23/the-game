@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.data.state.SettlementState
-import org.roldy.rendering.environment.SpriteTileBehaviour
+import org.roldy.rendering.environment.SpriteTileBehaviourAdapter
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.g2d.Layered
 
-class SettlementTileObject : SpriteTileBehaviour<SettlementTileObject.Data>() {
+class SettlementTileBehaviour : SpriteTileBehaviourAdapter<SettlementTileBehaviour.Data>() {
 
     data class Data(
         override val position: Vector2,
@@ -24,7 +24,7 @@ class SettlementTileObject : SpriteTileBehaviour<SettlementTileObject.Data>() {
         val settlementData: SettlementState,
         val worldPosition: (Vector2Int) -> Vector2,
         val inBounds: (Vector2Int) -> Boolean
-    ) : SpriteTileObject.ISpriteData
+    ) : SpriteTileBehaviour.ISpriteData
 
     val borders: MutableList<Sprite> = mutableListOf()
 

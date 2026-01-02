@@ -98,7 +98,7 @@ class GameLoader(
     val gameTime = GameLoaderProperty<GameTime>()
     val tileFocusManager = GameLoaderProperty<TileFocusManager>()
     val tileDecorationAtlas = GameLoaderProperty<TileDecorationAtlas>()
-
+    val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
     init {
 
         // CONFIGURATION LOADERS
@@ -193,9 +193,13 @@ class GameLoader(
         }
 
         // GUI Loader
+        addLoader(Strings.loading_gui, craftingIconAtlas) {
+            AtlasLoader.craftingIcons
+        }
+
 
         addLoader(Strings.loading_gui, gui) {
-            WorldGUI {
+            WorldGUI(craftingIconAtlas.value) {
                 gameSaveManager.save(gameState.value)
             }
         }
@@ -216,7 +220,7 @@ class GameLoader(
                 SettlementPopulator(worldMap.value, tileDecorationAtlas.value, gameState.value.settlements),
                 RoadsPopulator(worldMap.value, roads.value),
                 MountainsPopulator(worldMap.value),
-                HarvestablePopulator(worldMap.value, gameState.value.mines),
+                HarvestablePopulator(worldMap.value, gameState.value.mines, tileDecorationAtlas.value, craftingIconAtlas.value),
                 FoliagePopulator(worldMap.value)
             )
         }

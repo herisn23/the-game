@@ -2,6 +2,7 @@ package org.roldy.gui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
@@ -32,10 +33,25 @@ data class GUIColors(
     val progressBar: Color
 )
 
-data class GuiContext(
+class WorldGuiContext(
+    val craftingIcons: CraftingIconTextures,
+    colors: GUIColors,
+    textures: GUITextures,
+    i18n: I18N,
+    font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont,
+) : GuiContext(colors, textures, i18n, font)
+
+class DefaultGuiContext(
+    colors: GUIColors,
+    textures: GUITextures,
+    i18n: I18N,
+    font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
+) : GuiContext(colors, textures, i18n, font)
+
+abstract class GuiContext(
     val colors: GUIColors,
     val textures: GUITextures,
-    val craftingIcons: CraftingIconTextures,
+
     override val i18n: I18N,
     val font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
 ) : I18NContext {
@@ -74,18 +90,11 @@ var colorSchema = GUIColors(
 )
 
 @Scene2dDsl
-fun Gui.gui(
+fun <C : GuiContext> Gui.gui(
     scale: Float = 1f,
-    build: context(GuiContext) (@Scene2dDsl UIStage).(GuiContext) -> Unit
+    guiContext: C,
+    build: context(C) (@Scene2dDsl UIStage).(C) -> Unit
 ): UIStage {
-    val atlas by disposable { AtlasLoader.gui }
-    val craftingIcons by disposable { AtlasLoader.craftingIcons }
-    val colors = colorSchema
-    val bundle = I18N()
-    val guiContext = GuiContext(colors, GUITextures(atlas), CraftingIconTextures(craftingIcons), bundle) { style, size, initialize ->
-        gameFont(size = size, style = style, initialize = initialize).disposable()
-    }
-
     val stage by disposable {
         context(guiContext) {
             stage(scale, 3840 x 2160) {
@@ -95,4 +104,31 @@ fun Gui.gui(
         }
     }
     return stage
+}
+
+fun Gui.createDefaultGuiContext(): DefaultGuiContext {
+    val atlas by disposable { AtlasLoader.gui }
+    val colors = colorSchema
+    val bundle = I18N()
+    return DefaultGuiContext(
+        colors,
+        GUITextures(atlas),
+        bundle
+    ) { style, size, initialize ->
+        gameFont(size = size, style = style, initialize = initialize).disposable()
+    }
+}
+
+fun Gui.createWorldGuiContext(craftingIcons: TextureAtlas): WorldGuiContext {
+    val atlas by disposable { AtlasLoader.gui }
+    val colors = colorSchema
+    val bundle = I18N()
+    return WorldGuiContext(
+        CraftingIconTextures(craftingIcons),
+        colors,
+        GUITextures(atlas),
+        bundle
+    ) { style, size, initialize ->
+        gameFont(size = size, style = style, initialize = initialize).disposable()
+    }
 }

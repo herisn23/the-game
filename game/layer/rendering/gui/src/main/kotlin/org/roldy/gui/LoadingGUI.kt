@@ -11,7 +11,7 @@ import org.roldy.rendering.g2d.gui.el.table
 
 class LoadingGUI : AutoDisposableAdapter(), Gui {
     private lateinit var progressBar: LoadingBarDelegate
-    override val stage = gui(1f) { gui ->
+    override val stage = gui(1f, createDefaultGuiContext()) { gui ->
         Gdx.input.inputProcessor = this
         table {
             pad(100f)

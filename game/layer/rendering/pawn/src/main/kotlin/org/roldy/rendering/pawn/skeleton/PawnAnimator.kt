@@ -2,9 +2,9 @@ package org.roldy.rendering.pawn.skeleton
 
 import com.esotericsoftware.spine.AnimationState
 import com.esotericsoftware.spine.AnimationStateData
-import org.roldy.rendering.g2d.animation.AnimationTypeEventListenerHandler
-import org.roldy.rendering.g2d.animation.add
-import org.roldy.rendering.g2d.animation.listener
+import org.roldy.rendering.g2d.animation.skeleton.AnimationTypeEventListenerHandler
+import org.roldy.rendering.g2d.animation.skeleton.add
+import org.roldy.rendering.g2d.animation.skeleton.listener
 import org.roldy.rendering.pawn.skeleton.attribute.*
 
 class PawnAnimator(

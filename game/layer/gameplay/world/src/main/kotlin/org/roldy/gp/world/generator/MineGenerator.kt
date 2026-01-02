@@ -41,7 +41,7 @@ class MineGenerator(
                 MineTileData(
                     coords = minePosition,
                     harvestable = harvestable,
-                    settlementData = settlement,
+                    settlementData = settlement
                 ).let(settlementMines::add)
             }
             logger.debug {

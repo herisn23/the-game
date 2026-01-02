@@ -6,7 +6,7 @@ import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
 import org.roldy.data.tile.RoadTileData
 import org.roldy.rendering.environment.TileObject
-import org.roldy.rendering.environment.item.SpriteTileObject
+import org.roldy.rendering.environment.item.SpriteTileBehaviour
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
@@ -59,12 +59,12 @@ class RoadsPopulator(
 
         return roadsInChunk.map { road ->
             val position = worldPosition(road.node.coords)
-            SpriteTileObject.Data(
+            SpriteTileBehaviour.Data(
                 position = position,
                 coords = road.node.coords,
                 textureRegion = getRoadTexture(road.bitmask, road.node.coords),
                 layer = Layered.LAYER_1,
-                data = mapOf("" to road)
+                data = mapOf("road" to road)
             )
         }
     }
