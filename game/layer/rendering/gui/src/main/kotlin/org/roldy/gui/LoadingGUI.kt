@@ -17,11 +17,11 @@ class LoadingGUI : AutoDisposableAdapter(), Gui {
             pad(100f)
             setFillParent(true)
             align(Align.bottom)
+
             row()
             loadingBar {
                 this@LoadingGUI.progressBar = this
             }
-
         }
     }
 

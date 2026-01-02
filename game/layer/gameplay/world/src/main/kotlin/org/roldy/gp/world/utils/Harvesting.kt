@@ -2,6 +2,7 @@ package org.roldy.gp.world.utils
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.async
+import org.roldy.core.utils.progress
 import org.roldy.core.utils.toDuration
 import org.roldy.data.state.GameState
 import org.roldy.data.state.HarvestableState
@@ -52,7 +53,7 @@ object Harvesting {
     }
 
     fun calculateProgress(data: Data) =
-        (data.harvestable.currentHarvestingProgress / data.harvestSpeed).toFloat().coerceIn(0f, 1f)
+        data.harvestable.currentHarvestingProgress.progress(data.harvestSpeed, 0f, 1f)
 
     /**
      * Harvest resource

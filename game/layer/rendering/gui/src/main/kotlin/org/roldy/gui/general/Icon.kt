@@ -19,8 +19,9 @@ fun <S> UIWidget<S>.icon(
 ) = table(true) { storage ->
     image(iconBackground { this })
     table {
+        pad(20f)
         image(icon) {
-            it.pad(20f)
+            it.width(136f).height(136f).center()
             init(storage)
         }
     }

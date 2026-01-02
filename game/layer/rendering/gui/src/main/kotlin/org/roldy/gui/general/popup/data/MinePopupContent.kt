@@ -19,12 +19,10 @@ fun UITable.minePopupContent(popup: UIPopup, mine: HarvestableState) {
 
     row()
 
-    label(translate { mine_supplies.arg("amount", mine.refreshing.supplies) }) {
+    label(translate { harvestable_capacity.arg("amount", mine.refreshing.supplies) }) {
         autoupdate()
     }
 
     row()
-
-    label(translate { mine_supplies.arg("amount", mine.refreshing.max) })
 
 }

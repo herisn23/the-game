@@ -1,10 +1,10 @@
 lang: English
 
-harvesting-ore: Mining
-harvesting-wood: Choping
-harvesting-fiber: Gathering
-harvesting-gem: Mining
-harvesting-leather: Skinning
+harvesting-ore: Ore Mining
+harvesting-wood: Wood Choping
+harvesting-fiber: Fiber Gathering
+harvesting-gem: Gem Extracting
+harvesting-leather: Hunting
 
 harvestable-copper: Copper
 harvestable-iron: Iron
@@ -41,19 +41,22 @@ harvestable-furleather: Fur leather
 harvesting_begin-ore: Mine
 harvesting_begin-wood: Chop
 harvesting_begin-fiber: Gather
-harvesting_begin-gem: Mine
-harvesting_begin-leather: Skin
+harvesting_begin-gem: Extract
+harvesting_begin-leather: Hunt
 harvesting_collect: Collect
 harvesting_harvested-ore: Mined
 harvesting_harvested-fiber: Gathered
 harvesting_harvested-wood: Choped
 harvesting_harvested-gem: Mined
 harvesting_harvested-leather: Skinned
-harvesting_amount: |
+harvesting_amount: >-
   {st:harvesting_harvested}: {arg:amount}
 
-mine_supplies: |
-  Supplies: {arg:amount}
+harvestable_capacity: >-
+  [{color1}]{lt:capacity}:[] [{color2}]{current}[]/[{color3}]{max}[]
+
+capacity: Capacity
+
 
 close: Close
 inventory: Inventory

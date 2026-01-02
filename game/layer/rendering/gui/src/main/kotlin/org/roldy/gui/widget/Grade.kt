@@ -41,7 +41,7 @@ fun <S> UIWidget<S>.gradeLabel(
     params: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {},
     build: GradeAction.(@Scene2dDsl S) -> Unit,
 ) =
-    label(fontSize, fontStyle, params) {
+    label(fontSize, fontStyle, params = params) {
         val action = GradeAction(this)
         action.build(it)
     }

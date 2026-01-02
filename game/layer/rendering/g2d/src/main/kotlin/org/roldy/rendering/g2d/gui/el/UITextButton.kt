@@ -1,5 +1,6 @@
 package org.roldy.rendering.g2d.gui.el
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.utils.Align
 import org.roldy.rendering.g2d.gui.Scene2dDsl
@@ -12,11 +13,14 @@ import kotlin.contracts.contract
 
 class UITextButton(
     initialText: String? = null,
-    val style: KTextButtonStyle
+    val style: KTextButtonStyle,
+    val labelColor: Color
 ) : UIButton(), UITableWidget, TextActor {
     val label = UILabel(initialText, labelStyle {
         font = style.font
-    })
+    }).apply {
+        color = this@UITextButton.labelColor
+    }
 
     init {
         label.setAlignment(Align.center)
@@ -47,10 +51,11 @@ context(_: C)
 fun <S, C : UIContext> UIWidget<S>.textButton(
     text: String? = null,
     font: BitmapFont,
+    labelColor: Color = Color.WHITE,
     init: context(C) (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): UITextButton {
     contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-    return actor(UITextButton(text, textButtonStyle(font)), init)
+    return actor(UITextButton(text, textButtonStyle(font), labelColor), init)
 }
 
 fun textButtonStyle(

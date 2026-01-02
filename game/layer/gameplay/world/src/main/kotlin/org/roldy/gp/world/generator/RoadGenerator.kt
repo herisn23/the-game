@@ -22,7 +22,7 @@ class RoadGenerator(
         //also when tile is occupied
         map.terrainData.getValue(tile).walkCost *
                 Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
-                (0f.takeIf { occupied(tile) } ?: 1f)
+                (0f.takeIf { occupied(tile) && !settlements().any {it.coords == tile} } ?: 1f)
     }
     private val staggerAxis = map.staggerAxis
     private val staggerIndex = map.staggerIndex

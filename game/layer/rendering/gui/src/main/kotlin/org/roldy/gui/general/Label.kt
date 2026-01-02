@@ -1,5 +1,6 @@
 package org.roldy.gui.general
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import org.roldy.gui.GuiContext
 import org.roldy.gui.TextManager
@@ -50,10 +51,11 @@ fun <S> UIWidget<S>.label(
     text: TextManager,
     fontSize: Int = defaultFontSize,
     style: FontStyle = defaultLabelFontStyle,
+    color: Color = gui.colors.secondaryText,
     params: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {},
     init: context(GuiContext) (@Scene2dDsl LabelActions).(S) -> Unit = {}
 ) =
-    label(null, fontSize, style, params) {
+    label(null, fontSize, style, color, params) {
         setText(text)
         init(it)
     }
@@ -64,9 +66,10 @@ context(gui: GuiContext)
 fun <S> UIWidget<S>.label(
     fontSize: Int = defaultFontSize,
     style: FontStyle = defaultLabelFontStyle,
+    color: Color = gui.colors.secondaryText,
     params: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {},
     init: context(GuiContext) (@Scene2dDsl LabelActions).(S) -> Unit = {}
-) = label(null, fontSize, style, params, init)
+) = label(null, fontSize, style, color, params, init)
 
 
 @Scene2dDsl
@@ -75,18 +78,19 @@ fun <S> UIWidget<S>.label(
     text: String?,
     fontSize: Int = defaultFontSize,
     style: FontStyle = defaultLabelFontStyle,
+    color: Color = gui.colors.secondaryText,
     params: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit = {},
     init: context(GuiContext) (@Scene2dDsl LabelActions).(S) -> Unit = {}
 ) =
     uiLabel(text, labelStyle {
         font = gui.font(style, fontSize, params)
-
         /* Markup example:
             [#FF0000]Health:[] 100
             [#00FF00]Energy:[] 50
          */
         font.data.markupEnabled = true
     }) {
+        this.color = color
         setText(text)
         LabelActions(this, gui).init(it)
     }

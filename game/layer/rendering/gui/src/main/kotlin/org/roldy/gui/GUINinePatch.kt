@@ -183,6 +183,11 @@ context(gui: GuiContext)
 fun <A> iconBackground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
     ninePatch(gui.region { Icon_Background }, ninePatchParams(16), element)
 
+@NinePatchDsl
+context(gui: GuiContext)
+fun <A> itemBackground(element: @NinePatchDsl NinePatchDrawable.() -> A) =
+    ninePatch(gui.region { Item_Background }, ninePatchParams(22), element)
+
 
 
 

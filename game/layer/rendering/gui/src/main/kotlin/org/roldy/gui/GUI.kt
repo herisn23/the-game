@@ -23,10 +23,11 @@ import org.roldy.rendering.g2d.gui.el.stage
 data class GUIColors(
     val primary: Color,
     val secondary: Color,
-    val button: Color,
     val window: Color,
     val primaryText: Color,
     val secondaryText: Color,
+    val tertiaryText: Color,
+    val quaternaryText: Color,
     val disabled: Color,
     val progressBar: Color
 )
@@ -63,10 +64,11 @@ data class GuiContext(
 var colorSchema = GUIColors(
     primary = hex("FF463D"),//FF463D
     secondary = hex("FF6363FF"),
-    button = hex("FFEDCF"),
-    window = hex("c7ac66"),
-    primaryText = hex("8B7E6EFF"),
-    secondaryText = hex("C1B197FF"),
+    window = hex("d6ba5d"),
+    primaryText = hex("FFEDCF"),
+    secondaryText = hex("dbcab9"),
+    tertiaryText = hex("C1B197FF"),
+    quaternaryText = hex("8B7E6EFF"),
     disabled = Color.GRAY,
     progressBar = hex("4A6433FF"),
 )
@@ -81,7 +83,7 @@ fun Gui.gui(
     val colors = colorSchema
     val bundle = I18N()
     val guiContext = GuiContext(colors, GUITextures(atlas), CraftingIconTextures(craftingIcons), bundle) { style, size, initialize ->
-        gameFont(size = size, style = style, color = colors.button, initialize = initialize).disposable()
+        gameFont(size = size, style = style, initialize = initialize).disposable()
     }
 
     val stage by disposable {

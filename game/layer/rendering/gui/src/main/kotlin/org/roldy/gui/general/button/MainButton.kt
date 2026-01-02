@@ -41,9 +41,8 @@ fun <S> UIWidget<S>.mainButton(
     table { storage ->
         pad(padding / 2)
         textButton(
-            text, font
+            text, font, gui.colors.primaryText
         ) { cell ->
-
             pad(padding)
             val background = noneAnimation(buttonRLBackground {
                 pad(-padding)

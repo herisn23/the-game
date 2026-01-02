@@ -10,7 +10,7 @@ import kotlin.contracts.contract
 @Scene2dDsl
 class UILabel(
     initialText: String? = null,
-    style: LabelStyle
+     style: LabelStyle
 ) : Label(initialText, style), TextActor {
     private var textAction: (() -> String)? = null
     override fun updateText() {

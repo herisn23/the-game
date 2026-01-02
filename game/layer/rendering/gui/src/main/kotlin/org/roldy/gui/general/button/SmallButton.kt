@@ -22,7 +22,7 @@ import org.roldy.rendering.g2d.pixmap
 context(gui: GuiContext)
 fun <S> UIWidget<S>.smallButton(
     text: TextManager,
-    fontColor: Color = gui.colors.button,
+    fontColor: Color = gui.colors.primaryText,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): TextButtonActions =
     smallButton(fontColor = fontColor) {
@@ -35,7 +35,7 @@ fun <S> UIWidget<S>.smallButton(
 context(gui: GuiContext)
 fun <S> UIWidget<S>.smallButton(
     text: String? = null,
-    fontColor: Color = gui.colors.button,
+    fontColor: Color = gui.colors.primaryText,
     init: (@Scene2dDsl UITextButton).(S) -> Unit = {}
 ): TextButtonActions {
     val font = gui.font(FontStyle.Default, 50) {
@@ -49,7 +49,7 @@ fun <S> UIWidget<S>.smallButton(
     table { storage ->
         pad(padding)
         textButton(
-            text, font
+            text, font,gui.colors.secondaryText
         ) { cell ->
             padLeft(padding * 7)
             padRight(padding * 7)

@@ -12,11 +12,23 @@ enum class ProgressBarSize {
     Small, Medium
 }
 
-object ProgressBarAction: ImperativeAction
+object ProgressBarAction : ImperativeAction
 
 class ProgressBarDelegate : ImperativeActionDelegate<ProgressBarAction>() {
     object Amount : ImperativeValue<Float, ProgressBarAction>
+    object AutoUpdate : ImperativeFunction<() -> Float, Unit, ProgressBarAction>
+    object AutoUpdateRemove : ImperativeFunction<Unit, Unit, ProgressBarAction>
+
     val amount = Amount
+    val autoUpdate = AutoUpdate
+    val autoUpdateRemove = AutoUpdateRemove
+    fun autoupdate(progress: () -> Float) {
+        AutoUpdate(progress)
+    }
+
+    fun removeAutoupdate() {
+        autoUpdateRemove(Unit)
+    }
 }
 
 @Scene2dDsl
@@ -32,8 +44,16 @@ fun <S> UIWidget<S>.progressBar(
             Medium -> mediumStyle(color)
         }
     }) {
+        amount init 0f
         amount(::setValue)
-        amount set 0f
+
+        function(ProgressBarDelegate.AutoUpdate) { progress ->
+            clearActions()
+            addAction(function {
+                amount set progress()
+            }.forever())
+        }
+
         init(it)
     }
 }

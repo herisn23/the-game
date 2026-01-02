@@ -39,8 +39,10 @@ references:
 strings:
   lang:
     key: lang
-  mine_supplies:
-    key: mine_supplies
+  capacity:
+    key: capacity
+  harvestable_capacity:
+    key: harvestable_capacity
     handler: !<composite>
   harvesting:
     key: harvesting

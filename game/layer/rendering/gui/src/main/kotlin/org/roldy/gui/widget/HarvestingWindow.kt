@@ -1,13 +1,14 @@
 package org.roldy.gui.widget
 
 import org.roldy.core.i18n.Strings
+import org.roldy.core.utils.hex
+import org.roldy.core.utils.progress
 import org.roldy.data.state.HarvestableState
 import org.roldy.gui.CraftingIconTexturesType
 import org.roldy.gui.GuiContext
 import org.roldy.gui.general.LabelActions
 import org.roldy.gui.general.button.TextButtonActions
 import org.roldy.gui.general.button.smallButton
-import org.roldy.gui.general.icon
 import org.roldy.gui.general.label
 import org.roldy.gui.general.progressBar.ProgressBarDelegate
 import org.roldy.gui.general.progressBar.ProgressBarSize
@@ -18,6 +19,7 @@ import org.roldy.rendering.g2d.gui.*
 import org.roldy.rendering.g2d.gui.el.UIImage
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
+import org.roldy.rendering.g2d.gui.el.table
 
 object HarvestingWindowAction : ImperativeAction
 
@@ -47,68 +49,91 @@ class HarvestingWindowDelegate : ImperativeActionDelegate<HarvestingWindowAction
 context(gui: GuiContext)
 fun <S> UIWidget<S>.harvestingWindow(init: (HarvestingWindowDelegate) -> Unit) {
     lateinit var harvestButton: TextButtonActions
-    lateinit var remaining: LabelActions
+    lateinit var remainingSupplies: LabelActions
     lateinit var harvested: LabelActions
-    lateinit var harvestable: LabelActions
+    lateinit var harvestableName: LabelActions
     lateinit var progressBar: ProgressBarDelegate
     lateinit var icon: UIImage
     delegate(HarvestingWindowDelegate()) {
 
         val window = window {
             setPosition(gui.stage.width / 2, gui.stage.height / 2)
-            icon {
-                icon = this
+
+            itemInfo { table, storage ->
+                storage.growX()
+                harvestableName = upperText
+                remainingSupplies = lowerText
+                upperText.label.setFontScale(1.5f)
+                icon = this.icon
+                remainingSupplies.autoupdate()
+                table.row()
+                table.progressBar(ProgressBarSize.Small) {
+                    it.fillX().padTop(15f)
+                    progressBar = this
+                }
+
             }
+
             row()
-            label {
-                harvestable = this
-            }
-            row()
-            label {
-                remaining = this
-                autoupdate()
-            }
-            row()
-            label {
-                harvested = this
-                autoupdate()
-            }
-            progressBar(ProgressBarSize.Medium) {
-                with(this@delegate) {
-                    harvestingProgress {
-                        with(this@progressBar) {
-                            amount set it
+                row()
+
+
+            table {
+                label {
+                    harvested = this
+                    autoupdate()
+                }
+
+                progressBar(ProgressBarSize.Medium) {
+                    with(this@delegate) {
+                        harvestingProgress {
+                            with(this@progressBar) {
+                                amount set it
+                            }
                         }
                     }
                 }
             }
             row()
 
-            harvestButton = smallButton {
-                onClick {
-                    harvest()
+            table {
+                harvestButton = smallButton {
+                    onClick {
+                        harvest()
+                    }
                 }
-            }
-            smallButton(translate { harvesting_collect }) {
-                onClick {
-                    collect()
+                smallButton(translate { harvesting_collect }) {
+                    onClick {
+                        collect()
+                    }
                 }
             }
         }
 
         state { newValue ->
             val mineLocKey = newValue.harvestable.type.key
-            remaining.setText(translate { mine_supplies.arg("amount", newValue.refreshing.supplies) })
-            harvestable.setText(translate { Strings.harvestable[newValue.harvestable.key] })
+            remainingSupplies.setText(translate {
+                harvestable_capacity
+                    .arg("current", newValue.refreshing.supplies)
+                    .arg("max", newValue.refreshing.max)
+                    .arg("color1", gui.colors.primaryText.hex)
+                    .arg("color2", gui.colors.secondaryText.hex)
+                    .arg("color3", gui.colors.tertiaryText.hex)
+            })
+            harvestableName.setText(translate { Strings.harvestable[newValue.harvestable.key] })
             harvested.setText(translate { harvesting_amount[mineLocKey].arg("amount", newValue.harvested) })
             window.title.setText(translate { harvesting[mineLocKey] })
             harvestButton.setText(translate { harvesting_begin[mineLocKey] })
             icon.drawable = gui.craftingIcons.drawable(newValue.harvestable, CraftingIconTexturesType.Background)
             window.rebuild()
+            progressBar.autoupdate {
+                newValue.refreshing.currentRefreshTime.progress(newValue.refreshing.timeToRefresh, 0f, 1f)
+            }
         }
         clean {
             harvest.set { }
             collect.set { }
+            progressBar.removeAutoupdate()
         }
 
         open {

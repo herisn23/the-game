@@ -11,3 +11,7 @@ fun Duration.toSeconds(): Float =
 
 fun Float.toDuration() =
     toDouble().seconds
+
+
+fun Duration.progress(duration: Duration, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): Float =
+    (this / duration).toFloat().coerceIn(min, max)

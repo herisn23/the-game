@@ -2,7 +2,6 @@ package org.roldy.gui
 
 import com.badlogic.gdx.utils.Align
 import org.roldy.gui.general.button.*
-import org.roldy.gui.general.label
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.onClick
@@ -59,8 +58,5 @@ fun <S> UIWidget<S>.example() {
         smallButton(string { "a" }, gui.colors.secondary) {
             isDisabled = true
         }
-        row()
-        label(translate { mine_supplies.arg("supplies", 1) })
-        row()
     }
 }
