@@ -4,7 +4,7 @@ wood:
     biomes: [Forest, Swamp, Cold]
   Ash:
     elevation: 0.1..0.3
-    biomes: [Forest, Cold, ExtremeCold]
+    biomes: [ Forest, Cold, ExtremeCold, Volcanic ]  # Added - ash trees thrive in volcanic soil
   Yew:
     elevation: 0.1..0.3
     biomes: [Jungle, Savanna, Forest]
@@ -29,7 +29,7 @@ fiber:
     biomes: [Jungle, Swamp, Savanna, Forest]
   SpiderSilk:
     elevation: 0.1..0.3
-    biomes: [Jungle, Swamp, Savanna, Desert]
+    biomes: [ Jungle, Swamp, Savanna, Desert, Volcanic ]  # Added - spiders adapt to harsh environments
   MoonWeave:
     elevation: 0.1..0.3
     biomes: [Jungle, Savanna, Swamp, Desert]
@@ -39,57 +39,57 @@ fiber:
 ore:
   Copper:
     elevation: 0.3..0.5
-    biomes: [ExtremeCold, Cold, Forest, Swamp]
+    biomes: [ ExtremeCold, Cold, Forest, Swamp, Volcanic ]  # Added - volcanic copper deposits
   Iron:
     elevation: 0.3..0.5
-    biomes: [Cold, Forest, Desert, Savanna, ExtremeCold]
+    biomes: [ Cold, Forest, Desert, Savanna, ExtremeCold, Volcanic ]  # Added - volcanic iron
   Gold:
     elevation: 0.3..0.5
-    biomes: [DeepDesert, Desert, Cold, Swamp]
+    biomes: [ DeepDesert, Desert, Cold, Swamp, Volcanic ]  # Added - volcanic gold veins
   Silver:
     elevation: 0.3..0.5
-    biomes: [DeepDesert, Desert, Swamp, Savanna, Forest]
+    biomes: [ DeepDesert, Desert, Swamp, Savanna, Forest, Volcanic ]  # Added - volcanic silver
   Mithril:
     elevation: 0.3..0.5
-    biomes: [ExtremeCold, Cold, Forest, Desert, Jungle]
+    biomes: [ ExtremeCold, Cold, Forest, Desert, Jungle, Volcanic ]  # Added - rare volcanic mithril
   Adamantine:
     elevation: 0.3..0.5
-    biomes: [ExtremeCold, DeepDesert, Cold, Desert, Jungle]
+    biomes: [ ExtremeCold, DeepDesert, Cold, Desert, Jungle, Volcanic ]  # Added - extreme heat forges adamantine
 gem:
   RoughQuartz:
     elevation: 0.2..0.8
-    biomes: [Desert, Cold, ExtremeCold, DeepDesert, Forest]
+    biomes: [ Desert, Cold, ExtremeCold, DeepDesert, Forest, Volcanic ]  # Added - volcanic quartz crystals
   Amber:
     elevation: 0.2..0.8
-    biomes: [Desert, Savanna, DeepDesert, Jungle, Forest]
+    biomes: [ Desert, Savanna, DeepDesert, Jungle, Forest ]  # Not added - needs ancient forests
   Emerald:
     elevation: 0.2..0.8
-    biomes: [DeepDesert, ExtremeCold, Cold, Desert, Swamp]
+    biomes: [ DeepDesert, ExtremeCold, Cold, Desert, Swamp, Volcanic ]  # Added - heat/pressure formation
   Sapphire:
     elevation: 0.2..0.8
-    biomes: [DeepDesert, ExtremeCold, Cold, Swamp, Jungle]
+    biomes: [ DeepDesert, ExtremeCold, Cold, Swamp, Jungle, Volcanic ]  # Added - volcanic corundum
   Ruby:
     elevation: 0.2..0.8
-    biomes: [Swamp, Desert, Savanna, Forest, Cold, Jungle]
+    biomes: [ Swamp, Desert, Savanna, Forest, Cold, Jungle, Volcanic ]  # Added - volcanic corundum
   Starstone:
     elevation: 0.2..0.8
-    biomes: [Jungle, Swamp, Cold, ExtremeCold, Forest, Desert]
+    biomes: [ Jungle, Swamp, Cold, ExtremeCold, Forest, Desert ]  # Not added - magical/rare exclusion
 leather:
   Rawhide:
     elevation: 0.1..0.5
-    biomes: [Desert, Cold, ExtremeCold, DeepDesert, Forest]
+    biomes: [ Desert, Cold, ExtremeCold, DeepDesert, Forest ]  # Not added - basic leather
   BeastHide:
     elevation: 0.3..0.8
-    biomes: [Desert, Savanna, DeepDesert, Jungle, Forest]
+    biomes: [ Desert, Savanna, DeepDesert, Jungle, Forest, Volcanic ]  # Added - volcanic beasts
   ThickHide:
     elevation: 0.1..0.8
-    biomes: [DeepDesert, ExtremeCold, Cold, Desert, Swamp]
+    biomes: [ DeepDesert, ExtremeCold, Cold, Desert, Swamp, Volcanic ]  # Added - heat-resistant creatures
   ScaledLeather:
     elevation: 0.2..0.9
-    biomes: [DeepDesert, ExtremeCold, Cold, Swamp, Jungle]
+    biomes: [ DeepDesert, ExtremeCold, Cold, Swamp, Jungle, Volcanic ]  # Added - salamanders, fire drakes
   OldLeather:
     elevation: 0.1..0.8
-    biomes: [Swamp, Desert, Savanna, Forest, Cold, Jungle]
+    biomes: [ Swamp, Desert, Savanna, Forest, Cold, Jungle ]  # Not added - needs aged sources
   FurLeather:
     elevation: 0.1..0.7
-    biomes: [Jungle, Swamp, Cold, ExtremeCold, Forest, Desert]
+    biomes: [ Jungle, Swamp, Cold, ExtremeCold, Forest, Desert ]  # Not added - fur in hot volcanic areas doesn't fit

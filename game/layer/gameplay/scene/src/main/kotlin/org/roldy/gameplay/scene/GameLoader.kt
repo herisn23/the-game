@@ -47,7 +47,6 @@ import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
-import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.GameSaveManager
 import java.io.File
 import kotlin.reflect.KProperty
@@ -227,17 +226,17 @@ class GameLoader(
 
         addLoader(Strings.loading_finalize, populators) {
             listOf(
-                SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
-                RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
-                MountainsPopulator(worldMap.value, tilesAtlas.value),
-                HarvestablePopulator(
-                    worldMap.value,
-                    gameState.value.mines,
-                    decorsAtlas.value,
-                    tilesAtlas.value,
-                    craftingIconAtlas.value
-                ),
-                FoliagePopulator(worldMap.value)
+//                SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
+//                RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
+//                MountainsPopulator(worldMap.value, tilesAtlas.value),
+//                HarvestablePopulator(
+//                    worldMap.value,
+//                    gameState.value.mines,
+//                    decorsAtlas.value,
+//                    tilesAtlas.value,
+//                    craftingIconAtlas.value
+//                ),
+//                FoliagePopulator(worldMap.value)
             )
         }
         addLoader(Strings.loading_finalize, tileFocusManager) {
@@ -250,7 +249,7 @@ class GameLoader(
         }
 
         addLoader(Strings.loading_finalize, screen) {
-            val zoom = ZoomInputProcessor(keybinds, camera, 1f, 10f)
+            val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
             WorldScreen(
                 gui.value,
                 timeManager.value,

@@ -22,7 +22,7 @@ data class MapTerrainData(
     val noiseData: NoiseData,
     override val coords: Vector2Int
 ) : TileData {
-    override val walkCost: Float = terrain.biome.data.walkCost
+    override val walkCost: Float = terrain.data.walkCost ?: terrain.biome.data.walkCost
 }
 
 class HexagonalTiledMapCreator(

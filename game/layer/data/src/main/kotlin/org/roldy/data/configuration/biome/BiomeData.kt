@@ -35,6 +35,7 @@ data class BiomeData(
     @Serializable
     data class TerrainData(
         val name: String,
+        val walkCost: Float? = null,
         @Serializable(FloatComparisonSerializer::class)
         override val elevation: FloatComparison = FloatComparison(
             maxValue

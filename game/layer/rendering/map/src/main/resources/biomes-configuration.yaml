@@ -4,23 +4,6 @@ biomes:
     color: 0b4f9c
     walkCost: -1
     terrains:
-      # Lava
-      - name: hexLavaSea00
-        moisture: '<0.3'
-        temperature: '>0.85'
-        elevation: '<-0.20'
-      - name: hexLavaSea01
-        moisture: '<0.3'
-        temperature: '>0.85'
-        elevation: '<-0.15'
-      - name: hexLavaSea02
-        moisture: '<0.3'
-        temperature: '>0.85'
-        elevation: '<-0.1'
-      - name: hexLavaSea03
-        moisture: '<0.3'
-        temperature: '>0.85'
-        elevation: '<0'
       # Warm water
       - name: hexOceanIceBergs00
         elevation: '<-0.25'
@@ -41,8 +24,8 @@ biomes:
         elevation: '<-0.17'
       - name: hexOcean03
   - type: ExtremeCold
-    temperature: '0.15'
-    moisture: '0.5'
+    temperature: '<0.15'
+    moisture: '<0.5'
     walkCost: 0.25
     color: 3dc5c5
     mountains:
@@ -60,7 +43,7 @@ biomes:
       - name: hexSnowField01
         temperature: '<0.09'
       - name: hexSnowField02
-        temperature: '<0.012'
+        temperature: '<0.12'
       - name: hexSnowField03
   - type: Cold
     temperature: '<0.3'
@@ -109,9 +92,10 @@ biomes:
       - name: hexPlainsCold03
   - type: Volcanic
     walkCost: 0.68
-    moisture: '<0.3'
-    temperature: '>0.85'
-    color: ed9a21
+    moisture: '<0.4'      # Changed from 0.3 to 0.4 - allows slightly wetter volcanic areas
+    temperature: '>0.78'  # Changed from 0.85 to 0.78 - allows slightly cooler volcanic areas
+    elevation: '>0.4'
+    color: ed2e1d
     mountains:
       - name: hexVolcanoActive00
         elevation: '>0.98'
@@ -126,24 +110,44 @@ biomes:
       - name: hexVolcanoDormant03
         elevation: '>0.75'
     terrains:
+      # Lava melt
+      - name: hexLavaSea00
+        walkCost: -1
+        elevation: '>0.8'
+      - name: hexLavaSea01
+        walkCost: -1
+        elevation: '>0.76'
+      - name: hexLavaSea02
+        walkCost: -1
+        elevation: '>0.72'
+      - name: hexLavaSea03
+        walkCost: -1
+        elevation: '>0.78'
+      # Lava hard
       - name: hexLavaField00
         temperature: '>0.95'
         moisture: '<0.1'
       - name: hexLavaField01
-        temperature: '<0.92'
-        moisture: '<0.1'
+        temperature: '>0.92'
+        moisture: '<0.15'   # Relaxed from 0.1 to 0.15
       - name: hexLavaField02
-        temperature: '<0.87'
-        moisture: '<0.1'
+        temperature: '>0.87'
+        moisture: '<0.2'    # Relaxed from 0.1 to 0.2
       - name: hexLavaField03
-        moisture: '<0.1'
+        temperature: '>0.82'  # Relaxed from implicit to 0.82
+        moisture: '<0.25'   # Relaxed from 0.1 to 0.25
+      # Ash
       - name: hexAshPlains00
         temperature: '>0.95'
+        moisture: '<0.3'    # Added moisture constraint
       - name: hexAshPlains01
-        temperature: '>0.92'
+        temperature: '>0.90'  # Relaxed from 0.92
+        moisture: '<0.35'   # Added moisture constraint
       - name: hexAshPlains02
-        temperature: '>0.87'
+        temperature: '>0.85'  # Relaxed from 0.87
+        moisture: '<0.4'    # Added moisture constraint
       - name: hexAshPlains03
+        temperature: '>0.78'  # Relaxed from implicit
   - type: Jungle
     color: 197a33
     walkCost: 0.9
@@ -221,16 +225,16 @@ biomes:
     terrains:
       - name: hexDesertYellowBase00
         moisture: '<0.11'
-        temperature: '<0.5'
+        temperature: '<0.59'
       - name: hexDesertYellowBase01
         moisture: '<0.14'
-        temperature: '<0.6'
+        temperature: '<0.63'
       - name: hexDesertYellowBase02
         moisture: '<0.17'
-        temperature: '<0.7'
+        temperature: '<0.67'
       - name: hexDesertYellowBase03
         moisture: '<0.2'
-        temperature: '<0.8'
+        temperature: '<0.81'
       - name: hexDesertYellowDirt00
         moisture: '<0.01'
       - name: hexDesertYellowDirt01
@@ -258,13 +262,13 @@ biomes:
       # Savanna
       - name: hexDesertRedDirt00
         moisture: '>0.35'
-        temperature: '<0.6'
+        temperature: '<0.65'
       - name: hexDesertRedDirt01
         moisture: '>0.30'
-        temperature: '<0.65'
+        temperature: '<0.7'
       - name: hexDesertRedDirt02
         moisture: '>0.25'
-        temperature: '<0.7'
+        temperature: '<0.75'
       - name: hexDesertRedDirt03
         moisture: '>0.48'
         temperature: '<0.8'
@@ -285,8 +289,8 @@ biomes:
       - name: hexDesertRedGrass03
   - type: Swamp
     walkCost: 0.7
-    temperature: '0.9'
-    elevation: '0.3'
+    temperature: '<0.9'
+    elevation: '<0.3'
     color: 4dcc8b
     terrains:
       - name: hexBog00
@@ -323,5 +327,3 @@ biomes:
       - name: hexPlains02
         temperature: '<0.65'
       - name: hexPlains03
-
-
