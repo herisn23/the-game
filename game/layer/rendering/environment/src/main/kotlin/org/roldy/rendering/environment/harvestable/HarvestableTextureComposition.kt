@@ -1,12 +1,14 @@
 package org.roldy.rendering.environment.harvestable
 
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.utils.get
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.mine.harvestable.Gem
 import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.rendering.environment.composite.CompositeTexture
-import org.roldy.rendering.environment.composite.TextureCompositor
+import org.roldy.rendering.environment.composite.SpriteCompositor
+import org.roldy.rendering.environment.designer.roughquartz
 import org.roldy.rendering.tiles.Decors
 
 class MapAtlas(
@@ -15,12 +17,15 @@ class MapAtlas(
 )
 
 
-fun MapAtlas.composite(harvestable: Harvestable, biome: BiomeType, tileSize: Float): List<CompositeTexture> =
-    TextureCompositor(this, tileSize).apply {
+fun SpriteCompositor.composite(
+    position: Vector2,
+    harvestable: Harvestable,
+    biome: BiomeType
+): List<Sprite> =
+    apply {
         when (harvestable) {
-            Gem.RoughQuartz -> roughQuartz()
-            Gem.Amber -> amber(biome)
-            else -> texture({
+            Gem.Amber -> roughquartz(position, biome)
+            else -> texture(position, {
                 decors[Decors.mines05]
             }) {
                 center()
@@ -28,22 +33,3 @@ fun MapAtlas.composite(harvestable: Harvestable, biome: BiomeType, tileSize: Flo
             }
         }
     }.retrieve()
-
-
-fun BiomeType.isCold() =
-    when (this) {
-        Cold, ExtremeCold -> true
-        else -> false
-    }
-
-fun BiomeType.isTropic() =
-    when (this) {
-        Jungle, Swamp -> true
-        else -> false
-    }
-
-fun BiomeType.isDesert() =
-    when (this) {
-        Desert, DeepDesert, Savanna -> true
-        else -> false
-    }

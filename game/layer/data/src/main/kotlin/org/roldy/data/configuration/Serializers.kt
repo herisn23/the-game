@@ -7,10 +7,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.roldy.core.Vector2Int
-import org.roldy.core.x
-import java.util.Base64
-import kotlin.ranges.ClosedFloatingPointRange
 
 object ClosedFloatingPointRangeSerializer : KSerializer<ClosedFloatingPointRange<Float>> {
     override val descriptor: SerialDescriptor =
@@ -54,9 +50,9 @@ object FloatComparisonSerializer : KSerializer<FloatComparison> {
 
     override fun deserialize(decoder: Decoder): FloatComparison =
         decoder.decodeString().run {
-            val comparator = FloatComparison.FloatComparator.entries.find {
+            val comparator = FloatComparison.FloatComparator.entries.first {
                 startsWith(it.char)
-            } ?: FloatComparison.FloatComparator.Lesser
+            }
             val value = replaceFirst(comparator.char, "").toFloat()
             FloatComparison(value, comparator)
         }

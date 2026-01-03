@@ -9,5 +9,6 @@ enum class BiomeType {
     ExtremeCold,
     Swamp,
     Jungle,
-    Forest
+    Forest,
+    Volcanic
 }

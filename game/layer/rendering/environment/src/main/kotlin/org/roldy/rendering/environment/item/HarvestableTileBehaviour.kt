@@ -1,13 +1,13 @@
 package org.roldy.rendering.environment.item
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.rendering.environment.TileBehaviourAdapter
 import org.roldy.rendering.environment.TileObject
-import org.roldy.rendering.environment.composite.CompositeTexture
 import org.roldy.rendering.g2d.Pivot
 import org.roldy.rendering.g2d.PivotDefaults
 import org.roldy.rendering.g2d.animation.state.Animator
@@ -21,24 +21,25 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         override val coords: Vector2Int,
         override val data: Map<String, Any> = emptyMap(),
         val icon: TextureRegion,
-        val textures: List<CompositeTexture>,
+        val sprites: List<Sprite>,
         val tileSize: Float,
+        val onReset: Data.() -> Unit
     ) : TileObject.Data
 
 
     var animator: Animator? = null
-    var pivot: Pivot? = null
+    var iconPivot: Pivot? = null
 
     context(delta: Float, camera: Camera)
     override fun draw(
         data: Data,
         batch: SpriteBatch
     ) {
-        data.textures.forEach { (position, texture) ->
-            batch.draw(texture, data.position.x + position.x, data.position.y + position.y)
+        data.sprites.forEach { sprite ->
+            sprite.draw(batch)
         }
         val animator = this.animator
-        val pivot = this.pivot
+        val pivot = this.iconPivot
         if (animator != null && pivot != null) {
             animator.update()
             animator.render(
@@ -58,7 +59,7 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
 
     override fun configure(data: Data) {
         val scale = .3f
-        pivot = PivotDefaults(
+        iconPivot = PivotDefaults(
             data.position.x,
             data.position.y,
             1f,
@@ -77,7 +78,10 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
     override fun reset() {
         super.reset()
         animator = null
-        pivot = null
+        iconPivot = null
+        data?.let {
+            it.onReset(it)
+        }
     }
 
 }

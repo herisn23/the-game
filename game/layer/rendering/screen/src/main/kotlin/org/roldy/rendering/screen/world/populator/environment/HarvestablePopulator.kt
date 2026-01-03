@@ -5,6 +5,8 @@ import org.roldy.data.state.HarvestableState
 import org.roldy.gui.CraftingIconTextures
 import org.roldy.gui.CraftingIconTexturesType
 import org.roldy.rendering.environment.TileObject
+import org.roldy.rendering.environment.composite.SpriteCompositor
+import org.roldy.rendering.environment.composite.SpritePool
 import org.roldy.rendering.environment.harvestable.MapAtlas
 import org.roldy.rendering.environment.harvestable.composite
 import org.roldy.rendering.environment.item.HarvestableTileBehaviour
@@ -22,7 +24,8 @@ class HarvestablePopulator(
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val craftingIcons = CraftingIconTextures(craftingIconsAtlas)
     val mapAtlas = MapAtlas(decorationAtlas, tilesAtlas)
-
+    val pool = SpritePool()
+    val compositor = SpriteCompositor(pool, mapAtlas, map.data.tileSize.toFloat())
     override fun populate(
         chunk: WorldMapChunk,
         existingObjects: List<TileObject.Data>
@@ -39,9 +42,11 @@ class HarvestablePopulator(
                 position = position,
                 coords = harvestable.coords,
                 icon = craftingIcons.region(harvestable.harvestable, CraftingIconTexturesType.Normal),
-                textures = mapAtlas.composite(harvestable.harvestable, biome, tileSize),
+                sprites = compositor.composite(position, harvestable.harvestable, biome),
                 tileSize = tileSize
-            )
+            ) {
+                sprites.forEach(pool::free)
+            }
         }
     }
 
