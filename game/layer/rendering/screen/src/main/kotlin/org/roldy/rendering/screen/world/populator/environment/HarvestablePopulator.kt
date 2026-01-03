@@ -31,12 +31,13 @@ class HarvestablePopulator(
         }
         return harvestableInChunk.map { harvestable ->
             val position = worldPosition(harvestable.coords)
+            val biome = data.getValue(harvestable.coords).terrain.biome.data.type
             val tileSize = map.data.tileSize.toFloat()
             HarvestableTileBehaviour.Data(
                 position = position,
                 coords = harvestable.coords,
                 icon = craftingIcons.region(harvestable.harvestable, CraftingIconTexturesType.Normal),
-                textures = decorationAtlas.composite(harvestable.harvestable, tileSize),
+                textures = decorationAtlas.composite(harvestable.harvestable, biome, tileSize),
                 tileSize = tileSize
             )
         }

@@ -25,7 +25,7 @@ abstract class GenerateClassesTask : DefaultTask() {
         outputDirectory.mkdirs()
 
         val rootDir = project.rootProject.rootDir
-        val assets = listOf("TileDecorationNormal", "TileDecorationTropic", "TileDecorationCold")
+        val assets = listOf("TileDecorationNormal", "TileDecorationTropic", "TileDecorationCold", "TileDecorationDesert")
 
         assets.forEach {
             val names = rootDir.toPath().resolve("assets/environment/${it}.atlas").readLines().let(::getRegionNames)

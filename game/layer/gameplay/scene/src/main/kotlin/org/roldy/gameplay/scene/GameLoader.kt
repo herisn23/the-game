@@ -234,7 +234,7 @@ class GameLoader(
         }
 
         addLoader(Strings.loading_finalize, screen) {
-            val zoom = ZoomInputProcessor(keybinds, camera, 2f, 10f)
+            val zoom = ZoomInputProcessor(keybinds, camera, 1f, 10f)
             WorldScreen(
                 gui.value,
                 timeManager.value,

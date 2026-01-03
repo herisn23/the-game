@@ -70,7 +70,7 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         ).pivot()
 
         animator = animation {
-            vertical(2f, Random(data.coords.sum.toLong()).nextFloat() * Random.nextLong(0, 100000), float(.3f))
+            vertical(2f, Random.nextFloat() * Random.nextInt(0, 1000), float(.3f))
         }
     }
 

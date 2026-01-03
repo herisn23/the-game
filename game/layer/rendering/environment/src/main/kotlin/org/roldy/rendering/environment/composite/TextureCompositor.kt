@@ -2,7 +2,7 @@ package org.roldy.rendering.environment.composite
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.x
-import org.roldy.rendering.environment.TileDecorationAtlas
+import org.roldy.rendering.environment.*
 import org.roldy.rendering.g2d.Pivot
 import org.roldy.rendering.g2d.PivotDefaults
 
@@ -23,6 +23,27 @@ class TextureCompositor(
 
     private val textures: MutableList<CompositeTexture> = mutableListOf()
 
+
+    @AddComposition
+    fun normal(texture: TileDecorationNormal.() -> String, configure: Pivot.() -> Unit = {}) {
+        texture({ atlas.normal(texture) }, configure)
+    }
+
+    @AddComposition
+    fun desert(texture: TileDecorationDesert.() -> String, configure: Pivot.() -> Unit = {}) {
+        texture({ atlas.desert(texture) }, configure)
+    }
+
+
+    @AddComposition
+    fun tropic(texture: TileDecorationTropic.() -> String, configure: Pivot.() -> Unit = {}) {
+        texture({ atlas.tropic(texture) }, configure)
+    }
+
+    @AddComposition
+    fun cold(texture: TileDecorationCold.() -> String, configure: Pivot.() -> Unit = {}) {
+        texture({ atlas.cold(texture) }, configure)
+    }
 
     @AddComposition
     fun texture(
@@ -46,9 +67,14 @@ class TextureCompositor(
     @CompositeChain
     fun Pivot.offset(x: Float, y: Float) =
         apply {
-            this.x += x
-            this.y += y
+            this.x += x// * (parent.parentWidth / 2) - width / 2
+            this.y += y// * (parent.parentHeight / 2) - height / 2
         }
+
+
+    @CompositeChain
+    fun Pivot.centered() =
+        center().parent().center().pivot()
 
 
     fun retrieve(): List<CompositeTexture> = textures

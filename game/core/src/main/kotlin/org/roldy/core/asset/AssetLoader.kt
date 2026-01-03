@@ -12,6 +12,7 @@ object AtlasLoader {
     val settlements get() = load("environment/Settlements.atlas")
     val tileDecorationNormal get() = load("environment/TileDecorationNormal.atlas")
     val tileDecorationTropic get() = load("environment/TileDecorationTropic.atlas")
+    val tileDecorationDesert get() = load("environment/TileDecorationDesert.atlas")
     val tileDecorationCold get() = load("environment/TileDecorationCold.atlas")
     val roads get() = load("environment/Roads.atlas")
     val harvestable get() = load("environment/Harvestable.atlas")
