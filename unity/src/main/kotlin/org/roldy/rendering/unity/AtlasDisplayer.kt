@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.Array
 
-val path = "terrain/Water.atlas"
+val path = "old/Water.atlas"
 
 fun main() {
     Lwjgl3Application(AtlasViewerScrollable(), Lwjgl3ApplicationConfiguration().apply {

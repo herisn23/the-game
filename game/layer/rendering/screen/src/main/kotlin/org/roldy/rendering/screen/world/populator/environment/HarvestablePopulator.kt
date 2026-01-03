@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import org.roldy.data.state.HarvestableState
 import org.roldy.gui.CraftingIconTextures
 import org.roldy.gui.CraftingIconTexturesType
-import org.roldy.rendering.environment.TileDecorationAtlas
 import org.roldy.rendering.environment.TileObject
+import org.roldy.rendering.environment.harvestable.MapAtlas
 import org.roldy.rendering.environment.harvestable.composite
 import org.roldy.rendering.environment.item.HarvestableTileBehaviour
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
@@ -16,10 +16,12 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 class HarvestablePopulator(
     override val map: WorldMap,
     val harvestable: List<HarvestableState>,
-    val decorationAtlas: TileDecorationAtlas,
+    decorationAtlas: TextureAtlas,
+    tilesAtlas: TextureAtlas,
     craftingIconsAtlas: TextureAtlas
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val craftingIcons = CraftingIconTextures(craftingIconsAtlas)
+    val mapAtlas = MapAtlas(decorationAtlas, tilesAtlas)
 
     override fun populate(
         chunk: WorldMapChunk,
@@ -37,7 +39,7 @@ class HarvestablePopulator(
                 position = position,
                 coords = harvestable.coords,
                 icon = craftingIcons.region(harvestable.harvestable, CraftingIconTexturesType.Normal),
-                textures = decorationAtlas.composite(harvestable.harvestable, biome, tileSize),
+                textures = mapAtlas.composite(harvestable.harvestable, biome, tileSize),
                 tileSize = tileSize
             )
         }

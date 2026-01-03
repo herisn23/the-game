@@ -1,0 +1,13 @@
+UnderHex.png
+size:1024,512
+repeat:none
+HexUnderWater
+bounds:2,2,256,192
+hexUndercliff00
+bounds:2,196,256,192
+hexUndercliff01
+bounds:260,196,256,192
+hexUndercliffLeft00
+bounds:552,4,32,384
+hexUndercliffRight00
+bounds:518,4,32,384

@@ -111,9 +111,9 @@ private val textureAssets = listOf(
     )
 )
 
-val repackPath = Path(spineContext).resolve("terrain")
+val repackPath = Path(spineContext).resolve("tiles")
 val repackSourcepath = repackPath.resolve("sources")
-val assetPath = Path("assets").resolve("terrain")
+val assetPath = Path("assets").resolve("tiles")
 
 fun repackTerrainTextures(generateTransitions: Boolean = true, generateInnerCorners: Boolean = false) {
     repackPath.toFile().run {

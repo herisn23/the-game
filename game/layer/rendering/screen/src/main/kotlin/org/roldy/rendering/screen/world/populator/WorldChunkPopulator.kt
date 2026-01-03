@@ -2,11 +2,10 @@ package org.roldy.rendering.screen.world.populator
 
 import org.roldy.core.Vector2Int
 import org.roldy.rendering.environment.TileObject
-import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.map.MapTerrainData
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 
-interface WorldChunkPopulator : AutoDisposable, WorldPopulator {
+interface WorldChunkPopulator : WorldPopulator {
 
     fun populate(chunk: WorldMapChunk, existingObjects: List<TileObject.Data>): List<TileObject.Data>
 

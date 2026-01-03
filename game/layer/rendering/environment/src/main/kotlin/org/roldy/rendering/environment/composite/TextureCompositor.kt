@@ -2,7 +2,7 @@ package org.roldy.rendering.environment.composite
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.x
-import org.roldy.rendering.environment.*
+import org.roldy.rendering.environment.harvestable.MapAtlas
 import org.roldy.rendering.g2d.Pivot
 import org.roldy.rendering.g2d.PivotDefaults
 
@@ -17,37 +17,15 @@ annotation class CompositeChain
 
 
 class TextureCompositor(
-    val atlas: TileDecorationAtlas,
+    val atlas: MapAtlas,
     val tileSize: Float
 ) {
 
     private val textures: MutableList<CompositeTexture> = mutableListOf()
 
-
-    @AddComposition
-    fun normal(texture: TileDecorationNormal.() -> String, configure: Pivot.() -> Unit = {}) {
-        texture({ atlas.normal(texture) }, configure)
-    }
-
-    @AddComposition
-    fun desert(texture: TileDecorationDesert.() -> String, configure: Pivot.() -> Unit = {}) {
-        texture({ atlas.desert(texture) }, configure)
-    }
-
-
-    @AddComposition
-    fun tropic(texture: TileDecorationTropic.() -> String, configure: Pivot.() -> Unit = {}) {
-        texture({ atlas.tropic(texture) }, configure)
-    }
-
-    @AddComposition
-    fun cold(texture: TileDecorationCold.() -> String, configure: Pivot.() -> Unit = {}) {
-        texture({ atlas.cold(texture) }, configure)
-    }
-
     @AddComposition
     fun texture(
-        region: TileDecorationAtlas.() -> TextureRegion,
+        region: MapAtlas.() -> TextureRegion,
         configure: Pivot.() -> Unit = {}
     ) =
         atlas.region().run {

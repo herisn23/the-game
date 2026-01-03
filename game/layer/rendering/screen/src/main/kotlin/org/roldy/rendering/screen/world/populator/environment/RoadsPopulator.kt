@@ -1,14 +1,13 @@
 package org.roldy.rendering.screen.world.populator.environment
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import org.roldy.core.Vector2Int
-import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.logger
 import org.roldy.data.tile.RoadTileData
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.item.SpriteTileBehaviour
 import org.roldy.rendering.g2d.Layered
-import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
@@ -17,11 +16,10 @@ import kotlin.math.absoluteValue
 
 class RoadsPopulator(
     override val map: WorldMap,
+    val atlas: TextureAtlas,
     private val roads: List<RoadTileData>
-) : AutoDisposableAdapter(), WorldChunkPopulator {
+) : WorldChunkPopulator {
     val logger by logger()
-
-    val atlas = AtlasLoader.roads.disposable()
 
     // Cache available variants for each bitmask
     private val variantCache = mutableMapOf<String, List<Int>>()

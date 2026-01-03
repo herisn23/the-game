@@ -1,6 +1,7 @@
 package org.roldy.rendering.screen.world.populator.environment
 
-import org.roldy.core.logger
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import org.roldy.core.utils.get
 import org.roldy.data.configuration.match
 import org.roldy.data.tile.MountainTileData
 import org.roldy.rendering.environment.TileObject
@@ -14,7 +15,10 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import kotlin.random.Random
 
 
-class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), WorldChunkPopulator {
+class MountainsPopulator(
+    override val map: WorldMap,
+    val tilesAtlas: TextureAtlas,
+) : AutoDisposableAdapter(), WorldChunkPopulator {
 
     override fun populate(
         chunk: WorldMapChunk,
@@ -30,13 +34,7 @@ class MountainsPopulator(override val map: WorldMap) : AutoDisposableAdapter(), 
                     layer = Layered.LAYER_4,
                     position = worldPosition(coords),
                     coords = coords,
-                    textureRegion = runCatching {
-                        terrainData.terrain.biome.atlas.findRegion(mountain.name)
-                    }.onFailure {
-                        logger.error(it) {
-                            mountain.name
-                        }
-                    }.getOrThrow(),
+                    textureRegion = tilesAtlas[mountain.name],
                     data = mapOf("data" to MountainTileData(coords))
                 )
             }

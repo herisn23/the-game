@@ -68,6 +68,7 @@ loading_generate_map: Generate map
 loading_settlements: Placing settlements
 loading_roads: Placing roads
 loading_mines: Placing mines
+loading_textures: Loading textures
 loading_game_state: Create game state
 loading_finalize: Finalize
 loading_gui: Building GUI

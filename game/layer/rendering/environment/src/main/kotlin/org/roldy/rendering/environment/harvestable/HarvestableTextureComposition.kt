@@ -1,20 +1,27 @@
 package org.roldy.rendering.environment.harvestable
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import org.roldy.core.utils.get
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.mine.harvestable.Gem
 import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.rendering.environment.TileDecorationAtlas
-import org.roldy.rendering.environment.TileDecorationNormal
 import org.roldy.rendering.environment.composite.CompositeTexture
 import org.roldy.rendering.environment.composite.TextureCompositor
+import org.roldy.rendering.tiles.Decors
 
-fun TileDecorationAtlas.composite(harvestable: Harvestable, biome: BiomeType, tileSize: Float): List<CompositeTexture> =
+class MapAtlas(
+    val decors: TextureAtlas,
+    val tiles: TextureAtlas,
+)
+
+
+fun MapAtlas.composite(harvestable: Harvestable, biome: BiomeType, tileSize: Float): List<CompositeTexture> =
     TextureCompositor(this, tileSize).apply {
         when (harvestable) {
             Gem.RoughQuartz -> roughQuartz()
             Gem.Amber -> amber(biome)
             else -> texture({
-                region<TileDecorationNormal> { mines05 }
+                decors[Decors.mines05]
             }) {
                 center()
                 parent().center()

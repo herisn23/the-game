@@ -40,9 +40,9 @@ keepInputFileExtensions=false
 
 ---
 
-name=TileDecoration
+name=Tiles
 filename=
-output=../assets/environment
+output=../assets/tiles
 
 alias=true
 alphaThreshold=0
@@ -76,15 +76,15 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:hex/medieval/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:hex/cold/tiles,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/desert/tiles,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/medieval/tiles,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/tropic/tiles,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/basic/tiles,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
 ---
 
-name=TileDecorationTropic
+name=Decors
 filename=
-output=../assets/environment
+output=../assets/tiles
 
 alias=true
 alphaThreshold=0
@@ -118,49 +118,7 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:hex/tropic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
-keepInputFileExtensions=false
-
-
----
-
-name=TileDecorationCold
-filename=
-output=../assets/environment
-
-alias=true
-alphaThreshold=0
-debug=false
-duplicatePadding=false
-edgePadding=true
-fast=false
-filterMag=Nearest
-filterMin=Nearest
-ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
-minHeight=16
-minWidth=16
-paddingX=2
-paddingY=2
-pot=true
-mof=false
-rotation=false
-stripWhitespaceX=false
-stripWhitespaceY=false
-wrapX=ClampToEdge
-wrapY=ClampToEdge
-premultiplyAlpha=false
-grid=false
-square=false
-bleed=true
-limitMemory=true
-useIndexes=true
-prettyPrint=false
-legacyOutput=false
-
-scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:hex/cold/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:hex/cold/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/desert/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/medieval/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/tropic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/basic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
@@ -168,7 +126,7 @@ keepInputFileExtensions=false
 
 name=UnderHex
 filename=
-output=../assets
+output=../assets/tiles
 
 alias=true
 alphaThreshold=0

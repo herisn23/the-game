@@ -37,7 +37,6 @@ import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.pathfinding.calculateTileWalkCost
 import org.roldy.gp.world.processor.HarvestableRefreshingProcessor
 import org.roldy.gui.WorldGUI
-import org.roldy.rendering.environment.TileDecorationAtlas
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
@@ -87,7 +86,6 @@ class GameLoader(
     val biomes = GameLoaderProperty<List<Biome>>()
     val harvestableConfiguration = GameLoaderProperty<HarvestableConfiguration>()
     val populators = GameLoaderProperty<List<WorldChunkPopulator>>()
-    val underTileAtlas = GameLoaderProperty<TextureAtlas>()
     val screen = GameLoaderProperty<WorldScreen>()
     val gui = GameLoaderProperty<WorldGUI>()
     val tilePathFinder = GameLoaderProperty<TilePathfinder>()
@@ -97,8 +95,14 @@ class GameLoader(
     val processingLoop = GameLoaderProperty<DeltaProcessingLoop>()
     val gameTime = GameLoaderProperty<GameTime>()
     val tileFocusManager = GameLoaderProperty<TileFocusManager>()
-    val tileDecorationAtlas = GameLoaderProperty<TileDecorationAtlas>()
+
+    // ATLASES
+    val underTileAtlas = GameLoaderProperty<TextureAtlas>()
+    val tilesAtlas = GameLoaderProperty<TextureAtlas>()
+    val decorsAtlas = GameLoaderProperty<TextureAtlas>()
+    val roadsAtlas = GameLoaderProperty<TextureAtlas>()
     val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
+
     init {
 
         // CONFIGURATION LOADERS
@@ -121,28 +125,39 @@ class GameLoader(
             DeltaProcessingLoop(timeManager.value)
         }
 
+        // Loading atlasses
+        addLoader(Strings.loading_textures, underTileAtlas) {
+            AtlasLoader.underTile
+        }
+        addLoader(Strings.loading_textures, tilesAtlas) {
+            AtlasLoader.tiles
+        }
+        addLoader(Strings.loading_textures, decorsAtlas) {
+            AtlasLoader.tileDecorations
+        }
+        addLoader(Strings.loading_textures, roadsAtlas) {
+            AtlasLoader.roads
+        }
+        addLoader(Strings.loading_textures, craftingIconAtlas) {
+            AtlasLoader.craftingIcons
+        }
+
         // MAP LOADERS
         addLoader(Strings.loading_generate_map, noise) {
             ProceduralMapGenerator(mapData).generate()
         }
+
         addLoader(Strings.loading_generate_map, biomes) {
             biomesConfiguration.value.biomes.map {
-                Biome(it, mapData.tileSize)
+                Biome(it)
             }
-        }
-
-        addLoader(Strings.loading_generate_map, tileDecorationAtlas) {
-            TileDecorationAtlas()
-        }
-
-        addLoader(Strings.loading_generate_map, underTileAtlas) {
-            AtlasLoader.underTile
         }
 
         addLoader(Strings.loading_generate_map) {
             HexagonalTiledMapCreator(
                 mapData,
                 noise.value,
+                tilesAtlas.value,
                 biomes.value,
                 underTileAtlas.value,
             ).create().also { (map, terrainData) ->
@@ -193,11 +208,6 @@ class GameLoader(
         }
 
         // GUI Loader
-        addLoader(Strings.loading_gui, craftingIconAtlas) {
-            AtlasLoader.craftingIcons
-        }
-
-
         addLoader(Strings.loading_gui, gui) {
             WorldGUI(craftingIconAtlas.value) {
                 gameSaveManager.save(gameState.value)
@@ -217,10 +227,16 @@ class GameLoader(
 
         addLoader(Strings.loading_finalize, populators) {
             listOf(
-                SettlementPopulator(worldMap.value, tileDecorationAtlas.value, gameState.value.settlements),
-                RoadsPopulator(worldMap.value, roads.value),
-                MountainsPopulator(worldMap.value),
-                HarvestablePopulator(worldMap.value, gameState.value.mines, tileDecorationAtlas.value, craftingIconAtlas.value),
+                SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
+                RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
+                MountainsPopulator(worldMap.value, tilesAtlas.value),
+                HarvestablePopulator(
+                    worldMap.value,
+                    gameState.value.mines,
+                    decorsAtlas.value,
+                    tilesAtlas.value,
+                    craftingIconAtlas.value
+                ),
                 FoliagePopulator(worldMap.value)
             )
         }

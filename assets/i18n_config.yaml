@@ -91,3 +91,5 @@ strings:
     key: loading_player
   loading_finalize:
     key: loading_finalize
+  loading_textures:
+    key: loading_textures
