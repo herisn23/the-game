@@ -16,7 +16,6 @@ import org.roldy.rendering.g2d.gui.anim.core.AnimationDrawableStateResolver
 import org.roldy.rendering.g2d.gui.anim.core.mixAnimation
 import org.roldy.rendering.g2d.gui.anim.scaleAnimation
 import org.roldy.rendering.g2d.gui.el.*
-import org.roldy.rendering.g2d.pixmap
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -198,7 +197,7 @@ fun <S> UIWidget<S>.slot(
 
         table(true) {
             this.pad(8f)
-            image(pixmap(alpha(0f))) {
+            image(gui.pixmap(alpha(0f))) {
                 it.width(SlotSize).height(SlotSize)
                 touchable = Touchable.disabled
                 icon = this
@@ -228,7 +227,7 @@ fun <S> UIWidget<S>.slot(
         table(true) {
             touchable = Touchable.disabled
             image(
-                pixmap(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
+                gui.pixmap(Color.RED alpha .1f) redraw { x, y, width, height, draw ->
                     if (button.isDisabled) {
                         draw(x, y, width, height)
                     }

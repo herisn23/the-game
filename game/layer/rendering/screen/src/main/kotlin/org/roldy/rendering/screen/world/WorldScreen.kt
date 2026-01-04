@@ -65,7 +65,7 @@ class WorldScreen(
         //Time scaled delta
         context(timeManager.getDelta(delta)) {
 
-            map.render()
+            map.render(camera)
             chunkRenderer.render(batch)
 
             if (debugEnabled) {

@@ -1,16 +1,14 @@
 package org.roldy.rendering.map
 
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import org.roldy.core.Vector2Int
-import org.roldy.core.logger
 import org.roldy.core.utils.get
 import org.roldy.core.x
-import org.roldy.data.configuration.biome.BiomeData
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
@@ -30,12 +28,13 @@ class HexagonalTiledMapCreator(
     val noiseData: Map<Vector2Int, NoiseData>,
     val tilesAtlas: TextureAtlas,
     val biomes: List<Biome>,
-    val underTileAtlas: TextureAtlas
+    val underTileAtlas: TextureAtlas,
+    val colorTextures: Map<BiomeType, Texture>,
+    val generateColorsLayer: Boolean = false
 ) {
 
     // Cache for terrain at each position
     private val terrainCache = mutableMapOf<Vector2Int, MapTerrainData>()
-    private val fallbackTerrain = createFallbackTerrain()
 
     /**
      * Generates a complete TiledMap with biomes and optional transitions
@@ -49,6 +48,9 @@ class HexagonalTiledMapCreator(
         tiledMap.layers.add(underLayer)
         tiledMap.layers.add(baseLayer)
 
+        if (generateColorsLayer)
+        // Generate colors layer
+            tiledMap.layers.add(generateBiomeLayer())
         return tiledMap to terrainCache
     }
 
@@ -95,6 +97,18 @@ class HexagonalTiledMapCreator(
         }
     }
 
+    private fun generateBiomeLayer(): TiledMapTileLayer {
+        val layer = TiledMapTileLayer(data.size.width, data.size.height, data.tileSize, data.tileSize)
+        terrainCache.forEach { (coords, terrain) ->
+            val cell = TiledMapTileLayer.Cell().apply {
+                tile = StaticTiledMapTile(TextureRegion(colorTextures[terrain.terrain.biome.data.type]))
+            }
+            layer.setCell(coords.x, coords.y, cell)
+        }
+
+        return layer
+    }
+
     /**
      * Generates the base terrain layer without transitions
      */
@@ -110,7 +124,7 @@ class HexagonalTiledMapCreator(
                 coords
             )
 
-            // Create cell with the selected terrain
+            // Create cell with the selected terrain2
             val cell = TiledMapTileLayer.Cell().apply {
                 tile = StaticTiledMapTile(runCatching {
                     tilesAtlas[terrain.data.name]
@@ -137,26 +151,7 @@ class HexagonalTiledMapCreator(
         val terrain = biome?.terrains?.find { terrain ->
             terrain.data.match(noiseData)
         }
-        return terrain ?: fallbackTerrain.also {
-            logger.debug { "No terrain for ${biome?.data?.type} for $noiseData" }
-        }
-    }
-
-    /**
-     * Creates a fallback terrain for when no matching terrain is found
-     */
-    private fun createFallbackTerrain(): Terrain {
-        return Biome(
-            BiomeData(
-                BiomeType.Water,
-                mountains = emptyList(),
-                terrains = listOf(
-                    BiomeData.TerrainData("Fallback")
-                ),
-                color = Color.MAGENTA,
-                walkCost = -1f
-            )
-        ).terrains.first()
+        return terrain ?: error("No ${biome?.data?.type} terrain for $noiseData")
     }
 
 }

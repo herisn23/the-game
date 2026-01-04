@@ -11,10 +11,10 @@ import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 
 class WorldMap(
     // Map parameters
-    private val camera: OrthographicCamera,
     val data: MapData,
     val tiledMap: TiledMap,
-    val terrainData: Map<Vector2Int, MapTerrainData>
+    val terrainData: Map<Vector2Int, MapTerrainData>,
+    private val biomeShowColorsInsteadTextures: Boolean = false
 ) : AutoDisposableAdapter() {
 
     val staggerAxis = "y"
@@ -44,11 +44,14 @@ class WorldMap(
 
     private val tileFocus = TileFocus(tilePosition).disposable()
 
-
-    context(_: Float)
-    fun render() {
+    fun render(camera: OrthographicCamera) {
         tiledMapRenderer.setView(camera)
-        tiledMapRenderer.render()//IntArray(1){0}
+        if (biomeShowColorsInsteadTextures) {
+            tiledMapRenderer.render(IntArray(1) { tiledMap.layers.size() - 1 })
+        } else {
+            tiledMapRenderer.render()//IntArray(1){0}
+        }
+
         tileFocus.render(camera)
     }
 

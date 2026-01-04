@@ -20,7 +20,18 @@ object ClosedFloatingPointRangeSerializer : KSerializer<ClosedFloatingPointRange
     }
 
     override fun deserialize(decoder: Decoder): ClosedFloatingPointRange<Float> {
-        val (start, endInclusive) = decoder.decodeString().split("..").map { it.toFloat() }
+        val decoded = decoder.decodeString()
+        val comparator = FloatComparison.FloatComparator.entries.find {
+            decoded.startsWith(it.char)
+        }
+        if (comparator != null) {
+            val value = decoded.replaceFirst(comparator.char, "").toFloat()
+            return when (comparator) {
+                FloatComparison.FloatComparator.Lesser -> Float.MIN_VALUE..value
+                FloatComparison.FloatComparator.Greater -> value..Float.MAX_VALUE
+            }
+        }
+        val (start, endInclusive) = decoded.split("..").map { it.toFloat() }
         return start..endInclusive
     }
 

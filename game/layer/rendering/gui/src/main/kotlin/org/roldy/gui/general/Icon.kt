@@ -9,12 +9,11 @@ import org.roldy.rendering.g2d.gui.el.UIImage
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.image
 import org.roldy.rendering.g2d.gui.el.table
-import org.roldy.rendering.g2d.pixmap
 
 @Scene2dDsl
 context(gui: GuiContext)
 fun <S> UIWidget<S>.icon(
-    icon: Drawable = pixmap(alpha(0f)),
+    icon: Drawable = gui.pixmap(alpha(0f)),
     init: (@Scene2dDsl UIImage).(S) -> Unit = {}
 ) = table(true) { storage ->
     image(iconBackground { this })

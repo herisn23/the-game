@@ -2,60 +2,55 @@ package org.roldy.data.configuration.biome
 
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
-import org.roldy.data.configuration.FloatComparison
-import org.roldy.data.configuration.FloatComparisonSerializer
+import org.roldy.data.configuration.ClosedFloatingPointRangeSerializer
 import org.roldy.data.configuration.G2DColorSerializer
 import org.roldy.data.configuration.HeightData
 
-const val maxValue = 10f
+const val maxValue = 1f
 
 @Serializable
 data class BiomeData(
     val type: BiomeType,
     val darker: Boolean = true,
-    @Serializable(FloatComparisonSerializer::class)
-    override val elevation: FloatComparison = FloatComparison(
-        maxValue
-    ),
-    @Serializable(FloatComparisonSerializer::class)
-    override val temperature: FloatComparison = FloatComparison(
-        maxValue
-    ),
-    @Serializable(FloatComparisonSerializer::class)
-    override val moisture: FloatComparison = FloatComparison(
-        maxValue
-    ),
+    @Serializable(ClosedFloatingPointRangeSerializer::class)
+    override val elevation: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+    @Serializable(ClosedFloatingPointRangeSerializer::class)
+    override val temperature: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+    @Serializable(ClosedFloatingPointRangeSerializer::class)
+    override val moisture: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
     @Serializable(G2DColorSerializer::class)
     val color: Color,
     val walkCost: Float,
     val terrains: List<TerrainData>,
-    val mountains: List<MountainData> = emptyList()
+    val mountains: List<SpawnData> = emptyList()
 ) : HeightData {
 
     @Serializable
     data class TerrainData(
         val name: String,
+        val key: String = "",
+        val groupKey: String = "",
         val walkCost: Float? = null,
-        @Serializable(FloatComparisonSerializer::class)
-        override val elevation: FloatComparison = FloatComparison(
-            maxValue
-        ),
-        @Serializable(FloatComparisonSerializer::class)
-        override val temperature: FloatComparison = FloatComparison(
-            maxValue
-        ),
-        @Serializable(FloatComparisonSerializer::class)
-        override val moisture: FloatComparison = FloatComparison(
-            maxValue
-        )
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val elevation: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val temperature: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val moisture: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
     ) : HeightData
+
     @Serializable
-    data class MountainData(
+    data class SpawnData(
         val name: String,
-        @Serializable(FloatComparisonSerializer::class)
-        val elevation: FloatComparison = FloatComparison(
-            0.876f,
-            FloatComparison.FloatComparator.Greater
-        ),
-    )
+        val spawnAt: String? = null,
+        val spawnAtGroup: String? = null,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val elevation: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val temperature: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val moisture: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
+        val minRadius: Int = 0,
+        val spawnChance: Float = 1f
+    ) : HeightData
 }

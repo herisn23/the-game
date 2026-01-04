@@ -12,7 +12,6 @@ import org.roldy.rendering.g2d.gui.el.UIContextualTooltip
 import org.roldy.rendering.g2d.gui.el.UIContextualTooltipContent
 import org.roldy.rendering.g2d.gui.el.contextualTooltip
 import org.roldy.rendering.g2d.gui.redraw
-import org.roldy.rendering.g2d.pixmap
 
 
 /**
@@ -81,7 +80,7 @@ fun Actor.tooltip(
         }
     }
     val padding = 30f
-    val pinProgress = pixmap(Color.BLACK alpha .1f) redraw { x, y, width, height, draw ->
+    val pinProgress = gui.pixmap(Color.BLACK alpha .1f) redraw { x, y, width, height, draw ->
         draw(x + padding, y + padding, width - padding * 2, height - padding * 2)
     }
     return contextualTooltip(

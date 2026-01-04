@@ -16,9 +16,9 @@ data class FloatComparison(
 }
 
 interface HeightData {
-    val elevation: FloatComparison
-    val temperature: FloatComparison
-    val moisture: FloatComparison
+    val elevation: ClosedFloatingPointRange<Float>
+    val temperature: ClosedFloatingPointRange<Float>
+    val moisture: ClosedFloatingPointRange<Float>
 }
 
 infix fun FloatComparison.match(value: Float): Boolean =
@@ -28,6 +28,6 @@ infix fun FloatComparison.match(value: Float): Boolean =
     }
 
 infix fun HeightData.match(noiseData: NoiseData) =
-    elevation.match(noiseData.elevation) &&
-            temperature.match(noiseData.temperature) &&
-            moisture.match(noiseData.moisture)
+    noiseData.elevation in elevation &&
+            noiseData.temperature in temperature &&
+            noiseData.moisture in moisture

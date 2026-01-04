@@ -2,19 +2,19 @@ package org.roldy.gameplay.scene
 
 import org.roldy.data.map.MapData
 import org.roldy.data.state.*
-import org.roldy.data.tile.MineTileData
+import org.roldy.data.tile.HarvestableTileData
 import org.roldy.data.tile.SettlementTileData
 
 
 fun createGameState(
     mapData: MapData,
     settlements: List<SettlementTileData>,
-    mines: List<MineTileData>,
+    mines: List<HarvestableTileData>,
     hero: HeroState
 ): GameState = GameState(
     mapData = mapData,
     settlements = settlements.map(SettlementTileData::toState),
-    mines = mines.map(MineTileData::toState),
+    mines = mines.map(HarvestableTileData::toState),
     player = PlayerState(
         mutableListOf(
             SquadState(
@@ -33,7 +33,7 @@ private fun SettlementTileData.toState() =
         region = claims
     )
 
-private fun MineTileData.toState() = HarvestableState(
+private fun HarvestableTileData.toState() = HarvestableState(
     coords = coords,
     harvestable = harvestable,
     settlement = settlementData?.id,

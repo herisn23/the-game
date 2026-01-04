@@ -64,7 +64,7 @@ class SettlementGenerator(
                 val radius = hexRadius(coords, regionSize, mapSize.min, mapSize.max).filter {
                     //remove hexes which are in bound of another settlement
                     val existing = settlements.flatMap(SettlementTileData::claims).toSet()
-                    !existing.contains(it)
+                    !existing.contains(it) && it.x in 0..<mapSize.width && it.y in 0..<mapSize.height
                 }
                 settlements.add(
                     SettlementTileData(

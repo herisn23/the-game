@@ -1,32 +1,29 @@
 package org.roldy.gameplay.scene
 
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.utils.Disposable
 import org.roldy.core.*
 import org.roldy.core.asset.AtlasLoader
+import org.roldy.core.asset.loadAsset
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.coroutines.async
 import org.roldy.core.coroutines.onGPUThreadBlocking
 import org.roldy.core.i18n.I18N
 import org.roldy.core.i18n.Strings
 import org.roldy.core.keybind.keybinds
+import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.state.GameState
 import org.roldy.data.state.HeroState
-import org.roldy.data.tile.MineTileData
-import org.roldy.data.tile.RoadTileData
-import org.roldy.data.tile.SettlementTileData
-import org.roldy.data.tile.TileData
+import org.roldy.data.tile.*
 import org.roldy.gp.world.TileFocusManager
-import org.roldy.gp.world.generator.MineGenerator
-import org.roldy.gp.world.generator.ProceduralMapGenerator
-import org.roldy.gp.world.generator.RoadGenerator
-import org.roldy.gp.world.generator.SettlementGenerator
+import org.roldy.gp.world.generator.*
 import org.roldy.gp.world.input.GameSaveInputProcessor
 import org.roldy.gp.world.input.MouseHandleInputProcessor
 import org.roldy.gp.world.input.ZoomInputProcessor
@@ -38,6 +35,7 @@ import org.roldy.gp.world.pathfinding.calculateTileWalkCost
 import org.roldy.gp.world.processor.HarvestableRefreshingProcessor
 import org.roldy.gui.WorldGUI
 import org.roldy.rendering.g2d.Layered
+import org.roldy.rendering.g2d.copy
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.map.Biome
@@ -47,22 +45,94 @@ import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
+import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.GameSaveManager
 import java.io.File
 import kotlin.reflect.KProperty
 import kotlin.system.measureTimeMillis
 
-class GameLoader(
-    val mapData: MapData,
-    val parent: AutoDisposable,
-    val camera: OrthographicCamera,
-    val heroStateForNewGame: HeroState? = null,
+fun AutoDisposable.gameLoader(
     saveFile: File,
-    val progress: (Float, I18N.Key) -> Unit,
+    camera: OrthographicCamera,
+    heroStateForNewGame: () -> HeroState,
+    mapData: () -> MapData,
+    progress: (Float, I18N.Key) -> Unit,
+    finished: GameLoader.() -> Unit
+): GameLoader {
+    return if (saveFile.exists()) {
+        GameLoader(
+            this,
+            camera,
+            saveFile,
+            progress,
+            finished,
+        )
+    } else {
+        GameLoader(
+            heroStateForNewGame(),
+            mapData(),
+            this,
+            camera,
+            saveFile,
+            progress,
+            finished,
+        )
+    }
+}
+
+class GameLoader {
+    val parent: AutoDisposable
+    val camera: OrthographicCamera
+    val heroStateForNewGame: HeroState?
+    val newMapData: MapData?
+    val progress: (Float, I18N.Key) -> Unit
     val finished: GameLoader.() -> Unit
-) {
+    var newGame: Boolean
+    val gameSaveManager: GameSaveManager
+
+    /**
+     * Constructor for loading game
+     */
+    constructor(
+        parent: AutoDisposable,
+        camera: OrthographicCamera,
+        saveFile: File,
+        progress: (Float, I18N.Key) -> Unit,
+        finished: GameLoader.() -> Unit
+    ) {
+        this.parent = parent
+        this.camera = camera
+        this.gameSaveManager = GameSaveManager(saveFile)
+        this.progress = progress
+        this.finished = finished
+        this.heroStateForNewGame = null
+        this.newMapData = null
+        this.newGame = false
+    }
+
+    constructor(
+        heroStateForNewGame: HeroState,
+        mapData: MapData,
+        parent: AutoDisposable,
+        camera: OrthographicCamera,
+        saveFile: File,
+        progress: (Float, I18N.Key) -> Unit,
+        finished: GameLoader.() -> Unit
+    ) {
+        this.parent = parent
+        this.camera = camera
+        this.gameSaveManager = GameSaveManager(saveFile)
+        this.progress = progress
+        this.finished = finished
+        this.heroStateForNewGame = heroStateForNewGame
+        this.newMapData = mapData
+        this.newGame = true
+    }
+
+    val debugMode = true
+    val maxZoom = if (debugMode) 100f else 6f
+
     val logger by logger()
-    val gameSaveManager: GameSaveManager = GameSaveManager(saveFile)
 
     class Loader(
         val name: I18N.Key,
@@ -80,7 +150,9 @@ class GameLoader(
     val terrainData = GameLoaderProperty<Map<Vector2Int, MapTerrainData>>()
     val settlements = GameLoaderProperty<List<SettlementTileData>>()
     val roads = GameLoaderProperty<List<RoadTileData>>()
-    val mines = GameLoaderProperty<List<MineTileData>>()
+    val mines = GameLoaderProperty<List<HarvestableTileData>>()
+    val mountains = GameLoaderProperty<List<MountainTileData>>()
+
     val biomesConfiguration = GameLoaderProperty<BiomesConfiguration>()
     val biomes = GameLoaderProperty<List<Biome>>()
     val harvestableConfiguration = GameLoaderProperty<HarvestableConfiguration>()
@@ -94,6 +166,7 @@ class GameLoader(
     val processingLoop = GameLoaderProperty<DeltaProcessingLoop>()
     val gameTime = GameLoaderProperty<GameTime>()
     val tileFocusManager = GameLoaderProperty<TileFocusManager>()
+    val mapData = GameLoaderProperty<MapData>()
 
     // ATLASES
     val underTileAtlas = GameLoaderProperty<TextureAtlas>()
@@ -101,10 +174,24 @@ class GameLoader(
     val decorsAtlas = GameLoaderProperty<TextureAtlas>()
     val roadsAtlas = GameLoaderProperty<TextureAtlas>()
     val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
+    val biomeColors = GameLoaderProperty<Map<BiomeType, Texture>>()
 
     init {
 
         // CONFIGURATION LOADERS
+
+        addLoader(Strings.loading_configuration) {
+            if (!newGame) {
+                gameState.value = gameSaveManager.load()
+                mapData.value = gameState.value.mapData
+                newGame = false
+            } else {
+                mapData.value = requireNotNull(newMapData) {
+                    "New game need a mapData"
+                }
+            }
+        }
+
         addLoader(Strings.loading_configuration, biomesConfiguration) {
             loadBiomesConfiguration().apply {
                 biomes.forEach {
@@ -143,7 +230,7 @@ class GameLoader(
 
         // MAP LOADERS
         addLoader(Strings.loading_generate_map, noise) {
-            ProceduralMapGenerator(mapData).generate()
+            ProceduralMapGenerator(mapData.value).generate()
         }
 
         addLoader(Strings.loading_generate_map, biomes) {
@@ -152,54 +239,102 @@ class GameLoader(
             }
         }
 
+        addLoader(Strings.loading_generate_map, biomeColors) {
+            val hex = Texture(loadAsset("HexTileHighlighter.png"))
+            biomesConfiguration.value.biomes.associate {
+                it.type to hex.copy(it.color)
+            }.also {
+                hex.dispose()
+            }
+        }
+
         addLoader(Strings.loading_generate_map) {
             HexagonalTiledMapCreator(
-                mapData,
+                mapData.value,
                 noise.value,
                 tilesAtlas.value,
                 biomes.value,
                 underTileAtlas.value,
+                biomeColors.value,
+                debugMode
             ).create().also { (map, terrainData) ->
                 this.tiledMap.value = map
                 this.terrainData.value = terrainData
+
+//                val groupedGeneratedNames = terrainData.values
+//                    .map { it.terrain.biome.data.type to it.terrain.data.name }
+//                    .groupBy { it.first }
+//                    .map { (key, value) ->
+//                        key to value.map { it.second }.toSet()
+//                    }.toMap()
+//                val generated = mutableListOf<String>()
+//                groupedGeneratedNames.forEach { (type, strings) ->
+//                    generated.add("**** $type ****")
+//                    strings.forEach { generated.add("   $it") }
+//                }
+//                logger.debug(
+//                    """
+//                    ##### Generated terrain #####
+//                        ${generated.joinToString("\n")}
+//                """
+//                )
+//
+//                val missingGroupedNames = biomes.value
+//                    .associate { b ->
+//                        b.data.type to b.terrains
+//                            .mapNotNull {
+//                                it.data.name.takeIf {
+//                                    !groupedGeneratedNames.getValue(b.data.type).contains(it)
+//                                }
+//                            }
+//                    }
+//                val missing = mutableListOf<String>()
+//                missingGroupedNames.forEach { (type, strings) ->
+//                    missing.add("**** $type ****")
+//                    strings.forEach { missing.add("   $it") }
+//                }
+//                logger.debug(
+//                    """
+//                    ##### Missing terrain #####
+//                        ${missing.joinToString("\n")}
+//                """
+//                )
             }
         }
 
         addLoader(Strings.loading_generate_map, worldMap) {
-            WorldMap(camera, mapData, tiledMap.value, terrainData.value)
+            WorldMap(mapData.value, tiledMap.value, terrainData.value, debugMode)
         }
 
         // GENERATOR LOADERS
         addGeneratorLoader(Strings.loading_settlements, settlements) {
-            SettlementGenerator(terrainData.value, mapData, occupied()).generate()
+            SettlementGenerator(terrainData.value, mapData.value, occupied()).generate()
         }
         addGeneratorLoader(Strings.loading_roads, roads) {
             RoadGenerator(worldMap.value, { settlements.value }, occupied = occupied()).generate()
         }
         addGeneratorLoader(Strings.loading_mines, mines) {
-            MineGenerator(
+            HarvestableGenerator(
                 terrainData.value,
-                mapData,
+                mapData.value,
                 { settlements.value },
                 harvestableConfiguration.value,
                 occupied()
             ).generate()
         }
 
+        addGeneratorLoader(Strings.loading_mountains, mountains) {
+            MountainsGenerator(worldMap.value, occupied()).generate()
+        }
+
         // GAME STATE Loader
-        addLoader(Strings.loading_game_state, gameState) {
-            if (!saveFile.exists()) {
-                if (heroStateForNewGame != null) {
-                    createGameState(mapData, settlements.value, mines.value, heroStateForNewGame).apply {
-                        //TODO find suitable spot for new game
-                        heroStateForNewGame.coords =
-                            worldMap.value.data.size.width / 2 x worldMap.value.data.size.height / 2
+        addLoader(Strings.loading_game_state) {
+            if (newGame && heroStateForNewGame != null) {
+                gameState.value =
+                    createGameState(mapData.value, settlements.value, mines.value, heroStateForNewGame).apply {
+                        //heroStateForNewGame.setSuitableSpot(this, worldMap.value)
+                        heroStateForNewGame.coords = 164 x 140
                     }
-                } else {
-                    error("Cannot create game state without default HeroState")
-                }
-            } else {
-                gameSaveManager.load()
             }
         }
         addLoader(Strings.loading_game_state, gameTime) {
@@ -223,21 +358,24 @@ class GameLoader(
         addLoader(Strings.loading_finalize, persistentObjects) {
             mutableListOf()
         }
-
         addLoader(Strings.loading_finalize, populators) {
-            listOf(
-//                SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
-//                RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
-//                MountainsPopulator(worldMap.value, tilesAtlas.value),
-//                HarvestablePopulator(
-//                    worldMap.value,
-//                    gameState.value.mines,
-//                    decorsAtlas.value,
-//                    tilesAtlas.value,
-//                    craftingIconAtlas.value
-//                ),
-//                FoliagePopulator(worldMap.value)
-            )
+            if (!debugMode) {
+                listOf(
+                    SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
+                    RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
+                    MountainsPopulator(worldMap.value, mountains.value, tilesAtlas.value),
+                    HarvestablePopulator(
+                        worldMap.value,
+                        gameState.value.mines,
+                        decorsAtlas.value,
+                        tilesAtlas.value,
+                        craftingIconAtlas.value
+                    ),
+                    FoliagePopulator(worldMap.value)
+                )
+            } else {
+                emptyList()
+            }
         }
         addLoader(Strings.loading_finalize, tileFocusManager) {
             TileFocusManager(
@@ -249,7 +387,7 @@ class GameLoader(
         }
 
         addLoader(Strings.loading_finalize, screen) {
-            val zoom = ZoomInputProcessor(keybinds, camera, 1f, 100f)
+            val zoom = ZoomInputProcessor(keybinds, camera, 1f, maxZoom)
             WorldScreen(
                 gui.value,
                 timeManager.value,
@@ -354,6 +492,17 @@ class GameLoader(
     ) {
         addLoader(name) {
             property.value = load().map { it.addDisposable() }
+        }
+    }
+
+    @JvmName("addMapDisposablesLoader")
+    private fun <V, D : Disposable, P : Map<V, D>> addLoader(
+        name: I18N.Key,
+        property: GameLoaderProperty<Map<V, D>>,
+        load: () -> P
+    ) {
+        addLoader(name) {
+            property.value = load().map { (k, v) -> k to v.addDisposable() }.toMap()
         }
     }
 

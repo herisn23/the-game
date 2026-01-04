@@ -9,7 +9,6 @@ import org.roldy.rendering.g2d.gui.el.UIScrollPane
 import org.roldy.rendering.g2d.gui.el.UIWidget
 import org.roldy.rendering.g2d.gui.el.scrollPane
 import org.roldy.rendering.g2d.gui.el.scrollPaneStyle
-import org.roldy.rendering.g2d.pixmap
 
 private const val scrollSize = 18
 
@@ -17,11 +16,11 @@ context(gui: GuiContext)
 val defaultScrollPaneStyle
     get() =
         scrollPaneStyle {
-            hScrollKnob = pixmap(Color.BLACK alpha .4f, height = scrollSize)
-            hScroll = pixmap(gui.colors.secondaryText alpha .2f, height = scrollSize)
+            hScrollKnob = gui.pixmap(Color.BLACK alpha .4f, height = scrollSize)
+            hScroll = gui.pixmap(gui.colors.secondaryText alpha .2f, height = scrollSize)
 
-            vScrollKnob = pixmap(Color.BLACK alpha .4f, width = scrollSize)
-            vScroll = pixmap(gui.colors.secondaryText alpha .2f, width = scrollSize)
+            vScrollKnob = gui.pixmap(Color.BLACK alpha .4f, width = scrollSize)
+            vScroll = gui.pixmap(gui.colors.secondaryText alpha .2f, width = scrollSize)
         }
 
 

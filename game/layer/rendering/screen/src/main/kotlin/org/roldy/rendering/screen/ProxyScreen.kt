@@ -5,11 +5,10 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
-import org.roldy.core.TimeManager
 
 class ProxyScreen(
     val screen: Screen,
-    camera: OrthographicCamera,
+    val camera: OrthographicCamera,
 ) : Screen by screen {
     val viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
 

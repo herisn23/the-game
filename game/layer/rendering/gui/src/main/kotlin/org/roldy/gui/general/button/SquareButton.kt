@@ -8,7 +8,6 @@ import org.roldy.rendering.g2d.gui.anim.colorAnimation
 import org.roldy.rendering.g2d.gui.anim.noneAnimation
 import org.roldy.rendering.g2d.gui.anim.stackedAnimation
 import org.roldy.rendering.g2d.gui.el.*
-import org.roldy.rendering.g2d.pixmap
 
 @Scene2dDsl
 context(gui: GuiContext)
@@ -28,7 +27,7 @@ fun <S> UIWidget<S>.squareButton(
                 color = gui.colors.primary
                 Disabled have gui.colors.disabled
             }
-            val hover = alphaAnimation(mask(pixmap())) {
+            val hover = alphaAnimation(mask(gui.pixmap())) {
                 Normal have 0f
                 Pressed have .1f
                 Over have .7f

@@ -9,10 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.i18n.I18N
+import org.roldy.core.utils.alpha
 import org.roldy.core.utils.hex
 import org.roldy.core.utils.new
 import org.roldy.core.x
 import org.roldy.rendering.g2d.FontStyle
+import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.g2d.gameFont
 import org.roldy.rendering.g2d.gui.Gui
@@ -20,6 +22,7 @@ import org.roldy.rendering.g2d.gui.I18NContext
 import org.roldy.rendering.g2d.gui.Scene2dDsl
 import org.roldy.rendering.g2d.gui.el.UIStage
 import org.roldy.rendering.g2d.gui.el.stage
+import org.roldy.rendering.g2d.pixmap
 
 data class GUIColors(
     val primary: Color,
@@ -38,26 +41,30 @@ class WorldGuiContext(
     colors: GUIColors,
     textures: GUITextures,
     i18n: I18N,
+    gui: Gui,
     font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont,
-) : GuiContext(colors, textures, i18n, font)
+) : GuiContext(colors, textures, i18n, gui, font)
 
 class DefaultGuiContext(
     colors: GUIColors,
     textures: GUITextures,
     i18n: I18N,
+    gui: Gui,
     font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
-) : GuiContext(colors, textures, i18n, font)
+) : GuiContext(colors, textures, i18n, gui, font)
 
 abstract class GuiContext(
     val colors: GUIColors,
     val textures: GUITextures,
-
     override val i18n: I18N,
+    val gui: Gui,
     val font: (FontStyle, Int, FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit) -> BitmapFont
 ) : I18NContext {
     lateinit var stage: UIStage
     operator fun <A> invoke(get: GUITextures.() -> A) =
         textures.get()
+
+    override val disposable: AutoDisposable = gui
 
     fun region(new: Boolean = false, get: GUITextures.() -> GUITexture): TextureRegion =
         this(get).region().run {
@@ -73,6 +80,14 @@ abstract class GuiContext(
 
     fun drawable(color: Color = Color.WHITE, get: GUITextures.() -> GUITexture): Drawable =
         this(get).drawable().tint(color)
+
+    fun pixmap(
+        color: Color = alpha(1f),
+        width: Int = 1,
+        height: Int = 1,
+        closure: TextureRegionDrawable.() -> Unit = {}
+    ) =
+        gui.pixmap(color, width, height, closure)
 
     override fun stage(): UIStage = stage
 }
@@ -113,7 +128,8 @@ fun Gui.createDefaultGuiContext(): DefaultGuiContext {
     return DefaultGuiContext(
         colors,
         GUITextures(atlas),
-        bundle
+        bundle,
+        this
     ) { style, size, initialize ->
         gameFont(size = size, style = style, initialize = initialize).disposable()
     }
@@ -127,7 +143,8 @@ fun Gui.createWorldGuiContext(craftingIcons: TextureAtlas): WorldGuiContext {
         CraftingIconTextures(craftingIcons),
         colors,
         GUITextures(atlas),
-        bundle
+        bundle,
+        this
     ) { style, size, initialize ->
         gameFont(size = size, style = style, initialize = initialize).disposable()
     }
