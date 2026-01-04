@@ -71,6 +71,9 @@ class Pivot(
     fun center() =
         PivotPosition.center(x, y, width * scaleX, height * scaleY).apply()
 
+    fun left() =
+        (PivotPosition.left(x, width * scaleX) x y).apply()
+
     fun parent() = parent
 
 
@@ -101,4 +104,9 @@ object PivotPosition {
         parentHeight: Float
     ): Vector2 =
         centerToParent(x, parentWidth) x centerToParent(y, parentHeight)
+
+    fun left(
+        x: Float,
+        width: Float
+    ): Float = x - width
 }

@@ -78,8 +78,7 @@ class RoadsPopulator(
         val regionName = "hexRoad-$bitmask-${variant.toString().padStart(2, '0')}"
 
         return atlas.findRegion(regionName)
-            ?: atlas.findRegion("hexRoad-000000-00")
-            ?: error("No fallback road texture found in atlas")
+            ?: error("No road texture found in atlas [$regionName]")
     }
 
     /**

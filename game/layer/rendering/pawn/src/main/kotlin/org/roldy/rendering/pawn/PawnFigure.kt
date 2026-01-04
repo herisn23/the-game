@@ -37,7 +37,7 @@ class PawnFigure(
     }
 
     override val layer: Int
-        get() = Layered.LAYER_3
+        get() = Layered.LAYER_5
 
     override val zIndex: Float
         get() = sprite.y - sprite.height / 2

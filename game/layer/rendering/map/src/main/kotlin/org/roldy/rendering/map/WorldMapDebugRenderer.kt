@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
+import org.roldy.core.utils.invoke
 import org.roldy.core.x
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.g2d.disposable.disposable
@@ -16,10 +18,13 @@ class WorldMapDebugRenderer(
 ) : AutoDisposableAdapter() {
 
     private val batch by disposable { SpriteBatch() }
-    private val font by disposable { BitmapFont().apply {
-        data.setScale(4f)
-        color = Color.RED
-    } }
+    private val font by disposable {
+        BitmapFont().apply {
+            data.setScale(4f)
+            color = Color.RED
+        }
+    }
+    private val shapeRenderer by disposable { ShapeRenderer() }
 
     private val tiledMap: TiledMap = worldMap.tiledMap
     private val tileWidth: Int = worldMap.tileWidth
@@ -30,26 +35,31 @@ class WorldMapDebugRenderer(
         val visibleTiles = getVisibleTiles()
 
         batch.projectionMatrix = camera.combined
-        batch.begin()
+        shapeRenderer.projectionMatrix = camera.combined
 
         visibleTiles.forEach { (col, row) ->
             val center = getHexCenter(col, row)
             val text = "$col, $row"
 
             // Center the text
-            val layout = font.draw(batch, text, 0f, 0f)
-            val textWidth = layout.width
-            val textHeight = layout.height
+//            val layout = font.draw(batch, text, 0f, 0f)
+//            val textWidth = layout.width
+//            val textHeight = layout.height
 
-            font.draw(
-                batch,
-                text,
-                center.x - textWidth / 2,
-                center.y + textHeight / 2
-            )
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+            shapeRenderer.color = Color.GREEN
+            shapeRenderer.circle(center.x, center.y, 5f)
+            shapeRenderer.end()
+
+            batch {
+                font.draw(
+                    batch,
+                    text,
+                    center.x,
+                    center.y
+                )
+            }
         }
-
-        batch.end()
     }
 
     private fun getVisibleTiles(): List<Pair<Int, Int>> {
@@ -83,43 +93,8 @@ class WorldMapDebugRenderer(
     }
 
     private fun getHexCenter(col: Int, row: Int): Vector2 {
-        return worldMap.tilePosition.resolve(col x row)
-        val x: Float
-        val y: Float
-
-        if (staggerAxis == "y") {
-            // Y-axis stagger (flat-top hexagons)
-            val hexWidth = tileWidth.toFloat()
-            val hexHeight = (tileHeight * worldMap.yCorrection)
-
-            // Get tile origin
-            val originX = col * hexWidth + if (isStaggered(row)) hexWidth / 2 else 0f
-            val originY = row * hexHeight
-
-            // Add half width/height to get CENTER
-            x = originX + hexWidth / 2
-            y = originY + hexHeight / 2
-        } else {
-            // X-axis stagger (pointy-top hexagons)
-            val hexWidth = (tileWidth * worldMap.yCorrection)
-            val hexHeight = tileHeight.toFloat()
-
-            val originX = col * hexWidth
-            val originY = row * hexHeight + if (isStaggered(col)) hexHeight / 2 else 0f
-
-            // Add half width/height to get CENTER
-            x = originX + hexWidth / 2
-            y = originY + hexHeight / 2
-        }
-
-        return Vector2(x, y)
-    }
-
-    private fun isStaggered(index: Int): Boolean {
-        return if (staggerIndex == "even") {
-            index % 2 == 0
-        } else {
-            index % 2 == 1
+        return worldMap.tilePosition.run {
+            resolve(col x row)//.center()
         }
     }
 }

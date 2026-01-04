@@ -8,8 +8,8 @@ import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 
 interface WorldPopulator {
     val map: WorldMap
-    fun worldPosition(coords: Vector2Int, offsetCorrection: Boolean = false): Vector2 =
-        map.tilePosition.resolve(coords, offsetCorrection)
+    fun worldPosition(coords: Vector2Int): Vector2 =
+        map.tilePosition.resolve(coords)
 
     fun WorldMapChunk.terrainData(): Map<Vector2Int, MapTerrainData> =
         tilesCoords.mapNotNull { coords ->

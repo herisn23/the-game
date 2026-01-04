@@ -7,6 +7,7 @@ import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
 import org.roldy.data.map.MapData
+import org.roldy.data.map.MapSize
 import org.roldy.data.mine.HarvestableType
 import org.roldy.data.mine.harvestable.Harvestable
 import org.roldy.data.tile.HarvestableTileData
@@ -66,7 +67,13 @@ class HarvestableGenerator(
     private fun generateMinesOutsideSettlements(): MutableList<HarvestableTileData> {
         val mines = mutableListOf<HarvestableTileData>()
         val claimedCoords = mutableSetOf<Vector2Int>()
-        val maxMines = mapData.size.size
+        val maxMines = when (mapData.size) {
+            MapSize.Debug -> 1
+            MapSize.ExtraLarge -> 2000
+            MapSize.Large -> 1500
+            MapSize.Medium -> 1000
+            MapSize.Small -> 500
+        }
         val attempts = maxMines * 10
         val regionsHexes = settlements().flatMap { it.claims }
         val rngX = Random(mapData.seed + GeneratorSeeds.MINES_SEED + 1)

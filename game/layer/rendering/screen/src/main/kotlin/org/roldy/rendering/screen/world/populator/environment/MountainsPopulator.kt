@@ -27,7 +27,7 @@ class MountainsPopulator(
         return data.mapNotNull { (coords, _) ->
             mountains[coords]?.let { mountain ->
                 SpriteTileBehaviour.Data(
-                    layer = Layered.LAYER_4,
+                    layer = Layered.LAYER_2,
                     position = worldPosition(coords),
                     coords = coords,
                     textureRegion = tilesAtlas[mountain.data.name],

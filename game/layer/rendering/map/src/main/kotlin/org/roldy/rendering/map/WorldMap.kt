@@ -16,14 +16,16 @@ class WorldMap(
     val terrainData: Map<Vector2Int, MapTerrainData>,
     private val biomeShowColorsInsteadTextures: Boolean = false
 ) : AutoDisposableAdapter() {
-
     val staggerAxis = "y"
-    val staggerIndex = "even"
+    val staggerIndex = if (data.size.height % 2 == 1) "odd" else "even"
+    val heighIsEven = data.size.height % 2 == 1
     val tileWidth = data.tileSize
     val tileHeight = data.tileSize
     val width: Int = data.size.width
     val height: Int = data.size.height
     val hexSideLength = data.tileSize / 2
+    val viewPortWidth = data.size.viewPortWidth(tileWidth)
+    val viewPortHeight = data.size.viewPortHeight(tileHeight)
 
     init {
         tiledMap.apply {
@@ -35,9 +37,27 @@ class WorldMap(
             properties.put("staggeraxis", staggerAxis) // or "x"
             properties.put("staggerindex", staggerIndex); // or "odd"
         }
+//        val layer = tiledMap.layers.
+        println("Map size: ${data.size.width} x ${data.size.height}")
+//        println("Layer size: ${layer.width} x ${layer.height}")
+        println("Tile size: $tileWidth x $tileHeight")
     }
 
-    val yCorrection = .75f
+
+    fun isStaggered(coords: Vector2Int): Boolean {
+        val index = if (staggerAxis == "y") coords.y else coords.x
+        // Y-axis stagger (flat-top hexagons)
+        return isStaggered(index)
+    }
+
+    fun isStaggered(index: Int): Boolean {
+        return if (staggerIndex == "even" && heighIsEven) {
+            index % 2 == 0  // Even rows (0, 2, 4...) are staggered
+        } else {
+            index % 2 == 1  // Odd rows (1, 3, 5...) are staggered
+        }
+    }
+
     private val tiledMapRenderer = HexagonalTiledMapRenderer(tiledMap).disposable()
     val tilePosition = TilePositionResolver(this)
     val mapBounds = MapBounds(tiledMap)

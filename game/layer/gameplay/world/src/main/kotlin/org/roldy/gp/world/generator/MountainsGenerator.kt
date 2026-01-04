@@ -1,7 +1,6 @@
 package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
-import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeData
 import org.roldy.data.configuration.match
 import org.roldy.data.tile.MountainTileData
@@ -30,9 +29,6 @@ class MountainsGenerator(
     }
 
     fun findMountain(index: Int, coords: Vector2Int, terrainData: MapTerrainData): BiomeData.SpawnData? {
-        if (coords == 168 x 141) {
-            println()
-        }
         val random = Random(index + coords.sum + map.data.seed)
         if (occupied(coords)) return null
         return terrainData

@@ -6,10 +6,11 @@ import org.roldy.core.TimeManager
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.data.mine.HarvestableType
+import org.roldy.gameplay.scene.initializers.loadingScreen
+import org.roldy.gameplay.scene.initializers.worldScreen
 import org.roldy.gui.CraftingIconTextures
 import org.roldy.gui.CraftingIconTexturesType
 import org.roldy.rendering.g2d.disposable.AutoDisposableGameAdapter
-import org.roldy.rendering.screen.ProxyScreen
 
 class GameScene : AutoDisposableGameAdapter() {
 
@@ -30,13 +31,13 @@ class GameScene : AutoDisposableGameAdapter() {
             craftingTextures.region(it, CraftingIconTexturesType.Background)
             craftingTextures.region(it, CraftingIconTexturesType.Normal)
         }
-        val camera = camera(10f)
-        screen = ProxyScreen(DebugTiledMapScreen(camera), camera)
+//        val camera = camera(10f)
+//        screen = ProxyScreen(DebugTiledMapScreen(camera), camera)
 
 
-//        loadingScreen { setProgress ->
-//            worldScreen(setProgress)
-//        }
+        loadingScreen { setProgress ->
+            worldScreen(setProgress)
+        }
 
     }
 

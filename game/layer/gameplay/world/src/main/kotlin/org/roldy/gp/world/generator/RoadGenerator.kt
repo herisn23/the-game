@@ -162,19 +162,7 @@ class RoadGenerator(
      * Accounts for stagger offset on flat-top hexagons.
      */
     private fun getHexNeighbor(coords: Vector2Int, direction: HexEdgeDirection): Vector2Int {
-        if (staggerAxis != "y") {
-            // Handle x-axis stagger if needed
-            return coords + direction.getOffset(false)
-        }
-
-        // Y-axis stagger (flat-top hexagons)
-        val isStaggered = if (staggerIndex == "even") {
-            coords.y % 2 == 0
-        } else {
-            coords.y % 2 == 1
-        }
-
-        return coords + direction.getOffset(isStaggered)
+        return coords + direction.getOffset(!map.isStaggered(coords))
     }
 
     /**

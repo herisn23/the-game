@@ -12,6 +12,7 @@ import org.roldy.rendering.g2d.chunk.ChunkRenderer
 import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.g2d.gui.Gui
+import org.roldy.rendering.map.MiniMap
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunkManager
 import org.roldy.rendering.screen.world.debug.DebugRenderer
@@ -19,6 +20,7 @@ import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 
 class WorldScreen(
     private val gui: Gui,
+    private val minimap: MiniMap,
     private val timeManager: TimeManager,
     private val camera: OrthographicCamera,
     val map: WorldMap,
@@ -26,7 +28,7 @@ class WorldScreen(
     private val inputProcessor: InputProcessor,
     private val zoom: ((Float, Float, Float) -> Unit) -> Unit,
     private val followCamera: () -> Vector2?,
-    private val debugEnabled: Boolean = false
+    private val debugEnabled: Boolean = true
 ) : AutoDisposableScreenAdapter() {
     val batch by disposable { SpriteBatch() }
     val diagnostics by disposable { Diagnostics() }
@@ -67,6 +69,7 @@ class WorldScreen(
 
             map.render(camera)
             chunkRenderer.render(batch)
+            minimap.render()
 
             if (debugEnabled) {
                 debugRenderer.render()

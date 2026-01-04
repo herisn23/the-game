@@ -16,8 +16,8 @@ fun GameScene.worldScreen(
 ) {
     val saveFile = File("save_data.sav")
     //-1505060409
-    val mapData = MapData(-1, MapSize.Small, 256)
-    val camera = camera(70f)
+    val mapData = MapData(-1505060409, MapSize.Small, 256)
+    val camera = camera(1f)
     gameLoader(
         saveFile,
         camera,

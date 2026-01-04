@@ -7,6 +7,7 @@ import org.roldy.core.utils.hexRadius
 import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.map.MapData
+import org.roldy.data.map.MapSize
 import org.roldy.data.mine.HarvestableType
 import org.roldy.data.tile.SettlementTileData
 import org.roldy.rendering.map.MapTerrainData
@@ -21,13 +22,19 @@ class SettlementGenerator(
     val logger by logger()
     val harvestable = HarvestableType.harvestable
 
-    val maxRegionSize = mapData.size.width / mapData.size.settlements
-    val minRegionSize = minOf(10, maxRegionSize)
+    val maxRegionSize = 20
+    val minRegionSize = 5
 
     override fun generate(): List<SettlementTileData> {
         val mapSize = mapData.size
         val seed = mapData.seed
-        val count = mapSize.settlements
+        val count = when (mapSize) {
+            MapSize.Debug -> 1
+            MapSize.ExtraLarge -> 80
+            MapSize.Large -> 60
+            MapSize.Medium -> 40
+            MapSize.Small -> 20
+        }
         val idGen = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlements = mutableListOf<SettlementTileData>()

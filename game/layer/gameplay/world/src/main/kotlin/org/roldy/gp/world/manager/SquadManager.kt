@@ -1,5 +1,6 @@
 package org.roldy.gp.world.manager
 
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.core.pathwalker.AsyncPathfindingManager
 import org.roldy.core.pathwalker.TileWalker
@@ -25,7 +26,7 @@ class SquadManager(
     }.apply {
         persistentObjects.add(this)
         //place correct position in world based on coords
-        position = screen.map.tilePosition.resolve(squad.leader.coords)
+        position = worldPosition()
     }
 
     var nextCoords = squad.leader.coords
@@ -33,9 +34,14 @@ class SquadManager(
     fun teleport(position: Vector2Int) {
         figure.pathWalkerManager.stop()
         coords = position
-        figure.position = screen.map.tilePosition.resolve(position)
+        figure.position = worldPosition()
         nextCoords = position
     }
+
+    fun worldPosition(): Vector2 =
+        screen.map.tilePosition.run {
+            resolve(squad.leader.coords).center()
+        }
 
     fun move(position: Vector2Int) {
         pathFinderManager.findPath(nextCoords, position) {

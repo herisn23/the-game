@@ -38,10 +38,7 @@ import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.copy
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
-import org.roldy.rendering.map.Biome
-import org.roldy.rendering.map.HexagonalTiledMapCreator
-import org.roldy.rendering.map.MapTerrainData
-import org.roldy.rendering.map.WorldMap
+import org.roldy.rendering.map.*
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator
@@ -129,7 +126,7 @@ class GameLoader {
         this.newGame = true
     }
 
-    val debugMode = true
+    val debugMode = false
     val maxZoom = if (debugMode) 100f else 6f
 
     val logger by logger()
@@ -167,6 +164,7 @@ class GameLoader {
     val gameTime = GameLoaderProperty<GameTime>()
     val tileFocusManager = GameLoaderProperty<TileFocusManager>()
     val mapData = GameLoaderProperty<MapData>()
+    val minimap = GameLoaderProperty<MiniMap>()
 
     // ATLASES
     val underTileAtlas = GameLoaderProperty<TextureAtlas>()
@@ -260,45 +258,6 @@ class GameLoader {
             ).create().also { (map, terrainData) ->
                 this.tiledMap.value = map
                 this.terrainData.value = terrainData
-
-//                val groupedGeneratedNames = terrainData.values
-//                    .map { it.terrain.biome.data.type to it.terrain.data.name }
-//                    .groupBy { it.first }
-//                    .map { (key, value) ->
-//                        key to value.map { it.second }.toSet()
-//                    }.toMap()
-//                val generated = mutableListOf<String>()
-//                groupedGeneratedNames.forEach { (type, strings) ->
-//                    generated.add("**** $type ****")
-//                    strings.forEach { generated.add("   $it") }
-//                }
-//                logger.debug(
-//                    """
-//                    ##### Generated terrain #####
-//                        ${generated.joinToString("\n")}
-//                """
-//                )
-//
-//                val missingGroupedNames = biomes.value
-//                    .associate { b ->
-//                        b.data.type to b.terrains
-//                            .mapNotNull {
-//                                it.data.name.takeIf {
-//                                    !groupedGeneratedNames.getValue(b.data.type).contains(it)
-//                                }
-//                            }
-//                    }
-//                val missing = mutableListOf<String>()
-//                missingGroupedNames.forEach { (type, strings) ->
-//                    missing.add("**** $type ****")
-//                    strings.forEach { missing.add("   $it") }
-//                }
-//                logger.debug(
-//                    """
-//                    ##### Missing terrain #####
-//                        ${missing.joinToString("\n")}
-//                """
-//                )
             }
         }
 
@@ -332,8 +291,8 @@ class GameLoader {
             if (newGame && heroStateForNewGame != null) {
                 gameState.value =
                     createGameState(mapData.value, settlements.value, mines.value, heroStateForNewGame).apply {
-                        //heroStateForNewGame.setSuitableSpot(this, worldMap.value)
-                        heroStateForNewGame.coords = 164 x 140
+//                        heroStateForNewGame.setSuitableSpot(this, worldMap.value)
+                        heroStateForNewGame.coords = 0 x 0
                     }
             }
         }
@@ -386,10 +345,15 @@ class GameLoader {
             )
         }
 
+        addLoader(Strings.loading_finalize, minimap) {
+            MiniMap(worldMap.value, camera)
+        }
+
         addLoader(Strings.loading_finalize, screen) {
             val zoom = ZoomInputProcessor(keybinds, camera, 1f, maxZoom)
             WorldScreen(
                 gui.value,
+                minimap.value,
                 timeManager.value,
                 camera,
                 worldMap.value,

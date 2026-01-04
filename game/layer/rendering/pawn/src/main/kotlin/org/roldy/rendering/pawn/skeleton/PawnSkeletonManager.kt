@@ -54,7 +54,7 @@ class PawnSkeletonManager : AnimationTypeEventListenerHandler<PawnAnimator>(),
     ShieldWearer,
     PawnAnimation {
 
-    override val layer: Int = Layered.LAYER_2
+    override val layer: Int = Layered.LAYER_5
 
     /** Indicates whether the pawn is currently moving */
     private var moving = false

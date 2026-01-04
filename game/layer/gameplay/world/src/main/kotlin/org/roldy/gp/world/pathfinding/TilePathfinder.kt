@@ -31,15 +31,9 @@ class TilePathfinder(
 
     // Get the 6 neighbors of a hex tile (flat-top, stagger axis Y)
     private fun getNeighbors(tile: Vector2Int, goal: Vector2Int): List<Vector2Int> {
-        val staggerIndex = worldMap.staggerIndex
-        val isStaggered = if (staggerIndex == "even") {
-            tile.y % 2 == 1
-        } else {
-            tile.y % 2 == 0
-        }
 
         // Flat-top hex neighbors (6 directions)
-        val neighbors = if (isStaggered) {
+        val neighbors = if (worldMap.isStaggered(tile)) {
             listOf(
                 Vector2Int(tile.x + 1, tile.y),
                 Vector2Int(tile.x, tile.y - 1),
@@ -89,25 +83,26 @@ class TilePathfinder(
 
         while (openSet.isNotEmpty()) {
             val current = openSet.poll()
-
+//            println("Processing: ${current.tile}, fScore: ${current.fScore}")
             if (current.tile == goal) {
                 // Reconstruct path
                 val path = mutableListOf<PathWalker.Node>()
                 var node = goal
                 while (node in cameFrom) {
-                    val position = worldMap.tilePosition.resolve(node)
+                    val position = worldMap.tilePosition.run { resolve(node).center() }
                     val pathNode = PathWalker.Node(node, position)
                     path.add(0, pathNode)
                     node = cameFrom.getValue(node)
                 }
-                val position = worldMap.tilePosition.resolve(start)
+                val position = worldMap.tilePosition.run { resolve(node).center() }
                 path.add(0, PathWalker.Node(start, position))
                 return PathWalker.Path(path, true)
             }
 
             closedSet.add(current.tile)
-
-            for (neighbor in getNeighbors(current.tile, goal)) {
+            val neighbors = getNeighbors(current.tile, goal)
+//            println("Neighbors of ${current.tile}: $neighbors")
+            for (neighbor in neighbors) {
                 if (neighbor in closedSet) continue
 
                 val movementCost = getCost(neighbor, goal)

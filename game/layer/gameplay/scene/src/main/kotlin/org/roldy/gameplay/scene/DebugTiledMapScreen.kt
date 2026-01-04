@@ -2,10 +2,8 @@ package org.roldy.gameplay.scene
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.Vector2Int
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.asset.loadAsset
@@ -21,6 +19,7 @@ import org.roldy.rendering.g2d.disposable.AutoDisposableScreenAdapter
 import org.roldy.rendering.g2d.disposable.disposable
 import org.roldy.rendering.map.Biome
 import org.roldy.rendering.map.HexagonalTiledMapCreator
+import org.roldy.rendering.map.MiniMap
 import org.roldy.rendering.map.WorldMap
 import kotlin.random.Random
 import kotlin.system.exitProcess
@@ -44,14 +43,6 @@ class DebugTiledMapScreen(
     }
 
     // Minimap components
-    private val minimapCamera = OrthographicCamera()
-    private var minimapFBO: FrameBuffer? = null
-    private val minimapBatch by disposable { SpriteBatch() }
-    private val minimapShapeRenderer by disposable { ShapeRenderer() }
-    private val minimapSize = 250f
-    private val minimapX = 20f
-    private val minimapY = 20f
-    private var mapSize = 0f
 
     override fun resize(width: Int, height: Int) {
         diagnostics.resize(width, height)
@@ -81,70 +72,19 @@ class DebugTiledMapScreen(
     var mapData = MapData(1, MapSize.Small, 256)
     var map: WorldMap? = null
     var showColor = false
-    var aspect = 1f
+    var minimap: MiniMap? = null
 
     init {
         gen(mapData)
-        mapSize = MapSize.Small.size * 256f
-        camera.position.set(mapSize / 2, mapSize / 2 - 9000, 0f)
+        camera.position.set(map!!.viewPortWidth / 2f, map!!.viewPortHeight / 2f, 0f)
         camera.update()
-
-        // Setup minimap camera to view entire map
-        minimapCamera.setToOrtho(false, mapSize, mapSize)
-        minimapCamera.position.set(mapSize / 2, mapSize / 2, 0f)
-        minimapCamera.update()
     }
 
     fun gen(mapData: MapData) {
         val noise = generateNoise(mapData)
         val tile = generateTile(mapData, noise, showColor)
         map = WorldMap(mapData, tile.first, tile.second)
-
-        // Update map size and minimap camera when regenerating
-        mapSize = mapData.size.size.toFloat()// * mapData.chunkSize.toFloat()
-        minimapCamera.setToOrtho(false, mapSize, mapSize)
-        minimapCamera.position.set(mapSize / 2, mapSize / 2, 0f)
-        minimapCamera.update()
-
-        // Pre-render the minimap once
-        preRenderMinimap()
-    }
-
-    private fun preRenderMinimap() {
-        // Dispose old FBO if exists
-        minimapFBO?.dispose()
-        val size = mapData.tileSize
-        // Create new FBO for minimap
-        val mapWidthPixels = map!!.data.size.width * size * 0.75f + size * 0.25f
-        val mapHeightPixels = map!!.data.size.height * size + size * 0.5f
-
-        // Calculate aspect ratio
-        aspect = mapWidthPixels / mapHeightPixels
-
-        val fboWidth = map!!.data.size.width * map!!.data.tileSize
-        val fboHeight = (map!!.data.size.height * map!!.data.tileSize)
-
-        minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, (4096).toInt(), (4096).toInt(), false)
-
-        // Update minimap camera viewport to match FBO size
-        minimapCamera.viewportWidth = fboWidth.toFloat()
-        minimapCamera.viewportHeight = fboHeight.toFloat() * aspect
-        minimapCamera.position.set(fboWidth / 2f, minimapCamera.viewportHeight / 2f, 0f)
-        minimapCamera.update()
-
-        minimapFBO?.begin()
-
-        // Clear minimap
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.15f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-        // Render entire map to minimap
-        map?.render(minimapCamera)
-
-        minimapFBO?.end()
-
-        // Reset main camera
-        camera.update()
+        minimap = MiniMap(map!!, camera)
     }
 
     override fun render(delta: Float) {
@@ -158,7 +98,7 @@ class DebugTiledMapScreen(
         }
 
         // Draw pre-rendered minimap
-        drawMinimap()
+        minimap?.render()
 
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             exitProcess(0)
@@ -175,85 +115,6 @@ class DebugTiledMapScreen(
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             gen(MapData(Random.nextInt().toLong(), MapSize.Small, 256))
         }
-    }
-
-    private fun drawMinimap() {
-        minimapFBO?.let { fbo ->
-            // Calculate aspect ratio of the FBO
-            val fboAspectRatio = aspect
-
-            // Calculate actual draw dimensions to fit in minimap area while preserving aspect ratio
-            val drawWidth: Float
-            val drawHeight: Float
-
-            if (fboAspectRatio < 1f) {
-                // FBO is wider - fit to width
-                drawWidth = minimapSize
-                drawHeight = minimapSize / fboAspectRatio
-            } else {
-                // FBO is taller - fit to height
-                drawHeight = minimapSize
-                drawWidth = minimapSize * fboAspectRatio
-            }
-
-            // Center the minimap in the allocated space
-//            val drawX = minimapX + (minimapSize - drawWidth) / 2f
-//            val drawY = minimapY + (minimapSize - drawHeight) / 2f
-
-            // Draw pre-rendered minimap texture
-            minimapBatch.begin()
-            minimapBatch.draw(
-                fbo.colorBufferTexture,
-                minimapX, minimapY,
-                minimapSize, minimapSize * aspect,
-                0f, 0f, 1f, 1f
-            )
-            minimapBatch.end()
-        }
-
-        // Draw dynamic elements (camera bounds and position)
-        // Set up projection for screen coordinates
-        minimapShapeRenderer.projectionMatrix.setToOrtho2D(
-            0f,
-            0f,
-            Gdx.graphics.width.toFloat(),
-            Gdx.graphics.height.toFloat()
-        )
-
-        // Calculate camera position in minimap coordinates
-        val camXNormalized = camera.position.x / mapSize
-        val camYNormalized = camera.position.y / mapSize
-        val camMinimapX = minimapX + camXNormalized * minimapSize
-        val camMinimapY = minimapY + camYNormalized * minimapSize
-
-        // Calculate viewport size in minimap
-        val viewWidthNormalized = (camera.viewportWidth * camera.zoom) / mapSize
-        val viewHeightNormalized = (camera.viewportHeight * camera.zoom) / mapSize
-        val viewMinimapWidth = viewWidthNormalized * minimapSize
-        val viewMinimapHeight = viewHeightNormalized * minimapSize
-
-        // Draw camera view bounds
-        minimapShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-        minimapShapeRenderer.color = Color.YELLOW
-        minimapShapeRenderer.rect(
-            camMinimapX - viewMinimapWidth / 2,
-            camMinimapY - viewMinimapHeight / 2,
-            viewMinimapWidth,
-            viewMinimapHeight
-        )
-        minimapShapeRenderer.end()
-
-        // Draw camera center point
-        minimapShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
-        minimapShapeRenderer.color = Color.RED
-        minimapShapeRenderer.circle(camMinimapX, camMinimapY, 3f)
-        minimapShapeRenderer.end()
-
-        // Draw border around minimap
-        minimapShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-        minimapShapeRenderer.color = Color.WHITE
-        minimapShapeRenderer.rect(minimapX, minimapY, minimapSize, minimapSize * aspect)
-        minimapShapeRenderer.end()
     }
 
     fun moveCamera(delta: Float) {
@@ -288,6 +149,5 @@ class DebugTiledMapScreen(
 
     override fun dispose() {
         super.dispose()
-        minimapFBO?.dispose()
     }
 }
