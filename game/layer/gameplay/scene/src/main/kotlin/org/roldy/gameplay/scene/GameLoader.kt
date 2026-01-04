@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.utils.Disposable
-import org.roldy.core.*
+import org.roldy.core.InputProcessorDelegate
+import org.roldy.core.TimeManager
+import org.roldy.core.Vector2Int
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.coroutines.DeltaProcessingLoop
@@ -14,6 +16,7 @@ import org.roldy.core.coroutines.onGPUThreadBlocking
 import org.roldy.core.i18n.I18N
 import org.roldy.core.i18n.Strings
 import org.roldy.core.keybind.keybinds
+import org.roldy.core.logger
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
@@ -291,8 +294,8 @@ class GameLoader {
             if (newGame && heroStateForNewGame != null) {
                 gameState.value =
                     createGameState(mapData.value, settlements.value, mines.value, heroStateForNewGame).apply {
-//                        heroStateForNewGame.setSuitableSpot(this, worldMap.value)
-                        heroStateForNewGame.coords = 0 x 0
+                        heroStateForNewGame.setSuitableSpot(this, worldMap.value)
+//                        heroStateForNewGame.coords = 0 x 0
                     }
             }
         }

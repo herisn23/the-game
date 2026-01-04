@@ -94,7 +94,7 @@ class WorldMapDebugRenderer(
 
     private fun getHexCenter(col: Int, row: Int): Vector2 {
         return worldMap.tilePosition.run {
-            resolve(col x row)//.center()
+            resolve(col x row).center()
         }
     }
 }
