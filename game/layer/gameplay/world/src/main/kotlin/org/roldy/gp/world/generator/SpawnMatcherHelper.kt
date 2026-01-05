@@ -6,7 +6,11 @@ import org.roldy.rendering.map.MapTerrainData
 
 
 fun BiomeData.SpawnData.match(mapData: MapTerrainData): Boolean =
-    matchByKey(mapData) || match(mapData.noiseData)
+    if (spawnAt != null || spawnAtGroup != null) {
+        matchByKey(mapData)
+    } else {
+        match(mapData.noiseData)
+    }
 
 
 fun BiomeData.SpawnData.matchByKey(mapData: MapTerrainData): Boolean {

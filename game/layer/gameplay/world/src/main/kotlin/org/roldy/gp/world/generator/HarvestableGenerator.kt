@@ -27,7 +27,11 @@ class HarvestableGenerator(
     val allHarvestable by lazy { HarvestableType.harvestable }
 
     override fun generate(): List<HarvestableTileData> =
-        generateHarvestableInSettlements() + generateMinesOutsideSettlements()
+        (generateHarvestableInSettlements() + generateMinesOutsideSettlements()).apply {
+            logger.debug {
+                "Generated harvestable: $size"
+            }
+        }
 
     private fun generateHarvestableInSettlements(): MutableList<HarvestableTileData> {
         val mines = mutableListOf<HarvestableTileData>()

@@ -30,10 +30,10 @@ class SettlementGenerator(
         val seed = mapData.seed
         val count = when (mapSize) {
             MapSize.Debug -> 1
-            MapSize.ExtraLarge -> 80
-            MapSize.Large -> 60
-            MapSize.Medium -> 40
-            MapSize.Small -> 20
+            MapSize.ExtraLarge -> 700
+            MapSize.Large -> 500
+            MapSize.Medium -> 300
+            MapSize.Small -> 100
         }
         val idGen = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
@@ -46,13 +46,11 @@ class SettlementGenerator(
             val x = settlementRng.nextInt(mapSize.width)
             val y = settlementRng.nextInt(mapSize.height)
             val coords = x x y
-            val tile = terrainData.getValue(coords)
-
             // Check if location is suitable
-            val isSuitable = tile.noiseData.elevation in 0.1f..0.65f &&  // Not too high/low
-                    settlements.none {
-                        hexDistance(x x y, it.coords) < mapSize.max.x / 4  // Min distance from others
-                    } && !occupied(coords)
+            val isSuitable =
+                settlements.none {
+                    hexDistance(x x y, it.coords) < maxRegionSize * 2 + 1  // Min distance from others
+                } && !occupied(coords)
 
             if (isSuitable) {
                 val random = Random(seed + coords.sum)
@@ -85,6 +83,10 @@ class SettlementGenerator(
                 )
             }
         }
-        return settlements
+        return settlements.apply {
+            logger.debug {
+                "Generated settlements: $size"
+            }
+        }
     }
 }

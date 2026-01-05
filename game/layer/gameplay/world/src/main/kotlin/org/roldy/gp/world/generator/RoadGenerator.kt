@@ -1,6 +1,7 @@
 package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
+import org.roldy.core.logger
 import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.utils.hexDistance
@@ -18,8 +19,7 @@ class RoadGenerator(
     val algorithm: Algorithm = Algorithm.K_NEAREST,
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<RoadTileData> {
-    private val staggerAxis = map.staggerAxis
-    private val staggerIndex = map.staggerIndex
+    private val logger by logger()
     val pathfinder = TilePathfinder(map, ::baseCost)
 
     /**
@@ -87,6 +87,10 @@ class RoadGenerator(
         return allRoadTiles.map { node ->
             val connections = getConnectedDirections(node.coords, allRoadTiles.map { it.coords }.toSet())
             RoadTileData(node, connectionsToBitmask(connections))
+        }.apply {
+            logger.debug {
+                "Generated roads: $size"
+            }
         }
     }
 

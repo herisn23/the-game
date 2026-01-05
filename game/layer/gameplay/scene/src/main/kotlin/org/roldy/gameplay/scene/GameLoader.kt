@@ -275,6 +275,9 @@ class GameLoader {
         addGeneratorLoader(Strings.loading_roads, roads) {
             RoadGenerator(worldMap.value, { settlements.value }, occupied = occupied()).generate()
         }
+        addGeneratorLoader(Strings.loading_mountains, mountains) {
+            MountainsGenerator(worldMap.value, biomes.value, occupied()).generate()
+        }
         addGeneratorLoader(Strings.loading_mines, mines) {
             HarvestableGenerator(
                 terrainData.value,
@@ -283,10 +286,6 @@ class GameLoader {
                 harvestableConfiguration.value,
                 occupied()
             ).generate()
-        }
-
-        addGeneratorLoader(Strings.loading_mountains, mountains) {
-            MountainsGenerator(worldMap.value, occupied()).generate()
         }
 
         // GAME STATE Loader
@@ -495,7 +494,6 @@ class GameLoader {
 
     private fun <A : Disposable> A.addDisposable() =
         parent.disposable(this)
-
 }
 
 class GameLoaderProperty<P : Any> {

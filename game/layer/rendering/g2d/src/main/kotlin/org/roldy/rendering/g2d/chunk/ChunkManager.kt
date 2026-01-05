@@ -90,7 +90,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         }
     }
 
-    internal val Chunk<D>.visibleObjects: List<Chunk.Object<D>>
+    internal val Chunk<D>.visibleObjects: Set<Chunk.Object<D>>
         get() =
             filterForVisibleObjects {
                 visibilityViewObjects.contains(it.data.position.x, it.data.position.y)

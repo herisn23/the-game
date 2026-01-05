@@ -12,14 +12,14 @@ abstract class Chunk<T: ChunkObjectData>(val coords: Vector2Int, val chunkWidth:
     )
 
     internal val objects: MutableList<Object<T>> = mutableListOf()
-    private val visibleObjects: MutableList<Object<T>> = mutableListOf()
+    private val visibleObjects: MutableSet<Object<T>> = mutableSetOf()
 
     val allObjects: List<Object<T>> get() = objects
 
-    fun filterForVisibleObjects(predicate: (Object<T>) -> Boolean): List<Object<T>> =
-        run {
-            this.visibleObjects.clear()
-            objects.filterTo(this.visibleObjects, predicate)
+    fun filterForVisibleObjects(predicate: (Object<T>) -> Boolean): Set<Object<T>> =
+        visibleObjects.apply {
+            clear()
+            addAll(objects.filter(predicate).toSet())
         }
 
     val x = coords.x * chunkWidth

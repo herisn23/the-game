@@ -27,10 +27,6 @@ class WorldMapDebugRenderer(
     private val shapeRenderer by disposable { ShapeRenderer() }
 
     private val tiledMap: TiledMap = worldMap.tiledMap
-    private val tileWidth: Int = worldMap.tileWidth
-    private val tileHeight: Int = worldMap.tileHeight
-    private val staggerAxis: String = worldMap.staggerAxis
-    private val staggerIndex: String = worldMap.staggerIndex
     fun render() {
         val visibleTiles = getVisibleTiles()
 

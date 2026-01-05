@@ -28,7 +28,7 @@ class WorldScreen(
     private val inputProcessor: InputProcessor,
     private val zoom: ((Float, Float, Float) -> Unit) -> Unit,
     private val followCamera: () -> Vector2?,
-    private val debugEnabled: Boolean = false
+    private val debugEnabled: Boolean = true
 ) : AutoDisposableScreenAdapter() {
     val batch by disposable { SpriteBatch() }
     val diagnostics by disposable { Diagnostics() }

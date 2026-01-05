@@ -1,5 +1,7 @@
 package org.roldy.rendering.g2d.chunk
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
@@ -66,6 +68,11 @@ class ChunkRenderer<D : ChunkObjectData, T : Chunk<D>>(
                     }
                 }
             }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+            println(chunkManager.visibleChunks.joinToString("\n") {
+                "${it}"
+            })
         }
     }
 }

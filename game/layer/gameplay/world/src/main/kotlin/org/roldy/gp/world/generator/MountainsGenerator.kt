@@ -1,124 +1,148 @@
 package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
+import org.roldy.core.logger
 import org.roldy.data.configuration.biome.BiomeData
-import org.roldy.data.configuration.match
+import org.roldy.data.map.MapSize
 import org.roldy.data.tile.MountainTileData
+import org.roldy.rendering.map.Biome
 import org.roldy.rendering.map.MapTerrainData
 import org.roldy.rendering.map.WorldMap
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
 import kotlin.random.Random
 
 class MountainsGenerator(
     val map: WorldMap,
+    val biomes: List<Biome>,
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<MountainTileData> {
-
-    private val placedMountains = mutableListOf<Vector2Int>()
+    private val logger by logger()
+    private val placedMountains = mutableSetOf<Vector2Int>()
 
     override fun generate(): List<MountainTileData> {
-        placedMountains.clear()
 
-        return map.terrainData.toList().withIndex().mapNotNull { (index, mapData) ->
-            val (coords, data) = mapData
-            val mountain = findMountain(index, coords, data)
-            mountain?.let {
+        val path = generateMountainSnakes()
+
+        return path.mapNotNull { (coords, spawnData) ->
+            if (!occupied(coords)) {
                 placedMountains.add(coords)
-                MountainTileData(coords, it)
+                MountainTileData(coords, spawnData)
+            } else null
+        }.apply {
+            logger.debug {
+                "Generated mountains: $size"
             }
         }
     }
 
-    fun findMountain(index: Int, coords: Vector2Int, terrainData: MapTerrainData): BiomeData.SpawnData? {
-        val random = Random(index + coords.sum + map.data.seed)
-        if (occupied(coords)) return null
-        return terrainData
-            .mountainData()
-            .filter { mountainData ->
-                mountainData.match(terrainData) &&
-                        !isTooCloseToOtherMountains(coords, mountainData.minRadius) &&
-                        // Optional: Add some randomness to make it less dense
-                        random.nextFloat() < mountainData.spawnChance // e.g., 0.3 = 30% chance
-            }.randomOrNull(random)
-    }
-
-    private fun isTooCloseToOtherMountains(coords: Vector2Int, minRadius: Int): Boolean {
-        return placedMountains.any { existingMountain ->
-            coords.distanceTo(existingMountain) < minRadius
+    private fun generateMountainSnakes(): List<Pair<Vector2Int, BiomeData.SpawnData>> {
+        val result = mutableListOf<Pair<Vector2Int, BiomeData.SpawnData>>()
+        val mountains = biomes.flatMap { it.data.mountains }
+        val mapIndex = when (map.data.size) {
+            MapSize.Debug -> 0
+            MapSize.ExtraLarge -> 4
+            MapSize.Large -> 3
+            MapSize.Medium -> 2
+            MapSize.Small -> 1
         }
-    }
+        repeat(1000 * mapIndex) { index ->
 
-    fun MapTerrainData.mountainData() = terrain.biome.data.mountains
+            val noodleRandom = Random(map.data.seed + index * 1000)
+            val startCoords = map.terrainData.keys.random(noodleRandom)
+            val startTerrain = map.terrainData[startCoords] ?: return@repeat
 
-    private fun Vector2Int.distanceTo(other: Vector2Int): Float {
-        val dx = (x - other.x).toFloat()
-        val dy = (y - other.y).toFloat()
-        return kotlin.math.sqrt(dx * dx + dy * dy)
-    }
-}
+            // Get mountain data for this biome
+            val mountainTypes = startTerrain.mountainData()
+            if (mountainTypes.isEmpty()) return@repeat
 
-// OPTIMIZED VERSION: Uses spatial grid for faster distance checks (for large maps)
-class MountainsGeneratorOptimized(
-    val map: WorldMap,
-    override val occupied: (Vector2Int) -> Boolean
-) : WorldGenerator<MountainTileData> {
+            // Generate the noodle path
+            val noodlePath = generateSnakePath(
+                start = startCoords,
+                random = noodleRandom,
+                length = noodleRandom.nextInt(20, 60),
+                width = noodleRandom.nextInt(1, 2)
+            )
 
-    // Grid-based spatial partitioning for O(1) neighbor checks
-    private val mountainGrid = mutableMapOf<Pair<Int, Int>, MutableList<Vector2Int>>()
-    private val cellSize = 10 // Adjust based on typical minRadius
-
-    override fun generate(): List<MountainTileData> {
-        mountainGrid.clear()
-
-        return map.terrainData.mapNotNull { (coords, data) ->
-            val mountain = findMountain(coords, data)
-            mountain?.let {
-                addToGrid(coords)
-                MountainTileData(coords, it)
-            }
-        }
-    }
-
-    fun findMountain(coords: Vector2Int, terrainData: MapTerrainData): BiomeData.SpawnData? {
-        return terrainData
-            .mountainData()
-            .filter { mountainData ->
-                mountainData.match(terrainData.noiseData) &&
-                        !isTooCloseToOtherMountains(coords, mountainData.minRadius)
-            }.randomOrNull()
-    }
-
-    private fun addToGrid(coords: Vector2Int) {
-        val cell = getCellKey(coords)
-        mountainGrid.getOrPut(cell) { mutableListOf() }.add(coords)
-    }
-
-    private fun getCellKey(coords: Vector2Int): Pair<Int, Int> {
-        return Pair(coords.x / cellSize, coords.y / cellSize)
-    }
-
-    // Only check nearby grid cells instead of all mountains
-    private fun isTooCloseToOtherMountains(coords: Vector2Int, minRadius: Int): Boolean {
-        val cellRadius = (minRadius / cellSize) + 1
-        val cell = getCellKey(coords)
-
-        for (dx in -cellRadius..cellRadius) {
-            for (dy in -cellRadius..cellRadius) {
-                val checkCell = Pair(cell.first + dx, cell.second + dy)
-                mountainGrid[checkCell]?.forEach { existingMountain ->
-                    if (coords.distanceTo(existingMountain) < minRadius) {
-                        return true
+            // Place mountains along the path
+            noodlePath.forEach { coords ->
+                map.terrainData
+                    .getValue(coords)
+                    .let { terrainData ->
+                        terrainData.mountainData()
+                            .filter { it.match(terrainData) }
+                            .randomOrNull(noodleRandom)
+                            ?.let { mountainData ->
+                                if (noodleRandom.nextFloat() < mountainData.spawnChance) {
+                                    result.add(coords to mountainData)
+                                }
+                            }
                     }
+            }
+        }
+
+        return result
+    }
+
+    private fun generateSnakePath(
+        start: Vector2Int,
+        random: Random,
+        length: Int,
+        width: Int
+    ): List<Vector2Int> {
+        val path = mutableListOf<Vector2Int>()
+        var current = start
+        var direction = random.nextFloat() * 2 * PI.toFloat()
+
+        repeat(length) {
+            // Add current position and width variations
+            path.add(current)
+
+            // Add width to create thicker noodles
+            if (width > 1) {
+                for (w in 1 until width) {
+                    val perpDir = direction + PI.toFloat() / 2
+                    val offset1 = Vector2Int(
+                        current.x + (cos(perpDir) * w).roundToInt(),
+                        current.y + (sin(perpDir) * w).roundToInt()
+                    )
+                    val offset2 = Vector2Int(
+                        current.x - (cos(perpDir) * w).roundToInt(),
+                        current.y - (sin(perpDir) * w).roundToInt()
+                    )
+                    if (map.terrainData.containsKey(offset1)) path.add(offset1)
+                    if (map.terrainData.containsKey(offset2)) path.add(offset2)
                 }
             }
+
+            // Meander: slight random direction change
+            direction += random.nextFloat() * 0.6f - 0.3f // ±0.3 radians (~17 degrees)
+
+            // Step size variation for more organic feel
+            val stepSize = if (random.nextFloat() < 0.3f) 2 else 1
+
+            // Move to next position
+            val next = Vector2Int(
+                current.x + (cos(direction) * stepSize).roundToInt(),
+                current.y + (sin(direction) * stepSize).roundToInt()
+            )
+
+            // Check if next position is valid
+            if (!map.terrainData.containsKey(next)) {
+                // Try to find a nearby valid position
+                direction += random.nextFloat() * PI.toFloat() - PI.toFloat() / 2
+
+            } else {
+                current = next
+            }
+
+
         }
-        return false
+
+        return path.distinct()
     }
 
     fun MapTerrainData.mountainData() = terrain.biome.data.mountains
-
-    private fun Vector2Int.distanceTo(other: Vector2Int): Float {
-        val dx = (x - other.x).toFloat()
-        val dy = (y - other.y).toFloat()
-        return kotlin.math.sqrt(dx * dx + dy * dy)
-    }
 }

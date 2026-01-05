@@ -29,7 +29,7 @@ class PlayerManager(
             current.teleport(0 x 0)
         }
         gui.teleportToEnd.onClick {
-            current.teleport(screen.map.width /2  x screen.map.height /2)
+            current.teleport(screen.map.width - 1 x screen.map.height - 1)
         }
     }
 

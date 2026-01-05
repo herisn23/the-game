@@ -98,9 +98,9 @@ biomes:
   - type: Volcanic
     color: ed2e1d
     walkCost: 0.68
-    temperature: '0.716..0.896'
-    moisture: '0.413..0.6466'
-    elevation: '0.62154..0.9657'
+    temperature: '0.73416..0.896'
+    moisture: '0.45413..0.6466'
+    elevation: '0.762154..0.9657'
     mountains:
       # Active volcanoes spawn at lava fields
       - name: hexVolcanoActive00
@@ -114,20 +114,24 @@ biomes:
       # Dormant volcanoes - FIXED: relaxed temperature
       - name: hexVolcanoDormant00
         temperature: '<0.80'   # Changed from <0.74
-        elevation: '>0.9'
-        spawnChance: 0.3
+        elevation: '>0.95'
+      #        spawnChance: 0.1458372
+      #        minRadius: 2
       - name: hexVolcanoDormant01
         temperature: '<0.80'   # Changed from <0.74
-        elevation: '>0.8'
-        spawnChance: 0.2
+        elevation: '>0.93'
+      #        spawnChance: 0.123735
+      #        minRadius: 1
       - name: hexVolcanoDormant02
         temperature: '<0.80'   # Changed from <0.74
-        elevation: '>0.7'
-        spawnChance: 0.6
+        elevation: '>0.91'
+      #        spawnChance: 0.142835
+      #        minRadius: 1
       - name: hexVolcanoDormant03
         temperature: '<0.80'   # Changed from <0.74
-        elevation: '>0.6'
-        spawnChance: 0.45
+        elevation: '>0.89'
+    #        spawnChance: 0.12653
+    #        minRadius: 1
     terrains:
       # Lava lakes - FIXED: relaxed conditions
       - name: hexLavaSea00
@@ -275,19 +279,24 @@ biomes:
     mountains:
       - name: hexDesertRedMesaLarge00
         elevation: '>0.90'
-        spawnChance: 0.4
+      #        spawnChance: 0.4
+      #        minRadius: 2
       - name: hexDesertRedMountains00
         elevation: '>0.87'
-        spawnChance: 0.55
+      #        spawnChance: 0.55
+      #        minRadius: 2
       - name: hexDesertRedMountains01
         elevation: '>0.84'
-        spawnChance: 0.6
+      #        spawnChance: 0.6
+      #        minRadius: 2
       - name: hexDesertRedMountains02
         elevation: '>0.81'
-        spawnChance: 0.35
+      #        spawnChance: 0.35
+      #        minRadius: 2
       - name: hexDesertRedMountains03
         elevation: '>0.78'
-        spawnChance: 0.45
+    #        spawnChance: 0.45
+    #        minRadius: 2
     terrains:
       # Dirt (drier savanna)
       - name: hexDesertRedDirt00
