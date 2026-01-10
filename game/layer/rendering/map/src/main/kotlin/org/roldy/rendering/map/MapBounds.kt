@@ -1,16 +1,14 @@
 package org.roldy.rendering.map
 
-import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import kotlin.math.floor
 
-class MapBounds(private val tiledMap: TiledMap) {
-    private val layer = tiledMap.layers[1] as TiledMapTileLayer
-    private val hexSideLength = tiledMap.properties.get("hexsidelength", Int::class.java).toFloat()
-    private val staggerIndex = tiledMap.properties.get("staggerindex", String::class.java)
+class MapBounds(private val map: WorldMap) {
+    private val layer = map.layer
+    private val hexSideLength = map.tiledMap.properties.get("hexsidelength", Int::class.java).toFloat()
+    private val staggerIndex = map.tiledMap.properties.get("staggerindex", String::class.java)
 
     private val tileWidth = layer.tileWidth.toFloat()
     private val tileHeight = layer.tileHeight.toFloat()

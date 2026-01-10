@@ -25,7 +25,7 @@ class HarvestablePopulator(
     val craftingIcons = CraftingIconTextures(craftingIconsAtlas)
     val mapAtlas = MapAtlas(decorationAtlas, tilesAtlas)
     val pool = SpritePool()
-    val compositor = SpriteCompositor(pool, mapAtlas, map.data.tileSize.toFloat())
+    val compositor = SpriteCompositor(pool, mapAtlas, map.tileWidth.toFloat())
     override fun populate(
         chunk: WorldMapChunk,
         existingObjects: List<TileObject.Data>
@@ -37,7 +37,7 @@ class HarvestablePopulator(
         return harvestableInChunk.map { harvestable ->
             val position = worldPosition(harvestable.coords)
             val biome = data.getValue(harvestable.coords).terrain.biome.data.type
-            val tileSize = map.data.tileSize.toFloat()
+            val tileSize = map.tileWidth.toFloat()
             HarvestableTileBehaviour.Data(
                 position = position,
                 coords = harvestable.coords,

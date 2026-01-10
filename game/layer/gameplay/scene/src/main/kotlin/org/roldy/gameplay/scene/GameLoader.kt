@@ -48,6 +48,7 @@ import org.roldy.rendering.screen.world.populator.WorldMapPopulator
 import org.roldy.rendering.screen.world.populator.environment.*
 import org.roldy.state.GameSaveManager
 import java.io.File
+import kotlin.math.round
 import kotlin.reflect.KProperty
 import kotlin.system.measureTimeMillis
 
@@ -170,7 +171,6 @@ class GameLoader {
     val minimap = GameLoaderProperty<MiniMap>()
 
     // ATLASES
-    val underTileAtlas = GameLoaderProperty<TextureAtlas>()
     val tilesAtlas = GameLoaderProperty<TextureAtlas>()
     val decorsAtlas = GameLoaderProperty<TextureAtlas>()
     val roadsAtlas = GameLoaderProperty<TextureAtlas>()
@@ -213,9 +213,6 @@ class GameLoader {
         }
 
         // Loading atlasses
-        addLoader(Strings.loading_textures, underTileAtlas) {
-            AtlasLoader.underTile
-        }
         addLoader(Strings.loading_textures, tilesAtlas) {
             AtlasLoader.tiles
         }
@@ -255,12 +252,25 @@ class GameLoader {
                 noise.value,
                 tilesAtlas.value,
                 biomes.value,
-                underTileAtlas.value,
                 biomeColors.value,
                 debugMode
             ).create().also { (map, terrainData) ->
                 this.tiledMap.value = map
                 this.terrainData.value = terrainData
+            }.also {
+                val total = this.terrainData.value.values.size
+                val biomes = this.terrainData.value.values.groupBy { it.terrain.biome.data.type }
+                val biomesDist = biomes.map { (key, vals) ->
+                    val proportion = round((vals.size.toFloat() / total.toFloat()) * 100)
+                    "$key: ${proportion}% (${vals.size})"
+                }
+                logger.debug {
+                    """
+                        
+                        Biomes distribution:
+                            ${biomesDist.joinToString("\n")}
+                    """.trimIndent()
+                }
             }
         }
 

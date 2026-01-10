@@ -8,14 +8,14 @@ import kotlin.math.abs
 
 class ProceduralMapGenerator(
     val mapData: MapData,
-    //elevaton settings
+    //elevation settings
     val elevationOctaves: Int = 8,
     val elevationLatitude: Float = .3f,
     val elevationFrequency: Float = 0.0008f,   // Lower = smoother elevation changes, default:0.001f
 
     //temperature settings
     val temperatureOctaves: Int = 4,
-    val temperatureLatitude: Float = 0.80f,
+    val temperatureLatitude: Float = 0.95f,
     val temperatureFrequency: Float = 0.05f,    // Lower = larger temperature zones, default:0.05f
 
     //moisture settings

@@ -1,0 +1,410 @@
+biomes:
+  - type: Water
+    elevation: '<0.12'
+    color: 0b4f9c
+    walkCost: -1
+    terrains:
+      # Cold water
+      - name: hexOceanIceBergs00
+        elevation: '<0.04'
+        temperature: '<0.05'
+      - name: hexOceanIceBergs01
+        elevation: '<0.07'
+        temperature: '<0.06'
+      - name: hexOceanIceBergs02
+        elevation: '<0.1'
+        temperature: '<0.07'
+      - name: hexOceanIceBergs03
+        temperature: '<0.08'
+      # Regular water
+      - name: hexOcean00
+        elevation: '<0.04'
+      - name: hexOcean01
+        elevation: '<0.07'
+      - name: hexOcean02
+        elevation: '<0.1'
+      - name: hexOcean03
+  - type: ExtremeCold
+    color: 3dc5c5
+    walkCost: 0.25
+    temperature: '<0.239827'
+    moisture: '0.19836..0.78265'
+    elevation: '0.57..0.9376'
+    mountains:
+      - name: hexMountainSnow00
+        elevation: '>0.90'
+      - name: hexMountainSnow01
+        elevation: '>0.87'
+      - name: hexMountainSnow02
+        elevation: '>0.84'
+      - name: hexMountainSnow03
+        elevation: '>0.80'
+    terrains:
+      - name: hexSnowField00
+        temperature: '>0.2'
+      - name: hexSnowField01
+        temperature: '>0.16'
+      - name: hexSnowField02
+        temperature: '>0.1'
+      - name: hexSnowField03
+  - type: Cold
+    color: a9c5c5
+    walkCost: 0.5
+    temperature: '<0.412616'
+    moisture: '0.5101..0.874'
+    elevation: '0.2218..1'
+    mountains:
+      - name: hexHillsColdSnowCovered00
+        elevation: '>0.95'
+      - name: hexHillsColdSnowCovered01
+        elevation: '>0.92'
+      - name: hexHillsColdSnowCovered02
+        elevation: '>0.89'
+      - name: hexHillsColdSnowCovered03
+        elevation: '>0.87'
+      - name: hexHillsCold00
+        elevation: '>0.85'
+      - name: hexHillsCold01
+        elevation: '>0.83'
+      - name: hexHillsCold02
+        elevation: '>0.81'
+      - name: hexHillsCold03
+        elevation: '>0.78'
+    terrains:
+      # Snow-covered plains (very cold + dry)
+      - name: hexPlainsColdSnowCovered00
+        temperature: '>0.38'
+        elevation: '>0.417'
+      - name: hexPlainsColdSnowCovered01
+        temperature: '>0.21'
+        elevation: '>0.38727'
+      - name: hexPlainsColdSnowCovered02
+        temperature: '>0.14'
+        elevation: '>0.35387'
+      - name: hexPlainsColdSnowCovered03
+        elevation: '>0.33167'
+      - name: hexPlainsColdSnowTransition00
+        temperature: '0.190135..0.395924'
+        elevation: '0.289..0.38167'
+        moisture: '0.55..0.67'
+      # Regular cold plains (cold + wetter) - FIXED: relaxed moisture requirements
+      - name: hexPlainsCold00
+        temperature: '>0.27'
+      - name: hexPlainsCold01
+        temperature: '>0.22'
+      - name: hexPlainsCold02
+        temperature: '>0.14'
+      - name: hexPlainsCold03
+  - type: Volcanic
+    color: ed2e1d
+    walkCost: 0.68
+    temperature: '0.73416..0.896'
+    moisture: '0.45413..0.6466'
+    elevation: '0.762154..0.9657'
+    mountains:
+      # Active volcanoes spawn at lava fields
+      - name: hexVolcanoActive00
+        spawnAtGroup: lava
+        minRadius: 5
+        spawnChance: 0.05
+      - name: hexVolcanoActive01
+        spawnAtGroup: lava
+        minRadius: 4
+        spawnChance: 0.05
+      # Dormant volcanoes - FIXED: relaxed temperature
+      - name: hexVolcanoDormant00
+        temperature: '<0.80'   # Changed from <0.74
+        elevation: '>0.95'
+      #        spawnChance: 0.1458372
+      #        minRadius: 2
+      - name: hexVolcanoDormant01
+        temperature: '<0.80'   # Changed from <0.74
+        elevation: '>0.93'
+      #        spawnChance: 0.123735
+      #        minRadius: 1
+      - name: hexVolcanoDormant02
+        temperature: '<0.80'   # Changed from <0.74
+        elevation: '>0.91'
+      #        spawnChance: 0.142835
+      #        minRadius: 1
+      - name: hexVolcanoDormant03
+        temperature: '<0.80'   # Changed from <0.74
+        elevation: '>0.89'
+    #        spawnChance: 0.12653
+    #        minRadius: 1
+    terrains:
+      # Lava lakes - FIXED: relaxed conditions
+      - name: hexLavaSea00
+        key: lava1
+        groupKey: lava
+        walkCost: -1
+        temperature: '>0.85239'
+        moisture: '0.49743..0.5901466'
+        elevation: '0.8319..0.880157'
+      - name: hexLavaSea01
+        key: lava2
+        groupKey: lava
+        walkCost: -1
+        temperature: '>0.8105239'
+        moisture: '0.49743..0.5901466'
+        elevation: '0.8319..0.880157'
+      - name: hexLavaSea02
+        key: lava2
+        groupKey: lava
+        walkCost: -1
+        temperature: '>0.775239'
+        moisture: '0.49743..0.5901466'
+        elevation: '0.8319..0.880157'
+      - name: hexLavaSea03
+        key: lava3
+        groupKey: lava
+        walkCost: -1
+        temperature: '>0.75239'
+        moisture: '0.49743..0.5901466'
+        elevation: '0.8319..0.880157'
+      # Hardened lava fields - FIXED: relaxed conditions
+      - name: hexLavaField00
+        temperature: '>0.8241'
+        moisture: '0.443..0.61466'
+        elevation: '0.79..0.8957'
+      - name: hexLavaField01
+        temperature: '>0.7829'
+        moisture: '0.443..0.61466'
+        elevation: '0.79..0.8957'
+      - name: hexLavaField02
+        temperature: '>0.7578'
+        moisture: '0.443..0.61466'
+        elevation: '0.79..0.8957'
+      - name: hexLavaField03
+        temperature: '>0.7239'
+        moisture: '0.443..0.61466'
+        elevation: '0.79..0.9157'
+      # Ash plains
+      - name: hexAshPlains00
+        temperature: '>0.8596'
+      - name: hexAshPlains01
+        temperature: '>0.789'
+      - name: hexAshPlains02
+        temperature: '>0.756'
+      - name: hexAshPlains03
+  - type: DeepDesert
+    color: ed9a21
+    walkCost: 0.35
+    temperature: '>0.7981'
+    moisture: '0.1223..0.3961'
+    elevation: '0.1..0.97'
+    mountains:
+      - name: hexDesertYellowMesaLarge00
+        elevation: '>0.9512'
+      - name: hexDesertYellowMesaLarge01
+        elevation: '>0.9123'
+      - name: hexDesertYellowMesas00
+        elevation: '>0.88129'
+      - name: hexDesertYellowMesas01
+        elevation: '>0.85814'
+      - name: hexDesertYellowMesas02
+        elevation: '>0.82249'
+      - name: hexDesertYellowMesas03
+        elevation: '>0.80124'
+    terrains:
+      - name: hexDesertYellowDirtDunes00
+        moisture: '0.21223..0.30961'
+        elevation: '>0.8'
+        temperature: '>0.97981'
+      - name: hexDesertYellowDirtDunes01
+        moisture: '0.18223..0.34961'
+        elevation: '>0.72645'
+        temperature: '>0.947981'
+      - name: hexDesertYellowDirtDunes02
+        moisture: '0.15223..0.37961'
+        elevation: '>0.63645'
+        temperature: '>0.917981'
+      - name: hexDesertYellowDirtDunes03
+        moisture: '0.1223..0.3961'
+        elevation: '>0.58645'
+        temperature: '>0.87'
+      - name: hexDesertDunes00
+        elevation: '>0.8'
+      - name: hexDesertDunes01
+        elevation: '>0.5'
+      - name: hexDesertDunes02
+        elevation: '>0.2'
+      - name: hexDesertDunes03
+  - type: Desert
+    color: ebdb2b
+    walkCost: 0.5
+    temperature: '>0.4831837'
+    moisture: '0.1823..0.391231'
+    elevation: '0..1'
+    mountains:
+      - name: hexDesertYellowMesaLarge00
+        elevation: '>0.90'
+      - name: hexDesertYellowMesaLarge01
+        elevation: '>0.87'
+      - name: hexDesertYellowMesaLargeOasis00
+        elevation: '>0.84'
+        spawnChance: 0.8
+        minRadius: 10
+      - name: hexDesertYellowMesaLargeOasis01
+        elevation: '>0.80'
+        spawnChance: 0.8
+        minRadius: 10
+    terrains:
+      - name: hexDesertYellowBase00
+        temperature: '>0.9383187'
+        moisture: '0.311823..0.3691231'
+      - name: hexDesertYellowBase01
+        temperature: '>0.8831837'
+        moisture: '0.291823..0.3791231'
+      - name: hexDesertYellowBase02
+        temperature: '>0.7831837'
+        moisture: '0.2721823..0.3891231'
+      - name: hexDesertYellowBase03
+        temperature: '>0.6831837'
+        moisture: '0.251823..0.391231'
+      # Very dry dirt - FIXED: relaxed moisture requirements
+      - name: hexDesertYellowDirt00
+        elevation: '>0.90'
+      - name: hexDesertYellowDirt01
+        elevation: '>0.6'
+      - name: hexDesertYellowDirt02
+        elevation: '>0.3'
+      - name: hexDesertYellowDirt03
+  - type: Savanna
+    color: 8a4807
+    walkCost: 0.9
+    temperature: '>0.448192'
+    moisture: '0.1012..0.53993'
+    elevation: '0..1'
+    mountains:
+      - name: hexDesertRedMesaLarge00
+        elevation: '>0.90'
+      #        spawnChance: 0.4
+      #        minRadius: 2
+      - name: hexDesertRedMountains00
+        elevation: '>0.87'
+      #        spawnChance: 0.55
+      #        minRadius: 2
+      - name: hexDesertRedMountains01
+        elevation: '>0.84'
+      #        spawnChance: 0.6
+      #        minRadius: 2
+      - name: hexDesertRedMountains02
+        elevation: '>0.81'
+      #        spawnChance: 0.35
+      #        minRadius: 2
+      - name: hexDesertRedMountains03
+        elevation: '>0.78'
+    #        spawnChance: 0.45
+    #        minRadius: 2
+    terrains:
+      # Dirt (drier savanna)
+      - name: hexDesertRedDirt00
+        moisture: '0.1012..0.2513'
+      - name: hexDesertRedDirt01
+        moisture: '0.1012..0.3156'
+      - name: hexDesertRedDirt02
+        moisture: '0.1012..0.355'
+      - name: hexDesertRedDirt03
+        moisture: '0.1012..0.421231'
+      # Base (mid moisture)
+      - name: hexDesertRedBase00
+        moisture: '<0.439'
+      - name: hexDesertRedBase01
+        moisture: '<0.441'
+      - name: hexDesertRedBase02
+        moisture: '<0.456'
+      - name: hexDesertRedBase03
+        moisture: '<0.486'
+      # Grass (wetter savanna) - FIXED: adjusted ranges
+      - name: hexDesertRedGrass00
+        elevation: '>0.75'
+      - name: hexDesertRedGrass01
+        elevation: '>0.5'
+      - name: hexDesertRedGrass02
+        elevation: '>0.25'
+      - name: hexDesertRedGrass03
+  - type: Jungle
+    color: 197a33
+    walkCost: 0.9
+    temperature: '>0.3236113'
+    moisture: '0.621..0.78312'
+    elevation: '0..1'
+    terrains:
+      - name: hexGrassySand00
+        temperature: '0.60..0.63'
+        moisture: '0.7121..0.7468312'
+      - name: hexGrassySand00
+        temperature: '0.58..0.64'
+        moisture: '0.69621..0.7368312'
+      - name: hexGrassySand00
+        temperature: '0.56..0.67'
+        moisture: '0.69621..0.7468312'
+      - name: hexGrassySand00
+        temperature: '0.51..0.71'
+        moisture: '0.6821..0.758312'
+      - name: hexJungle00
+        temperature: '<0.51'
+        elevation: '>0.3'
+        moisture: '0.65..0.66821'
+      - name: hexTropicalPlains00
+        elevation: '>0.75'
+      - name: hexTropicalPlains01
+        elevation: '>0.50'
+      - name: hexTropicalPlains02
+        elevation: '>25'
+      - name: hexTropicalPlains03
+  - type: Swamp
+    color: 4dcc8b
+    walkCost: 0.7
+    temperature: '>0.36113'
+    moisture: '0.4993..1'
+    elevation: '0.23..0.812'
+    terrains:
+      # Bogs (warmer swamps)
+      - name: hexBog00
+        temperature: '0.7424..0.87986'
+      - name: hexBog01
+        temperature: '0.7024..0.92586'
+      - name: hexBog02
+        temperature: '0.6978..0.986'
+      - name: hexBog03
+        temperature: '0.6578..1'
+      # Wetlands (colder swamps) - FIXED: relaxed temperature
+      - name: hexWetlands00
+        moisture: '>0.87'
+      - name: hexWetlands01
+        moisture: '>0.68'
+      - name: hexWetlands02
+        moisture: '>0.57'
+      - name: hexWetlands03
+  - type: Forest
+    color: 2de442
+    walkCost: 1
+    temperature: '0..1'
+    moisture: '0..1'
+    elevation: '0..1'
+    terrains:
+      - name: hexScrublands00
+        moisture: '0.4867..0.65965'
+        temperature: '0.2..0.8'
+        elevation: '0.3..0.6'
+      - name: hexScrublands01
+        moisture: '0.457..0.6965'
+        temperature: '0.2..0.8'
+        elevation: '0.3..0.6'
+      - name: hexScrublands02
+        moisture: '0.4267..0.7365'
+        temperature: '0.2..0.8'
+        elevation: '0.3..0.6'
+      - name: hexScrublands03
+        moisture: '0.367..0.765'
+        temperature: '0.2..0.8'
+        elevation: '0.3..0.6'
+      - name: hexPlains00
+        elevation: '0..75'
+      - name: hexPlains01
+        elevation: '0..5'
+      - name: hexPlains02
+        elevation: '0..25'
+      - name: hexPlains03

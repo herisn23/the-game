@@ -15,17 +15,17 @@ class WorldMapChunkManager(
     override val minCoords: Int = 0
     override val maxCoords: Int = map.data.size.chunks - 1
 
-    val hexRowHeight = map.data.tileSize * map.data.size.yCorrection
+    val hexRowHeight = map.tileHeight * map.data.size.yCorrection
 
 
     override val chunkWidth: Float by lazy {
-        (((map.data.size.width * map.data.tileSize) / map.data.size.chunks)).toFloat()
+        (((map.data.size.width * map.tileWidth) / map.data.size.chunks)).toFloat()
     }
 
     override val chunkHeight: Float by lazy {
         (((map.data.size.height * hexRowHeight) / map.data.size.chunks))
     }
-    val tilesX = (chunkWidth / map.data.tileSize)
+    val tilesX = (chunkWidth / map.tileHeight)
     val tilesY = (chunkHeight / hexRowHeight)
 
     override fun getChunk(coords: Vector2Int): WorldMapChunk =

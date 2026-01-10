@@ -26,7 +26,7 @@ class PlayerManager(
             gui.inventory.open(current.squad.leader, Inventory.size(current.squad.leader))
         }
         gui.teleportToStart.onClick {
-            current.teleport(0 x 0)
+            current.teleport(screen.map.terrainData.keys.random())
         }
         gui.teleportToEnd.onClick {
             current.teleport(screen.map.width - 1 x screen.map.height - 1)

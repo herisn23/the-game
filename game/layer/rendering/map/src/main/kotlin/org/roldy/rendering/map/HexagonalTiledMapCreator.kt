@@ -8,12 +8,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import org.roldy.core.Vector2Int
 import org.roldy.core.utils.get
-import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.tile.TileData
+
+const val tileSize = 256
 
 data class MapTerrainData(
     val terrain: Terrain,
@@ -28,7 +29,6 @@ class HexagonalTiledMapCreator(
     val noiseData: Map<Vector2Int, NoiseData>,
     val tilesAtlas: TextureAtlas,
     val biomes: List<Biome>,
-    val underTileAtlas: TextureAtlas,
     val colorTextures: Map<BiomeType, Texture>,
     val generateColorsLayer: Boolean = false
 ) {
@@ -43,9 +43,7 @@ class HexagonalTiledMapCreator(
         val tiledMap = TiledMap()
         // Generate base terrain layer
         val baseLayer = generateBaseLayer(biomes)
-        val underLayer = generateUnderLayer()
 
-        tiledMap.layers.add(underLayer)
         tiledMap.layers.add(baseLayer)
 
         if (generateColorsLayer)
@@ -54,51 +52,8 @@ class HexagonalTiledMapCreator(
         return tiledMap to terrainCache
     }
 
-    private fun generateUnderLayer(): TiledMapTileLayer {
-        val layer = TiledMapTileLayer(data.size.width, data.size.height, data.tileSize, data.tileSize)
-        fun generateFor(size: Int, shouldApply: (Vector2Int) -> Boolean = { true }, vector: (Int) -> Vector2Int) {
-            repeat(size) { index ->
-                val vector = vector(index)
-                if (shouldApply(vector)) {
-                    val cell = TiledMapTileLayer.Cell().apply {
-                        val terrainData = terrainCache[vector]
-                        tile = StaticTiledMapTile(resolveUnderTileTexture(terrainData))
-                        tile.offsetY = data.tileSize / -2f
-                    }
-                    layer.setCell(vector.x, vector.y, cell)
-                }
-            }
-        }
-
-        // first row
-        generateFor(data.size.width) {
-            it x 0
-        }
-
-        // left column
-        generateFor(data.size.height, { it.y % 2 == 0 }) {
-            0 x it
-        }
-
-        // right column
-        generateFor(data.size.height, { it.y % 2 != 0 }) {
-            data.size.width - 1 x it
-        }
-
-        return layer
-    }
-
-    val dirtRegions = listOf("hexUndercliff00", "hexUndercliff01")
-    fun resolveUnderTileTexture(mapTerrainData: MapTerrainData?): TextureRegion {
-        val isWater = mapTerrainData?.terrain?.biome?.data?.type == BiomeType.Water
-        return when {
-            isWater -> underTileAtlas.findRegion("HexUnderWater")
-            else -> underTileAtlas.findRegion(dirtRegions.random())
-        }
-    }
-
     private fun generateBiomeLayer(): TiledMapTileLayer {
-        val layer = TiledMapTileLayer(data.size.width, data.size.height, data.tileSize, data.tileSize)
+        val layer = TiledMapTileLayer(data.size.width, data.size.height, tileSize, tileSize)
         terrainCache.forEach { (coords, terrain) ->
             val cell = TiledMapTileLayer.Cell().apply {
                 tile = StaticTiledMapTile(TextureRegion(colorTextures[terrain.terrain.biome.data.type]))
@@ -113,7 +68,7 @@ class HexagonalTiledMapCreator(
      * Generates the base terrain layer without transitions
      */
     private fun generateBaseLayer(biomes: List<Biome>): TiledMapTileLayer {
-        val layer = TiledMapTileLayer(data.size.width, data.size.height, data.tileSize, data.tileSize)
+        val layer = TiledMapTileLayer(data.size.width, data.size.height, tileSize, tileSize)
         noiseData.forEach { (coords, noiseData) ->
             val terrain = findTerrainForNoise(biomes, noiseData)
 

@@ -10,9 +10,8 @@ fun loadAsset(name: String): FileHandle =
 
 object AtlasLoader {
     val tileDecorations get() = load("tiles/Decors.atlas")
-    val tiles get() = load("tiles/Tiles.atlas")
-    val underTile get() = load("tiles/UnderHex.atlas")
-    val roads get() = load("tiles/Roads.atlas")
+    val tiles get() = load("tiles2/Tiles.atlas")
+    val roads get() = load("tiles2/Roads.atlas")
     val gui get() = load("ui/GUI.atlas")
     val craftingIcons get() = load("ui/CraftingResourceIcons.atlas")
 

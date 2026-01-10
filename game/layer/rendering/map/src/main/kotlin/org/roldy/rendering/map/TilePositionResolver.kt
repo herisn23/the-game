@@ -1,6 +1,5 @@
 package org.roldy.rendering.map
 
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.Vector2Int
@@ -11,7 +10,7 @@ class TilePositionResolver(
     val worldMap: WorldMap
 ) {
     val logger by logger()
-    val layer = worldMap.tiledMap.layers[1] as TiledMapTileLayer
+    val layer = worldMap.layer
     val hexSideLength: Int = worldMap.hexSideLength
     val staggerAxis: String = worldMap.staggerAxis
     val staggerIndex: String = worldMap.staggerIndex
