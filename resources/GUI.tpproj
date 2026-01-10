@@ -118,7 +118,7 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:hex/cold/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/desert/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/medieval/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/tropic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/basic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/volcanic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:hex/cold/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/desert/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/medieval/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/tropic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/basic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/volcanic/decor,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:hex/icons,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
