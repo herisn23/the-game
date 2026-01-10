@@ -12,7 +12,7 @@ import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.chunk.WorldMapChunk
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
-import org.roldy.rendering.tiles.Decors
+import org.roldy.rendering.tiles.Environment
 
 
 class SettlementPopulator(
@@ -36,7 +36,7 @@ class SettlementPopulator(
             SettlementTileBehaviour.Data(
                 position = position,
                 coords = settle.coords,
-                textureRegion = atlas[Decors.castleFortified],
+                textureRegion = atlas[Environment.castle_1_1],
                 borderTextureRegion = border,
                 settlementData = settle,
                 worldPosition = ::worldPosition,

@@ -25,7 +25,7 @@ abstract class GenerateClassesTask : DefaultTask() {
         outputDirectory.mkdirs()
 
         val rootDir = project.rootProject.rootDir
-        val assets = listOf("Decors", "Tiles")
+        val assets = listOf("Environment", "Tiles")
 
         assets.forEach {
             val names = rootDir.toPath().resolve("assets/tiles/${it}.atlas").readLines().let(::getRegionNames)
@@ -36,7 +36,7 @@ abstract class GenerateClassesTask : DefaultTask() {
                 package $pack
                 object $it {
                     ${names.joinToString("\n"){
-                    """val $it = "$it"""".trimIndent()
+                    """val ${it.replace("-", "_").replace(" ", "_")} = "$it"""".trimIndent()
                     }}
                 }
                 """.trimIndent()

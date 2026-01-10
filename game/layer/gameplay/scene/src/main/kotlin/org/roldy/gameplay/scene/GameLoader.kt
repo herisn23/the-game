@@ -217,7 +217,7 @@ class GameLoader {
             AtlasLoader.tiles
         }
         addLoader(Strings.loading_textures, decorsAtlas) {
-            AtlasLoader.tileDecorations
+            AtlasLoader.tileEnvironment
         }
         addLoader(Strings.loading_textures, roadsAtlas) {
             AtlasLoader.roads
