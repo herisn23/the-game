@@ -4,6 +4,10 @@ interface Layered : Sortable {
     val layer: Int
 
     companion object {
+        // CLAIMS
+
+        const val LAYER_0: Int = -1
+
         // ROADS
         const val LAYER_1: Int = 0
 

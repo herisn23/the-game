@@ -21,7 +21,6 @@ import org.roldy.rendering.tiles.Environment
 class SettlementPopulator(
     override val map: WorldMap,
     atlas: TextureAtlas,
-    val outlineAtlas: TextureAtlas,
     val settlements: List<SettlementState>
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val logger by logger()
@@ -95,7 +94,6 @@ class SettlementPopulator(
                     textureRegion = config.snow.region,
                 ),
                 hasSnow = terrain.terrain.biome.data.type == BiomeType.Cold,
-                outlinesAtlas = outlineAtlas,
                 worldPosition = ::worldPosition,
                 state = settle
             )

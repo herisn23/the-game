@@ -2,6 +2,7 @@ package org.roldy.rendering.environment
 
 import com.badlogic.gdx.utils.Pool
 import org.roldy.rendering.environment.item.HarvestableTileBehaviour
+import org.roldy.rendering.environment.item.SettlementClaimsTileBehaviour
 import org.roldy.rendering.environment.item.SettlementTileBehaviour
 import org.roldy.rendering.environment.item.SpriteTileBehaviour
 
@@ -12,12 +13,16 @@ object BehaviourPool {
     private val settlementPool = object : Pool<SettlementTileBehaviour>() {
         override fun newObject(): SettlementTileBehaviour = SettlementTileBehaviour()
     }
+    private val settlementClaimsPopulator = object : Pool<SettlementClaimsTileBehaviour>() {
+        override fun newObject(): SettlementClaimsTileBehaviour = SettlementClaimsTileBehaviour()
+    }
     private val harvestablePool = object : Pool<HarvestableTileBehaviour>() {
         override fun newObject(): HarvestableTileBehaviour = HarvestableTileBehaviour()
     }
 
     fun obtain(data: TileObject.Data): TileBehaviour {
         return when (data) {
+            is SettlementClaimsTileBehaviour.Data -> settlementClaimsPopulator.obtain()
             is SettlementTileBehaviour.Data -> settlementPool.obtain()
             is SpriteTileBehaviour.Data -> spritePools.obtain()
             is HarvestableTileBehaviour.Data -> harvestablePool.obtain()
@@ -27,6 +32,7 @@ object BehaviourPool {
 
     fun free(behaviour: TileBehaviour) {
         when (behaviour) {
+            is SettlementClaimsTileBehaviour -> settlementClaimsPopulator.free(behaviour)
             is SettlementTileBehaviour -> settlementPool.free(behaviour)
             is SpriteTileBehaviour -> spritePools.free(behaviour)
             is HarvestableTileBehaviour -> harvestablePool.free(behaviour)

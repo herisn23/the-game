@@ -1,6 +1,7 @@
 package org.roldy.core.utils
 
 import org.roldy.core.Vector2Int
+import org.roldy.core.x
 import kotlin.math.abs
 
 /**
@@ -14,6 +15,23 @@ fun hexRadius(center: Vector2Int, radius: Int, min: Vector2Int, max: Vector2Int)
             if (
                 hexDistance(center, position) <= radius &&
                 position in min..max
+            ) {
+                tiles.add(position)
+            }
+        }
+    }
+
+    return tiles
+}
+
+fun hexRadius(radius: Int): List<Vector2Int> {
+    val center = 0 x 0
+    val tiles = mutableListOf<Vector2Int>()
+    for (x in center.x - radius..center.x + radius) {
+        for (y in center.y - radius..center.y + radius) {
+            val position = x x y
+            if (
+                hexDistance(center, position) <= radius
             ) {
                 tiles.add(position)
             }

@@ -9,5 +9,6 @@ data class SettlementState(
     override val coords: Vector2Int,
     var ruler: RulerState,
     var claims: List<Vector2Int>,
+    val reserved: List<Vector2Int>,
     val type: Int = 0
 ) : Positioned

@@ -20,7 +20,7 @@ class WorldMapDebugRenderer(
     private val batch by disposable { SpriteBatch() }
     private val font by disposable {
         BitmapFont().apply {
-            data.setScale(4f)
+            data.setScale(1f)
             color = Color.RED
         }
     }

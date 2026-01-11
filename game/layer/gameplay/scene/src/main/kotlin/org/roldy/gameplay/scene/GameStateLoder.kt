@@ -31,6 +31,7 @@ private fun SettlementTileData.toState() =
         coords = coords,
         ruler = RulerState(color = color),
         claims = claims,
+        reserved = reserved,
         type = type,
     )
 

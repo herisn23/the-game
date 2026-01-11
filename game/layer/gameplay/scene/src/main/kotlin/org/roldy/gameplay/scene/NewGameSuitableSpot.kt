@@ -9,12 +9,12 @@ fun HeroState.setSuitableSpot(state: GameState, map: WorldMap) {
     fun findSettlementInBiome(biome: BiomeType) =
         state.settlements.find {
             val data = map.terrainData.getValue(it.coords)
-            data.terrain.biome.data.type == biome
-        }
+            it.type == 0//&& data.terrain.biome.data.type == biome &&
+        }?.coords
 
     val terrainFinder = TerrainFinder(map)
 
-    val forestCoords = terrainFinder.findCenterMostTerrain(BiomeType.Forest)
+    val forestCoords = findSettlementInBiome(BiomeType.Forest) ?: terrainFinder.findCenterMostTerrain(BiomeType.Forest)
 
     coords = forestCoords.copy()
 }

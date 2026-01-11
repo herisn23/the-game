@@ -2,8 +2,8 @@ package org.roldy.gp.world.generator
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
+import org.roldy.core.plus
 import org.roldy.core.utils.hexDistance
-import org.roldy.core.utils.hexRadius
 import org.roldy.core.utils.randomColor
 import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
@@ -23,7 +23,8 @@ class SettlementGenerator(
     val logger by logger()
     val harvestable = HarvestableType.harvestable
     val minSettlementDistance = 10
-    val baseRegionSize = 1
+    val maxClaimsCount = 100
+    val minClaimsCount = 50
     override fun generate(): List<SettlementTileData> {
         val mapSize = mapData.size
         val seed = mapData.seed
@@ -38,12 +39,12 @@ class SettlementGenerator(
         val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlements = mutableListOf<SettlementTileData>()
         val attempts = count * 10 // Try multiple times to find good spots
-
+        val minBorderDistance = 10
         repeat(attempts) {
             if (settlements.size >= count) return@repeat
 
-            val x = settlementRng.nextInt(mapSize.width)
-            val y = settlementRng.nextInt(mapSize.height)
+            val x = settlementRng.nextInt(minBorderDistance, mapSize.width - minBorderDistance)
+            val y = settlementRng.nextInt(minBorderDistance, mapSize.height - minBorderDistance)
             val coords = x x y
             // Check if location is suitable
             val isSuitable =
@@ -52,31 +53,32 @@ class SettlementGenerator(
                 } && !occupied(coords) && terrainData.getValue(coords).terrain.biome.data.type != BiomeType.Water
 
             if (isSuitable) {
+                fun List<Vector2Int>.toWorldCoords() =
+                    map { it + coords }
+
                 val random = Random(seed + coords.sum)
-                val maxHarvestable = random.nextInt(baseRegionSize) // settlement can have max of 6 mines
+                val type = random.nextInt(0, 3)
+                val reserved = type.reservedTiles(coords.y % 2 == 0)
+                val claims = generateClaims(reserved, random.nextInt(minClaimsCount, maxClaimsCount + 1))
+                val maxHarvestable = random.nextInt(10, claims.size / 2) // settlement can have max of 6 mines
                 val harvestableCount = min(harvestable.size, maxHarvestable)
                 logger.debug {
                     """
                         
                         Generated settlement: $coords
-                            Region size: $baseRegionSize
                             Harvestable size: $harvestableCount
                     """.trimIndent()
                 }
 
-                val baseRadius = hexRadius(coords, baseRegionSize, mapSize.min, mapSize.max).filter {
-                    //remove hexes which are in bound of another settlement
-                    val existing = settlements.flatMap(SettlementTileData::claims).toSet()
-                    !existing.contains(it) && it.x in 0..<mapSize.width && it.y in 0..<mapSize.height
-                }
                 settlements.add(
                     SettlementTileData(
                         id = idGen.nextInt(),
                         coords,
                         "Settlement${settlements.size + 1}",
-                        baseRadius,
+                        claims.toWorldCoords(),
+                        reserved.toWorldCoords(),
                         harvestableCount,
-                        random.nextInt(0, 3),
+                        type,
                         randomColor(random)
                     )
                 )
@@ -86,6 +88,89 @@ class SettlementGenerator(
             logger.debug {
                 "Generated settlements: $size"
             }
+        }
+    }
+
+    fun generateClaims(reserved: List<Vector2Int>, count: Int): List<Vector2Int> {
+        if (reserved.isEmpty()) return emptyList()
+
+        val claims = reserved.toMutableSet()
+        val random = Random.Default
+
+        val hexDirections = listOf(
+            Vector2Int(1, 0), Vector2Int(-1, 0),
+            Vector2Int(0, 1), Vector2Int(1, 1),
+            Vector2Int(0, -1), Vector2Int(1, -1)
+        )
+
+        val frontier = mutableSetOf<Vector2Int>()
+
+        // Initialize frontier
+        reserved.forEach { coord ->
+            hexDirections.forEach { dir ->
+                val neighbor = coord + dir
+                if (neighbor !in claims) {
+                    frontier.add(neighbor)
+                }
+            }
+        }
+
+        var added = 0
+        while (added < count && frontier.isNotEmpty()) {
+            val newClaim = frontier.random(random)
+            claims.add(newClaim)
+            frontier.remove(newClaim)
+            added++
+
+            // Expand frontier
+            hexDirections.forEach { dir ->
+                val neighbor = newClaim + dir
+                if (neighbor !in claims) {
+                    frontier.add(neighbor)
+                }
+            }
+        }
+        claims.removeAll(reserved.toSet())
+        return claims.toList()
+    }
+
+    fun Int.reservedTiles(even: Boolean): List<Vector2Int> {
+        val base = if (even) {
+            listOf(
+                0 x 0,
+                -1 x 1,
+                0 x 1,
+                1 x 0,
+            )
+        } else {
+            listOf(
+                0 x 0,
+                1 x 0,
+                0 x 1,
+                1 x 1,
+            )
+        }
+        val additional = when (this) {
+            2 -> if (even) {
+                listOf(
+                    1 x 1,
+                    2 x 0,
+                    2 x 1
+                )
+            } else {
+                listOf(
+                    2 x 1,
+                    2 x 0,
+                    3 x 1
+                )
+            }
+
+            else -> emptyList()
+
+        }
+        return when (this) {
+            2 -> base + additional
+            else -> base
         }
     }
 }

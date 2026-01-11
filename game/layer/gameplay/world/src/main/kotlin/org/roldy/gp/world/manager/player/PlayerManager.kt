@@ -2,6 +2,7 @@ package org.roldy.gp.world.manager.player
 
 import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.ConcurrentLoopConsumer
+import org.roldy.core.utils.sequencer
 import org.roldy.core.x
 import org.roldy.data.state.GameState
 import org.roldy.gp.world.manager.SquadManager
@@ -21,13 +22,13 @@ class PlayerManager(
     val persistentObjects: MutableList<Layered>
 ) : ConcurrentLoopConsumer<Float> {
 
-
+    val settlements by sequencer { gameState.settlements }
     init {
         gui.inventoryButton.onClick {
             gui.inventory.open(current.squad.leader, Inventory.size(current.squad.leader))
         }
         gui.teleportToStart.onClick {
-            current.teleport(screen.map.terrainData.keys.random())
+            current.teleport(settlements.next().coords)
         }
         gui.teleportToEnd.onClick {
             current.teleport(screen.map.width - 1 x screen.map.height - 1)

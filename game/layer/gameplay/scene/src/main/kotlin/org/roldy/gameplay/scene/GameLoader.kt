@@ -344,10 +344,10 @@ class GameLoader {
         addLoader(Strings.loading_finalize, populators) {
             if (!debugMode) {
                 listOf(
+                    SettlementClaimsPopulator(worldMap.value, outlines.value, gameState.value.settlements),
                     SettlementPopulator(
                         worldMap.value,
                         environmentAtlas.value,
-                        outlines.value,
                         gameState.value.settlements
                     ),
                     RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),

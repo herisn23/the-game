@@ -8,6 +8,7 @@ data class SettlementTileData(
     override val coords: Vector2Int,
     val name: String,
     val claims: List<Vector2Int>,
+    val reserved: List<Vector2Int>,
     val harvestableCount: Int,
     val type: Int,
     val color: Color
