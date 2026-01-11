@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
+import org.roldy.core.utils.alpha
 import org.roldy.rendering.environment.TileBehaviourAdapter
 import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.g2d.Layered
@@ -15,12 +16,14 @@ class SettlementClaimsTileBehaviour : TileBehaviourAdapter<SettlementClaimsTileB
 
     override val zIndex: Float get() = data?.position?.y ?: 0f
     override val layer: Int get() = Layered.LAYER_0
-    val sprite = Sprite()
+    val border = Sprite()
+    val background = Sprite()
 
     data class Data(
         override val data: Map<String, Any> = emptyMap(),
         val worldPosition: (Vector2Int) -> Vector2,
-        val region: TextureRegion,
+        val borderRegion: TextureRegion?,
+        val backgroundRegion: TextureRegion,
         val color: Color,
         override val coords: Vector2Int,
         override val position: Vector2
@@ -31,23 +34,35 @@ class SettlementClaimsTileBehaviour : TileBehaviourAdapter<SettlementClaimsTileB
         data: Data,
         batch: SpriteBatch
     ) {
-        sprite.draw(batch)
+        background.draw(batch)
+        border.texture?.let {
+            border.draw(batch)
+        }
     }
 
     override fun configure(data: Data) {
-        sprite.apply {
-            setRegion(data.region)
-            color = data.color
-            setSize(data.region.regionWidth.toFloat(), data.region.regionHeight.toFloat())
+
+        fun Sprite.configure(region: TextureRegion, color: Color) = apply {
+            setRegion(region)
+            this.color = color
+            setSize(region.regionWidth.toFloat(), region.regionHeight.toFloat())
             setOriginCenter()
             setPosition(data.position.x, data.position.y)
             setRotation(rotation)
+        }
+
+        data.borderRegion?.let { region ->
+            border.configure(region, data.color)
+        }
+        background.apply {
+            configure(data.backgroundRegion, data.color alpha 0.1f)
         }
     }
 
 
     override fun reset() {
         super.reset()
-        sprite.texture = null
+        border.texture = null
+        background.texture = null
     }
 }

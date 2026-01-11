@@ -4,7 +4,7 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.core.plus
 import org.roldy.core.utils.hexDistance
-import org.roldy.core.utils.randomColor
+import org.roldy.core.utils.randomBrightColor
 import org.roldy.core.x
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.map.MapData
@@ -79,7 +79,7 @@ class SettlementGenerator(
                         reserved.toWorldCoords(),
                         harvestableCount,
                         type,
-                        randomColor(random)
+                        randomBrightColor(random)
                     )
                 )
             }

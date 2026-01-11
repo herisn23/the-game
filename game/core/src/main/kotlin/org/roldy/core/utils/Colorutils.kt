@@ -41,6 +41,16 @@ fun randomColor(random: Random) =
         1f
     )
 
+fun randomBrightColor(random: Random = Random.Default): Color {
+    val minBrightness = 0.5f
+
+    val r = minBrightness + random.nextFloat() * (1f - minBrightness)
+    val g = minBrightness + random.nextFloat() * (1f - minBrightness)
+    val b = minBrightness + random.nextFloat() * (1f - minBrightness)
+
+    return Color(r, g, b, 1f)
+}
+
 fun alpha(alpha: Float): Color =
     Color(
         1f, 1f, 1f,

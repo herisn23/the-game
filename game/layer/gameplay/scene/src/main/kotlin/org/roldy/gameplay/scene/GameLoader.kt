@@ -149,7 +149,6 @@ class GameLoader {
     private val loaders: MutableList<Loader> = mutableListOf()
     private val occupiedTiles: MutableList<TileData> = mutableListOf()
 
-
     val gameState = GameLoaderProperty<GameState>()
     val tiledMap = GameLoaderProperty<TiledMap>()
     val worldMap = GameLoaderProperty<WorldMap>()
@@ -184,6 +183,7 @@ class GameLoader {
     val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
     val outlines = GameLoaderProperty<TextureAtlas>()
     val biomeColors = GameLoaderProperty<Map<BiomeType, Texture>>()
+    val emptyHex = GameLoaderProperty<Texture>()
 
     private fun addLoaders() {
 
@@ -236,6 +236,9 @@ class GameLoader {
         addLoader(Strings.loading_textures, outlines) {
             AtlasLoader.hexOutline
         }
+        addLoader(Strings.loading_textures, emptyHex) {
+            Texture(loadAsset("tiles/EmptyHex.png"))
+        }
 
         // MAP LOADERS
         addLoader(Strings.loading_generate_map, noise) {
@@ -249,11 +252,9 @@ class GameLoader {
         }
 
         addLoader(Strings.loading_generate_map, biomeColors) {
-            val hex = Texture(loadAsset("tiles/EmptyHex.png"))
+
             biomesConfiguration.value.biomes.associate {
-                it.type to hex.copy(it.color)
-            }.also {
-                hex.dispose()
+                it.type to emptyHex.value.copy(it.color)
             }
         }
 
@@ -344,7 +345,12 @@ class GameLoader {
         addLoader(Strings.loading_finalize, populators) {
             if (!debugMode) {
                 listOf(
-                    SettlementClaimsPopulator(worldMap.value, outlines.value, gameState.value.settlements),
+                    SettlementClaimsPopulator(
+                        worldMap.value,
+                        outlines.value,
+                        emptyHex.value,
+                        gameState.value.settlements
+                    ),
                     SettlementPopulator(
                         worldMap.value,
                         environmentAtlas.value,
