@@ -7,6 +7,7 @@ import org.roldy.data.state.GameState
 import org.roldy.gp.world.manager.SquadManager
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.gp.world.utils.Inventory
+import org.roldy.gp.world.utils.Settlement
 import org.roldy.gui.WorldGUI
 import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.gui.el.onClick
@@ -56,6 +57,9 @@ class PlayerManager(
 
     fun move(position: Vector2Int) {
         current.move(position)
+        Settlement.find(gameState, position) {
+            println("Settlement found on $position")
+        }
     }
 
     context(delta: Float)

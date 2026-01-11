@@ -6,7 +6,8 @@ import org.roldy.core.Vector2Int
 @Serializable
 data class SettlementState(
     val id: Int,
-    val coords: Vector2Int,
+    override val coords: Vector2Int,
     var ruler: RulerState,
-    var region: List<Vector2Int>
-)
+    var region: List<Vector2Int>,
+    val type: Int = 0
+) : Positioned

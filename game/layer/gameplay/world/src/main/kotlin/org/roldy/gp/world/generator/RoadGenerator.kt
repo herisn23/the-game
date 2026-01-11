@@ -19,6 +19,7 @@ class RoadGenerator(
     val algorithm: Algorithm = Algorithm.K_NEAREST,
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<RoadTileData> {
+    private val roadOffset = Vector2Int(0, 0)
     private val logger by logger()
     val pathfinder = TilePathfinder(map, ::baseCost)
 
@@ -111,37 +112,80 @@ class RoadGenerator(
         val allRoads = mutableSetOf<PathWalker.Node>()
         val remainingDests = destinations.toMutableList()
 
-        // Find path to first destination (establishes main trunk)
-        val firstDest = remainingDests.removeAt(0)
-        val mainPath = pathfinder.findPath(source.coords, firstDest.coords)
-        if (mainPath.isComplete) {
-            allRoads.addAll(mainPath.tiles)
+        fun Vector2Int.node() =
+            PathWalker.Node(this, map.tilePosition.resolve(this))
 
-            // For remaining destinations, branch from any point on existing roads
-            remainingDests.forEach { dest ->
-                val pathfinder = TilePathfinder(map) { tile, goal ->
-                    val baseCost = map.terrainData.getValue(tile).walkCost *
-                            Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
-                            (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
+        // Include existing roads in our network from the start
+        allRoads.addAll(existingRoadsNodes)
 
-                    // Existing roads and global roads are nearly free
-                    if (tile in allRoads.map { it.coords } || tile in mainPath.tiles.map { it.coords }) {
-                        baseCost * 0.001f
-                    } else {
-                        baseCost
-                    }
+        // Helper to check if a settlement is already connected
+        fun isConnectedToRoadNetwork(settlement: SettlementTileData): Boolean {
+            val roadEntry = settlement.coords + roadOffset
+            val existingCoords = allRoads.map { it.coords }.toSet()
+            return settlement.coords in existingCoords || roadEntry in existingCoords
+        }
+
+        // Calculate road entry points for source
+        val sourceRoadEntry = source.coords + roadOffset
+
+        // Filter out destinations that are already connected
+        val unconnectedDests = remainingDests.filter { !isConnectedToRoadNetwork(it) }.toMutableList()
+
+        if (unconnectedDests.isEmpty()) {
+            // All destinations already connected, nothing to do
+            return allRoads
+        }
+
+        val firstDest = unconnectedDests.removeAt(0)
+        val firstDestRoadEntry = firstDest.coords + roadOffset
+
+        // Only build main path if source isn't already connected
+        if (!isConnectedToRoadNetwork(source)) {
+            val mainPath = pathfinder.findPath(sourceRoadEntry, firstDestRoadEntry)
+            if (mainPath.isComplete) {
+                allRoads.add(source.coords.node())
+                allRoads.addAll(mainPath.tiles)
+            }
+        } else {
+            // Source is connected, just path from network to first destination
+            val bestBranchPoint = allRoads.minByOrNull { roadTile ->
+                hexDistance(roadTile.coords, firstDestRoadEntry)
+            }?.coords ?: sourceRoadEntry
+
+            val pathToFirst = pathfinder.findPath(bestBranchPoint, firstDestRoadEntry)
+            if (pathToFirst.isComplete) {
+                allRoads.add(bestBranchPoint.node())
+                allRoads.addAll(pathToFirst.tiles)
+            }
+        }
+
+        // For remaining unconnected destinations, branch from existing roads
+        unconnectedDests.forEach { dest ->
+            val destRoadEntry = dest.coords + roadOffset
+
+            val pathfinder = TilePathfinder(map) { tile, goal ->
+                val baseCost = map.terrainData.getValue(tile).walkCost *
+                        Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
+                        (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
+
+                // Existing roads are nearly free
+                if (tile in allRoads.map { it.coords }) {
+                    baseCost * 0.001f
+                } else {
+                    baseCost
                 }
+            }
 
-                // Find closest point on existing roads to this destination
-                val bestBranchPoint = allRoads.minByOrNull { roadTile ->
-                    hexDistance(roadTile.coords, dest.coords)
-                }?.coords ?: source.coords
+            // Find closest point on existing roads to this destination
+            val bestBranchPoint = allRoads.minByOrNull { roadTile ->
+                hexDistance(roadTile.coords, destRoadEntry)
+            }?.coords ?: sourceRoadEntry
 
-                // Path from branch point to destination
-                val branchPath = pathfinder.findPath(bestBranchPoint, dest.coords)
-                if (branchPath.isComplete) {
-                    allRoads.addAll(branchPath.tiles)
-                }
+            // Path from branch point to destination road entry
+            val branchPath = pathfinder.findPath(bestBranchPoint, destRoadEntry)
+            if (branchPath.isComplete) {
+                allRoads.add(bestBranchPoint.node())
+                allRoads.addAll(branchPath.tiles)
             }
         }
 

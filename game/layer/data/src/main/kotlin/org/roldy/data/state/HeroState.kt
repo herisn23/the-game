@@ -10,6 +10,6 @@ import kotlin.time.Duration.Companion.seconds
 data class HeroState(
     var harvestingSpeed: Duration = 3.seconds,
     var speed: Float = 1f,
-    var coords: Vector2Int = 0 x 0,
+    override var coords: Vector2Int = 0 x 0,
     val inventory: InventoryState = InventoryState(10),
-)
+) : Positioned

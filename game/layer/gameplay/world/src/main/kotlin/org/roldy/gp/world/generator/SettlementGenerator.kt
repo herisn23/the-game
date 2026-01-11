@@ -30,10 +30,10 @@ class SettlementGenerator(
         val seed = mapData.seed
         val count = when (mapSize) {
             MapSize.Debug -> 1
-            MapSize.ExtraLarge -> 40
-            MapSize.Large -> 30
-            MapSize.Medium -> 20
-            MapSize.Small -> 10
+            MapSize.ExtraLarge -> 80
+            MapSize.Large -> 60
+            MapSize.Medium -> 40
+            MapSize.Small -> 20
         }
         val idGen = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
         val settlementRng = Random(seed + GeneratorSeeds.SETTLEMENT_SEED)
@@ -78,6 +78,7 @@ class SettlementGenerator(
                         "Settlement${settlements.size + 1}",
                         radius,
                         harvestableCount,
+                        random.nextInt(0, 3),
                         randomColor(random)
                     )
                 )

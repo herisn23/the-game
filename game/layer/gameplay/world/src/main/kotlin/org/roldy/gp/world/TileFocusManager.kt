@@ -36,7 +36,7 @@ class TileFocusManager(
             return world.x.toInt() x flippedY.toInt()
         }
 
-        Harvesting.findMine(gameState, coords) { mine ->
+        Harvesting.find(gameState, coords) { mine ->
             gui
                 .showTileInfo(
                     { minePopupContent(it, mine) },

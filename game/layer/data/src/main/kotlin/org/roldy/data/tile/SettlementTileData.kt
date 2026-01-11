@@ -9,5 +9,6 @@ data class SettlementTileData(
     val name: String,
     val claims: List<Vector2Int>,
     val harvestableCount: Int,
+    val type: Int,
     val color: Color
 ): TileData

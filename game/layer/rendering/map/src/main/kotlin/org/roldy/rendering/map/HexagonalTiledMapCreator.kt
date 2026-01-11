@@ -13,7 +13,6 @@ import org.roldy.data.configuration.match
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.tile.TileData
-
 const val tileSize = 256
 
 data class MapTerrainData(
@@ -86,6 +85,7 @@ class HexagonalTiledMapCreator(
                 }.onFailure {
                     println("Failed to find texture ${terrain.data.name}")
                 }.getOrThrow())
+
             }
             layer.setCell(coords.x, coords.y, cell)
         }

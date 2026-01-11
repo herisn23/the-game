@@ -3,4 +3,4 @@ package org.roldy.rendering.environment
 import com.badlogic.gdx.graphics.g2d.Sprite
 
 
-val Sprite.zIndex get() = y - height / 2f
+val Sprite.zIndex get() = y

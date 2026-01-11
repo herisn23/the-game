@@ -1,7 +1,6 @@
 package org.roldy.gp.world.utils
 
 import org.roldy.core.Vector2Int
-import org.roldy.core.coroutines.async
 import org.roldy.core.utils.progress
 import org.roldy.core.utils.toDuration
 import org.roldy.data.state.GameState
@@ -19,18 +18,11 @@ object Harvesting {
         val onHarvest: () -> Unit
     )
 
-    fun findMine(
+    fun find(
         state: GameState, coords: Vector2Int,
-        onMineFound: (HarvestableState) -> Unit
+        onFound: (HarvestableState) -> Unit
     ) {
-        async { main ->
-            val foundMine = state.mines.find { mine -> mine.coords == coords }
-            main {
-                foundMine?.let {
-                    onMineFound(foundMine)
-                }
-            }
-        }
+        PlaceFinder.find(state.mines, coords, onFound)
     }
 
     context(delta: Float)

@@ -25,7 +25,7 @@ abstract class HarvestingManager(
     }
 
     override fun onTileReached(coords: Vector2Int) {
-        Harvesting.findMine(gameState, coords) { state ->
+        Harvesting.find(gameState, coords) { state ->
             data = Harvesting.Data(
                 state,
                 hero.harvestingSpeed,

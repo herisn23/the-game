@@ -131,7 +131,7 @@ class GameLoader {
     }
 
     val debugMode = false
-    val maxZoom = if (debugMode) 100f else 6f
+    val maxZoom = if (debugMode) 100f else 100f
 
     val logger by logger()
 
@@ -304,7 +304,6 @@ class GameLoader {
                 gameState.value =
                     createGameState(mapData.value, settlements.value, mines.value, heroStateForNewGame).apply {
                         heroStateForNewGame.setSuitableSpot(this, worldMap.value)
-//                        heroStateForNewGame.coords = 0 x 0
                     }
             }
         }
