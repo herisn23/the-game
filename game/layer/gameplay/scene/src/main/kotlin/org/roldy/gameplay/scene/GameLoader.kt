@@ -20,6 +20,7 @@ import org.roldy.core.logger
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.biome.BiomesConfiguration
 import org.roldy.data.configuration.harvestable.HarvestableConfiguration
+import org.roldy.data.map.Biome
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
 import org.roldy.data.state.GameState
@@ -41,7 +42,10 @@ import org.roldy.rendering.g2d.Layered
 import org.roldy.rendering.g2d.copy
 import org.roldy.rendering.g2d.disposable.AutoDisposable
 import org.roldy.rendering.g2d.disposable.disposable
-import org.roldy.rendering.map.*
+import org.roldy.rendering.map.HexagonalTiledMapCreator
+import org.roldy.rendering.map.MapTerrainData
+import org.roldy.rendering.map.MiniMap
+import org.roldy.rendering.map.WorldMap
 import org.roldy.rendering.screen.world.WorldScreen
 import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 import org.roldy.rendering.screen.world.populator.WorldMapPopulator

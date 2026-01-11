@@ -10,8 +10,10 @@ import org.roldy.core.Vector2Int
 import org.roldy.core.utils.get
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.configuration.match
+import org.roldy.data.map.Biome
 import org.roldy.data.map.MapData
 import org.roldy.data.map.NoiseData
+import org.roldy.data.map.Terrain
 import org.roldy.data.tile.TileData
 const val tileSize = 256
 

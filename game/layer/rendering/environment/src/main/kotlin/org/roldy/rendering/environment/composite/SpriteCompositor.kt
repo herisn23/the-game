@@ -17,19 +17,37 @@ annotation class AddComposition
 annotation class CompositeChain
 
 
+enum class CompositeAnimationType {
+    Scale
+}
+
+data class CompositeAnimation(
+    val type: CompositeAnimationType,
+    val scaleX: Float,
+    val scaleY: Float,
+    val speed: Float
+)
+
+data class CompositeSprite(
+    val sprite: Sprite,
+    val enabled: () -> Boolean,
+    val animation: CompositeAnimation? = null
+)
+
 class SpriteCompositor(
     val pool: SpritePool,
     val atlas: MapAtlas,
     val tileSize: Float
 ) {
 
-    private val sprites: MutableList<Pair<Sprite, () -> Boolean>> = mutableListOf()
+    private val sprites: MutableList<CompositeSprite> = mutableListOf()
 
     @AddComposition
     fun texture(
         position: Vector2,
         region: MapAtlas.() -> TextureRegion,
         visible: () -> Boolean,
+        animation: CompositeAnimation? = null,
         configure: Pivot.() -> Unit = {}
     ): Sprite =
         atlas
@@ -53,7 +71,7 @@ class SpriteCompositor(
                 }
             }
             .also {
-                sprites.add(it to visible)
+                sprites.add(CompositeSprite(it, visible, animation))
             }
 
 
@@ -70,5 +88,5 @@ class SpriteCompositor(
         center().parent().center().pivot()
 
 
-    fun retrieve(): List<Pair<Sprite, () -> Boolean>> = sprites.toList().also { sprites.clear() }
+    fun retrieve(): List<CompositeSprite> = sprites.toList().also { sprites.clear() }
 }

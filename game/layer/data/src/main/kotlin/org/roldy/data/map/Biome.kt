@@ -1,4 +1,4 @@
-package org.roldy.rendering.map
+package org.roldy.data.map
 
 import org.roldy.data.configuration.biome.BiomeData
 

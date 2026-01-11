@@ -3,9 +3,9 @@ package org.roldy.gp.world.generator
 import org.roldy.core.Vector2Int
 import org.roldy.core.logger
 import org.roldy.data.configuration.biome.BiomeData
+import org.roldy.data.map.Biome
 import org.roldy.data.map.MapSize
 import org.roldy.data.tile.MountainTileData
-import org.roldy.rendering.map.Biome
 import org.roldy.rendering.map.MapTerrainData
 import org.roldy.rendering.map.WorldMap
 import kotlin.math.PI

@@ -4,13 +4,13 @@ import com.badlogic.gdx.math.Vector2
 import org.roldy.core.utils.get
 import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.map.Terrain
+import org.roldy.data.mine.harvestable.Gem.*
 import org.roldy.data.mine.harvestable.Harvestable
-import org.roldy.data.mine.harvestable.Ore.*
 import org.roldy.rendering.environment.composite.CompositeAnimation
 import org.roldy.rendering.environment.composite.SpriteCompositor
 import org.roldy.rendering.tiles.Environment
 
-fun SpriteCompositor.ore(position: Vector2, terrain: Terrain, harvestable: Harvestable, empty: () -> Boolean) {
+fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harvestable, empty: () -> Boolean) {
     if ("green_cold" == terrain.data.groupKey)
         texture(
             position,
@@ -516,41 +516,41 @@ fun SpriteCompositor.ore(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(-4.90007f, 28.39998f)
         }
-    if (Iron == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0004_Layer_366] }, { true }) {
+    if (RoughQuartz == harvestable)
+        texture(position, { environment[Environment.crystals_zync] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-72f, -20.9f)
+            offset(-70.4f, -29.9f)
         }
-    if (Copper == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0041_Layer_329] }, { true }) {
+    if (Amber == harvestable)
+        texture(position, { environment[Environment.crystals_yellow] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-72f, -29.6f)
+            offset(-70.4f, -29.9f)
         }
-    if (Gold == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0006_Layer_364] }, { true }) {
+    if (Emerald == harvestable)
+        texture(position, { environment[Environment.crystals_green] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-67.7f, -20.9f)
+            offset(-70.4f, -29.9f)
         }
-    if (Silver == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0000_Layer_370] }, { true }) {
+    if (Sapphire == harvestable)
+        texture(position, { environment[Environment.crystals_dark_blue] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-65.9f, -20.9f)
+            offset(-70.4f, -29.9f)
         }
-    if (Mithril == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0020_Layer_350] }, { true }) {
+    if (Ruby == harvestable)
+        texture(position, { environment[Environment.crystals_red] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-72f, -20.9f)
+            offset(-70.4f, -29.9f)
         }
-    if (Adamantine == harvestable)
-        texture(position, { environment[Environment.mountains_0000s_0038_Layer_332] }, { true }) {
+    if (Starstone == harvestable)
+        texture(position, { environment[Environment.crystals_purple] }, { true }) {
             setScale(0.3f, 0.3f)
             centered()
-            offset(-67.2f, -26.1f)
+            offset(-70.4f, -29.9f)
         }
     if ("blue_cold" == terrain.data.groupKey)
         texture(

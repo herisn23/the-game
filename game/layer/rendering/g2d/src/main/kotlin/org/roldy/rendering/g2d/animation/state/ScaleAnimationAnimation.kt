@@ -24,6 +24,28 @@ class PulseAnimationStyle(
 fun pulse(minScale: Float, maxScale: Float): PulseAnimationStyle =
     PulseAnimationStyle(minScale, maxScale)
 
+class ScaleAnimationStyle(
+    val minScaleX: Float,
+    val maxScaleX: Float,
+    val minScaleY: Float,
+    val maxScaleY: Float
+) : ScaleAnimationAnimationStyle {
+    context(time: Float)
+    override fun update(): Pair<Float, Float> {
+        val progress = (sin(time) + 1f) / 2f  // 0 to 1
+        val scaleX = lerp(minScaleX, maxScaleX, progress)
+        val scaleY = lerp(minScaleY, maxScaleY, progress)
+        return scaleX to scaleY
+    }
+}
+
+fun stretch(
+    minScaleX: Float,
+    maxScaleX: Float,
+    minScaleY: Float,
+    maxScaleY: Float
+) = ScaleAnimationStyle(minScaleX, maxScaleX, minScaleY, maxScaleY)
+
 
 class ScaleAnimationAnimation(
     val data: AnimationData,

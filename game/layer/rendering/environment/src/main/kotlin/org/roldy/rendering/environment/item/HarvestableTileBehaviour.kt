@@ -1,18 +1,19 @@
 package org.roldy.rendering.environment.item
 
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import org.roldy.core.Vector2Int
 import org.roldy.rendering.environment.TileBehaviourAdapter
 import org.roldy.rendering.environment.TileObject
+import org.roldy.rendering.environment.composite.CompositeSprite
 import org.roldy.rendering.g2d.Pivot
 import org.roldy.rendering.g2d.PivotDefaults
 import org.roldy.rendering.g2d.animation.state.Animator
 import org.roldy.rendering.g2d.animation.state.animation
 import org.roldy.rendering.g2d.animation.state.float
+import org.roldy.rendering.g2d.animation.state.stretch
 import kotlin.random.Random
 
 class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.Data>() {
@@ -21,13 +22,19 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         override val coords: Vector2Int,
         override val data: Map<String, Any> = emptyMap(),
         val icon: TextureRegion,
-        val sprites: List<Pair<Sprite, () -> Boolean>>,
+        val sprites: List<CompositeSprite>,
         val tileSize: Float,
         val onReset: Data.() -> Unit
     ) : TileObject.Data
 
+    data class SpriteAnimation(
+        val comp: CompositeSprite,
+        val animator: Animator? = null,
+    )
 
-    var animator: Animator? = null
+    var animations: List<SpriteAnimation> = emptyList()
+
+    var iconAnimator: Animator? = null
     var iconPivot: Pivot? = null
 
     context(delta: Float, camera: Camera)
@@ -35,11 +42,17 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         data: Data,
         batch: SpriteBatch
     ) {
-        data.sprites.forEach { sprite ->
-            if (sprite.second())
-                sprite.first.draw(batch)
+        animations.forEach { (comp, anim) ->
+            if (!comp.enabled()) return@forEach
+            if (anim == null) {
+                comp.sprite.draw(batch)
+            } else {
+                anim.update()
+                comp.sprite.setScale(anim.data.scaleX, anim.data.scaleY)
+                comp.sprite.draw(batch)
+            }
         }
-        val animator = this.animator
+        val animator = this.iconAnimator
         val pivot = this.iconPivot
         if (animator != null && pivot != null) {
             animator.update()
@@ -71,14 +84,39 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
             data.tileSize,
         ).pivot()
 
-        animator = animation {
+        animations = data.sprites.map { comp ->
+            val anim: Animator? = let {
+                if (comp.animation != null) {
+                    animation {
+                        scale(
+                            comp.animation.speed,
+                            0f,
+                            stretch(
+                                comp.sprite.scaleX,
+                                comp.sprite.scaleX - comp.animation.scaleX,
+                                comp.sprite.scaleY,
+                                comp.sprite.scaleY + comp.animation.scaleY
+                            )
+                        )
+                    }
+                } else {
+                    null
+                }
+            }
+            SpriteAnimation(comp, anim)
+        }
+
+        iconAnimator = animation {
             vertical(2f, Random.nextFloat() * Random.nextInt(0, 1000), float(.3f))
         }
+
+
     }
 
     override fun reset() {
         super.reset()
-        animator = null
+        animations = emptyList()
+        iconAnimator = null
         iconPivot = null
         data?.let {
             it.onReset(it)

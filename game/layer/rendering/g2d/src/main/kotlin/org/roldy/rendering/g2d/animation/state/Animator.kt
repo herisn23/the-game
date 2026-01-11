@@ -58,7 +58,6 @@ class Animator(
             pivot.height * data.scaleY
         )
     }
-
 }
 
 class AnimationStack(
@@ -70,7 +69,7 @@ class AnimationStack(
     fun scale(
         speed: Float,
         initialTime: Float = 0f,
-        animation: PulseAnimationStyle
+        animation: ScaleAnimationAnimationStyle
     ) = add(ScaleAnimationAnimation(data, speed, initialTime, animation))
 
     @Animating
