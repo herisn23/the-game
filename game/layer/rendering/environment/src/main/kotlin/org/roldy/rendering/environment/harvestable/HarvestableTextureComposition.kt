@@ -21,35 +21,15 @@ fun SpriteCompositor.composite(
 ): List<CompositeSprite> =
     apply {
         when (harvestable.harvestable.type) {
-            HarvestableType.ORE -> ore(
-                position,
-                terrain,
-                harvestable.harvestable
-            ) { harvestable.refreshing.supplies == 0 }
-
-            HarvestableType.WOOD -> wood(
-                position,
-                terrain,
-                harvestable.harvestable
-            ) { harvestable.refreshing.supplies == 0 }
-
-            HarvestableType.FIBER -> wood(
-                position,
-                terrain,
-                harvestable.harvestable
-            ) { harvestable.refreshing.supplies == 0 }
-
-            HarvestableType.GEM -> gem(
-                position,
-                terrain,
-                harvestable.harvestable
-            ) { harvestable.refreshing.supplies == 0 }
-
-            HarvestableType.LEATHER -> wood(
-                position,
-                terrain,
-                harvestable.harvestable
-            ) { harvestable.refreshing.supplies == 0 }
-        }
+            HarvestableType.ORE -> ::ore
+            HarvestableType.WOOD -> ::wood
+            HarvestableType.FIBER -> ::fiber
+            HarvestableType.GEM -> ::gem
+            HarvestableType.LEATHER -> ::leather
+        }(
+            position,
+            terrain,
+            harvestable.harvestable
+        ) { harvestable.refreshing.supplies == 0 }
 
     }.retrieve()
