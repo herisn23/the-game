@@ -18,12 +18,12 @@ import org.roldy.rendering.screen.world.populator.WorldChunkPopulator
 class HarvestablePopulator(
     override val map: WorldMap,
     val harvestable: List<HarvestableState>,
-    decorationAtlas: TextureAtlas,
+    environmentAtlas: TextureAtlas,
     tilesAtlas: TextureAtlas,
     craftingIconsAtlas: TextureAtlas
 ) : AutoDisposableAdapter(), WorldChunkPopulator {
     val craftingIcons = CraftingIconTextures(craftingIconsAtlas)
-    val mapAtlas = MapAtlas(decorationAtlas, tilesAtlas)
+    val mapAtlas = MapAtlas(environmentAtlas, tilesAtlas)
     val pool = SpritePool()
     val compositor = SpriteCompositor(pool, mapAtlas, map.tileWidth.toFloat())
     override fun populate(
@@ -42,10 +42,12 @@ class HarvestablePopulator(
                 position = position,
                 coords = harvestable.coords,
                 icon = craftingIcons.region(harvestable.harvestable, CraftingIconTexturesType.Normal),
-                sprites = compositor.composite(position, harvestable.harvestable, biome),
+                sprites = compositor.composite(position, harvestable, biome),
                 tileSize = tileSize
             ) {
-                sprites.forEach(pool::free)
+                sprites.forEach {
+                    pool.free(it.first)
+                }
             }
         }
     }

@@ -15,9 +15,7 @@ class DebugRenderer(
 ) : AutoDisposableAdapter() {
 
     val mapDebug by disposable { WorldMapDebugRenderer(map, camera) }
-    val chunkDebug by disposable {
-        ChunkDebugRenderer(camera, manager)
-    }
+    val chunkDebug by disposable { ChunkDebugRenderer(camera, manager) }
 
     fun render() {
         mapDebug.render()

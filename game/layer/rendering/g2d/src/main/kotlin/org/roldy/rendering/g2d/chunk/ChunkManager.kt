@@ -41,7 +41,7 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
 
     private val visibleChunksCache = mutableListOf<T>()
 
-    val preloadRadius = -300f
+    val preloadRadius = 400f
 
     val visibleChunks: List<Chunk<D>>
         get() = synchronized(visibleChunksCache) {
@@ -104,17 +104,16 @@ abstract class ChunkManager<D : ChunkObjectData, T : Chunk<D>>(
         //update visibility views
         val radius = preloadRadius * zoom
         visibilityViewChunks.set(
-            view.x + radius,
-            view.y + radius,
-            view.x + view.width - radius,
-            view.y + view.height - radius
+            view.x - radius,
+            view.y - radius,
+            view.x + view.width + radius,
+            view.y + view.height + radius
         )
-        val itemMargin = radius * 2
         visibilityViewObjects.set(
-            view.x + radius,
-            view.y + radius,
-            view.width - itemMargin,
-            view.height - itemMargin,
+            view.x - radius,
+            view.y - radius,
+            view.x + view.width + radius,
+            view.y + view.height + radius,
         )
     }
 

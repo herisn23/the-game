@@ -23,14 +23,15 @@ class SpriteCompositor(
     val tileSize: Float
 ) {
 
-    private val sprites: MutableList<Sprite> = mutableListOf()
+    private val sprites: MutableList<Pair<Sprite, () -> Boolean>> = mutableListOf()
 
     @AddComposition
     fun texture(
         position: Vector2,
         region: MapAtlas.() -> TextureRegion,
+        visible: () -> Boolean,
         configure: Pivot.() -> Unit = {}
-    ) =
+    ): Sprite =
         atlas
             .region()
             .run {
@@ -51,7 +52,9 @@ class SpriteCompositor(
                     setScale(config.scaleX, config.scaleY)
                 }
             }
-            .also(sprites::add)
+            .also {
+                sprites.add(it to visible)
+            }
 
 
     @CompositeChain
@@ -67,5 +70,5 @@ class SpriteCompositor(
         center().parent().center().pivot()
 
 
-    fun retrieve(): List<Sprite> = sprites.toList().also { sprites.clear() }
+    fun retrieve(): List<Pair<Sprite, () -> Boolean>> = sprites.toList().also { sprites.clear() }
 }

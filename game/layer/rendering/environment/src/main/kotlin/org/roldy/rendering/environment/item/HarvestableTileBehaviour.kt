@@ -21,7 +21,7 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         override val coords: Vector2Int,
         override val data: Map<String, Any> = emptyMap(),
         val icon: TextureRegion,
-        val sprites: List<Sprite>,
+        val sprites: List<Pair<Sprite, () -> Boolean>>,
         val tileSize: Float,
         val onReset: Data.() -> Unit
     ) : TileObject.Data
@@ -36,7 +36,8 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         batch: SpriteBatch
     ) {
         data.sprites.forEach { sprite ->
-            sprite.draw(batch)
+            if (sprite.second())
+                sprite.first.draw(batch)
         }
         val animator = this.animator
         val pivot = this.iconPivot

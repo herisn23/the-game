@@ -4,20 +4,20 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
 import org.roldy.data.configuration.biome.BiomeType
-import org.roldy.data.mine.harvestable.Harvestable
+import org.roldy.data.state.HarvestableState
 import org.roldy.rendering.environment.composite.SpriteCompositor
 
 class MapAtlas(
-    val decors: TextureAtlas,
+    val environment: TextureAtlas,
     val tiles: TextureAtlas,
 )
 
 
 fun SpriteCompositor.composite(
     position: Vector2,
-    harvestable: Harvestable,
+    harvestable: HarvestableState,
     biome: BiomeType
-): List<Sprite> =
+): List<Pair<Sprite, () -> Boolean>> =
     apply {
-
+        ore(position, biome, harvestable.harvestable) { harvestable.refreshing.supplies == 0 }
     }.retrieve()

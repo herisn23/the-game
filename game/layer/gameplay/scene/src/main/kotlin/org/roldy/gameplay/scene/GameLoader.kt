@@ -172,7 +172,7 @@ class GameLoader {
 
     // ATLASES
     val tilesAtlas = GameLoaderProperty<TextureAtlas>()
-    val decorsAtlas = GameLoaderProperty<TextureAtlas>()
+    val environmentAtlas = GameLoaderProperty<TextureAtlas>()
     val roadsAtlas = GameLoaderProperty<TextureAtlas>()
     val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
     val biomeColors = GameLoaderProperty<Map<BiomeType, Texture>>()
@@ -216,7 +216,7 @@ class GameLoader {
         addLoader(Strings.loading_textures, tilesAtlas) {
             AtlasLoader.tiles
         }
-        addLoader(Strings.loading_textures, decorsAtlas) {
+        addLoader(Strings.loading_textures, environmentAtlas) {
             AtlasLoader.tileEnvironment
         }
         addLoader(Strings.loading_textures, roadsAtlas) {
@@ -331,13 +331,13 @@ class GameLoader {
         addLoader(Strings.loading_finalize, populators) {
             if (!debugMode) {
                 listOf(
-                    SettlementPopulator(worldMap.value, decorsAtlas.value, gameState.value.settlements),
+                    SettlementPopulator(worldMap.value, environmentAtlas.value, gameState.value.settlements),
                     RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
                     MountainsPopulator(worldMap.value, mountains.value, tilesAtlas.value),
                     HarvestablePopulator(
                         worldMap.value,
                         gameState.value.mines,
-                        decorsAtlas.value,
+                        environmentAtlas.value,
                         tilesAtlas.value,
                         craftingIconAtlas.value
                     ),

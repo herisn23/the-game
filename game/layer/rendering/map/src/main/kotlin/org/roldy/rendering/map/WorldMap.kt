@@ -20,7 +20,7 @@ class WorldMap(
     val layer = tiledMap.layers[0] as TiledMapTileLayer
     val staggerAxis = "y"
     val staggerIndex = if (data.size.height % 2 == 1) "odd" else "even"
-    val heighIsEven = data.size.height % 2 == 1
+    val heightIsEven = data.size.height % 2 == 1
     val tileWidth = layer.tileWidth
     val tileHeight = layer.tileHeight
     val width: Int = data.size.width
@@ -53,7 +53,7 @@ class WorldMap(
     }
 
     fun isStaggered(index: Int): Boolean {
-        return if (staggerIndex == "even" && heighIsEven) {
+        return if (staggerIndex == "even" && heightIsEven) {
             index % 2 == 0  // Even rows (0, 2, 4...) are staggered
         } else {
             index % 2 == 1  // Odd rows (1, 3, 5...) are staggered
