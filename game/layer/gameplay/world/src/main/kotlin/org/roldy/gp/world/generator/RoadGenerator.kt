@@ -6,8 +6,8 @@ import org.roldy.core.pathwalker.PathWalker
 import org.roldy.core.plus
 import org.roldy.core.utils.hexDistance
 import org.roldy.core.x
+import org.roldy.data.state.SettlementState
 import org.roldy.data.tile.RoadTileData
-import org.roldy.data.tile.SettlementTileData
 import org.roldy.gp.world.generator.road.*
 import org.roldy.gp.world.pathfinding.TilePathfinder
 import org.roldy.rendering.map.WorldMap
@@ -15,7 +15,7 @@ import kotlin.random.Random
 
 class RoadGenerator(
     val map: WorldMap,
-    val settlements: () -> List<SettlementTileData>,
+    val settlements: List<SettlementState>,
     val algorithm: Algorithm = Algorithm.K_NEAREST,
     override val occupied: (Vector2Int) -> Boolean
 ) : WorldGenerator<RoadTileData> {
@@ -30,7 +30,7 @@ class RoadGenerator(
     fun baseCost(tile: Vector2Int, goal: Vector2Int) =
         map.terrainData.getValue(tile).walkCost *
                 Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
-                (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
+                (0f.takeIf { occupied(tile) && !settlements.any { it.coords == tile } } ?: 1f)
 
     enum class Algorithm(
         val alg: RoadNetworkAlgorithm,
@@ -60,7 +60,7 @@ class RoadGenerator(
             KNearest, mapOf("k" to 3, "randomness" to 0.5f)
         );
 
-        fun generate(seed: Long, settlements: List<SettlementTileData>) =
+        fun generate(seed: Long, settlements: List<SettlementState>) =
             alg.generate(seed, settlements, config)
     }
 
@@ -68,7 +68,6 @@ class RoadGenerator(
      * Generates road network using specified algorithm.
      */
     override fun generate(): List<RoadTileData> {
-        val settlements = settlements()
         if (settlements.size < 2) return emptyList()
 
         val edges = algorithm.generate(map.data.seed + GeneratorSeeds.ROADS_SEED, settlements)
@@ -103,8 +102,8 @@ class RoadGenerator(
      * Builds optimal branching network by finding best branch points.
      */
     private fun buildBranchingNetwork(
-        source: SettlementTileData,
-        destinations: List<SettlementTileData>,
+        source: SettlementState,
+        destinations: List<SettlementState>,
         existingRoadsNodes: Set<PathWalker.Node>
     ): Set<PathWalker.Node> {
         if (destinations.isEmpty()) return emptySet()
@@ -119,7 +118,7 @@ class RoadGenerator(
         allRoads.addAll(existingRoadsNodes)
 
         // Helper to check if a settlement is already connected
-        fun isConnectedToRoadNetwork(settlement: SettlementTileData): Boolean {
+        fun isConnectedToRoadNetwork(settlement: SettlementState): Boolean {
             val roadEntry = settlement.coords + roadOffset
             val existingCoords = allRoads.map { it.coords }.toSet()
             return settlement.coords in existingCoords || roadEntry in existingCoords
@@ -166,7 +165,7 @@ class RoadGenerator(
             val pathfinder = TilePathfinder(map) { tile, goal ->
                 val baseCost = map.terrainData.getValue(tile).walkCost *
                         Random(map.data.seed + tile.sum + goal.sum).nextFloat() *
-                        (0f.takeIf { occupied(tile) && !settlements().any { it.coords == tile } } ?: 1f)
+                        (0f.takeIf { occupied(tile) && !settlements.any { it.coords == tile } } ?: 1f)
 
                 // Existing roads are nearly free
                 if (tile in allRoads.map { it.coords }) {

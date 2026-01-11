@@ -30,7 +30,7 @@ private fun SettlementTileData.toState() =
         id = id,
         coords = coords,
         ruler = RulerState(color = color),
-        region = claims,
+        claims = claims,
         type = type,
     )
 

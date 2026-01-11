@@ -2,7 +2,7 @@ package org.roldy.gp.world.generator.road
 
 import org.roldy.core.times
 import org.roldy.core.utils.hexDistance
-import org.roldy.data.tile.SettlementTileData
+import org.roldy.data.state.SettlementState
 import kotlin.random.Random
 
 
@@ -15,18 +15,18 @@ object MinimumSpanningTree : RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementTileData>,
+        settlements: List<SettlementState>,
         config: Map<String, Any>
-    ): List<Pair<SettlementTileData, SettlementTileData>> {
+    ): List<Pair<SettlementState, SettlementState>> {
         val randomness: Float by config
-        val edges = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
-        val visited = mutableSetOf<SettlementTileData>()
+        val edges = mutableListOf<Pair<SettlementState, SettlementState>>()
+        val visited = mutableSetOf<SettlementState>()
 
 
         visited.add(settlements.random(Random(seed)))
 
         while (visited.size < settlements.size) {
-            val candidates = mutableListOf<Triple<SettlementTileData, SettlementTileData, Float>>()
+            val candidates = mutableListOf<Triple<SettlementState, SettlementState, Float>>()
 
             visited.forEach { from ->
                 settlements.filter { it !in visited }.forEach { to ->

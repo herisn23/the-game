@@ -1,6 +1,7 @@
 package org.roldy.rendering.map
 
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer
@@ -14,6 +15,7 @@ class WorldMap(
     // Map parameters
     val data: MapData,
     val tiledMap: TiledMap,
+    val outlines: TextureAtlas,
     val terrainData: Map<Vector2Int, MapTerrainData>,
     private val biomeShowColorsInsteadTextures: Boolean = false
 ) : AutoDisposableAdapter() {
@@ -64,7 +66,7 @@ class WorldMap(
     val tilePosition = TilePositionResolver(this)
     val mapBounds = MapBounds(this)
 
-    private val tileFocus = TileFocus(tilePosition).disposable()
+    private val tileFocus = TileFocus(tilePosition, outlines).disposable()
 
     fun render(camera: OrthographicCamera) {
         tiledMapRenderer.setView(camera)

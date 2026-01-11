@@ -1,14 +1,14 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.data.tile.SettlementTileData
+import org.roldy.data.state.SettlementState
 
 object KNearest : RoadNetworkAlgorithm {
     override fun generate(
         seed: Long,
-        settlements: List<SettlementTileData>,
+        settlements: List<SettlementState>,
         config: Map<String, Any>
-    ): List<Pair<SettlementTileData, SettlementTileData>> {
+    ): List<Pair<SettlementState, SettlementState>> {
         val k: Int by config
 
         // First, build MST for basic connectivity

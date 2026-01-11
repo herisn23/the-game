@@ -12,6 +12,7 @@ object AtlasLoader {
     val tileEnvironment get() = load("tiles/Environment.atlas")
     val tiles get() = load("tiles/Tiles.atlas")
     val roads get() = load("tiles/Roads.atlas")
+    val hexOutline get() = load("tiles/Outline.atlas")
     val gui get() = load("ui/GUI.atlas")
     val craftingIcons get() = load("ui/CraftingResourceIcons.atlas")
 

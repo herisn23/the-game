@@ -82,6 +82,8 @@ fun AutoDisposable.gameLoader(
             progress,
             finished,
         )
+    }.apply {
+        start()
     }
 }
 
@@ -153,9 +155,10 @@ class GameLoader {
     val worldMap = GameLoaderProperty<WorldMap>()
     val noise = GameLoaderProperty<Map<Vector2Int, NoiseData>>()
     val terrainData = GameLoaderProperty<Map<Vector2Int, MapTerrainData>>()
+
     val settlements = GameLoaderProperty<List<SettlementTileData>>()
     val roads = GameLoaderProperty<List<RoadTileData>>()
-    val mines = GameLoaderProperty<List<HarvestableTileData>>()
+    val harvestable = GameLoaderProperty<List<HarvestableTileData>>()
     val mountains = GameLoaderProperty<List<MountainTileData>>()
 
     val biomesConfiguration = GameLoaderProperty<BiomesConfiguration>()
@@ -179,9 +182,10 @@ class GameLoader {
     val environmentAtlas = GameLoaderProperty<TextureAtlas>()
     val roadsAtlas = GameLoaderProperty<TextureAtlas>()
     val craftingIconAtlas = GameLoaderProperty<TextureAtlas>()
+    val outlines = GameLoaderProperty<TextureAtlas>()
     val biomeColors = GameLoaderProperty<Map<BiomeType, Texture>>()
 
-    init {
+    private fun addLoaders() {
 
         // CONFIGURATION LOADERS
 
@@ -229,6 +233,9 @@ class GameLoader {
         addLoader(Strings.loading_textures, craftingIconAtlas) {
             AtlasLoader.craftingIcons
         }
+        addLoader(Strings.loading_textures, outlines) {
+            AtlasLoader.hexOutline
+        }
 
         // MAP LOADERS
         addLoader(Strings.loading_generate_map, noise) {
@@ -242,7 +249,7 @@ class GameLoader {
         }
 
         addLoader(Strings.loading_generate_map, biomeColors) {
-            val hex = Texture(loadAsset("HexTileHighlighter.png"))
+            val hex = Texture(loadAsset("tiles/EmptyHex.png"))
             biomesConfiguration.value.biomes.associate {
                 it.type to hex.copy(it.color)
             }.also {
@@ -279,20 +286,14 @@ class GameLoader {
         }
 
         addLoader(Strings.loading_generate_map, worldMap) {
-            WorldMap(mapData.value, tiledMap.value, terrainData.value, debugMode)
+            WorldMap(mapData.value, tiledMap.value, outlines.value, terrainData.value, debugMode)
         }
 
-        // GENERATOR LOADERS
-        addGeneratorLoader(Strings.loading_settlements, settlements) {
+        // generators for new game
+        addGeneratorLoader(Strings.loading_settlements, settlements, { newGame }) {
             SettlementGenerator(terrainData.value, mapData.value, occupied()).generate()
         }
-        addGeneratorLoader(Strings.loading_roads, roads) {
-            RoadGenerator(worldMap.value, { settlements.value }, occupied = occupied()).generate()
-        }
-        addGeneratorLoader(Strings.loading_mountains, mountains) {
-            MountainsGenerator(worldMap.value, biomes.value, occupied()).generate()
-        }
-        addGeneratorLoader(Strings.loading_mines, mines) {
+        addGeneratorLoader(Strings.loading_mines, harvestable, { newGame }) {
             HarvestableGenerator(
                 terrainData.value,
                 mapData.value,
@@ -306,11 +307,19 @@ class GameLoader {
         addLoader(Strings.loading_game_state) {
             if (newGame && heroStateForNewGame != null) {
                 gameState.value =
-                    createGameState(mapData.value, settlements.value, mines.value, heroStateForNewGame).apply {
+                    createGameState(mapData.value, settlements.value, harvestable.value, heroStateForNewGame).apply {
                         heroStateForNewGame.setSuitableSpot(this, worldMap.value)
                     }
             }
         }
+        // generators based on game state
+        addGeneratorLoader(Strings.loading_roads, roads) {
+            RoadGenerator(worldMap.value, gameState.value.settlements, occupied = occupied()).generate()
+        }
+        addGeneratorLoader(Strings.loading_mountains, mountains) {
+            MountainsGenerator(worldMap.value, biomes.value, occupied()).generate()
+        }
+
         addLoader(Strings.loading_game_state, gameTime) {
             GameTime(gameState.value.time)
         }
@@ -335,7 +344,12 @@ class GameLoader {
         addLoader(Strings.loading_finalize, populators) {
             if (!debugMode) {
                 listOf(
-                    SettlementPopulator(worldMap.value, environmentAtlas.value, gameState.value.settlements),
+                    SettlementPopulator(
+                        worldMap.value,
+                        environmentAtlas.value,
+                        outlines.value,
+                        gameState.value.settlements
+                    ),
                     RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
                     MountainsPopulator(worldMap.value, mountains.value, tilesAtlas.value),
                     HarvestablePopulator(
@@ -415,11 +429,14 @@ class GameLoader {
                 }
             }
         }
+    }
 
+    fun start() {
+        addLoaders()
         load()
     }
 
-    fun load() {
+    private fun load() {
         async { onMain ->
             val size = loaders.size
 
@@ -488,13 +505,15 @@ class GameLoader {
     private fun <P : TileData> addGeneratorLoader(
         name: I18N.Key,
         property: GameLoaderProperty<List<P>>,
+        enabled: () -> Boolean = { true },
         load: () -> List<P>
     ) {
-        addLoader(name, property) {
-            load().also {
-                it.addOccupied()
+        if (enabled())
+            addLoader(name, property) {
+                load().also {
+                    it.addOccupied()
+                }
             }
-        }
     }
 
     private fun occupied(): (Vector2Int) -> Boolean = { coords ->

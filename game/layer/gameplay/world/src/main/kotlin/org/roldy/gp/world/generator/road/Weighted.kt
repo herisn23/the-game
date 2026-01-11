@@ -1,11 +1,11 @@
 package org.roldy.gp.world.generator.road
 
 import org.roldy.core.utils.hexDistance
-import org.roldy.data.tile.SettlementTileData
+import org.roldy.data.state.SettlementState
 
 
 fun interface WeightedImportance {
-    fun get(data: SettlementTileData): Int
+    fun get(data: SettlementState): Int
 }
 
 object Weighted : RoadNetworkAlgorithm {
@@ -16,11 +16,11 @@ object Weighted : RoadNetworkAlgorithm {
      */
     override fun generate(
         seed: Long,
-        settlements: List<SettlementTileData>,
+        settlements: List<SettlementState>,
         config: Map<String, Any>
-    ): List<Pair<SettlementTileData, SettlementTileData>> {
+    ): List<Pair<SettlementState, SettlementState>> {
         val getImportance: WeightedImportance by config
-        val edges = mutableListOf<Triple<SettlementTileData, SettlementTileData, Int>>()
+        val edges = mutableListOf<Triple<SettlementState, SettlementState, Int>>()
 
         // Create weighted edges
         for (i in settlements.indices) {
@@ -41,10 +41,10 @@ object Weighted : RoadNetworkAlgorithm {
     }
 
     private fun buildMSTFromWeightedEdges(
-        edges: List<Triple<SettlementTileData, SettlementTileData, Int>>
-    ): List<Pair<SettlementTileData, SettlementTileData>> {
-        val result = mutableListOf<Pair<SettlementTileData, SettlementTileData>>()
-        val visited = mutableSetOf<SettlementTileData>()
+        edges: List<Triple<SettlementState, SettlementState, Int>>
+    ): List<Pair<SettlementState, SettlementState>> {
+        val result = mutableListOf<Pair<SettlementState, SettlementState>>()
+        val visited = mutableSetOf<SettlementState>()
         val sortedEdges = edges.sortedBy { it.third }
 
         // Kruskal's algorithm

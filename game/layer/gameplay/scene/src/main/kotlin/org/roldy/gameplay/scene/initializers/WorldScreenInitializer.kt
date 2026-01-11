@@ -10,14 +10,13 @@ import org.roldy.gameplay.scene.gameLoader
 import org.roldy.rendering.g2d.Diagnostics
 import org.roldy.rendering.screen.ProxyScreen
 import java.io.File
-import kotlin.random.Random
 
 fun GameScene.worldScreen(
     progress: (Float, I18N.Key) -> Unit
 ) {
     val saveFile = File("save_data.sav")
     //-1505060409
-    val mapData = MapData(Random.nextInt(0, Int.MAX_VALUE).toLong(), MapSize.Small)
+    val mapData = MapData(-1505060409L, MapSize.Small)
     val camera = camera(1f)
     gameLoader(
         saveFile,

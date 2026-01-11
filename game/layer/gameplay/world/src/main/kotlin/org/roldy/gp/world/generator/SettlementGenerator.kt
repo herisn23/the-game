@@ -6,6 +6,7 @@ import org.roldy.core.utils.hexDistance
 import org.roldy.core.utils.hexRadius
 import org.roldy.core.utils.randomColor
 import org.roldy.core.x
+import org.roldy.data.configuration.biome.BiomeType
 import org.roldy.data.map.MapData
 import org.roldy.data.map.MapSize
 import org.roldy.data.mine.HarvestableType
@@ -21,10 +22,8 @@ class SettlementGenerator(
 ) : WorldGenerator<SettlementTileData> {
     val logger by logger()
     val harvestable = HarvestableType.harvestable
-
-    val maxRegionSize = 20
-    val minRegionSize = 5
-
+    val minSettlementDistance = 10
+    val baseRegionSize = 1
     override fun generate(): List<SettlementTileData> {
         val mapSize = mapData.size
         val seed = mapData.seed
@@ -49,24 +48,23 @@ class SettlementGenerator(
             // Check if location is suitable
             val isSuitable =
                 settlements.none {
-                    hexDistance(x x y, it.coords) < maxRegionSize * 2 + 1  // Min distance from others
-                } && !occupied(coords)
+                    hexDistance(x x y, it.coords) < minSettlementDistance + 1  // Min distance from others
+                } && !occupied(coords) && terrainData.getValue(coords).terrain.biome.data.type != BiomeType.Water
 
             if (isSuitable) {
                 val random = Random(seed + coords.sum)
-                val regionSize = random.nextInt(minRegionSize, maxRegionSize) // tiles from settlement is 15
-                val maxHarvestable = random.nextInt(regionSize) // settlement can have max of 6 mines
+                val maxHarvestable = random.nextInt(baseRegionSize) // settlement can have max of 6 mines
                 val harvestableCount = min(harvestable.size, maxHarvestable)
                 logger.debug {
                     """
                         
                         Generated settlement: $coords
-                            Region size: $regionSize
+                            Region size: $baseRegionSize
                             Harvestable size: $harvestableCount
                     """.trimIndent()
                 }
 
-                val radius = hexRadius(coords, regionSize, mapSize.min, mapSize.max).filter {
+                val baseRadius = hexRadius(coords, baseRegionSize, mapSize.min, mapSize.max).filter {
                     //remove hexes which are in bound of another settlement
                     val existing = settlements.flatMap(SettlementTileData::claims).toSet()
                     !existing.contains(it) && it.x in 0..<mapSize.width && it.y in 0..<mapSize.height
@@ -76,7 +74,7 @@ class SettlementGenerator(
                         id = idGen.nextInt(),
                         coords,
                         "Settlement${settlements.size + 1}",
-                        radius,
+                        baseRadius,
                         harvestableCount,
                         random.nextInt(0, 3),
                         randomColor(random)
