@@ -128,7 +128,7 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(-68.89995f, 50f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.tree_9_20] },
@@ -139,7 +139,7 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(-68.79995f, 83.7f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.tree_8_34] }, { empty() }) {
             setScale(1f, 1f)
             centered()
@@ -263,7 +263,7 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(71.8f, 28.59998f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.tree_10_29] },
@@ -274,13 +274,13 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(58.9f, 71.4f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.tree_8_34] }, { empty() }) {
             setScale(1f, 1f)
             centered()
             offset(67.9f, 27.29997f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.water_0001s_0035_Layer_291] }, { true }) {
             setScale(0.5f, 0.5f)
             centered()
@@ -423,7 +423,7 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(-44.2f, -52.40002f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.tree_9_30] },
@@ -434,7 +434,7 @@ fun SpriteCompositor.wood(position: Vector2, terrain: Terrain, harvestable: Harv
             centered()
             offset(-46.1f, -23.9f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.tree_8_34] }, { empty() }) {
             setScale(1f, 1f)
             centered()

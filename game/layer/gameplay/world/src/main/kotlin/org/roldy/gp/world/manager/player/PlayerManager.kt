@@ -3,7 +3,6 @@ package org.roldy.gp.world.manager.player
 import org.roldy.core.Vector2Int
 import org.roldy.core.coroutines.ConcurrentLoopConsumer
 import org.roldy.core.utils.sequencer
-import org.roldy.core.x
 import org.roldy.data.state.GameState
 import org.roldy.gp.world.manager.SquadManager
 import org.roldy.gp.world.pathfinding.TilePathfinder
@@ -31,7 +30,7 @@ class PlayerManager(
             current.teleport(settlements.next().coords)
         }
         gui.teleportToEnd.onClick {
-            current.teleport(screen.map.width - 1 x screen.map.height - 1)
+            current.teleport(screen.map.terrainData.keys.random())
         }
     }
 

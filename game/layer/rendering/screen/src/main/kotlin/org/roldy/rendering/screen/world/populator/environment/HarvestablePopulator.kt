@@ -8,7 +8,7 @@ import org.roldy.rendering.environment.TileObject
 import org.roldy.rendering.environment.composite.SpriteCompositor
 import org.roldy.rendering.environment.composite.SpritePool
 import org.roldy.rendering.environment.harvestable.MapAtlas
-import org.roldy.rendering.environment.harvestable.composite
+import org.roldy.rendering.environment.harvestable.compose
 import org.roldy.rendering.environment.item.HarvestableTileBehaviour
 import org.roldy.rendering.g2d.disposable.AutoDisposableAdapter
 import org.roldy.rendering.map.WorldMap
@@ -42,7 +42,7 @@ class HarvestablePopulator(
                 position = position,
                 coords = harvestable.coords,
                 icon = craftingIcons.region(harvestable.harvestable, CraftingIconTexturesType.Normal),
-                sprites = compositor.composite(position, harvestable, terrain),
+                sprites = compositor.compose(position, harvestable, terrain),
                 tileSize = tileSize
             ) {
                 sprites.forEach {

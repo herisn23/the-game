@@ -103,7 +103,7 @@ fun SpriteCompositor.leather(position: Vector2, terrain: Terrain, harvestable: H
             centered()
             offset(90.8f, 36.3f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.forest_0000s_0040_Layer_245] },

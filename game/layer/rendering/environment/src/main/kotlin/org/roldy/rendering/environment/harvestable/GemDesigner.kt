@@ -429,7 +429,7 @@ fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(77.6f, 78.1f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0203_Layer_16] },
@@ -440,7 +440,7 @@ fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(-54.3f, 114.1f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0204_Layer_15] },
@@ -451,7 +451,7 @@ fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(-13.5f, 134.2f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0206_Layer_13] },
@@ -498,13 +498,13 @@ fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(-5.050003f, 24.71992f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.mine_4_1] }, { !empty() }) {
             setScale(0.3f, 0.3f)
             centered()
             offset(-4.9f, 26.7f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(position, { environment[Environment.mine_4_2] }, { empty() }) {
             setScale(0.3f, 0.3f)
             centered()
@@ -651,7 +651,7 @@ fun SpriteCompositor.gem(position: Vector2, terrain: Terrain, harvestable: Harve
             centered()
             offset(37.3f, -65.5f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0205_Layer_14] },

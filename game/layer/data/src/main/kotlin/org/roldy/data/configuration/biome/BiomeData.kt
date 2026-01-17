@@ -22,7 +22,8 @@ data class BiomeData(
     val color: Color,
     val walkCost: Float,
     val terrains: List<TerrainData>,
-    val mountains: List<SpawnData> = emptyList()
+    val mountains: List<StaticSpawnData> = emptyList(),
+    val trees: List<StaticSpawnData> = emptyList()
 ) : HeightData {
 
     @Serializable
@@ -40,7 +41,7 @@ data class BiomeData(
     ) : HeightData
 
     @Serializable
-    data class SpawnData(
+    data class StaticSpawnData(
         val name: String,
         val spawnAt: String? = null,
         val spawnAtGroup: String? = null,
@@ -51,6 +52,7 @@ data class BiomeData(
         @Serializable(ClosedFloatingPointRangeSerializer::class)
         override val moisture: ClosedFloatingPointRange<Float> = -maxValue..maxValue,
         val minRadius: Int = 0,
-        val spawnChance: Float = 1f
+        val spawnChance: Float = 1f,
+        val walkCost: Float = 1f
     ) : HeightData
 }

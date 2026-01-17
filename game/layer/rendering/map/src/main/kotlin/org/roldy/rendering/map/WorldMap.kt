@@ -79,6 +79,33 @@ class WorldMap(
         tileFocus.render(camera)
     }
 
+    fun getNeighbors(tile: Vector2Int): List<Vector2Int> {
+
+        // Flat-top hex neighbors (6 directions)
+        val neighbors = if (isStaggered(tile)) {
+            listOf(
+                Vector2Int(tile.x + 1, tile.y),
+                Vector2Int(tile.x, tile.y - 1),
+                Vector2Int(tile.x + 1, tile.y - 1),
+                Vector2Int(tile.x - 1, tile.y),
+                Vector2Int(tile.x, tile.y + 1),
+                Vector2Int(tile.x + 1, tile.y + 1)
+            )
+        } else {
+            listOf(
+                Vector2Int(tile.x + 1, tile.y),
+                Vector2Int(tile.x - 1, tile.y - 1),
+                Vector2Int(tile.x, tile.y - 1),
+                Vector2Int(tile.x - 1, tile.y),
+                Vector2Int(tile.x - 1, tile.y + 1),
+                Vector2Int(tile.x, tile.y + 1)
+            )
+        }
+
+        // Don't filter here - let A* handle costs
+        return neighbors.filter { mapBounds.isInBounds(it) }
+    }
+
     fun clampToBounds(position: Vector2, newPosition: (Vector2) -> Unit) {
         if (!mapBounds.isInBounds(position)) {
             newPosition(mapBounds.clampToMap(position))

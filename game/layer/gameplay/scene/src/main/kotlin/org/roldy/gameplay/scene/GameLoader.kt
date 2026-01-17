@@ -158,7 +158,8 @@ class GameLoader {
     val settlements = GameLoaderProperty<List<SettlementTileData>>()
     val roads = GameLoaderProperty<List<RoadTileData>>()
     val harvestable = GameLoaderProperty<List<HarvestableTileData>>()
-    val mountains = GameLoaderProperty<List<MountainTileData>>()
+    val mountains = GameLoaderProperty<List<FoliageTileData>>()
+    val trees = GameLoaderProperty<List<FoliageTileData>>()
 
     val biomesConfiguration = GameLoaderProperty<BiomesConfiguration>()
     val biomes = GameLoaderProperty<List<Biome>>()
@@ -308,17 +309,23 @@ class GameLoader {
         addLoader(Strings.loading_game_state) {
             if (newGame && heroStateForNewGame != null) {
                 gameState.value =
-                    createGameState(mapData.value, settlements.value, harvestable.value, heroStateForNewGame).apply {
-                        heroStateForNewGame.setSuitableSpot(this, worldMap.value)
-                    }
+                    createGameState(mapData.value, settlements.value, harvestable.value, heroStateForNewGame)
+                        .apply {
+                            heroStateForNewGame.setSuitableSpot(this, worldMap.value)
+                        }
             }
         }
         // generators based on game state
         addGeneratorLoader(Strings.loading_roads, roads) {
             RoadGenerator(worldMap.value, gameState.value.settlements, occupied = occupied()).generate()
         }
+
+        addGeneratorLoader(Strings.loading_trees, trees) {
+            StaticSpawnDataGenerator.cluster(worldMap.value, gameState.value, occupied()).generate()
+        }
+
         addGeneratorLoader(Strings.loading_mountains, mountains) {
-            MountainsGenerator(worldMap.value, biomes.value, occupied()).generate()
+            StaticSpawnDataGenerator.snake(worldMap.value, gameState.value, occupied()).generate()
         }
 
         addLoader(Strings.loading_game_state, gameTime) {
@@ -357,15 +364,17 @@ class GameLoader {
                         gameState.value.settlements
                     ),
                     RoadsPopulator(worldMap.value, roadsAtlas.value, roads.value),
-                    MountainsPopulator(worldMap.value, mountains.value, tilesAtlas.value),
+
+                    FoliagePopulator(worldMap.value, trees.value, tilesAtlas.value),
+                    FoliagePopulator(worldMap.value, mountains.value, tilesAtlas.value),
+
                     HarvestablePopulator(
                         worldMap.value,
                         gameState.value.mines,
                         environmentAtlas.value,
                         tilesAtlas.value,
                         craftingIconAtlas.value
-                    ),
-                    FoliagePopulator(worldMap.value)
+                    )
                 )
             } else {
                 emptyList()

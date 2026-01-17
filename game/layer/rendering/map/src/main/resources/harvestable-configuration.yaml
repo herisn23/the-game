@@ -4,7 +4,7 @@ wood:
     biomes: [Forest, Swamp, Cold]
   Ash:
     elevation: 0.1..0.3
-    biomes: [ Forest, Cold, Volcanic ]
+    biomes: [ Forest, Cold, WitchForest ]
   Yew:
     elevation: 0.1..0.3
     biomes: [ MysticalForest, Forest ]
@@ -30,50 +30,50 @@ fiber:
     biomes: [ MysticalForest, Swamp, Forest ]
   SpiderSilk:
     elevation: 0.1..0.3
-    biomes: [ MysticalForest, Swamp, Volcanic ]
+    biomes: [ MysticalForest, Swamp, WitchForest ]
   MoonWeave:
     elevation: 0.1..0.3
     biomes: [ MysticalForest, Swamp ]
   Cotton:
     elevation: 0.1..0.3
-    biomes: [ Forest, MysticalForest, Volcanic ]
+    biomes: [ Forest, MysticalForest, WitchForest ]
 
 ore:
   Copper:
     elevation: 0.3..0.5
-    biomes: [ Cold, Forest, Swamp, Volcanic ]
+    biomes: [ Cold, Forest, Swamp, WitchForest ]
   Iron:
     elevation: 0.3..0.5
-    biomes: [ Cold, Forest, Volcanic ]
+    biomes: [ Cold, Forest, WitchForest ]
   Gold:
     elevation: 0.3..0.5
-    biomes: [ Volcanic, Cold, Swamp ]
+    biomes: [ WitchForest, Cold, Swamp ]
   Silver:
     elevation: 0.3..0.5
-    biomes: [ Volcanic, Swamp, Forest ]
+    biomes: [ WitchForest, Swamp, Forest ]
   Mithril:
     elevation: 0.3..0.5
-    biomes: [ Cold, Forest, MysticalForest, Volcanic ]
+    biomes: [ Cold, Forest, MysticalForest, WitchForest ]
   Adamantine:
     elevation: 0.3..0.5
-    biomes: [ Cold, Volcanic, MysticalForest ]
+    biomes: [ Cold, WitchForest, MysticalForest ]
 
 gem:
   RoughQuartz:
     elevation: 0.2..0.8
-    biomes: [ Cold, Forest, Volcanic ]
+    biomes: [ Cold, Forest, WitchForest ]
   Amber:
     elevation: 0.2..0.8
     biomes: [ Forest, MysticalForest ]
   Emerald:
     elevation: 0.2..0.8
-    biomes: [ Cold, Swamp, Volcanic ]
+    biomes: [ Cold, Swamp, WitchForest ]
   Sapphire:
     elevation: 0.2..0.8
-    biomes: [ Cold, Swamp, MysticalForest, Volcanic ]
+    biomes: [ Cold, Swamp, MysticalForest, WitchForest ]
   Ruby:
     elevation: 0.2..0.8
-    biomes: [ Swamp, Forest, Cold, MysticalForest, Volcanic ]
+    biomes: [ Swamp, Forest, Cold, MysticalForest, WitchForest ]
   Starstone:
     elevation: 0.2..0.8
     biomes: [ MysticalForest, Swamp, Cold, Forest ]
@@ -81,16 +81,16 @@ gem:
 leather:
   Rawhide:
     elevation: 0.1..0.5
-    biomes: [ Cold, Forest, Volcanic ]
+    biomes: [ Cold, Forest, WitchForest ]
   BeastHide:
     elevation: 0.3..0.8
-    biomes: [ Forest, MysticalForest, Volcanic ]
+    biomes: [ Forest, MysticalForest, WitchForest ]
   ThickHide:
     elevation: 0.1..0.8
-    biomes: [ Cold, Swamp, Volcanic ]
+    biomes: [ Cold, Swamp, WitchForest ]
   ScaledLeather:
     elevation: 0.2..0.9
-    biomes: [ Cold, Swamp, MysticalForest, Volcanic ]
+    biomes: [ Cold, Swamp, MysticalForest, WitchForest ]
   OldLeather:
     elevation: 0.1..0.8
     biomes: [ Swamp, Forest, Cold, MysticalForest ]

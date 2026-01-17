@@ -15,6 +15,74 @@ biomes:
     temperature: '<0.8'
     moisture: '0.56..0.83'
     elevation: '0.35..0.72'
+    trees:
+      - name: forest_0004s_0001s_0000_4
+        spawnAtGroup: blue_cold
+        elevation: '>0.68'
+        walkCost: 0.7
+      - name: forest_0004s_0001s_0001_3
+        spawnAtGroup: blue_cold
+        elevation: '>0.6'
+        walkCost: 0.7
+      - name: forest_0004s_0001s_0002_1
+        spawnAtGroup: blue_cold
+        elevation: '>0.52'
+        walkCost: 0.7
+      - name: forest_0004s_0001s_0003_2
+        spawnAtGroup: blue_cold
+        elevation: '>0.44'
+        walkCost: 0.7
+
+      - name: forest_0004s_0000s_0000_4
+        spawnAtGroup: green_cold
+        elevation: '>0.68'
+        walkCost: 0.65
+      - name: forest_0004s_0000s_0001_3
+        spawnAtGroup: green_cold
+        elevation: '>0.6'
+        walkCost: 0.65
+      - name: forest_0004s_0000s_0002_1
+        spawnAtGroup: green_cold
+        elevation: '>0.52'
+        walkCost: 0.65
+      - name: forest_0004s_0000s_0003_2
+        spawnAtGroup: green_cold
+        elevation: '>0.44'
+        walkCost: 0.65
+
+    mountains:
+      - name: mountains_0003s_0000s_0000_4
+        elevation: '>0.70'
+        spawnAtGroup: blue_cold
+        walkCost: -1
+      - name: mountains_0003s_0000s_0001_3
+        elevation: '>0.65'
+        spawnAtGroup: blue_cold
+        walkCost: -1
+      - name: mountains_0003s_0000s_0002_2
+        elevation: '>0.60'
+        spawnAtGroup: blue_cold
+        walkCost: -1
+      - name: mountains_0003s_0000s_0003_1
+        elevation: '>0.55'
+        spawnAtGroup: blue_cold
+        walkCost: -1
+      - name: mountains_0003s_0001s_0000_4
+        elevation: '>0.70'
+        spawnAtGroup: green_cold
+        walkCost: -1
+      - name: mountains_0003s_0001s_0001_3
+        elevation: '>0.65'
+        spawnAtGroup: green_cold
+        walkCost: -1
+      - name: mountains_0003s_0001s_0002_2
+        elevation: '>0.60'
+        spawnAtGroup: green_cold
+        walkCost: -1
+      - name: mountains_0003s_0001s_0003_1
+        elevation: '>0.55'
+        spawnAtGroup: green_cold
+        walkCost: -1
     terrains:
       - name: hex_ground_0000s_0002s_0001s_0000_1
         groupKey: "blue_cold"
@@ -48,6 +116,52 @@ biomes:
     temperature: '0..0.8'
     moisture: '0.40..0.95'
     elevation: '0.5..0.75'
+    trees:
+      - name: forest_0001s_0001s_0000_1
+        moisture: '>0.8'
+        walkCost: 0.85
+      - name: forest_0001s_0001s_0001_2
+        moisture: '>0.7'
+        walkCost: 0.85
+      - name: forest_0001s_0001s_0002_3
+        moisture: '>0.55'
+        walkCost: 0.85
+      - name: forest_0001s_0001s_0003_4
+        moisture: '>0.45'
+        walkCost: 0.85
+    mountains:
+      - name: mountains_0001s_0000s_0000_1
+        elevation: '>0.80'
+        spawnAtGroup: wet_forest
+        walkCost: -1
+      - name: mountains_0001s_0000s_0001_2
+        elevation: '>0.75'
+        spawnAtGroup: wet_forest
+        walkCost: -1
+      - name: mountains_0001s_0000s_0002_3
+        elevation: '>0.70'
+        spawnAtGroup: wet_forest
+        walkCost: -1
+      - name: mountains_0001s_0000s_0003_4
+        elevation: '>0.65'
+        spawnAtGroup: wet_forest
+        walkCost: -1
+      - name: mountains_0000s_0001s_0000_4
+        elevation: '>0.80'
+        spawnAtGroup: dry_forest
+        walkCost: -1
+      - name: mountains_0000s_0001s_0001_3
+        elevation: '>0.75'
+        spawnAtGroup: dry_forest
+        walkCost: -1
+      - name: mountains_0000s_0001s_0002_2
+        elevation: '>0.70'
+        spawnAtGroup: dry_forest
+        walkCost: -1
+      - name: mountains_0000s_0001s_0003_1
+        elevation: '>0.65'
+        spawnAtGroup: dry_forest
+        walkCost: -1
     terrains:
       #dry
       - name: hex_ground_0000s_0000s_0001s_0004_1
@@ -87,6 +201,52 @@ biomes:
     temperature: '0.35..1'
     moisture: '0.45..1'
     elevation: '0.2..0.95'
+    trees:
+      - name: forest_0000s_0000s_0000_1
+        moisture: '>0.9'
+        walkCost: 0.45
+      - name: forest_0000s_0000s_0001_2
+        moisture: '>0.8'
+        walkCost: 0.45
+      - name: forest_0000s_0000s_0002_3
+        moisture: '>0.7'
+        walkCost: 0.45
+      - name: forest_0000s_0000s_0003_4
+        moisture: '>0.6'
+        walkCost: 0.45
+    mountains:
+      - name: mountains_0002s_0001s_0000_4
+        elevation: '>0.70'
+        spawnAtGroup: dark_green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0001s_0001_3
+        elevation: '>0.65'
+        spawnAtGroup: dark_green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0001s_0002_2
+        elevation: '>0.60'
+        spawnAtGroup: dark_green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0001s_0003_1
+        elevation: '>0.55'
+        spawnAtGroup: dark_green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0000s_0000_4
+        elevation: '>0.70'
+        spawnAtGroup: green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0000s_0001_3
+        elevation: '>0.65'
+        spawnAtGroup: green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0000s_0002_2
+        elevation: '>0.60'
+        spawnAtGroup: green_swamp
+        walkCost: -1
+      - name: mountains_0002s_0000s_0003_1
+        elevation: '>0.55'
+        spawnAtGroup: green_swamp
+        walkCost: -1
     terrains:
       # dry swamp
       - name: hex_ground_0000s_0003s_0001s_0000_1
@@ -119,6 +279,73 @@ biomes:
     temperature: '0..1'
     moisture: '0.2..1'
     elevation: '0.3..1'
+    trees:
+      - name: forest_0000s_0001s_0000_1
+        spawnAtGroup: red_mystical
+        moisture: '>0.35'
+        walkCost: 0.8
+      - name: forest_0000s_0001s_0001_2
+        spawnAtGroup: red_mystical
+        moisture: '>0.30'
+        walkCost: 0.8
+      - name: forest_0000s_0001s_0002_3
+        spawnAtGroup: red_mystical
+        moisture: '>0.25'
+        walkCost: 0.8
+      - name: forest_0000s_0001s_0003_4
+        spawnAtGroup: red_mystical
+        moisture: '>0.20'
+        walkCost: 0.8
+      - name: forest_0003s_0000s_0000_4
+        spawnAtGroup: blue_mystical
+        moisture: '>0.35'
+        walkCost: 0.8
+      - name: forest_0003s_0000s_0001_3
+        spawnAtGroup: blue_mystical
+        moisture: '>0.30'
+        walkCost: 0.8
+      - name: forest_0003s_0000s_0002_2
+        spawnAtGroup: blue_mystical
+        moisture: '>0.25'
+        walkCost: 0.8
+      - name: forest_0003s_0000s_0003_1
+        spawnAtGroup: blue_mystical
+        moisture: '>0.20'
+        walkCost: 0.8
+
+      - name: forest_0001s_0000s_0000_1
+        spawnAtGroup: dark_green_mystical
+        moisture: '>0.8'
+        walkCost: 0.8
+      - name: forest_0001s_0000s_0001_2
+        spawnAtGroup: dark_green_mystical
+        moisture: '>0.6'
+        walkCost: 0.8
+      - name: forest_0001s_0000s_0002_3
+        spawnAtGroup: dark_green_mystical
+        moisture: '>0.4'
+        walkCost: 0.8
+      - name: forest_0001s_0000s_0003_4
+        spawnAtGroup: dark_green_mystical
+        moisture: '>0.2'
+        walkCost: 0.8
+
+      - name: forest_0003s_0001s_0000_4
+        spawnAtGroup: bright_green_mystical
+        moisture: '>0.8'
+        walkCost: 0.8
+      - name: forest_0003s_0001s_0001_3
+        spawnAtGroup: bright_green_mystical
+        moisture: '>0.6'
+        walkCost: 0.8
+      - name: forest_0003s_0001s_0002_2
+        spawnAtGroup: bright_green_mystical
+        moisture: '>0.4'
+        walkCost: 0.8
+      - name: forest_0003s_0001s_0003_1
+        spawnAtGroup: bright_green_mystical
+        moisture: '>0.2'
+        walkCost: 0.8
     terrains:
       - name: tile_ground_forest_1_c2 # red
         groupKey: "red_mystical"
@@ -134,35 +361,105 @@ biomes:
       - name: tile_ground_forest_3_c1 # bright green
         groupKey: "bright_green_mystical"
 
-  - type: Volcanic
-    color: c04e53
+  - type: WitchForest
+    color: 2f0f40
     walkCost: 0.80
     temperature: '0..1'
     moisture: '0..1'
     elevation: '0..1'
+    trees:
+      - name: forest_0002s_0001s_0000_1
+        elevation: '>0.4'
+        spawnAtGroup: black_witch
+        walkCost: 0.667
+      - name: forest_0002s_0001s_0001_2
+        elevation: '>0.3'
+        spawnAtGroup: black_witch
+        walkCost: 0.667
+      - name: forest_0002s_0001s_0002_3
+        elevation: '>0.2'
+        spawnAtGroup: black_witch
+        walkCost: 0.667
+      - name: forest_0002s_0001s_0003_4
+        elevation: '>0.1'
+        spawnAtGroup: black_witch
+        walkCost: 0.667
+      - name: forest_0002s_0000s_0000_1
+        elevation: '>0.4'
+        spawnAtGroup: blue_witch
+        walkCost: 0.667
+      - name: forest_0002s_0000s_0001_2
+        elevation: '>0.3'
+        spawnAtGroup: blue_witch
+        walkCost: 0.667
+      - name: forest_0002s_0000s_0002_3
+        elevation: '>0.2'
+        spawnAtGroup: blue_witch
+        walkCost: 0.667
+      - name: forest_0002s_0000s_0003_4
+        elevation: '>0.1'
+        spawnAtGroup: blue_witch
+        walkCost: 0.667
+    mountains:
+      - name: mountains_0001s_0001s_0000_1
+        elevation: '>0.5'
+        spawnAtGroup: black_witch
+        walkCost: -1
+      - name: mountains_0001s_0001s_0001_2
+        elevation: '>0.4'
+        spawnAtGroup: black_witch
+        walkCost: -1
+      - name: mountains_0001s_0001s_0002_3
+        elevation: '>0.3'
+        spawnAtGroup: black_witch
+        walkCost: -1
+      - name: mountains_0001s_0001s_0003_4
+        elevation: '>0.2'
+        spawnAtGroup: black_witch
+        walkCost: -1
+      - name: mountains_0000s_0000s_0000_4
+        elevation: '>0.5'
+        spawnAtGroup: blue_witch
+        walkCost: -1
+      - name: mountains_0000s_0000s_0001_3
+        elevation: '>0.4'
+        spawnAtGroup: blue_witch
+        walkCost: -1
+      - name: mountains_0000s_0000s_0002_2
+        elevation: '>0.3'
+        spawnAtGroup: blue_witch
+        walkCost: -1
+      - name: mountains_0000s_0000s_0003_1
+        elevation: '>0.2'
+        spawnAtGroup: blue_witch
+        walkCost: -1
     terrains:
       # hot volcanic
       - name: hex_ground_0000s_0001s_0001s_0000_1
-        groupKey: "black_volcanic"
-        temperature: '>0.95'
+        groupKey: "black_witch"
+        moisture: '<0.2'
+        temperature: '>0.2'
       - name: hex_ground_0000s_0001s_0001s_0001_2
-        groupKey: "black_volcanic"
-        temperature: '>0.90'
+        groupKey: "black_witch"
+        moisture: '>0.15'
+        temperature: '>0.18'
       - name: hex_ground_0000s_0001s_0001s_0002_3
-        groupKey: "black_volcanic"
-        temperature: '>0.85'
+        groupKey: "black_witch"
+        moisture: '>0.1'
+        temperature: '>0.16'
       - name: hex_ground_0000s_0001s_0001s_0003_4
-        groupKey: "black_volcanic"
-        temperature: '>0.80'
+        groupKey: "black_witch"
+        moisture: '>0.05'
+        temperature: '>0.14'
       # cold volcanic
       - name: hex_ground_0000s_0001s_0000s_0000_1
-        groupKey: "blue_volcanic"
-        elevation: '>0.3'
+        groupKey: "blue_witch"
+        elevation: '<0.3'
       - name: hex_ground_0000s_0001s_0000s_0001_2
-        groupKey: "blue_volcanic"
-        elevation: '>0.5'
+        groupKey: "blue_witch"
+        elevation: '<0.5'
       - name: hex_ground_0000s_0001s_0000s_0002_3
-        groupKey: "blue_volcanic"
-        elevation: '>0.7'
+        groupKey: "blue_witch"
+        elevation: '<0.7'
       - name: hex_ground_0000s_0001s_0000s_0003_4
-        groupKey: "blue_volcanic"
+        groupKey: "blue_witch"

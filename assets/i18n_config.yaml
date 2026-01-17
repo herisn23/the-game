@@ -85,6 +85,8 @@ strings:
     key: loading_mines
   loading_mountains:
     key: loading_mountains
+  loading_trees:
+    key: loading_trees
   loading_game_state:
     key: loading_game_state
   loading_gui:

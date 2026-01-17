@@ -54,7 +54,7 @@ class HarvestableTileBehaviour : TileBehaviourAdapter<HarvestableTileBehaviour.D
         }
         val animator = this.iconAnimator
         val pivot = this.iconPivot
-        if (animator != null && pivot != null && false) {
+        if (animator != null && pivot != null) {
             animator.update()
             animator.render(
                 data.icon,

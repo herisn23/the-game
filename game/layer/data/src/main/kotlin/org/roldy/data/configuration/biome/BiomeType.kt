@@ -4,7 +4,7 @@ enum class BiomeType {
     Water,
     Swamp,
     Cold,
-    Volcanic,
+    WitchForest,
     Forest,
     MysticalForest
 }

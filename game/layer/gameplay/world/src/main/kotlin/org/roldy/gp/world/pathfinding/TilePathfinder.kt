@@ -29,34 +29,6 @@ class TilePathfinder(
         return bestWalkCost / walkability  // 1f -> cost 1.0, 0.5f -> cost 2.0, etc.
     }
 
-    // Get the 6 neighbors of a hex tile (flat-top, stagger axis Y)
-    private fun getNeighbors(tile: Vector2Int, goal: Vector2Int): List<Vector2Int> {
-
-        // Flat-top hex neighbors (6 directions)
-        val neighbors = if (worldMap.isStaggered(tile)) {
-            listOf(
-                Vector2Int(tile.x + 1, tile.y),
-                Vector2Int(tile.x, tile.y - 1),
-                Vector2Int(tile.x + 1, tile.y - 1),
-                Vector2Int(tile.x - 1, tile.y),
-                Vector2Int(tile.x, tile.y + 1),
-                Vector2Int(tile.x + 1, tile.y + 1)
-            )
-        } else {
-            listOf(
-                Vector2Int(tile.x + 1, tile.y),
-                Vector2Int(tile.x - 1, tile.y - 1),
-                Vector2Int(tile.x, tile.y - 1),
-                Vector2Int(tile.x - 1, tile.y),
-                Vector2Int(tile.x - 1, tile.y + 1),
-                Vector2Int(tile.x, tile.y + 1)
-            )
-        }
-
-        // Don't filter here - let A* handle costs
-        return neighbors.filter { worldMap.mapBounds.isInBounds(it) }
-    }
-
     // Heuristic: Manhattan distance
     private fun heuristic(a: Vector2Int, b: Vector2Int): Float {
         return abs(a.x - b.x).toFloat() + abs(a.y - b.y).toFloat()
@@ -100,7 +72,7 @@ class TilePathfinder(
             }
 
             closedSet.add(current.tile)
-            val neighbors = getNeighbors(current.tile, goal)
+            val neighbors = worldMap.getNeighbors(current.tile)
 //            println("Neighbors of ${current.tile}: $neighbors")
             for (neighbor in neighbors) {
                 if (neighbor in closedSet) continue

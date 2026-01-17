@@ -450,7 +450,7 @@ fun SpriteCompositor.fiber(position: Vector2, terrain: Terrain, harvestable: Har
             centered()
             offset(-52.5f, -5.8f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0000_Layer_22] },
@@ -461,7 +461,7 @@ fun SpriteCompositor.fiber(position: Vector2, terrain: Terrain, harvestable: Har
             centered()
             offset(-64.8f, 31.2f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0000s_0031_Layer_61] },
@@ -472,7 +472,7 @@ fun SpriteCompositor.fiber(position: Vector2, terrain: Terrain, harvestable: Har
             centered()
             offset(33.1f, -53.7f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0000s_0032_Layer_60] },
@@ -483,7 +483,7 @@ fun SpriteCompositor.fiber(position: Vector2, terrain: Terrain, harvestable: Har
             centered()
             offset(29.9f, 56.5f)
         }
-    if (listOf(BiomeType.Volcanic).contains(terrain.biome.data.type))
+    if (listOf(BiomeType.WitchForest).contains(terrain.biome.data.type))
         texture(
             position,
             { environment[Environment.grass_0205_Layer_14] },

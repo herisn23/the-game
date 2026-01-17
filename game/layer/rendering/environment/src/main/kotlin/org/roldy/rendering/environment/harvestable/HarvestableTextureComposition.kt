@@ -14,7 +14,7 @@ class MapAtlas(
 )
 
 
-fun SpriteCompositor.composite(
+fun SpriteCompositor.compose(
     position: Vector2,
     harvestable: HarvestableState,
     terrain: Terrain

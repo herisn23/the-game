@@ -25,7 +25,7 @@ class RoadsPopulator(
         BiomeType.MysticalForest to "dirt3",
         BiomeType.Forest to "dirt4",
         BiomeType.Cold to "snow",
-        BiomeType.Volcanic to "stone1",
+        BiomeType.WitchForest to "stone1",
         BiomeType.Swamp to "stone2",
 //        BiomeType.Volcanic to "stone3",
 //        BiomeType.Volcanic to "stone4"

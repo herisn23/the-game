@@ -23,8 +23,8 @@ class SettlementGenerator(
     val logger by logger()
     val harvestable = HarvestableType.harvestable
     val minSettlementDistance = 10
-    val maxClaimsCount = 100
-    val minClaimsCount = 50
+    val maxClaimsCount = 200
+    val minClaimsCount = 100
     override fun generate(): List<SettlementTileData> {
         val mapSize = mapData.size
         val seed = mapData.seed
