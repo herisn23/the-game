@@ -1,7 +1,7 @@
 [versions]
 kaml = "0.61.0"
 kotlinx-serialization = "1.7.3"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 kotlin-coroutines = "1.10.2"
 gdx = "1.14.0"
 graalHelperVersion = "2.0.1"

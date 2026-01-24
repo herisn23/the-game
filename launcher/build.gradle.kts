@@ -36,7 +36,7 @@ dependencies {
     runtimeOnly(variantOf(libs.gdx.freetype.platform) {
         classifier("natives-desktop")
     })
-    implementation(projects.game.application)
+    implementation(projects.game.boot)
 
     //exclude assets from compileTime we only need it at runtime
     runtimeOnly(assets.output)

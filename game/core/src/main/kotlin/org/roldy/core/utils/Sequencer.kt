@@ -49,6 +49,13 @@ class Sequencer<T>(
     fun clampIndex() {
         index = index.clamp(0, list.size)
     }
+    fun Int.clamp(min: Int, max: Int): Int {
+        return when {
+            this >= max -> min
+            this < min -> max - 1
+            else -> this
+        }
+    }
 }
 
 fun <T> sequencer(list: ()->List<T>) = lazy {

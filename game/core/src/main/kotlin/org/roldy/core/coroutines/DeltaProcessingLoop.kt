@@ -1,6 +1,6 @@
 package org.roldy.core.coroutines
 
-import org.roldy.core.TimeManager
+import org.roldy.core.time.TimeManager
 
 class DeltaProcessingLoop(
     val timeManager: TimeManager,

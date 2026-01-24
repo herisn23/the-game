@@ -22,12 +22,14 @@ allprojects {
     kotlin {
         jvmToolchain(javaVersion.toInt())
         compilerOptions {
-            languageVersion.set(KotlinVersion.KOTLIN_2_2)
-            apiVersion.set(KotlinVersion.KOTLIN_2_2)
+            languageVersion.set(KotlinVersion.KOTLIN_2_3)
+            apiVersion.set(KotlinVersion.KOTLIN_2_3)
             freeCompilerArgs.addAll(
                 listOf(
                     "-Xcontext-sensitive-resolution",
-                    "-Xcontext-parameters"
+                    "-Xcontext-parameters",
+                    "-Xnested-type-aliases",
+                    "-Xdata-flow-based-exhaustivness"
                 )
             )
         }
