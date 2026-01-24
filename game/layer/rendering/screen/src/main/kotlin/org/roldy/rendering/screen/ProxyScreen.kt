@@ -2,13 +2,13 @@ package org.roldy.rendering.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 class ProxyScreen(
     val screen: Screen,
-    val camera: OrthographicCamera,
+    val camera: Camera,
 ) : Screen by screen {
     val viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
 
