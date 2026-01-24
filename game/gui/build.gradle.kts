@@ -1,4 +1,3 @@
 dependencies {
     implementation(projects.game.core)
-    implementation(projects.game.g3d)
 }

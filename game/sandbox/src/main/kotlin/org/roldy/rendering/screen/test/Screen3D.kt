@@ -3,8 +3,9 @@ package org.roldy.rendering.screen.test
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelBatch
@@ -19,24 +20,13 @@ import com.badlogic.gdx.math.Vector3
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.utils.sequencer
+import org.roldy.g3d.pawn.*
 
 
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
     var loading = true
-    val assetManager = AssetManager().apply {
-        load("3d/ModularCharacters.g3db", Model::class.java)
-        load("3d/Idle.g3db", Model::class.java)
-        load("3d/Idle2.g3db", Model::class.java)
-        load("3d/Walking.g3db", Model::class.java)
-        load("3d/PolygonFantasyHero_Texture_01_A.png", Texture::class.java)
-        load("3d/PolygonFantasyHero_Texture_Mask_01.png", Texture::class.java)
-        load("3d/PolygonFantasyHero_Texture_Mask_02.png", Texture::class.java)
-        load("3d/PolygonFantasyHero_Texture_Mask_03.png", Texture::class.java)
-        load("3d/PolygonFantasyHero_Texture_Mask_04.png", Texture::class.java)
-        load("3d/PolygonFantasyHero_Texture_Mask_05.png", Texture::class.java)
-    }
 
     init {
         camera.position.set(16.799997f, 0f, 0f)
@@ -44,58 +34,9 @@ class Screen3D(
         camera.update()
     }
 
-    val maskTextures by lazy {
-        fun setupTexture(path: String, flip: Boolean = false): Texture {
-            val tex = assetManager.get<Texture>(path)
-            if (flip) {
-                // Flip texture vertically
-                if (!tex.textureData.isPrepared) {
-                    tex.textureData.prepare()
-                }
-                val pixmap = tex.textureData.consumePixmap()
-
-                // Flip Y
-                val flipped = Pixmap(pixmap.width, pixmap.height, pixmap.format)
-                for (y in 0 until pixmap.height) {
-                    for (x in 0 until pixmap.width) {
-                        flipped.drawPixel(x, pixmap.height - 1 - y, pixmap.getPixel(x, y))
-                    }
-                }
-
-                val flippedTex = Texture(flipped)
-                flippedTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-                flippedTex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-
-                pixmap.dispose()
-                flipped.dispose()
-                return flippedTex
-            }
-            tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-            tex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-            return tex
-        }
-
-        val flip = true
-        MaskTextures(
-            baseTexture = setupTexture("3d/PolygonFantasyHero_Texture_01_A.png", flip = flip),
-            mask01 = setupTexture("3d/PolygonFantasyHero_Texture_Mask_01.png", flip = flip),
-            mask02 = setupTexture("3d/PolygonFantasyHero_Texture_Mask_02.png", flip = flip),
-            mask03 = setupTexture("3d/PolygonFantasyHero_Texture_Mask_03.png", flip = flip),
-            mask04 = setupTexture("3d/PolygonFantasyHero_Texture_Mask_04.png", flip = flip),
-            mask05 = setupTexture("3d/PolygonFantasyHero_Texture_Mask_05.png", flip = flip)
-        )
-    }
-    val idle by lazy {
-        assetManager.get("3d/Idle.g3db", Model::class.java)
-    }
-    val idle2 by lazy {
-        assetManager.get("3d/Idle2.g3db", Model::class.java)
-    }
-    val walking by lazy {
-        assetManager.get("3d/Walking.g3db", Model::class.java)
-    }
+    val maskTextures = MaskTextures()
     val orig by lazy {
-        assetManager.get<Model>("3d/ModularCharacters.g3db").apply {
+        PawnAssetManager.model.get().apply {
             printModelData()
         }
     }
@@ -112,13 +53,8 @@ class Screen3D(
     }
 
     val character by lazy {
-        CharacterController(
-            orig, maskTextures,
-            mapOf(
-                "idle" to idle.animations.first(),
-                "idle2" to idle2.animations.first(),
-                "walking" to walking.animations.first()
-            )
+        PawnConfiguration(
+            orig, maskTextures
         ).apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
@@ -130,10 +66,10 @@ class Screen3D(
     }
     val animController by lazy {
         AnimationController(character.instance).apply {
-            setAnimation("idle", -1)
+            setAnimation(PawnAnimations.idle.id, -1)
         }
     }
-    val batch by disposable { ModelBatch(CharacterShaderProvider(character, camera)) }
+    val batch by disposable { ModelBatch(PawnShaderProvider(character)) }
 
 
     val env by lazy {
@@ -163,7 +99,7 @@ class Screen3D(
     }
 
     val anims by sequencer {
-        listOf("idle", "idle2", "walking")
+        PawnAnimations.all.keys.toList()
     }
     val colors by sequencer {
         listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW)
@@ -187,7 +123,7 @@ class Screen3D(
     }
     val rotation = Quaternion()
     override fun render(delta: Float) {
-        if (loading && assetManager.update()) {
+        if (loading && PawnAssetManager.assetManager.update()) {
             loading = false
 
         }

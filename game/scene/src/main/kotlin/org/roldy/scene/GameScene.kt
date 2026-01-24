@@ -1,5 +1,6 @@
 package org.roldy.scene
 
+import com.badlogic.gdx.Gdx
 import org.roldy.core.CursorManager
 import org.roldy.core.Logger
 import org.roldy.core.coroutines.DeltaProcessingLoop
@@ -22,6 +23,12 @@ class GameScene : AutoDisposableGameAdapter() {
         CursorManager.initialize()
         screen = Screen3D(camera3D())
 
+    }
+
+    override fun render() {
+        screen?.apply {
+            render(timeManager.getDelta(Gdx.graphics.deltaTime))
+        }
     }
 
 
