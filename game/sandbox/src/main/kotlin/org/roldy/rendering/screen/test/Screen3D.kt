@@ -15,15 +15,15 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.PawnAnimations
 import org.roldy.g3d.pawn.PawnAssetManager
 import org.roldy.g3d.pawn.PawnConfiguration
-import org.roldy.g3d.pawn.PawnShaderProvider
+import org.roldy.g3d.pawn.PawnShaderProvider2
 
 
 class Screen3D(
@@ -35,12 +35,6 @@ class Screen3D(
         camera.position.set(16.799997f, 0f, 0f)
         camera.lookAt(0f, 0f, 0f)
         camera.update()
-    }
-
-    val orig by lazy {
-        PawnAssetManager.model.get().apply {
-            printModelData()
-        }
     }
 
     fun Model.printModelData() {
@@ -65,7 +59,7 @@ class Screen3D(
     }
 
     val character by lazy {
-        PawnConfiguration(orig).apply {
+        PawnConfiguration().apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
@@ -76,16 +70,16 @@ class Screen3D(
     }
     val animController by lazy {
         AnimationController(character.instance).apply {
-            setAnimation(PawnAnimations.idle.id, -1)
+            setAnimation(character.instance.animations.first().id, -1)
         }
     }
-    val batch by disposable { ModelBatch(PawnShaderProvider(character)) }
+    val batch by disposable { ModelBatch(PawnShaderProvider2(character)) }
 
-
+    val light = DirectionalLight().set(hex("FFF4D6"), -1f, 1f, -0.2f)
     val env by lazy {
         Environment().apply {
-            set(ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
-            add(DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f))
+            set(ColorAttribute(ColorAttribute.Emissive, hex("FFF4D6")))
+            add(light)
         }
     }
 
@@ -109,63 +103,50 @@ class Screen3D(
     }
 
     val anims by sequencer {
-        PawnAnimations.all.keys.toList()
+        PawnAnimations[character.body].all.toList()
     }
     val colors by sequencer {
         listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW)
     }
-    val parts by sequencer {
-        listOf(
-            character.colorPrimary,
-            character.colorSecondary,
-            character.colorLeatherPrimary,
-            character.colorLeatherSecondary,
-            character.colorMetalPrimary,
-            character.colorMetalSecondary,
-            character.colorMetalDark,
-            character.colorHair,
-            character.colorSkin,
-            character.colorStubble,
-            character.colorScar,
-            character.colorBodyArt,
-            character.colorEyes
-        )
-    }
-    val rotation = Quaternion()
+
     val allowed by sequencer {
 
         listOf(
             emptyList(),
-            character.allNodes.map { it.id },
+            character.instance.allNodes.map { it.id },
             listOf(
-                "Chr_Hips_Male_00",
-                "Chr_HandLeft_Male_00",
-                "Chr_HandRight_Male_00",
-                "Chr_LegLeft_Male_00",
-                "Chr_LegRight_Male_00",
-                "Chr_ArmLowerLeft_Male_00",
-                "Chr_ArmLowerRight_Male_00",
-                "Chr_ArmUpperLeft_Male_00",
-                "Chr_ArmUpperRight_Male_00",
-                "Chr_Torso_Male_00",
-                "Chr_FacialHair_Male_01",
-                "Chr_Head_Male_19",
+                "PT_${character.body}_Armor_head_01",
+                "PT_${character.body}_Armor_01_A_body",
+                "PT_${character.body}_Armor_01_A_boots",
+                "PT_${character.body}_Armor_01_A_cape",
+                "PT_${character.body}_Armor_01_A_gauntlets",
+                "PT_${character.body}_Armor_01_A_helmet",
+                "PT_${character.body}_Armor_01_A_legs",
             ),
             listOf(
-                "Chr_Hips_Male_00",
-                "Chr_HandLeft_Male_00",
-                "Chr_HandRight_Male_00",
-                "Chr_LegLeft_Male_00",
-                "Chr_LegRight_Male_00",
-                "Chr_ArmLowerRight_Male_11",
-                "Chr_ArmLowerRight_Male_00",
-                "Chr_ArmUpperLeft_Male_00",
-                "Chr_ArmUpperRight_Male_00",
-                "Chr_Torso_Male_00",
-                "Chr_FacialHair_Male_01",
-                "Chr_Eyebrow_Male_01",
-                "Chr_Head_Male_19",
-                "Chr_HeadCoverings_No_Hair_09"
+                "PT_${character.body}_Armor_head_01",
+                "PT_${character.body}_Armor_01_A_body",
+                "PT_${character.body}_Armor_01_A_boots",
+                "PT_${character.body}_Armor_01_A_cape",
+                "PT_${character.body}_Armor_01_A_gauntlets",
+                "PT_${character.body}_Armor_Ex1_helmet_39",
+                "PT_${character.body}_Armor_01_A_legs",
+            ),
+            listOf(
+                "PT_${character.body}_Armor_Ex1_body_21",
+                "PT_${character.body}_Armor_Ex1_boots_03",
+                "PT_${character.body}_Armor_Ex1_cape_01",
+                "PT_${character.body}_Armor_Ex1_gauntlets_02",
+                "PT_${character.body}_Armor_Ex1_helmet_05",
+                "PT_${character.body}_Armor_Ex1_legs_01",
+            ),
+            listOf(
+                "PT_${character.body}_Armor_Ex1_body_21",
+                "PT_${character.body}_Armor_Ex1_boots_03",
+                "PT_${character.body}_Armor_Ex1_cape_01",
+                "PT_${character.body}_Armor_Ex1_gauntlets_02",
+                "PT_${character.body}_Armor_Ex1_helmet_33",
+                "PT_${character.body}_Armor_Ex1_legs_01"
             )
         )
     }
@@ -179,27 +160,29 @@ class Screen3D(
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
         Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
         Gdx.gl.glViewport(0, 0, Gdx.graphics.backBufferWidth, Gdx.graphics.backBufferHeight)
-        Gdx.gl.glClearColor(1f, 0f, 1f, 1f)
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            parts.next()
-            println(parts.current)
-        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-            character.colorBodyArt.set(colors.next())
+            character.leather3Color.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            character.colorSkin.set(colors.next())
+            character.skinColor.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            character.colorEyes.set(colors.next())
+            character.eyesColor.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
-            character.setVisibility(
+            character.instance.setVisibility(
                 allowed.next()
             )
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            light.direction.y += delta
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            light.direction.y -= delta
         }
 
 
@@ -208,11 +191,10 @@ class Screen3D(
         controller.update()
         animController.update(delta)
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            animController.setAnimation(anims.next(), -1)
+            animController.setAnimation(anims.next().id, -1)
         }
 
         batch.begin(camera)
-
 
         batch.render(character.instance, env)
         batch.end()

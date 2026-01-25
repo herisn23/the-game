@@ -6,6 +6,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.pathString
 
@@ -26,9 +27,8 @@ abstract class GenerateClassesTask : DefaultTask() {
 
         val classes = listOf(
             generateAssets(),
-            generateAnimations(),
-            generateParts()
-        )
+            generateAnimations()
+        ) + generateParts()
         generateKotlinClasses(outputDirectory, classes)
         logger.lifecycle("Generated classes in: ${outputDirectory.absolutePath}")
     }
@@ -40,12 +40,15 @@ abstract class GenerateClassesTask : DefaultTask() {
         val contextDir = Path.of("assets").resolve(base)
         val absolutePath = rootDir.toPath().resolve(contextDir)
         val p = absolutePath.toFile().listFiles().map { file ->
-            file.nameWithoutExtension.lowercase()
+            val body = file.bodyType()
+            body to file.nameWithoutExtension.lowercase()
         }
         return ClassInfo(
             "PawnAnimations",
             pack,
-            animTemplate(p)
+            animTemplate(p.groupBy { it.first }.map {
+                it.key to it.value.map { it.second }
+            }.toMap())
 
         )
     }
@@ -59,26 +62,32 @@ abstract class GenerateClassesTask : DefaultTask() {
             absolutePath.toFile().listFiles().filter { it.name.contains("Mask") }.sortedBy { it.nameWithoutExtension }
                 .mapIndexed { index, file ->
                     AssetData(
-                        "mask${index + 1}",
+                        "mask${index}",
                         base.resolve(file.name).pathString,
                         "Texture"
                     )
                 }
         val anims = absolutePath.resolve("animations").toFile().listFiles().mapIndexed { index, file ->
+            val body = file.bodyType()
             AssetData(
                 file.nameWithoutExtension.lowercase(),
                 base.resolve("animations").resolve(file.name).pathString,
                 "Model"
             )
         }
-        val baseModel = listOf(
+        val models = listOf(
+            "modelMale" to "PT_Male_Armors_Modular.g3db",
+            "modelFemale" to "PT_Female_Armors_Modular.g3db",
+            "modelMaleExt" to "PT_Male_Armors_Ex1_Modular.g3db",
+            "modelFemaleExt" to "PT_Female_Armors_Ex1_Modular.g3db"
+        ).map { (prop, path) ->
             AssetData(
-                "model",
-                base.resolve("Pawn.g3db").pathString,
+                prop,
+                base.resolve(path).pathString,
                 "Model"
             )
-        )
-        val assetData = masks + baseModel + anims
+        }
+        val assetData = masks + anims + models
         return ClassInfo(
             "PawnAssetManager",
             pack,
@@ -88,7 +97,7 @@ abstract class GenerateClassesTask : DefaultTask() {
 
     }
 
-    fun animTemplate(anims: List<String>) =
+    fun animTemplate(anims: Map<String, List<String>>) =
         """
             package $pack
             import com.badlogic.gdx.graphics.g3d.Model
@@ -96,15 +105,41 @@ abstract class GenerateClassesTask : DefaultTask() {
                   class Anim(
                     val id: String,
                     val model: PawnAssetManager.Asset<Model>
-                  ) {
-                  
-                  }
-                ${
-            anims.joinToString("\n") {
-                "val ${it} = Anim(\"$it\", PawnAssetManager.${it})"
+                  )
+                  interface IAnim {
+                  ${
+            anims.getValue(anims.keys.first()).joinToString("\n") {
+                val id = it.replace(anims.keys.first().lowercase(), "")
+                "val ${id}: Anim"
             }
         }
-            val all = mapOf(${anims.joinToString(", ") { "\"$it\" to $it" }})
+                    val all: List<Anim>
+                  }
+                ${
+            anims.keys.joinToString("\n") { body ->
+                """
+                    object $body: IAnim {
+                        ${
+                    anims.getValue(body).joinToString("\n") { name ->
+                        val id = name.replace(body.lowercase(), "")
+                        "override val ${id} = Anim(\"$id\", PawnAssetManager.${name})"
+                    }
+                }
+                        override val all = listOf(${
+                    anims.getValue(body).joinToString(", ") {
+                        it.replace(body.lowercase(), "")
+                    }
+                })
+                    }
+                """.trimIndent()
+                
+            }
+        }
+            operator fun get(type: BodyType) = 
+        when (type) {
+            BodyType.Male -> Male
+            BodyType.Female -> Female
+        }
             }
         """.trimIndent()
 
@@ -149,6 +184,13 @@ object PawnAssetManager {
     data class AssetData(
         val property: String,
         val path: String,
-        val type: String,
+        val type: String
     )
+
+    private fun File.bodyType() =
+        when {
+            name.contains("Female") -> "Female"
+            name.contains("Male") -> "Male"
+            else -> error("Unsupported file type $this")
+        }
 }
