@@ -68,7 +68,6 @@ abstract class GenerateClassesTask : DefaultTask() {
                     )
                 }
         val anims = absolutePath.resolve("animations").toFile().listFiles().mapIndexed { index, file ->
-            val body = file.bodyType()
             AssetData(
                 file.nameWithoutExtension.lowercase(),
                 base.resolve("animations").resolve(file.name).pathString,
@@ -77,9 +76,11 @@ abstract class GenerateClassesTask : DefaultTask() {
         }
         val models = listOf(
             "modelMale" to "PT_Male_Armors_Modular.g3db",
-            "modelFemale" to "PT_Female_Armors_Modular.g3db",
             "modelMaleExt" to "PT_Male_Armors_Ex1_Modular.g3db",
-            "modelFemaleExt" to "PT_Female_Armors_Ex1_Modular.g3db"
+            "modelMaleExt2" to "PT_Male_Armors_Ex2_Modular.g3db",
+            "modelFemale" to "PT_Female_Armors_Modular.g3db",
+            "modelFemaleExt" to "PT_Female_Armors_Ex1_Modular.g3db",
+            "modelFemaleExt2" to "PT_Female_Armors_Ex2_Modular.g3db"
         ).map { (prop, path) ->
             AssetData(
                 prop,

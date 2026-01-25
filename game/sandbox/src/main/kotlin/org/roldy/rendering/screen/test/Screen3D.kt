@@ -23,7 +23,7 @@ import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.PawnAnimations
 import org.roldy.g3d.pawn.PawnAssetManager
 import org.roldy.g3d.pawn.PawnConfiguration
-import org.roldy.g3d.pawn.PawnShaderProvider2
+import org.roldy.g3d.pawn.PawnShaderProvider
 
 
 class Screen3D(
@@ -73,7 +73,7 @@ class Screen3D(
             setAnimation(character.instance.animations.first().id, -1)
         }
     }
-    val batch by disposable { ModelBatch(PawnShaderProvider2(character)) }
+    val batch by disposable { ModelBatch(PawnShaderProvider(character)) }
 
     val light = DirectionalLight().set(hex("FFF4D6"), -1f, 1f, -0.2f)
     val env by lazy {
@@ -92,7 +92,6 @@ class Screen3D(
 
     val controller by lazy {
         ModelController(character.instance, camera).also(Gdx.input::setInputProcessor).apply {
-
         }
     }
 
@@ -103,7 +102,7 @@ class Screen3D(
     }
 
     val anims by sequencer {
-        PawnAnimations[character.body].all.toList()
+        PawnAnimations[character.bodyType].all.toList()
     }
     val colors by sequencer {
         listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW)
@@ -115,38 +114,38 @@ class Screen3D(
             emptyList(),
             character.instance.allNodes.map { it.id },
             listOf(
-                "PT_${character.body}_Armor_head_01",
-                "PT_${character.body}_Armor_01_A_body",
-                "PT_${character.body}_Armor_01_A_boots",
-                "PT_${character.body}_Armor_01_A_cape",
-                "PT_${character.body}_Armor_01_A_gauntlets",
-                "PT_${character.body}_Armor_01_A_helmet",
-                "PT_${character.body}_Armor_01_A_legs",
+                "PT_${character.bodyType}_Armor_head_01",
+                "PT_${character.bodyType}_Armor_01_A_body",
+                "PT_${character.bodyType}_Armor_01_A_boots",
+                "PT_${character.bodyType}_Armor_01_A_cape",
+                "PT_${character.bodyType}_Armor_01_A_gauntlets",
+                "PT_${character.bodyType}_Armor_01_A_helmet",
+                "PT_${character.bodyType}_Armor_01_A_legs",
             ),
             listOf(
-                "PT_${character.body}_Armor_head_01",
-                "PT_${character.body}_Armor_01_A_body",
-                "PT_${character.body}_Armor_01_A_boots",
-                "PT_${character.body}_Armor_01_A_cape",
-                "PT_${character.body}_Armor_01_A_gauntlets",
-                "PT_${character.body}_Armor_Ex1_helmet_39",
-                "PT_${character.body}_Armor_01_A_legs",
+                "PT_${character.bodyType}_Armor_head_01",
+                "PT_${character.bodyType}_Armor_01_A_body",
+                "PT_${character.bodyType}_Armor_01_A_boots",
+                "PT_${character.bodyType}_Armor_01_A_cape",
+                "PT_${character.bodyType}_Armor_01_A_gauntlets",
+                "PT_${character.bodyType}_Armor_Ex1_helmet_39",
+                "PT_${character.bodyType}_Armor_01_A_legs",
             ),
             listOf(
-                "PT_${character.body}_Armor_Ex1_body_21",
-                "PT_${character.body}_Armor_Ex1_boots_03",
-                "PT_${character.body}_Armor_Ex1_cape_01",
-                "PT_${character.body}_Armor_Ex1_gauntlets_02",
-                "PT_${character.body}_Armor_Ex1_helmet_05",
-                "PT_${character.body}_Armor_Ex1_legs_01",
+                "PT_${character.bodyType}_Armor_Ex1_body_21",
+                "PT_${character.bodyType}_Armor_Ex1_boots_03",
+                "PT_${character.bodyType}_Armor_Ex1_cape_01",
+                "PT_${character.bodyType}_Armor_Ex1_gauntlets_02",
+                "PT_${character.bodyType}_Armor_Ex1_helmet_05",
+                "PT_${character.bodyType}_Armor_Ex1_legs_01",
             ),
             listOf(
-                "PT_${character.body}_Armor_Ex1_body_21",
-                "PT_${character.body}_Armor_Ex1_boots_03",
-                "PT_${character.body}_Armor_Ex1_cape_01",
-                "PT_${character.body}_Armor_Ex1_gauntlets_02",
-                "PT_${character.body}_Armor_Ex1_helmet_33",
-                "PT_${character.body}_Armor_Ex1_legs_01"
+                "PT_${character.bodyType}_Armor_Ex1_body_21",
+                "PT_${character.bodyType}_Armor_Ex1_boots_03",
+                "PT_${character.bodyType}_Armor_Ex1_cape_01",
+                "PT_${character.bodyType}_Armor_Ex1_gauntlets_02",
+                "PT_${character.bodyType}_Armor_Ex1_helmet_33",
+                "PT_${character.bodyType}_Armor_Ex1_legs_01"
             )
         )
     }
@@ -165,13 +164,13 @@ class Screen3D(
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-            character.leather3Color.set(colors.next())
+            character.defaultColors.metal2Color.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            character.skinColor.set(colors.next())
+            character.defaultColors.skinColor.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            character.eyesColor.set(colors.next())
+            character.defaultColors.eyesColor.set(colors.next())
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
             character.instance.setVisibility(

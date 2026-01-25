@@ -26,7 +26,11 @@ class PawnShader(
     }
 
     fun colorize(renderable: Renderable) {
-        configuration.let { config ->
+        val node =
+            configuration.instance.meshMap.getValue(with(configuration.instance) { renderable.meshPart.mappingId() })
+
+        configuration.let { pawn ->
+            val config = pawn.getShaderConfig(node)
             // Base texture - unit 0
             val diffuse = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Diffuse)
             diffuse?.textureDescription?.texture?.bind(0)
@@ -193,11 +197,125 @@ class PawnShader(
     }
 }
 
-class PawnShaderProvider2(
+class PawnShaderProvider(
     private val configuration: PawnConfiguration,
 ) : BaseShaderProvider() {
 
     override fun createShader(renderable: Renderable): Shader {
         return PawnShader(configuration, renderable)
     }
+}
+
+interface ShaderConfig {
+    val skinColor: Color
+    val eyesColor: Color
+    val hairColor: Color
+    val scleraColor: Color
+    val lipsColor: Color
+    val scarsColor: Color
+
+    // Metal colors
+    val metal1Color: Color
+    val metal2Color: Color
+    val metal3Color: Color
+
+    // Leather colors
+    val leather1Color: Color
+    val leather2Color: Color
+    val leather3Color: Color
+
+    // Cloth colors
+    val cloth1Color: Color
+    val cloth2Color: Color
+    val cloth3Color: Color
+
+    // Gems colors
+    val gems1Color: Color
+    val gems2Color: Color
+    val gems3Color: Color
+
+    // Feathers colors
+    val feathers1Color: Color
+    val feathers2Color: Color
+    val feathers3Color: Color
+
+
+    // Smoothness values
+    val skinSmoothness: Float
+    val eyesSmoothness: Float
+    val hairSmoothness: Float
+    val scleraSmoothness: Float
+    val lipsSmoothness: Float
+    val scarsSmoothness: Float
+    val metal1Smoothness: Float
+    val metal2Smoothness: Float
+    val metal3Smoothness: Float
+    val leather1Smoothness: Float
+    val leather2Smoothness: Float
+    val leather3Smoothness: Float
+    val gems1Smoothness: Float
+    val gems2Smoothness: Float
+    val gems3Smoothness: Float
+
+    // Metallic values
+    val metal1Metallic: Float
+    val metal2Metallic: Float
+    val metal3Metallic: Float
+}
+
+class DefaultShaderConfig : ShaderConfig {
+    override var skinColor = Color(2.02193f, 1.0081f, 0.6199315f, 1f)
+    override var eyesColor = Color(0.0734529f, 0.1320755f, 0.05046281f, 1f)
+    override var hairColor = Color(0.5943396f, 0.3518379f, 0.1093361f, 1f)
+    override var scleraColor = Color(0.9056604f, 0.8159487f, 0.8159487f, 1f)
+    override var lipsColor = Color(0.8301887f, 0.3185886f, 0.2780349f, 1f)
+    override var scarsColor = Color(0.8490566f, 0.5037117f, 0.3884835f, 1f)
+
+    // Metal colors
+    override var metal1Color = Color(2f, 0.682353f, 0.1960784f, 1f)
+    override var metal2Color = Color(0.4674706f, 0.4677705f, 0.5188679f, 1f)
+    override var metal3Color = Color(0.4383232f, 0.4383232f, 0.4716981f, 1f)
+
+    // Leather colors
+    override var leather1Color = Color(0.4811321f, 0.2041155f, 0.08851016f, 1f)
+    override var leather2Color = Color(0.4245283f, 0.190437f, 0.09011215f, 1f)
+    override var leather3Color = Color(0.1698113f, 0.04637412f, 0.02963688f, 1f)//.mul(2.5f)
+
+    // Cloth colors
+    override var cloth1Color = Color(0.1465379f, 0.282117f, 0.3490566f, 1f)
+    override var cloth2Color = Color(1f, 0f, 0f, 1f)
+    override var cloth3Color = Color(0.8773585f, 0.6337318f, 0.3434941f, 1f)
+
+    // Gems colors
+    override var gems1Color = Color(0.3773585f, 0f, 0.06650025f, 1f)
+    override var gems2Color = Color(0.2023368f, 0f, 0.4339623f, 1f)
+    override var gems3Color = Color(0f, 0.1132075f, 0.01206957f, 1f)
+
+    // Feathers colors
+    override var feathers1Color = Color(0.7735849f, 0.492613f, 0.492613f, 1f)
+    override var feathers2Color = Color(0.6792453f, 0f, 0f, 1f)
+    override var feathers3Color = Color(0f, 0.1793142f, 0.7264151f, 1f)
+
+
+    // Smoothness values
+    override var skinSmoothness = 0.3f
+    override var eyesSmoothness = 0.7f
+    override var hairSmoothness = 0.1f
+    override var scleraSmoothness = 0.5f
+    override var lipsSmoothness = 0.4f
+    override var scarsSmoothness = 0.3f
+    override var metal1Smoothness = 0.7f
+    override var metal2Smoothness = 0.7f
+    override var metal3Smoothness = 0.7f
+    override var leather1Smoothness = 0.3f
+    override var leather2Smoothness = 0.3f
+    override var leather3Smoothness = 0.3f
+    override var gems1Smoothness = 1.0f
+    override var gems2Smoothness = 0.0f
+    override var gems3Smoothness = 0.0f
+
+    // Metallic values
+    override var metal1Metallic = 0.65f
+    override var metal2Metallic = 0.65f
+    override var metal3Metallic = 0.65f
 }

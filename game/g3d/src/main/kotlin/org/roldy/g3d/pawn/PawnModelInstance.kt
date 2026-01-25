@@ -2,8 +2,10 @@ package org.roldy.g3d.pawn
 
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.graphics.g3d.model.MeshPart
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.model.NodePart
+import com.badlogic.gdx.math.Vector3
 import org.roldy.g3d.pawn.utils.copyAnimation
 
 class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(modelData.run {
@@ -20,10 +22,24 @@ class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(mod
     private val nodeParts: List<Pair<Node, List<NodePart>>>
     val allNodes: List<Node>
 
+    val meshMap: Map<Pair<String, Vector3>, Node> by lazy {
+        nodeParts.flatMap { (node, parts) ->
+            parts.map {
+                (it.meshPart.mappingId()) to node
+            }
+        }.toMap()
+    }
+
     init {
         allNodes = nodes.collect()
         nodeParts = allNodes.map {
             it to it.parts.toList()
+        }
+        nodes.forEach {
+            if (!it.id.contains("Hips")) {
+                println(it.id)
+            }
+
         }
     }
 
@@ -44,4 +60,7 @@ class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(mod
         val base: Model,
         val additions: List<Model>
     )
+
+    fun MeshPart.mappingId() =
+        id to center
 }
