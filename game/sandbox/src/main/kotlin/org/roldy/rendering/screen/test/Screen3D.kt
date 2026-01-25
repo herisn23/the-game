@@ -20,7 +20,10 @@ import com.badlogic.gdx.math.Vector3
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.utils.sequencer
-import org.roldy.g3d.pawn.*
+import org.roldy.g3d.pawn.PawnAnimations
+import org.roldy.g3d.pawn.PawnAssetManager
+import org.roldy.g3d.pawn.PawnConfiguration
+import org.roldy.g3d.pawn.PawnShaderProvider
 
 
 class Screen3D(
@@ -34,7 +37,6 @@ class Screen3D(
         camera.update()
     }
 
-    val maskTextures = MaskTextures()
     val orig by lazy {
         PawnAssetManager.model.get().apply {
             printModelData()
@@ -42,20 +44,28 @@ class Screen3D(
     }
 
     fun Model.printModelData() {
-        // Print the node structure to see bone ordering
         fun printBoneOrder(node: Node, indent: String = "") {
-            println("$indent${node.id}")
+            if (node.id == "Root") return
+            if (node.children.count() == 0) {
+                val parents = mutableListOf<Node>()
+                fun Node.parentPath() {
+                    if (parent != null) {
+                        parents.add(parent)
+                        parent.parentPath()
+                    }
+                }
+                node.parentPath()
+                print(parents.reversed().joinToString("|") { it.id })
+                println("|${node.id}")
+            }
+
             node.children.forEach { printBoneOrder(it, "$indent  ") }
         }
-
-        println("=== Model Node Hierarchy ===")
         nodes.forEach { printBoneOrder(it) }
     }
 
     val character by lazy {
-        PawnConfiguration(
-            orig, maskTextures
-        ).apply {
+        PawnConfiguration(orig).apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
@@ -122,6 +132,44 @@ class Screen3D(
         )
     }
     val rotation = Quaternion()
+    val allowed by sequencer {
+
+        listOf(
+            emptyList(),
+            character.allNodes.map { it.id },
+            listOf(
+                "Chr_Hips_Male_00",
+                "Chr_HandLeft_Male_00",
+                "Chr_HandRight_Male_00",
+                "Chr_LegLeft_Male_00",
+                "Chr_LegRight_Male_00",
+                "Chr_ArmLowerLeft_Male_00",
+                "Chr_ArmLowerRight_Male_00",
+                "Chr_ArmUpperLeft_Male_00",
+                "Chr_ArmUpperRight_Male_00",
+                "Chr_Torso_Male_00",
+                "Chr_FacialHair_Male_01",
+                "Chr_Head_Male_19",
+            ),
+            listOf(
+                "Chr_Hips_Male_00",
+                "Chr_HandLeft_Male_00",
+                "Chr_HandRight_Male_00",
+                "Chr_LegLeft_Male_00",
+                "Chr_LegRight_Male_00",
+                "Chr_ArmLowerRight_Male_11",
+                "Chr_ArmLowerRight_Male_00",
+                "Chr_ArmUpperLeft_Male_00",
+                "Chr_ArmUpperRight_Male_00",
+                "Chr_Torso_Male_00",
+                "Chr_FacialHair_Male_01",
+                "Chr_Eyebrow_Male_01",
+                "Chr_Head_Male_19",
+                "Chr_HeadCoverings_No_Hair_09"
+            )
+        )
+    }
+
     override fun render(delta: Float) {
         if (loading && PawnAssetManager.assetManager.update()) {
             loading = false
@@ -148,6 +196,11 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             character.colorEyes.set(colors.next())
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+            character.setVisibility(
+                allowed.next()
+            )
+        }
 
 
         camera.update()
@@ -159,6 +212,8 @@ class Screen3D(
         }
 
         batch.begin(camera)
+
+
         batch.render(character.instance, env)
         batch.end()
     }

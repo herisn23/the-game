@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
 import kotlin.io.path.pathString
 
-const val pack = "org.roldy.g3d.pawn"
+private const val pack = "org.roldy.g3d.pawn"
 
 abstract class GenerateClassesTask : DefaultTask() {
 
@@ -26,7 +26,8 @@ abstract class GenerateClassesTask : DefaultTask() {
 
         val classes = listOf(
             generateAssets(),
-            generateAnimations()
+            generateAnimations(),
+            generateParts()
         )
         generateKotlinClasses(outputDirectory, classes)
         logger.lifecycle("Generated classes in: ${outputDirectory.absolutePath}")
