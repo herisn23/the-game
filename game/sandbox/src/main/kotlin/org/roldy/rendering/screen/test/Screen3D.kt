@@ -11,31 +11,107 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
+import org.roldy.core.InputProcessorDelegate
+import org.roldy.core.coroutines.async
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.map.MapData
+import org.roldy.core.map.MapGenerator
+import org.roldy.core.map.MapSize
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
+import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
+import org.roldy.g3d.terrain.ChunkedTerrain
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
 
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
     var loading = true
-    val postProcess = PostProcessing(camera)
+    val postProcess = PostProcessing()
 
     init {
-        camera.position.set(16.799997f, 0f, 0f)
+        camera.position.set(0f, 20f, 0f)
         camera.update()
     }
 
+    val mapSize = MapSize(2000, 2000)
+    val mapData = MapData(1, mapSize)
+    var noiseData = MapGenerator(mapData).generate()
+    var terrainInstance = ChunkedTerrain(
+        noiseData = noiseData,
+        mapSize = mapSize
+    )
+
+    data class TData(
+        val name: String,
+        var value: Float = 0f
+    )
+
+    val flatRegionAmount = TData("flatRegionAmount", 0.6f)
+    val mountainHeight = TData("mountainHeight", 0.9f)
+
+    var currentData = flatRegionAmount
+
+    val seq by sequencer {
+        listOf(flatRegionAmount, mountainHeight)
+    }
+
+    fun changeTerrain(): ChunkedTerrain {
+        return ChunkedTerrain(noiseData, mapSize)
+    }
+
+    val sens = 0.01f
+    fun modify(dir: Int) {
+        currentData.value = (currentData.value + dir * sens).coerceIn(0f, 10f)
+        println("Set ${currentData}")
+    }
+
+    fun changeTerrainData() {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+            currentData = seq.next()
+            println("Modify ${currentData.name}")
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
+            modify(-1)
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) {
+            modify(1)
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            regenerate()
+//            character.manager.animationController.setAnimation(anims.next().id, -1)
+        }
+    }
+
+    fun regenerate() {
+        async {
+            noiseData = MapGenerator(
+                MapData(Random.nextInt().toLong(), mapSize),
+                flatRegionAmount = flatRegionAmount.value,  // 0-1: how much of map is flat
+                mountainHeight = mountainHeight.value,       // How tall mountains are
+
+            ).generate()
+            it {
+                this.terrainInstance = changeTerrain()
+            }
+        }
+    }
+
+
     val skybox by lazy { Skybox() }
+    val modelBuilder by disposable(::PawnModelBuilder)
+
     val character2 by disposable {
-        PawnManager(BodyType.Male).apply {
+        PawnManager(modelBuilder, BodyType.Male).apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
@@ -47,7 +123,7 @@ class Screen3D(
         }
     }
     val character3 by disposable {
-        PawnManager(BodyType.Male).apply {
+        PawnManager(modelBuilder, BodyType.Male).apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
@@ -59,11 +135,11 @@ class Screen3D(
         }
     }
     val character by disposable {
-        PawnManager().apply {
+        PawnManager(modelBuilder).apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
-            initialTransform.setTranslation(0f, -9.700001f, 0f)
+            initialTransform.setTranslation(0f, 0f, 0f)
             initialTransform.rotate(Vector3.Y, 90f)
             instance.transform.set(initialTransform) // Copy it over
         }.run {
@@ -71,10 +147,17 @@ class Screen3D(
         }
     }
 
-    val light = DirectionalLight().set(hex("FFF4D6"), -1f, 1f, -0.2f)
+    val cameraController = EditorCameraController(camera)
+
+    //    val controller by lazy { ModelController(character.manager.instance, camera) }
+    val adapter by lazy {
+        InputProcessorDelegate(listOf(cameraController))
+            .also(Gdx.input::setInputProcessor)
+    }
+    val light = DirectionalLight().set(1f, 1f, 1f, -1f, -0.8f, -0.2f)
     val env by lazy {
         Environment().apply {
-            set(ColorAttribute(ColorAttribute.Emissive, hex("FFF4D6")))
+            set(ColorAttribute.createAmbient(0.4f, 0.4f, 0.4f, 1f))
             add(light)
         }
     }
@@ -83,11 +166,6 @@ class Screen3D(
         println("$indent${node.id}")
         for (child in node.children) {
             printNodeHierarchy(child, "$indent  ")
-        }
-    }
-
-    val controller by lazy {
-        ModelController(character.manager.instance, camera).also(Gdx.input::setInputProcessor).apply {
         }
     }
 
@@ -105,37 +183,19 @@ class Screen3D(
     override fun render(delta: Float) {
         if (loading && PawnAssetManager.assetManager.update()) {
             loading = false
-
+            adapter
         }
         if (loading) return
-        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
-            character.manager.cycleSets()
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            light.direction.x += delta
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            light.direction.x -= delta
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            light.direction.y += delta
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            light.direction.y -= delta
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            postProcess.toggle()
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            character.manager.animationController.setAnimation(anims.next().id, -1)
-        }
+        changeTerrainData()
         camera.update()
-        controller.update()
+//        controller.update()
+        cameraController.update(delta)
         context(delta, env, camera) {
             postProcess {
-                skybox.render()
-                character2.render()
-                character3.render()
+                terrainInstance.render()
+//                skybox.render()
+//                character2.render()
+//                character3.render()
                 character.render()
             }
         }

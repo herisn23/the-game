@@ -6,19 +6,8 @@ import com.badlogic.gdx.graphics.g3d.model.MeshPart
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.model.NodePart
 import com.badlogic.gdx.math.Vector3
-import org.roldy.g3d.pawn.utils.copyAnimation
 
-class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(modelData.run {
-    base.apply {
-        additions.forEach {
-            nodes.addAll(it.nodes)
-        }
-
-        PawnAnimations[bodyType].all.forEach { anim ->
-            animations.add(copyAnimation(anim.model.get().animations.first(), anim.id))
-        }
-    }
-}) {
+class PawnModelInstance(model: Model) : ModelInstance(model) {
     private val nodeParts: List<Pair<Node, List<NodePart>>>
     val allNodes: List<Node>
 
@@ -50,10 +39,6 @@ class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(mod
             it.children.collect() + listOf(it)
         }
 
-    data class Data(
-        val base: Model,
-        val additions: List<Model>
-    )
 
     fun MeshPart.mappingId() =
         id to center

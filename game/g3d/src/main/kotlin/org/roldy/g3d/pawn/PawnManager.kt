@@ -6,31 +6,13 @@ import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.part.*
 
 class PawnManager(
+    val builder: PawnModelBuilder,
     val bodyType: BodyType = BodyType.Female
 ) {
 
     val beardIndex = 0
     val hairIndex = 0
     val headIndex = 0
-    private val modelData by lazy {
-        when (bodyType) {
-            BodyType.Male -> PawnModelInstance.Data(
-                PawnAssetManager.modelMale.get(),
-                listOf(
-                    PawnAssetManager.modelMaleExt.get(),
-                    PawnAssetManager.modelMaleExt2.get()
-                )
-            )
-
-            BodyType.Female -> PawnModelInstance.Data(
-                PawnAssetManager.modelFemale.get(),
-                listOf(
-                    PawnAssetManager.modelFemaleExt.get(),
-                    PawnAssetManager.modelFemaleExt2.get()
-                )
-            )
-        }
-    }
     private val body by lazy {
         when (bodyType) {
             BodyType.Male -> MaleBody
@@ -56,7 +38,7 @@ class PawnManager(
     val defaultColors = DefaultShaderConfig()
 
     val instance by lazy {
-        PawnModelInstance(modelData, bodyType).apply {
+        PawnModelInstance(builder[bodyType]).apply {
             //set defaults
             val modularParts = body.modularParts.mapNotNull { body[it].firstOrNull() }
             setVisibility(modularParts + naked)

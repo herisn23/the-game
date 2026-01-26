@@ -28,3 +28,6 @@ then export model without skin on 60 FPS, convert it using `fbx-conv resources/f
 Animations must contain body type i.e. `IdleMale.g3db`
 
 Then gradle plugin re-generates all necessary classes, so no code edit is needed
+
+Editor camera control:
+

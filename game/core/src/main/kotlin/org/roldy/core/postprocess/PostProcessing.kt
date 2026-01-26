@@ -1,10 +1,10 @@
 package org.roldy.core.postprocess
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.crashinvaders.vfx.VfxManager
 import com.crashinvaders.vfx.effects.*
 import org.roldy.core.disposable.AutoDisposableAdapter
@@ -12,13 +12,13 @@ import org.roldy.core.disposable.disposable
 import org.roldy.core.utils.invoke
 
 class PostProcessing(
-    camera: Camera,
     private var width: () -> Int = { Gdx.graphics.backBufferWidth },
     private var height: () -> Int = { Gdx.graphics.backBufferHeight }
 ) : AutoDisposableAdapter() {
     typealias Render = () -> Unit
 
-    private var sceneFBO = DepthFrameBuffer(width(), height())
+    var enabled = false
+    private var sceneFBO = FrameBuffer(Pixmap.Format.RGBA8888, width(), height(), true)
     private val spriteBatch by disposable { SpriteBatch() }
 
     val bloom = BloomEffect().apply {
@@ -41,14 +41,6 @@ class PostProcessing(
         setPasses(4)      // Number of blur passes (1-4, more = smoother but slower)
         setType(GaussianBlurEffect.BlurType.Gaussian5x5) // Blur kernel size
     }
-    val dof = DepthOfFieldEffect { sceneFBO.depthTexture }.apply {
-        focusDistance = 50.0f
-        focusRange = 20.0f     // Wider range = more gradual transition
-        blurStrength = 0.02f
-        nearDistance = camera.near
-        farDistance = camera.far
-        rebind()
-    }
     val radialBlur = RadialBlurEffect(100).apply {
         setOrigin(0.5f, 0.5f)  // Center point (0-1, normalized screen coords)
         setZoom(1f)          // Blur strength (0.0-1.0, default: 0.1)
@@ -62,8 +54,8 @@ class PostProcessing(
 //            addEffect(dof)
 //            addEffect(radialDistortion)
             addEffect(bloom)
-            addEffect(filmGrain)
-            addEffect(vignette)
+//            addEffect(filmGrain)
+//            addEffect(vignette)
             addEffect(antialiasing)
         }
     }
@@ -71,10 +63,8 @@ class PostProcessing(
     fun resize(width: Int, height: Int) {
         vfxManager.resize(width, height)
         sceneFBO.dispose()
-        sceneFBO = DepthFrameBuffer(width(), height())
+        sceneFBO = FrameBuffer(Pixmap.Format.RGBA8888, width(), height(), true)
     }
-
-    var enabled = true
 
     fun toggle() {
         enabled = !enabled
@@ -123,7 +113,7 @@ class PostProcessing(
                     height
                 )
                 draw(
-                    sceneFBO.colorTexture,
+                    sceneFBO.colorBufferTexture,
                     0f, 0f,
                     width, height,
                     0f, 0f, 1f, 1f

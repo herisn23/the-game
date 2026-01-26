@@ -12,6 +12,7 @@ interface AutoDisposable : Disposable {
             }
         }
     }
+
     override fun dispose() {
         disposables.forEach(Disposable::dispose)
     }
@@ -31,8 +32,18 @@ fun <T : Disposable?> AutoDisposable.disposable(disposable: T): T {
     }
 }
 
+fun <T : Disposable?> AutoDisposable.disposableList(initializer: () -> List<T>): Lazy<List<T>> {
+    return lazy {
+        disposableList(initializer())
+    }
+}
+
 fun <T : Disposable?> AutoDisposable.disposableList(
     vararg elements: T
+) = disposableList(elements.asList())
+
+fun <T : Disposable?> AutoDisposable.disposableList(
+    elements: List<T>
 ) = elements.map {
     it.disposable()
 }

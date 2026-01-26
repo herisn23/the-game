@@ -7,8 +7,8 @@ import org.roldy.core.logger
 
 
 object ShaderLoader {
-    val characterFrag by lazy { load("shaders/characterHDR.fragment.glsl") }
-    val dofFrag by lazy { loadAsset("shaders/dof.fragment.glsl") }
+    val characterFrag by lazy { load("shaders/characterHDR.frag.glsl") }
+    val ssaoFrag by lazy { loadAsset("shaders/ssao.frag.glsl") }
     val screenspaceVert by lazy { Gdx.files.classpath("gdxvfx/shaders/screenspace.vert") }
 
     val skyboxFrag by lazy { loadAsset("shaders/skybox.frag.glsl") }
