@@ -35,12 +35,6 @@ class PawnModelInstance(modelData: Data, bodyType: BodyType) : ModelInstance(mod
         nodeParts = allNodes.map {
             it to it.parts.toList()
         }
-        nodes.forEach {
-            if (!it.id.contains("Hips")) {
-                println(it.id)
-            }
-
-        }
     }
 
     fun setVisibility(visibleParts: List<String>) {

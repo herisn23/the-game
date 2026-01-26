@@ -3,33 +3,27 @@ package org.roldy.rendering.screen.test
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g3d.Environment
-import com.badlogic.gdx.graphics.g3d.Model
-import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
-import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
-import org.roldy.g3d.pawn.PawnAnimations
-import org.roldy.g3d.pawn.PawnAssetManager
-import org.roldy.g3d.pawn.PawnConfiguration
-import org.roldy.g3d.pawn.PawnShaderProvider
+import org.roldy.g3d.pawn.*
 
 
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
     var loading = true
+    val postProcess = PostProcessing(camera)
 
     init {
         camera.position.set(16.799997f, 0f, 0f)
@@ -37,43 +31,42 @@ class Screen3D(
         camera.update()
     }
 
-    fun Model.printModelData() {
-        fun printBoneOrder(node: Node, indent: String = "") {
-            if (node.id == "Root") return
-            if (node.children.count() == 0) {
-                val parents = mutableListOf<Node>()
-                fun Node.parentPath() {
-                    if (parent != null) {
-                        parents.add(parent)
-                        parent.parentPath()
-                    }
-                }
-                node.parentPath()
-                print(parents.reversed().joinToString("|") { it.id })
-                println("|${node.id}")
-            }
-
-            node.children.forEach { printBoneOrder(it, "$indent  ") }
+    val character2 by disposable {
+        PawnManager(BodyType.Male).apply {
+            val initialTransform = Matrix4()
+            initialTransform.idt()
+            initialTransform.scl(0.1f)
+            initialTransform.setTranslation(-10f, -9.700001f, 10f)
+            initialTransform.rotate(Vector3.Y, 95f)
+            instance.transform.set(initialTransform) // Copy it over
+        }.run {
+            PawnRenderer(this, camera)
         }
-        nodes.forEach { printBoneOrder(it) }
     }
-
-    val character by lazy {
-        PawnConfiguration().apply {
+    val character3 by disposable {
+        PawnManager(BodyType.Male).apply {
+            val initialTransform = Matrix4()
+            initialTransform.idt()
+            initialTransform.scl(0.1f)
+            initialTransform.setTranslation(-30f, -9.700001f, -10f)
+            initialTransform.rotate(Vector3.Y, 80f)
+            instance.transform.set(initialTransform) // Copy it over
+        }.run {
+            PawnRenderer(this, camera)
+        }
+    }
+    val character by disposable {
+        PawnManager().apply {
             val initialTransform = Matrix4()
             initialTransform.idt()
             initialTransform.scl(0.1f)
             initialTransform.setTranslation(0f, -9.700001f, 0f)
             initialTransform.rotate(Vector3.Y, 90f)
             instance.transform.set(initialTransform) // Copy it over
+        }.run {
+            PawnRenderer(this, camera)
         }
     }
-    val animController by lazy {
-        AnimationController(character.instance).apply {
-            setAnimation(character.instance.animations.first().id, -1)
-        }
-    }
-    val batch by disposable { ModelBatch(PawnShaderProvider(character)) }
 
     val light = DirectionalLight().set(hex("FFF4D6"), -1f, 1f, -0.2f)
     val env by lazy {
@@ -91,63 +84,19 @@ class Screen3D(
     }
 
     val controller by lazy {
-        ModelController(character.instance, camera).also(Gdx.input::setInputProcessor).apply {
+        ModelController(character.manager.instance, camera).also(Gdx.input::setInputProcessor).apply {
         }
     }
 
     override fun resize(width: Int, height: Int) {
+        postProcess.resize(width, height)
         camera.viewportWidth = width.toFloat()
         camera.viewportHeight = height.toFloat()
         camera.update()
     }
 
     val anims by sequencer {
-        PawnAnimations[character.bodyType].all.toList()
-    }
-    val colors by sequencer {
-        listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW)
-    }
-
-    val allowed by sequencer {
-
-        listOf(
-            emptyList(),
-            character.instance.allNodes.map { it.id },
-            listOf(
-                "PT_${character.bodyType}_Armor_head_01",
-                "PT_${character.bodyType}_Armor_01_A_body",
-                "PT_${character.bodyType}_Armor_01_A_boots",
-                "PT_${character.bodyType}_Armor_01_A_cape",
-                "PT_${character.bodyType}_Armor_01_A_gauntlets",
-                "PT_${character.bodyType}_Armor_01_A_helmet",
-                "PT_${character.bodyType}_Armor_01_A_legs",
-            ),
-            listOf(
-                "PT_${character.bodyType}_Armor_head_01",
-                "PT_${character.bodyType}_Armor_01_A_body",
-                "PT_${character.bodyType}_Armor_01_A_boots",
-                "PT_${character.bodyType}_Armor_01_A_cape",
-                "PT_${character.bodyType}_Armor_01_A_gauntlets",
-                "PT_${character.bodyType}_Armor_Ex1_helmet_39",
-                "PT_${character.bodyType}_Armor_01_A_legs",
-            ),
-            listOf(
-                "PT_${character.bodyType}_Armor_Ex1_body_21",
-                "PT_${character.bodyType}_Armor_Ex1_boots_03",
-                "PT_${character.bodyType}_Armor_Ex1_cape_01",
-                "PT_${character.bodyType}_Armor_Ex1_gauntlets_02",
-                "PT_${character.bodyType}_Armor_Ex1_helmet_05",
-                "PT_${character.bodyType}_Armor_Ex1_legs_01",
-            ),
-            listOf(
-                "PT_${character.bodyType}_Armor_Ex1_body_21",
-                "PT_${character.bodyType}_Armor_Ex1_boots_03",
-                "PT_${character.bodyType}_Armor_Ex1_cape_01",
-                "PT_${character.bodyType}_Armor_Ex1_gauntlets_02",
-                "PT_${character.bodyType}_Armor_Ex1_helmet_33",
-                "PT_${character.bodyType}_Armor_Ex1_legs_01"
-            )
-        )
+        PawnAnimations[character.manager.bodyType].all.toList()
     }
 
     override fun render(delta: Float) {
@@ -156,26 +105,14 @@ class Screen3D(
 
         }
         if (loading) return
-        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
-        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.backBufferWidth, Gdx.graphics.backBufferHeight)
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-            character.defaultColors.metal2Color.set(colors.next())
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            character.defaultColors.skinColor.set(colors.next())
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            character.defaultColors.eyesColor.set(colors.next())
-        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
-            character.instance.setVisibility(
-                allowed.next()
-            )
+            character.manager.cycleSets()
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            light.direction.x += delta
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            light.direction.x -= delta
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             light.direction.y += delta
@@ -183,20 +120,22 @@ class Screen3D(
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             light.direction.y -= delta
         }
-
-
-        camera.update()
-
-        controller.update()
-        animController.update(delta)
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            animController.setAnimation(anims.next().id, -1)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            postProcess.toggle()
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            character.manager.animationController.setAnimation(anims.next().id, -1)
+        }
+        camera.update()
+        controller.update()
 
-        batch.begin(camera)
-
-        batch.render(character.instance, env)
-        batch.end()
+        postProcess {
+            context(delta, env) {
+                character2.render()
+                character3.render()
+                character.render()
+            }
+        }
     }
 
 }
@@ -253,6 +192,7 @@ class ModelController(
                 model.transform.rotate(Vector3.Y, -1f)
             }
         }
-//        model.transform.setTranslation(position)
+        model.transform.setTranslation(position)
     }
+
 }

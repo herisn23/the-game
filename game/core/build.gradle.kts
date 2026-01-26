@@ -7,4 +7,5 @@ dependencies {
     api(libs.kotlin.coroutines)
     implementation(libs.classgraph)
     implementation(libs.kotlinx.serialization.yaml)
+    implementation(libs.bundles.gdx.vfx)
 }

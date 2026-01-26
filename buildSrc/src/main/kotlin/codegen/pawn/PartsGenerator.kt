@@ -52,7 +52,7 @@ fun generateParts(): List<ClassInfo> {
     val femaleArmorsSets = females.filter { it.filterForArmors() }.collectArmors()
 
     val maleBody = males.filter { it.filterForBody() }.collectBody()
-    val femaleBody = females.filter { it.filterForBody() }.collectBody()
+    val femaleBody = females.filter { it.filterForBody() }.collectBody() + listOf("_beard" to emptyList())
 
     maleArmorsSets.checkMissing(femaleArmorsSets, female)
     femaleArmorsSets.checkMissing(maleArmorsSets, male)
@@ -147,12 +147,12 @@ private fun processArmors(
             }
         }
                 )
-                override val sets: Map<String, List<Pair<ArmorPart, String>>> = 
+                override val sets: Map<String, Map<ArmorPart, String>> = 
                 mapOf(
                     ${
             sets.keys.joinToString(",\n") { key ->
                 """
-                           "$key" to listOf(
+                           "$key" to mapOf(
                                 ${
                     sets.getValue(key).joinToString(",") { name ->
                         val armorType = armorParts.first { name.lowercase().contains(it.first) }.second

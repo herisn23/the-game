@@ -7,8 +7,9 @@ gdx = "1.14.0"
 graalHelperVersion = "2.0.1"
 construo = "2.1.0"
 ashley = "1.7.4"
-gdxSpine="4.2.10"
-classgraph="4.8.165"
+gdxSpine = "4.2.10"
+classgraph = "4.8.165"
+gdx-vfx = "0.5.4"
 
 [libraries]
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
@@ -19,15 +20,17 @@ kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", 
 #GDX libraries
 gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
 gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
-gdx-backend-headless={module="com.badlogicgames.gdx:gdx-backend-headless", version.ref="gdx"}
+gdx-backend-headless = { module = "com.badlogicgames.gdx:gdx-backend-headless", version.ref = "gdx" }
 gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
 gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.ref = "gdx" }
-gdx-spine = { module="com.esotericsoftware.spine:spine-libgdx", version.ref="gdxSpine"}
-gdx-tools = {module="com.badlogicgames.gdx:gdx-tools", version.ref="gdx"}
-gdx-freetype = {module="com.badlogicgames.gdx:gdx-freetype", version.ref="gdx"}
-gdx-freetype-platform = {module="com.badlogicgames.gdx:gdx-freetype-platform", version.ref="gdx"}
+gdx-spine = { module = "com.esotericsoftware.spine:spine-libgdx", version.ref = "gdxSpine" }
+gdx-tools = { module = "com.badlogicgames.gdx:gdx-tools", version.ref = "gdx" }
+gdx-freetype = { module = "com.badlogicgames.gdx:gdx-freetype", version.ref = "gdx" }
+gdx-freetype-platform = { module = "com.badlogicgames.gdx:gdx-freetype-platform", version.ref = "gdx" }
+gdx-vfx-core = { module = "com.crashinvaders.vfx:gdx-vfx-core", version.ref = "gdx-vfx" }
+gdx-vfx-effects = { module = "com.crashinvaders.vfx:gdx-vfx-effects", version.ref = "gdx-vfx" }
 
-classgraph = {module="io.github.classgraph:classgraph", version.ref="classgraph"}
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -36,3 +39,4 @@ construo = { id = "io.github.fourlastor.construo", version.ref = "construo" }
 
 [bundles]
 gdx = ["gdx", "gdx-backend-lwjgl3", "gdx-lwjgl3-angle"]
+gdx-vfx = ["gdx-vfx-core", "gdx-vfx-effects"]
