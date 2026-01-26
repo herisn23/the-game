@@ -16,6 +16,8 @@ class PostProcessing(
     private var width: () -> Int = { Gdx.graphics.backBufferWidth },
     private var height: () -> Int = { Gdx.graphics.backBufferHeight }
 ) : AutoDisposableAdapter() {
+    typealias Render = () -> Unit
+
     private var sceneFBO = DepthFrameBuffer(width(), height())
     private val spriteBatch by disposable { SpriteBatch() }
 
@@ -42,7 +44,7 @@ class PostProcessing(
     val dof = DepthOfFieldEffect { sceneFBO.depthTexture }.apply {
         focusDistance = 50.0f
         focusRange = 20.0f     // Wider range = more gradual transition
-        blurStrength = 2.0f
+        blurStrength = 0.02f
         nearDistance = camera.near
         farDistance = camera.far
         rebind()
@@ -57,7 +59,7 @@ class PostProcessing(
     }
     val vfxManager by disposable {
         VfxManager(Pixmap.Format.RGBA8888, width(), height()).apply {
-            addEffect(dof)
+//            addEffect(dof)
 //            addEffect(radialDistortion)
             addEffect(bloom)
             addEffect(filmGrain)
@@ -78,20 +80,30 @@ class PostProcessing(
         enabled = !enabled
     }
 
-    operator fun invoke(render: () -> Unit) {
+    operator fun invoke(
+        render: Render
+    ) {
         val width = width()
         val height = height()
         Gdx.gl.glClearColor(1f, 1f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         Gdx.gl.glViewport(0, 0, width, height)
+        postProcess(render, width.toFloat(), height.toFloat())
+    }
+
+    private fun render(render: Render) {
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
+        render()
+    }
+
+    private fun postProcess(render: Render, width: Float, height: Float) {
         if (enabled) {
             sceneFBO.begin()
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
-            Gdx.gl.glDepthFunc(GL20.GL_LEQUAL) // Ensure correct depth function
             Gdx.gl.glDepthMask(true)
             Gdx.gl.glDisable(GL20.GL_BLEND)
-            render()
+            render(render)
             sceneFBO.end()
 
 
@@ -102,18 +114,18 @@ class PostProcessing(
             vfxManager.beginInputCapture()
             // Disable depth test for 2D post-processing
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
             spriteBatch {
                 projectionMatrix.setToOrtho2D(
                     0f, 0f,
-                    width.toFloat(),
-                    height.toFloat()
+                    width,
+                    height
                 )
                 draw(
                     sceneFBO.colorTexture,
                     0f, 0f,
-                    width.toFloat(), height.toFloat(),
+                    width, height,
                     0f, 0f, 1f, 1f
                 )
             }
@@ -125,10 +137,7 @@ class PostProcessing(
             vfxManager.applyEffects()
             vfxManager.renderToScreen()
         } else {
-            // No post-processing - render directly
-            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
-            Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
-            render()
+            render(render)
         }
     }
 }

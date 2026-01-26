@@ -17,6 +17,9 @@ import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.*
+import org.roldy.g3d.skybox.Skybox
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class Screen3D(
@@ -27,10 +30,10 @@ class Screen3D(
 
     init {
         camera.position.set(16.799997f, 0f, 0f)
-        camera.lookAt(0f, 0f, 0f)
         camera.update()
     }
 
+    val skybox by lazy { Skybox() }
     val character2 by disposable {
         PawnManager(BodyType.Male).apply {
             val initialTransform = Matrix4()
@@ -40,7 +43,7 @@ class Screen3D(
             initialTransform.rotate(Vector3.Y, 95f)
             instance.transform.set(initialTransform) // Copy it over
         }.run {
-            PawnRenderer(this, camera)
+            PawnRenderer(this)
         }
     }
     val character3 by disposable {
@@ -52,7 +55,7 @@ class Screen3D(
             initialTransform.rotate(Vector3.Y, 80f)
             instance.transform.set(initialTransform) // Copy it over
         }.run {
-            PawnRenderer(this, camera)
+            PawnRenderer(this)
         }
     }
     val character by disposable {
@@ -64,7 +67,7 @@ class Screen3D(
             initialTransform.rotate(Vector3.Y, 90f)
             instance.transform.set(initialTransform) // Copy it over
         }.run {
-            PawnRenderer(this, camera)
+            PawnRenderer(this)
         }
     }
 
@@ -128,9 +131,9 @@ class Screen3D(
         }
         camera.update()
         controller.update()
-
-        postProcess {
-            context(delta, env) {
+        context(delta, env, camera) {
+            postProcess {
+                skybox.render()
                 character2.render()
                 character3.render()
                 character.render()
@@ -157,6 +160,7 @@ class ModelController(
         return true
     }
 
+
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         // Zoom in/out
         zoom += amountY * 2f // Adjust multiplier for zoom speed
@@ -174,6 +178,9 @@ class ModelController(
 
     }
 
+    val rotateSpeed = 2f
+    private var yaw = -90f // Left/right
+    private var pitch = 0f // Up/down
     fun update() {
         when (lastKey) {
             Input.Keys.W -> {
@@ -191,8 +198,31 @@ class ModelController(
             Input.Keys.E -> {
                 model.transform.rotate(Vector3.Y, -1f)
             }
+
+            (Input.Keys.L) -> {
+                yaw -= rotateSpeed
+            }
+
+            (Input.Keys.J) -> yaw += rotateSpeed
+            (Input.Keys.K) -> pitch -= rotateSpeed
+            (Input.Keys.I) -> pitch += rotateSpeed
         }
         model.transform.setTranslation(position)
+
+        // Clamp pitch to avoid flipping
+        pitch = pitch.coerceIn(-89f, 89f)
+
+        // Calculate direction from angles
+        val radYaw = Math.toRadians(yaw.toDouble()).toFloat()
+        val radPitch = Math.toRadians(pitch.toDouble()).toFloat()
+
+        camera.direction.set(
+            cos(radPitch) * sin(radYaw),
+            sin(radPitch),
+            cos(radPitch) * cos(radYaw)
+        )
+        camera.up.set(0f, 1f, 0f)
+        camera.update()
     }
 
 }

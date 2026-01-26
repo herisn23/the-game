@@ -14,8 +14,8 @@ fun camera(zoom: Float = 1f) =
 fun camera3D() =
     PerspectiveCamera(
         67f,
-        Gdx.graphics.width.toFloat(),
-        Gdx.graphics.height.toFloat()
+        Gdx.graphics.backBufferWidth.toFloat(),
+        Gdx.graphics.backBufferHeight.toFloat()
     ).apply {
         position.set(0f, 0f, 0f)
         lookAt(0f, 0f, 0f)
