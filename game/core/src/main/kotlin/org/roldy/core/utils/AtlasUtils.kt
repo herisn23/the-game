@@ -6,7 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 
 
 infix operator fun TextureAtlas.get(regionName: String): TextureAtlas.AtlasRegion =
-    findRegion(regionName)
+    findRegion(regionName).also {
+        if (it == null) error("Atlas $regionName does not exist")
+    }
 
 infix fun TextureAtlas.drawable(regionName: String) =
     get(regionName).drawable()

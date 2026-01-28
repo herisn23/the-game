@@ -8,4 +8,5 @@ dependencies {
     implementation(libs.classgraph)
     implementation(libs.kotlinx.serialization.yaml)
     implementation(libs.bundles.gdx.vfx)
+    implementation(libs.gdx.freetype)
 }

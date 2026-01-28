@@ -1,6 +1,5 @@
 package org.roldy.core.asset
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import org.roldy.core.logger
@@ -8,12 +7,12 @@ import org.roldy.core.logger
 
 object ShaderLoader {
     val characterFrag by lazy { load("shaders/characterHDR.frag.glsl") }
-    val ssaoFrag by lazy { loadAsset("shaders/ssao.frag.glsl") }
-    val screenspaceVert by lazy { Gdx.files.classpath("gdxvfx/shaders/screenspace.vert") }
-
+    val terrainVert by lazy { loadAsset("shaders/terrain.vert.glsl") }
+    val terrainFrag by lazy { loadAsset("shaders/terrain.frag.glsl") }
     val skyboxFrag by lazy { loadAsset("shaders/skybox.frag.glsl") }
     val skyboxVert by lazy { loadAsset("shaders/skybox.vert.glsl") }
     val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
+    val terrainShader by lazy { createShader(terrainVert, terrainFrag) }
 
     fun load(name: String) =
         loadAsset(name).readString()

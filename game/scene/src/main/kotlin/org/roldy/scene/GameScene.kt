@@ -1,6 +1,7 @@
 package org.roldy.scene
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import org.roldy.core.CursorManager
 import org.roldy.core.Logger
 import org.roldy.core.coroutines.DeltaProcessingLoop
@@ -22,6 +23,9 @@ class GameScene : AutoDisposableGameAdapter() {
         Logger.level = Logger.Level.Debug
         CursorManager.initialize()
         screen = Screen3D(camera3D())
+        println("GL Version: ${Gdx.gl.glGetString(GL20.GL_VERSION)}")
+        println("GLSL Version: ${Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)}")
+        println("GL30: ${Gdx.gl30}")
 
     }
 

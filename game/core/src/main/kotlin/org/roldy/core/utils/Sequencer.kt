@@ -21,7 +21,7 @@ class Sequencer<T>(
     private fun <R> nextIndex(exec: (T) -> R): R {
         val previous = current
         index++
-        clampIndex()
+        cycleIndex()
         return exec(previous)
     }
 
@@ -38,7 +38,7 @@ class Sequencer<T>(
     private fun <R> prevIndex(exec: (T) -> R): R {
         val previous = current
         index--
-        clampIndex()
+        cycleIndex()
         return exec(previous)
     }
 
@@ -46,21 +46,15 @@ class Sequencer<T>(
         index = 0
     }
 
-    fun clampIndex() {
-        index = index.clamp(0, list.size)
-    }
-    fun Int.clamp(min: Int, max: Int): Int {
-        return when {
-            this >= max -> min
-            this < min -> max - 1
-            else -> this
-        }
+    fun cycleIndex() {
+        index = index.cycle(0..<list.size)
     }
 }
 
-fun <T> sequencer(list: ()->List<T>) = lazy {
+fun <T> sequencer(list: () -> List<T>) = lazy {
     Sequencer(list())
 }
+
 fun <T> sequencer(vararg list: T) = lazy {
     Sequencer(list.toList())
 }

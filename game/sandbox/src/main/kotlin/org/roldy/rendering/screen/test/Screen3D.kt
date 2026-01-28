@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
+import org.roldy.core.Diagnostics
 import org.roldy.core.InputProcessorDelegate
 import org.roldy.core.coroutines.async
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
@@ -23,7 +24,7 @@ import org.roldy.core.utils.sequencer
 import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
-import org.roldy.g3d.terrain.ChunkedTerrain
+import org.roldy.g3d.terrain.Terrain
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -34,19 +35,20 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     var loading = true
     val postProcess = PostProcessing()
-
+    val diagnostics by disposable { Diagnostics() }
     init {
         camera.position.set(0f, 20f, 0f)
         camera.update()
+        Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
-    val mapSize = MapSize(2000, 2000)
+    val mapSize = MapSize(1000, 1000)
     val mapData = MapData(1, mapSize)
-    var noiseData = MapGenerator(mapData).generate()
-    var terrainInstance = ChunkedTerrain(
-        noiseData = noiseData,
-        mapSize = mapSize
-    )
+    var noiseData = MapGenerator(mapData).generate().apply {
+        val elevations = values.map { it.elevation }
+        println("Elevation: min=${elevations.minOrNull()}, max=${elevations.maxOrNull()}")
+    }
+    var terrainInstance = changeTerrain()
 
     data class TData(
         val name: String,
@@ -62,8 +64,8 @@ class Screen3D(
         listOf(flatRegionAmount, mountainHeight)
     }
 
-    fun changeTerrain(): ChunkedTerrain {
-        return ChunkedTerrain(noiseData, mapSize)
+    fun changeTerrain(): Terrain {
+        return Terrain(noiseData, mapSize)
     }
 
     val sens = 0.01f
@@ -186,18 +188,24 @@ class Screen3D(
             adapter
         }
         if (loading) return
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            postProcess.toggle()
+        }
         changeTerrainData()
         camera.update()
 //        controller.update()
         cameraController.update(delta)
         context(delta, env, camera) {
             postProcess {
+                skybox.render()
                 terrainInstance.render()
-//                skybox.render()
 //                character2.render()
 //                character3.render()
                 character.render()
             }
+//            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            diagnostics.render()
         }
     }
 

@@ -1,7 +1,7 @@
 package org.roldy.core.utils
 
 
-infix fun String.repeat(count: Int) =
+infix fun String.cycle(count: Int) =
     (0..count).joinToString("") { this }
 
 enum class NamingStyle {
