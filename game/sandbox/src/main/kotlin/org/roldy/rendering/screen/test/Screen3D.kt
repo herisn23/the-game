@@ -9,19 +9,21 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
-import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.Diagnostics
 import org.roldy.core.InputProcessorDelegate
+import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.coroutines.async
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
+import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
+import org.roldy.core.utils.cycle
+import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
-import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
@@ -36,18 +38,25 @@ class Screen3D(
     var loading = true
     val postProcess = PostProcessing()
     val diagnostics by disposable { Diagnostics() }
+
     init {
         camera.position.set(0f, 20f, 0f)
         camera.update()
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
-    val mapSize = MapSize(1000, 1000)
-    val mapData = MapData(1, mapSize)
-    var noiseData = MapGenerator(mapData).generate().apply {
-        val elevations = values.map { it.elevation }
-        println("Elevation: min=${elevations.minOrNull()}, max=${elevations.maxOrNull()}")
+    val light = DirectionalLight().set(hex("CF7A4F"), -1f, -0.8f, -0.2f)
+    val ambientLight = ColorAttribute.createAmbient(hex("CF7A4F"))
+    val env by lazy {
+        Environment().apply {
+            set(ambientLight)
+            add(light)
+        }
     }
+
+    val mapSize = MapSize(2000, 2000)
+    val mapData = MapData(1, mapSize)
+    var mapTerrainData = MapGenerator(mapData).generate()
     var terrainInstance = changeTerrain()
 
     data class TData(
@@ -65,7 +74,7 @@ class Screen3D(
     }
 
     fun changeTerrain(): Terrain {
-        return Terrain(noiseData, mapSize)
+        return Terrain(mapTerrainData, light, ambientLight, camera, mapSize)
     }
 
     val sens = 0.01f
@@ -96,7 +105,7 @@ class Screen3D(
 
     fun regenerate() {
         async {
-            noiseData = MapGenerator(
+            mapTerrainData = MapGenerator(
                 MapData(Random.nextInt().toLong(), mapSize),
                 flatRegionAmount = flatRegionAmount.value,  // 0-1: how much of map is flat
                 mountainHeight = mountainHeight.value,       // How tall mountains are
@@ -112,58 +121,49 @@ class Screen3D(
     val skybox by lazy { Skybox() }
     val modelBuilder by disposable(::PawnModelBuilder)
 
-    val character2 by disposable {
-        PawnManager(modelBuilder, BodyType.Male).apply {
-            val initialTransform = Matrix4()
-            initialTransform.idt()
-            initialTransform.scl(0.1f)
-            initialTransform.setTranslation(-10f, -9.700001f, 10f)
-            initialTransform.rotate(Vector3.Y, 95f)
-            instance.transform.set(initialTransform) // Copy it over
-        }.run {
-            PawnRenderer(this)
-        }
-    }
-    val character3 by disposable {
-        PawnManager(modelBuilder, BodyType.Male).apply {
-            val initialTransform = Matrix4()
-            initialTransform.idt()
-            initialTransform.scl(0.1f)
-            initialTransform.setTranslation(-30f, -9.700001f, -10f)
-            initialTransform.rotate(Vector3.Y, 80f)
-            instance.transform.set(initialTransform) // Copy it over
-        }.run {
-            PawnRenderer(this)
-        }
-    }
     val character by disposable {
+        val scale = 1f
         PawnManager(modelBuilder).apply {
-            val initialTransform = Matrix4()
-            initialTransform.idt()
-            initialTransform.scl(0.1f)
-            initialTransform.setTranslation(0f, 0f, 0f)
-            initialTransform.rotate(Vector3.Y, 90f)
-            instance.transform.set(initialTransform) // Copy it over
+//            val area = mapTerrainData.noiseData.findFlatAreas(1).first()
+//            val charX = (area.center.x - terrainInstance.width / 2f) * scale
+//            val charY = area.elevation * terrainInstance.heightScale
+//            val charZ = (area.center.y - terrainInstance.depth / 2f) * scale
+//            instance.transform.setTranslation(charX, charY, charZ)
+            val area = mapTerrainData.noiseData.findFlatAreas(1).first()
+
+// Character position
+            val charX = (area.center.x) * scale  // Apply terrain offset!
+            val charY = area.elevation * terrainInstance.heightScale
+            val charZ = (area.center.y) * scale
+
+// Set character transform
+            instance.transform.idt()
+            instance.transform.setTranslation(charX, charY, charZ)
+            instance.transform.rotate(Vector3.Y, 90f)
+
+// Position camera BEHIND and ABOVE character
+            val cameraDistance = 10f
+            val cameraHeight = 5f
+
+            camera.position.set(
+                charX - cameraDistance,  // Behind
+                charY + cameraHeight,    // Above
+                charZ
+            )
+            camera.lookAt(charX, charY + 2f, charZ)  // Look at character's head
+            camera.update()
         }.run {
             PawnRenderer(this)
         }
     }
 
-    val cameraController = EditorCameraController(camera)
+    val cameraController by lazy { ThirdPersonCamera(camera, character.manager.instance) }
 
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
     val adapter by lazy {
         InputProcessorDelegate(listOf(cameraController))
             .also(Gdx.input::setInputProcessor)
     }
-    val light = DirectionalLight().set(1f, 1f, 1f, -1f, -0.8f, -0.2f)
-    val env by lazy {
-        Environment().apply {
-            set(ColorAttribute.createAmbient(0.4f, 0.4f, 0.4f, 1f))
-            add(light)
-        }
-    }
-
     fun printNodeHierarchy(node: Node, indent: String = "") {
         println("$indent${node.id}")
         for (child in node.children) {
@@ -191,20 +191,34 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            terrainInstance.apply {
+                debugMode = (debugMode + 1).cycle(0, 21)
+                println("Debug mode: $debugMode")
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+            Gdx.app.log("UV", "=== UV VALUES BEING SET ===")
+            for (i in 0 until 4) {
+                val uv = terrainInstance.materialUVs[i]
+                Gdx.app.log("UV", "u_uv$i: offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})")
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+            terrainInstance.apply {
+                debugMode = 100
+            }
+        }
         changeTerrainData()
-        camera.update()
 //        controller.update()
-        cameraController.update(delta)
+
         context(delta, env, camera) {
+            cameraController.update()
             postProcess {
                 skybox.render()
                 terrainInstance.render()
-//                character2.render()
-//                character3.render()
                 character.render()
             }
-//            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             diagnostics.render()
         }
     }

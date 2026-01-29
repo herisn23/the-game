@@ -51,7 +51,6 @@ class PostProcessing(
     }
     val vfxManager by disposable {
         VfxManager(Pixmap.Format.RGBA8888, width(), height()).apply {
-//            addEffect(dof)
 //            addEffect(radialDistortion)
             addEffect(bloom)
 //            addEffect(filmGrain)

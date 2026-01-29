@@ -20,9 +20,9 @@ object ShaderLoader {
     fun createShader(vert: FileHandle, frag: FileHandle) =
         ShaderProgram(vert, frag).apply {
             if (isCompiled) {
-                logger.info("Shader $vert/$frag compiled")
+                logger.info("Shader $vert:$frag compiled")
             } else {
-                logger.error("Shader $vert/$frag not compiled")
+                logger.error("Shader $vert:$frag not compiled")
             }
         }
 }

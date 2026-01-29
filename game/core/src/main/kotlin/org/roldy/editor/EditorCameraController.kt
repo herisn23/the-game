@@ -195,7 +195,8 @@ class EditorCameraController(
         updateCameraOrbit()
     }
 
-    fun update(deltaTime: Float) {
+    context(deltaTime: Float)
+    fun update() {
         // WASD movement when right mouse is held
         if (rightMouseDown) {
             val speed = moveSpeed * (if (shiftDown) fastMultiplier else 1f) * deltaTime

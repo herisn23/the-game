@@ -1,5 +1,7 @@
 package org.roldy.core.map
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.SimplexNoise
 import org.roldy.core.Vector2Int
 import kotlin.math.abs
@@ -36,8 +38,8 @@ class MapGenerator(
     private val elevationNoise = SimplexNoise(mapData.seed + 2)
     private val regionNoise = SimplexNoise(mapData.seed + 3)
 
-    fun generate(): Map<Vector2Int, NoiseData> {
-        val terrainData = mutableMapOf<Vector2Int, NoiseData>()
+    fun generate(): MapTerrainData {
+        val noiseData = mutableMapOf<Vector2Int, NoiseData>()
 
         // First pass: raw elevation
         var minElevation = Float.MAX_VALUE
@@ -75,11 +77,117 @@ class MapGenerator(
                 val temperature = getTemperature(x, y)
                 val moisture = getMoisture(x, y)
 
-                terrainData[pos] = NoiseData(x, y, elevation, temperature, moisture)
+                noiseData[pos] = NoiseData(x, y, elevation, temperature, moisture)
             }
         }
 
-        return terrainData
+        return MapTerrainData(
+            noiseData.generateSplatMaps(),
+            noiseData
+        )
+    }
+
+    private fun Map<Vector2Int, NoiseData>.generateSplatMaps(): List<Texture> {
+        val width = keys.maxOf { it.x } + 1
+        val height = keys.maxOf { it.y } + 1
+
+        val splatmaps = Array(7) {
+            Pixmap(width, height, Pixmap.Format.RGBA8888).apply {
+                // CRITICAL: Disable blending so alpha=0 pixels are written!
+                blending = Pixmap.Blending.None
+            }
+        }
+
+        for ((pos, data) in this) {
+            val weights = chooseWeights(data)
+
+            val sum = weights.sum()
+            val w = if (sum > 0f) {
+                weights.map { it / sum }
+            } else {
+                MutableList(28) { 0f }.apply { this[0] = 1f }
+            }
+
+            for (i in 0 until 7) {
+                val r = (w[i * 4 + 0].toFloat() * 255f).toInt().coerceIn(0, 255)
+                val g = (w[i * 4 + 1].toFloat() * 255f).toInt().coerceIn(0, 255)
+                val b = (w[i * 4 + 2].toFloat() * 255f).toInt().coerceIn(0, 255)
+                val a = (w[i * 4 + 3].toFloat() * 255f).toInt().coerceIn(0, 255)
+
+                val color = (r shl 24) or (g shl 16) or (b shl 8) or a
+                splatmaps[i].drawPixel(pos.x, pos.y, color)
+            }
+        }
+
+        val textures = splatmaps.map { pixmap ->
+            val tex = Texture(pixmap)
+            tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            pixmap.dispose()
+            tex
+        }
+
+        return textures
+    }
+
+    private fun chooseWeights(data: NoiseData): FloatArray {
+        val w = FloatArray(28) { 0f }
+
+        val e = data.elevation
+        val t = data.temperature
+        val m = data.moisture
+
+        fun smoothstep(x: Float): Float = x * x * (3f - 2f * x)
+
+        fun transition(value: Float, start: Float, end: Float): Float {
+            return smoothstep(((value - start) / (end - start)).coerceIn(0f, 1f))
+        }
+
+        // Elevation zones
+        val isBeach = 1f - transition(e, 0f, 0.15f)
+        val isLowland = transition(e, 0.1f, 0.2f) * (1f - transition(e, 0.35f, 0.45f))
+        val isHills = transition(e, 0.35f, 0.45f) * (1f - transition(e, 0.6f, 0.7f))
+        val isMountain = transition(e, 0.6f, 0.7f) * (1f - transition(e, 0.85f, 0.92f))
+        val isPeak = transition(e, 0.85f, 0.92f)
+
+        // Moisture split
+        val isDry = 1f - transition(m, 0.4f, 0.6f)
+        val isWet = transition(m, 0.4f, 0.6f)
+
+        // Temperature split
+        val isCold = 1f - transition(t, 0.4f, 0.6f)
+        val isWarm = transition(t, 0.4f, 0.6f)
+
+        // ========== ASSIGN TEXTURES ==========
+
+        // Beach (0-3)
+        w[0] = isBeach * isDry                // sand
+        w[1] = isBeach * isWet                // wet sand / mud
+
+        // Lowland (4-7)
+        w[4] = isLowland * isWet              // grass
+        w[5] = isLowland * isDry * isWarm     // dirt
+        w[6] = isLowland * isDry * isCold     // dry grass
+        w[7] = isLowland * isWet * isWarm     // lush grass
+
+        // Hills (8-11)
+        w[8] = isHills * isWet                // forest floor
+        w[9] = isHills * isDry                // rocky dirt
+        w[10] = isHills * isWet * isCold      // moss
+        w[11] = isHills * isDry * isWarm      // dry rocks
+
+        // Mountain (12-15)
+        w[12] = isMountain * isDry            // rock
+        w[13] = isMountain * isWet            // wet rock
+        w[14] = isMountain * isCold           // cold rock
+        w[15] = isMountain * isWarm           // warm rock
+
+        // Peak (16-19)
+        w[16] = isPeak * isCold               // snow
+        w[17] = isPeak * isWarm               // alpine rock
+        w[18] = isPeak * isCold * isWet       // ice
+        w[19] = isPeak * isWarm * isDry       // bare peak
+
+        return w
     }
 
     /**
@@ -188,3 +296,8 @@ class MapGenerator(
         return a + (b - a) * t
     }
 }
+
+class MapTerrainData(
+    val splatMaps: List<Texture>,
+    val noiseData: Map<Vector2Int, NoiseData>
+)

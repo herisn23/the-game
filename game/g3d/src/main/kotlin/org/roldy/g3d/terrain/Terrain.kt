@@ -3,82 +3,68 @@ package org.roldy.g3d.terrain
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.badlogic.gdx.math.Vector3
-import org.roldy.core.EnvironmentalRenderable
-import org.roldy.core.Vector2Int
+import org.roldy.core.Renderable
+import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.map.MapSize
-import org.roldy.core.map.NoiseData
-import org.roldy.g3d.Biome
+import org.roldy.core.map.MapTerrainData
+import org.roldy.core.utils.invoke
 
 class Terrain(
-    val noiseData: Map<Vector2Int, NoiseData>,
+    val mapTerrainData: MapTerrainData,
+    val light: DirectionalLight,
+    val ambientLight: ColorAttribute,
+    val camera: Camera,
     mapSize: MapSize,
-    val scale: Float = 1f,
-    val heightScale: Float = 150f,
+    val scale: Float = 10f,
+    val heightScale: Float = 1500f,
     val chunkSize: Int = 255,
-) : AutoDisposableAdapter(), EnvironmentalRenderable {
+) : AutoDisposableAdapter(), Renderable {
+    var debugMode = 0
 
-    private val width = mapSize.width
-    private val depth = mapSize.height
+    private val noiseData = mapTerrainData.noiseData
+    private val splatMaps = mapTerrainData.splatMaps
+    val width = mapSize.width
+    val depth = mapSize.height
     private val chunks = mutableListOf<TerrainChunk>()
 
-    private val textureManager by disposable { BiomeTextureManager() }
-    private val shader: ShaderProgram by disposable { ShaderLoader.terrainShader }
-    private val lightDir = Vector3(-1f, -0.8f, -0.2f).nor()
-
-    // Global biome to slot mapping (max 4 for GL20)
-    private val globalBiomeSlots = mutableMapOf<Biome, Int>()
-    private val slotBiomes = arrayOfNulls<Biome>(4)
-
-    init {
-        // First pass: find all biomes used in entire terrain
-        analyzeGlobalBiomes()
-
-        // Second pass: create chunks with global mapping
-        createChunks()
+    // Load textures directly with mipmaps
+    private val texturesAlbedo: Texture by disposable {
+        AtlasLoader.terrainAlbedo.textures.first()
     }
 
-    private fun analyzeGlobalBiomes() {
-        val biomeCounts = mutableMapOf<Biome, Int>()
+    private val texturesNormal: Texture by disposable {
+        AtlasLoader.terrainNormal.textures.first()
+    }
 
-        for (x in 0 until width) {
-            for (z in 0 until depth) {
-                val data = noiseData[Vector2Int(x, z)] ?: continue
+    private val shader: ShaderProgram by disposable { ShaderLoader.terrainShader }
 
-                // Calculate slope
-                val left = noiseData[Vector2Int(maxOf(0, x - 1), z)]?.elevation ?: data.elevation
-                val right = noiseData[Vector2Int(minOf(width - 1, x + 1), z)]?.elevation ?: data.elevation
-                val up = noiseData[Vector2Int(x, maxOf(0, z - 1))]?.elevation ?: data.elevation
-                val down = noiseData[Vector2Int(x, minOf(depth - 1, z + 1))]?.elevation ?: data.elevation
+    // Atlas configuration
+    private val tileSize = 512
+    private val atlasWidth = 4096
+    private val atlasHeight = 2048
+    private val materialCount = 28
+    private val padding = 16
 
-                val normal = Vector3(left - right, 2f * scale / heightScale, up - down).nor()
-                val slope = 1f - normal.y
+    // Pre-computed UVs
+    val materialUVs = generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
 
-                val biome = Biome.fromClimate(data.elevation, data.temperature, data.moisture, slope)
-                biomeCounts[biome] = (biomeCounts[biome] ?: 0) + 1
-            }
+    init {
+        createChunks()
+        // Log what UV values are being generated
+        for (i in 0 until 8) {
+            val uv = materialUVs[i]
+            Gdx.app.log(
+                "UV",
+                "materialUVs[$i] = offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})"
+            )
         }
-
-        // Take top 4 most common biomes
-        val topBiomes = biomeCounts.entries
-            .sortedByDescending { it.value }
-            .take(4)
-            .map { it.key }
-
-        topBiomes.forEachIndexed { slot, biome ->
-            globalBiomeSlots[biome] = slot
-            slotBiomes[slot] = biome
-        }
-
-        // Debug
-        println("=== SLOT MAPPING ===")
-        println("globalBiomeSlots: $globalBiomeSlots")
-        println("slotBiomes: ${slotBiomes.toList()}")
     }
 
     private fun createChunks() {
@@ -95,9 +81,8 @@ class Terrain(
                 chunks.add(
                     TerrainChunk(
                         startX, startZ, endX, endZ,
-                        noiseData, width, depth, scale, heightScale,
-                        globalBiomeSlots  // Pass global mapping
-                    )
+                        noiseData, width, depth, scale, heightScale
+                    ).disposable()
                 )
             }
         }
@@ -106,72 +91,82 @@ class Terrain(
     fun setPosition(x: Float, y: Float, z: Float) {
         chunks.forEach { chunk ->
             chunk.instance.transform.setTranslation(x, y, z)
-            // Update bounding box with new position
             chunk.instance.calculateBoundingBox(chunk.boundingBox)
         }
     }
 
-    context(delta: Float, environment: Environment, camera: Camera)
+    context(delta: Float)
     override fun render() {
         shader.bind()
-        shader.setUniformMatrix("u_projViewTrans", camera.combined)
-        shader.setUniformf("u_lightDir", lightDir)
-        shader.setUniformf("u_ambientLight", 0.3f)
 
-//        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
-//        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
-//        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
-//        Gdx.gl.glCullFace(GL20.GL_BACK)
-        // Clear all texture units first
-        repeat(4) {
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + it)
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, 0)
-
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + it)
-            val biome = slotBiomes[it] ?: Biome.GRASSLAND
-            textureManager[biome].bind()
-            shader.setUniformi("u_texture$it", it)
+        // Camera
+        shader("u_projViewTrans") {
+            setUniformMatrix(it, camera.combined)
+        }
+        shader("u_cameraPosition") {
+            setUniformf(it, camera.position)
         }
 
+        // Debug mode
+        shader("u_debugMode") {
+            setUniformi(it, debugMode)
+        }
+
+        // Lighting
+        shader("u_lightDirection") {
+            setUniformf(it, light.direction)
+        }
+        shader("u_lightColor") {
+            setUniformf(it, light.color.r, light.color.g, light.color.b)
+        }
+        shader("u_ambientLight") {
+            setUniformf(it, ambientLight.color.r, ambientLight.color.g, ambientLight.color.b)
+        }
+
+        // Material UVs
+        for (i in 0 until materialCount) {
+            val uv = materialUVs[i]
+            shader("u_uv$i") {
+                setUniformf(it, uv.offset.x, uv.offset.y, uv.scale.x, uv.scale.y)
+            }
+        }
+
+        // Texture samplers
+        shader("u_albedoAtlas") {
+            setUniformi(it, 0)
+        }
+        shader("u_normalAtlas") {
+            setUniformi(it, 1)
+        }
+        for (i in 0 until minOf(7, splatMaps.size)) {
+            shader("u_splat$i") {
+                setUniformi(it, 2 + i)
+            }
+        }
+
+        // Bind textures
+        texturesAlbedo.bind(0)
+        texturesNormal.bind(1)
+        for (i in 0 until minOf(7, splatMaps.size)) {
+            splatMaps[i].bind(2 + i)
+        }
+
+        // Reset active texture
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
+
+        // Render visible chunks
         chunks.forEach { chunk ->
             if (camera.frustum.boundsInFrustum(chunk.boundingBox)) {
-                renderChunk(chunk)
+                shader("u_worldTrans") {
+                    setUniformMatrix(it, chunk.instance.transform)
+                }
+                chunk.instance.model.meshes.first().render(shader, GL20.GL_TRIANGLES)
             }
         }
     }
 
-    private fun renderChunk(chunk: TerrainChunk) {
-        // Bind textures for this chunk's biomes
-        val biomeList = chunk.usedBiomes.take(4).toList()
+    fun getVisibleCount(camera: Camera): Int =
+        chunks.count { camera.frustum.boundsInFrustum(it.boundingBox) }
 
-        biomeList.forEachIndexed { slot, biome ->
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + slot)
-            textureManager[biome].bind()
-            shader.setUniformi("u_texture$slot", slot)
-        }
-
-        // Fill remaining slots with first texture
-        biomeList.forEachIndexed { slot, biome ->
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + slot)
-            textureManager[biome].bind()
-            shader.setUniformi("u_texture$slot", slot)
-        }
-        for (slot in biomeList.size until 4) {
-
-        }
-
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
-
-        shader.setUniformMatrix("u_worldTrans", chunk.instance.transform)
-        chunk.instance.model.meshes.first().render(shader, GL20.GL_TRIANGLES)
-    }
-
-    // Debug: count visible chunks
-    fun getVisibleCount(camera: Camera): Int {
-        return chunks.count { camera.frustum.boundsInFrustum(it.boundingBox) }
-    }
-    fun getTotalCount(): Int {
-        return chunks.size
-    }
-
+    fun getTotalCount(): Int = chunks.size
 }
