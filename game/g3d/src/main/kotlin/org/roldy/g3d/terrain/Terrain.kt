@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.Vector3
 import org.roldy.core.Renderable
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.asset.ShaderLoader
@@ -22,8 +23,8 @@ class Terrain(
     val ambientLight: ColorAttribute,
     val camera: Camera,
     mapSize: MapSize,
-    val scale: Float = 10f,
-    val heightScale: Float = 1500f,
+    val scale: Float = 100f,
+    val heightScale: Float = 150f * scale,
     val chunkSize: Int = 255,
 ) : AutoDisposableAdapter(), Renderable {
     var debugMode = 0
@@ -32,7 +33,7 @@ class Terrain(
     private val splatMaps = mapTerrainData.splatMaps
     val width = mapSize.width
     val depth = mapSize.height
-    private val chunks = mutableListOf<TerrainChunk>()
+    val chunks = mutableListOf<TerrainChunk>()
 
     // Load textures directly with mipmaps
     private val texturesAlbedo: Texture by disposable {
@@ -88,10 +89,9 @@ class Terrain(
         }
     }
 
-    fun setPosition(x: Float, y: Float, z: Float) {
+    fun setPosition(position: Vector3) {
         chunks.forEach { chunk ->
-            chunk.instance.transform.setTranslation(x, y, z)
-            chunk.instance.calculateBoundingBox(chunk.boundingBox)
+            chunk.position = position
         }
     }
 

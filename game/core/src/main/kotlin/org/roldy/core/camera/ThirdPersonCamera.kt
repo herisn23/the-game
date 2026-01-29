@@ -10,7 +10,7 @@ class ThirdPersonCamera(
     private val camera: PerspectiveCamera,
     private val target: ModelInstance
 ) : InputAdapter() {
-    val zoomSensitivity = 2f
+    val zoomSensitivity = 20f
     val rotateSensitivity = 0.3f
     var rightMouseDown = false
     var height = 300f         // Height above target

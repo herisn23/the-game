@@ -14,8 +14,7 @@ fun Map<Vector2Int, NoiseData>.findFlatAreas(
     count: Int = 5,
     areaSize: Int = 10,
     minDistance: Int = 50,  // Minimum distance between areas
-    minElevation: Float = 0.1f,
-    maxElevation: Float = 0.2f
+    elevationRanger: ClosedRange<Float> = 0.1f..0.2f,
 ): List<FlatArea> {
     val noiseData = this
     val results = mutableListOf<FlatArea>()
@@ -33,7 +32,7 @@ fun Map<Vector2Int, NoiseData>.findFlatAreas(
             val centerPos = Vector2Int(centerX, centerY)
             val centerData = noiseData[centerPos] ?: continue
 
-            if (centerData.elevation < minElevation || centerData.elevation > maxElevation) continue
+            if (centerData.elevation !in elevationRanger) continue
 
             var totalSlope = 0f
             var sampleCount = 0

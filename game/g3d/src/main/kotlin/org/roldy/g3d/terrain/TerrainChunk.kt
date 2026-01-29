@@ -5,11 +5,12 @@ import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.Model
-import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import org.roldy.core.Vector2Int
+import org.roldy.core.camera.FloatingOriginEntity
+import org.roldy.core.camera.FloatingOriginModelInstance
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.map.NoiseData
 
@@ -23,15 +24,22 @@ class TerrainChunk(
     private val depth: Int,
     private val scale: Float,
     private val heightScale: Float
-) : AutoDisposableAdapter() {
+) : AutoDisposableAdapter(), FloatingOriginEntity {
     val model: Model
-    val instance: ModelInstance
+    val instance: FloatingOriginModelInstance
+
+    // Local space bounding box (never changes)
+    private val localBoundingBox = BoundingBox()
+
+    // World space bounding box (updated when position changes)
     val boundingBox = BoundingBox()
 
     init {
         model = createChunkModel().disposable()
-        instance = ModelInstance(model)
-        instance.calculateBoundingBox(boundingBox)
+        instance = object : FloatingOriginModelInstance(model) {}
+
+        // Calculate local bounds once
+        instance.calculateBoundingBox(localBoundingBox)
     }
 
     private fun createChunkModel(): Model {
@@ -119,4 +127,13 @@ class TerrainChunk(
         builder.part("chunk", mesh, GL20.GL_TRIANGLES, Material())
         return builder.end()
     }
+
+    override var position: Vector3
+        get() = instance.position
+        set(value) {
+            instance.position = value
+            instance.calculateBoundingBox(boundingBox)
+            boundingBox.mul(instance.transform)
+        }
+
 }
