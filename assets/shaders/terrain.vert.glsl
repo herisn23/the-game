@@ -10,13 +10,15 @@ attribute vec2 a_texCoord1;// Splatmap UV
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 uniform vec3 u_cameraPosition;
-uniform vec3 u_renderOffset;// Add this
+uniform vec3 u_renderOffset;
 
 varying vec3 v_worldPos;
 varying vec3 v_normal;
 varying vec2 v_tiledUV;
 varying vec2 v_splatUV;
 varying vec3 v_viewDir;
+varying vec3 v_tangent;
+varying vec3 v_bitangent;
 
 void main() {
     vec4 worldPos = u_worldTrans * vec4(a_position, 1.0);
@@ -26,7 +28,25 @@ void main() {
 
     v_worldPos = worldPos.xyz;
 
-    v_normal = normalize(mat3(u_worldTrans[0].xyz, u_worldTrans[1].xyz, u_worldTrans[2].xyz) * a_normal);
+    // Transform normal to world space
+    mat3 normalMatrix = mat3(u_worldTrans[0].xyz, u_worldTrans[1].xyz, u_worldTrans[2].xyz);
+    vec3 normal = normalize(normalMatrix * a_normal);
+    v_normal = normal;
+
+    // Calculate tangent and bitangent for terrain
+    // For terrain on XZ plane, tangent follows X axis, bitangent follows Z axis
+    vec3 worldTangent = normalize(normalMatrix * vec3(1.0, 0.0, 0.0));
+    vec3 worldBitangent = normalize(normalMatrix * vec3(0.0, 0.0, 1.0));
+
+    // Gram-Schmidt orthogonalization - make tangent perpendicular to normal
+    worldTangent = normalize(worldTangent - dot(worldTangent, normal) * normal);
+
+    // Recalculate bitangent to ensure orthogonal basis
+    worldBitangent = cross(normal, worldTangent);
+
+    v_tangent = worldTangent;
+    v_bitangent = worldBitangent;
+
     v_tiledUV = a_texCoord0;
     v_splatUV = a_texCoord1;
     v_viewDir = normalize(u_cameraPosition - worldPos.xyz);

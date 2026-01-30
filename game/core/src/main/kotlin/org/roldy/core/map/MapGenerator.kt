@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.IVector2Int
 import org.roldy.core.SimplexNoise
 import org.roldy.core.Vector2Int
+import org.roldy.core.biome.BiomeData
+import org.roldy.core.configuration.HeightData
 import kotlin.math.abs
 
 /**
@@ -16,6 +18,7 @@ import kotlin.math.abs
  */
 class MapGenerator(
     val mapData: MapData,
+    val biomesData: List<BiomeData>,
     // Elevation settings
     val elevationOctaves: Int = 8,
     val elevationLatitude: Float = .3f,
@@ -83,114 +86,119 @@ class MapGenerator(
         }
 
         return MapTerrainData(
-            noiseData.generateSplatMaps(),
+            noiseData.generateSplatMaps(32),
             noiseData
         )
     }
 
-    private fun Map<IVector2Int, NoiseData>.generateSplatMaps(): List<Texture> {
+    private fun Map<IVector2Int, NoiseData>.generateSplatMaps(materialCount: Int): List<Texture> {
+        val texCount = 4 // textures count per splatmap, 4 textures, 8 splatmaps (4*8=32) total 32 textures
         val width = keys.maxOf { it.x } + 1
         val height = keys.maxOf { it.y } + 1
 
-        val splatmaps = Array(7) {
+        val splatmaps = Array(materialCount / texCount) {//4 textures per splatmap
             Pixmap(width, height, Pixmap.Format.RGBA8888).apply {
                 // CRITICAL: Disable blending so alpha=0 pixels are written!
                 blending = Pixmap.Blending.None
             }
         }
-
-        for ((pos, data) in this) {
-            val weights = chooseWeights(data)
+        forEach { (pos, data) ->
+            val weights = chooseWeights(data, materialCount)
 
             val sum = weights.sum()
-            val w = if (sum > 0f) {
-                weights.map { it / sum }
-            } else {
-                MutableList(28) { 0f }.apply { this[0] = 1f }
-            }
+            val w = if (sum > 0f) weights.map { it / sum } else weights.toList()
 
-            for (i in 0 until 7) {
-                val r = (w[i * 4 + 0].toFloat() * 255f).toInt().coerceIn(0, 255)
-                val g = (w[i * 4 + 1].toFloat() * 255f).toInt().coerceIn(0, 255)
-                val b = (w[i * 4 + 2].toFloat() * 255f).toInt().coerceIn(0, 255)
-                val a = (w[i * 4 + 3].toFloat() * 255f).toInt().coerceIn(0, 255)
+            splatmaps.forEachIndexed { i, pixmap ->
+                val r = (w[i * texCount + 0] * 255f).toInt().coerceIn(0, 255)
+                val g = (w[i * texCount + 1] * 255f).toInt().coerceIn(0, 255)
+                val b = (w[i * texCount + 2] * 255f).toInt().coerceIn(0, 255)
+                val a = (w[i * texCount + 3] * 255f).toInt().coerceIn(0, 255)
 
                 val color = (r shl 24) or (g shl 16) or (b shl 8) or a
-                splatmaps[i].drawPixel(pos.x, pos.y, color)
+                pixmap.drawPixel(pos.x, pos.y, color)
             }
         }
-
-        val textures = splatmaps.map { pixmap ->
-            val tex = Texture(pixmap)
-            tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            pixmap.dispose()
-            tex
+        val textures = splatmaps.mapIndexed { i, pixmap ->
+            Texture(pixmap).apply {
+                setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                pixmap.dispose()
+            }
         }
-
         return textures
     }
 
-    private fun chooseWeights(data: NoiseData): FloatArray {
-        val w = FloatArray(28) { 0f }
+    private fun chooseWeights(data: NoiseData, materialCount: Int): FloatArray {
+        val w = FloatArray(materialCount) { 0f }
 
-        val e = data.elevation
-        val t = data.temperature
-        val m = data.moisture
+        val e = data.elevation.coerceIn(0f, 1f)  // Note: you have e=1.073 in debug!
+        val t = data.temperature.coerceIn(0f, 1f)
+        val m = data.moisture.coerceIn(0f, 1f)
 
-        fun smoothstep(x: Float): Float = x * x * (3f - 2f * x)
+        var matchedBiome: String?
 
-        fun transition(value: Float, start: Float, end: Float): Float {
-            return smoothstep(((value - start) / (end - start)).coerceIn(0f, 1f))
+        for (biome in biomesData) {
+            if (e < biome.elevation.start || e > biome.elevation.endInclusive) continue
+            if (t < biome.temperature.start || t > biome.temperature.endInclusive) continue
+            if (m < biome.moisture.start || m > biome.moisture.endInclusive) continue
+
+            matchedBiome = biome.type.name
+
+            for (terrain in biome.terrains) {
+                val eMin = maxOf(biome.elevation.start, terrain.elevation.start)
+                val eMax = minOf(biome.elevation.endInclusive, terrain.elevation.endInclusive)
+                val tMin = maxOf(biome.temperature.start, terrain.temperature.start)
+                val tMax = minOf(biome.temperature.endInclusive, terrain.temperature.endInclusive)
+                val mMin = maxOf(biome.moisture.start, terrain.moisture.start)
+                val mMax = minOf(biome.moisture.endInclusive, terrain.moisture.endInclusive)
+
+                if (eMin > eMax || tMin > tMax || mMin > mMax) continue
+                if (e < eMin || e > eMax) continue
+                if (t < tMin || t > tMax) continue
+                if (m < mMin || m > mMax) continue
+                w[terrain.index] = 1f
+                return w
+            }
         }
-
-        // Elevation zones
-        val isBeach = 1f - transition(e, 0f, 0.15f)
-        val isLowland = transition(e, 0.1f, 0.2f) * (1f - transition(e, 0.35f, 0.45f))
-        val isHills = transition(e, 0.35f, 0.45f) * (1f - transition(e, 0.6f, 0.7f))
-        val isMountain = transition(e, 0.6f, 0.7f) * (1f - transition(e, 0.85f, 0.92f))
-        val isPeak = transition(e, 0.85f, 0.92f)
-
-        // Moisture split
-        val isDry = 1f - transition(m, 0.4f, 0.6f)
-        val isWet = transition(m, 0.4f, 0.6f)
-
-        // Temperature split
-        val isCold = 1f - transition(t, 0.4f, 0.6f)
-        val isWarm = transition(t, 0.4f, 0.6f)
-
-        // ========== ASSIGN TEXTURES ==========
-
-        // Beach (0-3)
-        w[0] = isBeach * isDry                // sand
-        w[1] = isBeach * isWet                // wet sand / mud
-
-        // Lowland (4-7)
-        w[4] = isLowland * isWet              // grass
-        w[5] = isLowland * isDry * isWarm     // dirt
-        w[6] = isLowland * isDry * isCold     // dry grass
-        w[7] = isLowland * isWet * isWarm     // lush grass
-
-        // Hills (8-11)
-        w[8] = isHills * isWet                // forest floor
-        w[9] = isHills * isDry                // rocky dirt
-        w[10] = isHills * isWet * isCold      // moss
-        w[11] = isHills * isDry * isWarm      // dry rocks
-
-        // Mountain (12-15)
-        w[12] = isMountain * isDry            // rock
-        w[13] = isMountain * isWet            // wet rock
-        w[14] = isMountain * isCold           // cold rock
-        w[15] = isMountain * isWarm           // warm rock
-
-        // Peak (16-19)
-        w[16] = isPeak * isCold               // snow
-        w[17] = isPeak * isWarm               // alpine rock
-        w[18] = isPeak * isCold * isWet       // ice
-        w[19] = isPeak * isWarm * isDry       // bare peak
-
+        w[0] = 1f  // Fallback
         return w
     }
 
+    private fun HeightData.isInRange(e: Float, t: Float, m: Float, edge: Float): Boolean {
+        val eOk = e >= elevation.start - edge && e <= elevation.endInclusive + edge
+        val tOk = t >= temperature.start - edge && t <= temperature.endInclusive + edge
+        val mOk = m >= moisture.start - edge && m <= moisture.endInclusive + edge
+        return eOk && tOk && mOk
+    }
+
+    private fun intersectRanges(
+        biomeRange: ClosedFloatingPointRange<Float>,
+        terrainRange: ClosedFloatingPointRange<Float>
+    ): ClosedFloatingPointRange<Float> {
+        val start = maxOf(biomeRange.start, terrainRange.start)
+        val end = minOf(biomeRange.endInclusive, terrainRange.endInclusive)
+        return if (start <= end) start..end else biomeRange // Fallback to biome if no intersection
+    }
+
+    private fun calculateScore(
+        e: Float, t: Float, m: Float,
+        eRange: ClosedFloatingPointRange<Float>,
+        tRange: ClosedFloatingPointRange<Float>,
+        mRange: ClosedFloatingPointRange<Float>
+    ): Float {
+        // Higher score = closer to center of range
+        fun centerScore(value: Float, range: ClosedFloatingPointRange<Float>): Float {
+            val rangeSize = range.endInclusive - range.start
+            if (rangeSize < 0.001f) return 1f // Point range
+
+            val center = (range.start + range.endInclusive) / 2f
+            val distFromCenter = kotlin.math.abs(value - center)
+            val maxDist = rangeSize / 2f
+
+            return 1f - (distFromCenter / maxDist) * 0.5f // 0.5 to 1.0 range
+        }
+
+        return centerScore(e, eRange) * centerScore(t, tRange) * centerScore(m, mRange)
+    }
     /**
      * Blend between flat plains and mountainous terrain
      */

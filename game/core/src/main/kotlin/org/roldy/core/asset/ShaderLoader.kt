@@ -22,7 +22,7 @@ object ShaderLoader {
             if (isCompiled) {
                 logger.info("Shader $vert:$frag compiled")
             } else {
-                logger.error("Shader $vert:$frag not compiled")
+                logger.error("Shader $vert:$frag not compiled:\n$log")
             }
         }
 }

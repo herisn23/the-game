@@ -1,6 +1,5 @@
 package org.roldy.g3d.terrain
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
@@ -18,6 +17,7 @@ import org.roldy.core.map.MapSize
 import org.roldy.core.map.MapTerrainData
 import org.roldy.core.utils.invoke
 
+
 class Terrain(
     val mapTerrainData: MapTerrainData,
     val light: DirectionalLight,
@@ -31,31 +31,26 @@ class Terrain(
     private val frustum = FrustumCuller()
     private val noiseData = mapTerrainData.noiseData
     private val splatMaps = mapTerrainData.splatMaps
-    private val textureScale = 1f
+    private val textureScale = 5f
     val width = mapSize.width
     val depth = mapSize.height
     val chunks = mutableListOf<TerrainChunk>()
     var originOffset: Vector3 = Vector3()
 
-    private val atlasAlbedo by disposable { AtlasLoader.terrainAlbedo }
-    private val atlasNormal by disposable { AtlasLoader.terrainNormal }
+    private val atlas by disposable { AtlasLoader.terrainAlbedo }
 
     // Load textures directly with mipmaps
-    private val texturesAlbedo: Texture by lazy { atlasAlbedo.textures.first() }
-    private val texturesNormal: Texture by lazy { atlasNormal.textures.first() }
+    private val texturesAlbedo: Texture by lazy { atlas.textures.first() }
 
     private val shader: ShaderProgram by disposable { ShaderLoader.terrainShader }
 
     // Atlas configuration
-    private val tileSize by lazy { atlasAlbedo.regions.first().regionHeight }
-    private val atlasWidth by lazy { texturesAlbedo.width }
-    private val atlasHeight by lazy { texturesAlbedo.height }
     private val materialCount by lazy { AtlasLoader.terrainAlbedo.regions.size }
-    private val padding = 0
 
     // Pre-computed UVs
     val materialUVs by lazy {
-        generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
+//        generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
+        AlternatingAtlasUV.generateAllUVs(materialCount)
     }
 
     private inner class FrustumCuller {
@@ -131,39 +126,37 @@ class Terrain(
         }
 
         // Material UVs
-        for (i in 0 until materialCount) {
-            val uv = materialUVs[i]
+        materialUVs.forEachIndexed { i, uv ->
             shader("u_uv$i") {
-                setUniformf(it, uv.offset.x, uv.offset.y, uv.scale.x, uv.scale.y)
+                setUniformf(it, uv.x, uv.y, uv.z, uv.w)
             }
         }
 
         // Texture samplers
-
+        shader("u_normalStrength") {
+            setUniformf(it, 1f)
+        }
         shader("u_textureScale") {
             setUniformf(it, textureScale)
         }
         shader("u_albedoAtlas") {
+            // Bind textures
             setUniformi(it, 0)
         }
-        shader("u_normalAtlas") {
-            setUniformi(it, 1)
-        }
-        for (i in 0 until minOf(7, splatMaps.size)) {
-            shader("u_splat$i") {
-                setUniformi(it, 2 + i)
+        splatMaps.forEachIndexed { index, _ ->
+            shader("u_splat$index") {
+                setUniformi(it, 1 + index)
             }
+
+        }
+        texturesAlbedo.bind(0)
+        splatMaps.forEachIndexed { index, texture ->
+            texture.bind(1 + index)
         }
 
-        // Bind textures
-        texturesAlbedo.bind(0)
-        texturesNormal.bind(1)
-        for (i in 0 until minOf(7, splatMaps.size)) {
-            splatMaps[i].bind(2 + i)
-        }
 
         // Reset active texture
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
+//        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
 
         // Render visible chunks
         frustum.getVisibleChunks(chunks, camera).forEach { chunk ->

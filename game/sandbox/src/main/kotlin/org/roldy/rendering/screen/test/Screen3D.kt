@@ -18,7 +18,7 @@ import org.roldy.core.Diagnostics
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.StrategyCameraController
 import org.roldy.core.camera.ThirdPersonCamera
-import org.roldy.core.coroutines.async
+import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.map.MapData
@@ -33,7 +33,6 @@ import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainHeightSampler
 import org.roldy.g3d.terrain.TerrainRaycaster
-import kotlin.random.Random
 
 
 class Screen3D(
@@ -41,7 +40,7 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     var loading = true
     val postProcess = PostProcessing()
-
+    val biomesData by lazy { loadBiomesConfiguration().biomes }
     val diagnostics by disposable { Diagnostics() }
     fun createTargetMarker(): ModelInstance {
         val modelBuilder = ModelBuilder()
@@ -74,7 +73,7 @@ class Screen3D(
     val mapSizeLength = 1024
     val mapSize = MapSize(mapSizeLength * mapSizeScale, mapSizeLength * mapSizeScale)
     val mapData = MapData(1, mapSize)
-    var mapTerrainData = MapGenerator(mapData).generate()
+    var mapTerrainData = MapGenerator(mapData, biomesData).generate()
     var terrainInstance = changeTerrain()
     val heightSampler = TerrainHeightSampler(
         noiseData = terrainInstance.mapTerrainData.noiseData,
@@ -129,34 +128,7 @@ class Screen3D(
             currentData = seq.next()
             println("Modify ${currentData.name}")
         }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
-            modify(-1)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) {
-            modify(1)
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            regenerate()
-//            character.manager.animationController.setAnimation(anims.next().id, -1)
-        }
     }
-
-    fun regenerate() {
-        async {
-            mapTerrainData = MapGenerator(
-                MapData(Random.nextInt().toLong(), mapSize),
-                flatRegionAmount = flatRegionAmount.value,  // 0-1: how much of map is flat
-                mountainHeight = mountainHeight.value,       // How tall mountains are
-
-            ).generate()
-            it {
-                this.terrainInstance = changeTerrain()
-            }
-        }
-    }
-
 
     val skybox by lazy { Skybox() }
     val modelBuilder by disposable(::PawnModelBuilder)
@@ -239,14 +211,6 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            Gdx.app.log("UV", "=== UV VALUES BEING SET ===")
-            for (i in 0 until 4) {
-                val uv = terrainInstance.materialUVs[i]
-                Gdx.app.log("UV", "u_uv$i: offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})")
-            }
-        }
-
 
         changeTerrainData()
 
