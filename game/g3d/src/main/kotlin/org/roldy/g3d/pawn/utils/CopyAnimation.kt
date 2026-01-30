@@ -6,9 +6,13 @@ import com.badlogic.gdx.graphics.g3d.model.NodeAnimation
 import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe
 import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
+import org.roldy.core.logger
 import com.badlogic.gdx.utils.Array as GdxArray
 
+private val cLogger by logger("CopyAnimation")
+
 fun Model.copyAnimation(sourceAnim: Animation, newId: String): Animation {
+
     val newAnim = Animation()
     newAnim.id = newId
     newAnim.duration = sourceAnim.duration
@@ -49,7 +53,7 @@ fun Model.copyAnimation(sourceAnim: Animation, newId: String): Animation {
 
             newAnim.nodeAnimations.add(newNodeAnim)
         } else {
-            println("Warning: Node $sourceNodeId not found in target model")
+            cLogger.warn("Node $sourceNodeId not found in target model")
         }
     }
 

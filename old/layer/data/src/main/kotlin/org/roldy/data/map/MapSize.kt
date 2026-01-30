@@ -64,10 +64,3 @@ sealed interface MapSize {
     }
 
 }
-
-fun main() {
-    val w = 100f
-    val c = .75f
-    val h = w * c
-    println(h)
-}

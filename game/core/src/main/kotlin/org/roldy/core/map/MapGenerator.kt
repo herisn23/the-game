@@ -2,6 +2,7 @@ package org.roldy.core.map
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import org.roldy.core.IVector2Int
 import org.roldy.core.SimplexNoise
 import org.roldy.core.Vector2Int
 import kotlin.math.abs
@@ -39,7 +40,7 @@ class MapGenerator(
     private val regionNoise = SimplexNoise(mapData.seed + 3)
 
     fun generate(): MapTerrainData {
-        val noiseData = mutableMapOf<Vector2Int, NoiseData>()
+        val noiseData = mutableMapOf<IVector2Int, NoiseData>()
 
         // First pass: raw elevation
         var minElevation = Float.MAX_VALUE
@@ -87,7 +88,7 @@ class MapGenerator(
         )
     }
 
-    private fun Map<Vector2Int, NoiseData>.generateSplatMaps(): List<Texture> {
+    private fun Map<IVector2Int, NoiseData>.generateSplatMaps(): List<Texture> {
         val width = keys.maxOf { it.x } + 1
         val height = keys.maxOf { it.y } + 1
 
@@ -299,5 +300,5 @@ class MapGenerator(
 
 class MapTerrainData(
     val splatMaps: List<Texture>,
-    val noiseData: Map<Vector2Int, NoiseData>
+    val noiseData: Map<IVector2Int, NoiseData>
 )

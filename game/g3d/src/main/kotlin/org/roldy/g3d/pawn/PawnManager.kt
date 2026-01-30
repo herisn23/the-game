@@ -92,7 +92,7 @@ class PawnManager(
 
     //test functions
     fun cycleSets() {
-        val parts = armor.sets.getValue(setKeys.next().also(::println))
+        val parts = armor.sets.getValue(setKeys.next())
         setArmor(parts)
     }
 }

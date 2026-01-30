@@ -2,6 +2,10 @@
 precision mediump float;
 #endif
 
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 varying vec3 v_worldPos;
 varying vec3 v_normal;
 varying vec2 v_tiledUV;
@@ -29,13 +33,14 @@ uniform vec3 u_lightDirection;
 uniform vec3 u_lightColor;
 uniform vec3 u_ambientLight;
 
-uniform int u_debugMode;
+uniform float u_textureScale;// Add this - higher = smaller textures (more tiling)
 
 vec3 sampleTex(vec4 uvData, vec2 tiledUV) {
-    vec2 uv = uvData.xy + fract(tiledUV) * uvData.zw;
+    // Apply texture scale to tiled UV
+    vec2 scaledUV = tiledUV * u_textureScale;
+    vec2 uv = uvData.xy + fract(scaledUV) * uvData.zw;
     return texture2D(u_albedoAtlas, uv).rgb;
 }
-
 void main() {
     // Sample all splatmaps
     vec4 s0 = texture2D(u_splat0, v_splatUV);

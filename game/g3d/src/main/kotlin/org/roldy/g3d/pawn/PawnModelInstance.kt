@@ -1,13 +1,13 @@
 package org.roldy.g3d.pawn
 
 import com.badlogic.gdx.graphics.g3d.Model
+import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.model.MeshPart
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.model.NodePart
 import com.badlogic.gdx.math.Vector3
-import org.roldy.core.camera.FloatingOriginModelInstance
 
-class PawnModelInstance(model: Model) : FloatingOriginModelInstance(model) {
+class PawnModelInstance(model: Model) : ModelInstance(model) {
     private val nodeParts: List<Pair<Node, List<NodePart>>>
     val allNodes: List<Node>
 

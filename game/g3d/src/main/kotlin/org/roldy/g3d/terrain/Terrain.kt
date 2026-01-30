@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.BoundingBox
 import org.roldy.core.Renderable
 import org.roldy.core.asset.AtlasLoader
 import org.roldy.core.asset.ShaderLoader
@@ -27,13 +28,15 @@ class Terrain(
     val heightScale: Float = 150f * scale,
     val chunkSize: Int = 255,
 ) : AutoDisposableAdapter(), Renderable {
-    var debugMode = 0
-
+    private val frustum = FrustumCuller()
     private val noiseData = mapTerrainData.noiseData
     private val splatMaps = mapTerrainData.splatMaps
+    private val textureScale = 10f
     val width = mapSize.width
     val depth = mapSize.height
     val chunks = mutableListOf<TerrainChunk>()
+    var originOffset: Vector3 = Vector3()
+
 
     // Load textures directly with mipmaps
     private val texturesAlbedo: Texture by disposable {
@@ -56,16 +59,27 @@ class Terrain(
     // Pre-computed UVs
     val materialUVs = generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
 
+    private inner class FrustumCuller {
+        private val tmpBox = BoundingBox()
+
+        fun isVisible(chunk: TerrainChunk, camera: Camera): Boolean {
+            val offset = originOffset
+
+            // Copy chunk bounds and apply offset
+            tmpBox.set(chunk.boundingBox)
+            tmpBox.min.sub(offset)
+            tmpBox.max.sub(offset)
+
+            return camera.frustum.boundsInFrustum(tmpBox)
+        }
+
+        fun getVisibleChunks(chunks: List<TerrainChunk>, camera: Camera): List<TerrainChunk> {
+            return chunks.filter { isVisible(it, camera) }
+        }
+    }
+
     init {
         createChunks()
-        // Log what UV values are being generated
-        for (i in 0 until 8) {
-            val uv = materialUVs[i]
-            Gdx.app.log(
-                "UV",
-                "materialUVs[$i] = offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})"
-            )
-        }
     }
 
     private fun createChunks() {
@@ -89,12 +103,6 @@ class Terrain(
         }
     }
 
-    fun setPosition(position: Vector3) {
-        chunks.forEach { chunk ->
-            chunk.position = position
-        }
-    }
-
     context(delta: Float)
     override fun render() {
         shader.bind()
@@ -107,9 +115,9 @@ class Terrain(
             setUniformf(it, camera.position)
         }
 
-        // Debug mode
-        shader("u_debugMode") {
-            setUniformi(it, debugMode)
+        // Offset to moving chunks
+        shader("u_renderOffset") {
+            setUniformf(it, originOffset.x, originOffset.y, originOffset.z)
         }
 
         // Lighting
@@ -132,6 +140,10 @@ class Terrain(
         }
 
         // Texture samplers
+
+        shader("u_textureScale") {
+            setUniformf(it, textureScale)
+        }
         shader("u_albedoAtlas") {
             setUniformi(it, 0)
         }
@@ -155,18 +167,17 @@ class Terrain(
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
 
         // Render visible chunks
-        chunks.forEach { chunk ->
-            if (camera.frustum.boundsInFrustum(chunk.boundingBox)) {
-                shader("u_worldTrans") {
-                    setUniformMatrix(it, chunk.instance.transform)
-                }
-                chunk.instance.model.meshes.first().render(shader, GL20.GL_TRIANGLES)
+        frustum.getVisibleChunks(chunks, camera).forEach { chunk ->
+            shader("u_worldTrans") {
+                setUniformMatrix(it, chunk.instance.transform)
             }
+            chunk.instance.model.meshes.first().render(shader, GL20.GL_TRIANGLES)
         }
     }
 
     fun getVisibleCount(camera: Camera): Int =
-        chunks.count { camera.frustum.boundsInFrustum(it.boundingBox) }
+        frustum.getVisibleChunks(chunks, camera).size
 
     fun getTotalCount(): Int = chunks.size
 }
+

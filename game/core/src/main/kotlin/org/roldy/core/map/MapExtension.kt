@@ -1,5 +1,6 @@
 package org.roldy.core.map
 
+import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -10,7 +11,7 @@ data class FlatArea(
     val elevation: Float
 )
 
-fun Map<Vector2Int, NoiseData>.findFlatAreas(
+fun Map<IVector2Int, NoiseData>.findFlatAreas(
     count: Int = 5,
     areaSize: Int = 10,
     minDistance: Int = 50,  // Minimum distance between areas

@@ -5,13 +5,12 @@ import com.badlogic.gdx.utils.Disposable
 interface AutoDisposable : Disposable {
     val disposables: MutableList<Disposable>
 
-    fun <T : Disposable?> T.disposable(): T {
-        return also {
+    fun <T : Disposable?> T.disposable(): T =
+        also {
             if (it != null) {
                 disposables.add(it)
             }
         }
-    }
 
     override fun dispose() {
         disposables.forEach(Disposable::dispose)

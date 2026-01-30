@@ -3,14 +3,19 @@ package org.roldy.rendering.screen.test
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.Diagnostics
-import org.roldy.core.camera.FloatingOriginManager
+import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.StrategyCameraController
 import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.coroutines.async
@@ -21,12 +26,13 @@ import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.utils.cycle
 import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
+import org.roldy.g3d.terrain.TerrainHeightSampler
+import org.roldy.g3d.terrain.TerrainRaycaster
 import kotlin.random.Random
 
 
@@ -35,8 +41,20 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     var loading = true
     val postProcess = PostProcessing()
-    val floatingOriginManager = FloatingOriginManager()
+
     val diagnostics by disposable { Diagnostics() }
+    fun createTargetMarker(): ModelInstance {
+        val modelBuilder = ModelBuilder()
+        val material = Material(ColorAttribute.createDiffuse(Color.GREEN))
+        val model = modelBuilder.createCylinder(
+            0.5f, 0.1f, 0.5f, 16,
+            material,
+            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong()
+        )
+        return ModelInstance(model.disposable())
+    }
+
+    val targetMarker = createTargetMarker()
 
     init {
         camera.position.set(0f, 20f, 0f)
@@ -57,6 +75,26 @@ class Screen3D(
     val mapData = MapData(1, mapSize)
     var mapTerrainData = MapGenerator(mapData).generate()
     var terrainInstance = changeTerrain()
+    val heightSampler = TerrainHeightSampler(
+        noiseData = terrainInstance.mapTerrainData.noiseData,
+        heightScale = terrainInstance.heightScale,
+        width = terrainInstance.width,
+        depth = terrainInstance.depth,
+        scale = terrainInstance.scale
+    )
+    val charController by lazy {
+        RTSCharacterController(character.manager.instance, heightSampler)
+    }
+    val offsetShiftingManager = OffsetShiftingManager().apply {
+        onShift = { shiftX, shiftZ, totalOffset ->
+            // Update height sampler with total offset
+            heightSampler.originOffset = totalOffset
+
+            // Shift character controller positions
+            charController.onOriginShift(shiftX, shiftZ)
+            terrainInstance.originOffset = totalOffset
+        }
+    }
 
     data class TData(
         val name: String,
@@ -132,7 +170,7 @@ class Screen3D(
             val charX = (area.center.x - corX) * scale// Apply terrain offset!
             val charY = area.elevation * terrainInstance.heightScale
             val charZ = (area.center.y - corZ) * scale
-
+            println("Starting Y: $charY")
 // Set character transform
             instance.transform.idt()
             instance.transform.setTranslation(charX, charY, charZ)
@@ -165,6 +203,7 @@ class Screen3D(
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
     val adapter by lazy {
         InputMultiplexer().apply {
+            addProcessor(RTSInputHandler(camera, TerrainRaycaster(heightSampler, camera), charController))
             addProcessor(cameraController)
         }
             .also(Gdx.input::setInputProcessor)
@@ -199,12 +238,6 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            terrainInstance.apply {
-                debugMode = (debugMode + 1).cycle(0, 21)
-                println("Debug mode: $debugMode")
-            }
-        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
             Gdx.app.log("UV", "=== UV VALUES BEING SET ===")
             for (i in 0 until 4) {
@@ -212,21 +245,13 @@ class Screen3D(
                 Gdx.app.log("UV", "u_uv$i: offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})")
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-            terrainInstance.apply {
-                debugMode = 100
-            }
-        }
 
 
         changeTerrainData()
-//        controller.update()
 
         context(delta, env, camera) {
-            floatingOriginManager.update(
-                character.manager.instance,
-                terrainInstance.chunks
-            )
+            offsetShiftingManager.update(character.manager.instance)
+            charController.update(delta)
             cameraController.update()
             postProcess {
                 skybox.render()

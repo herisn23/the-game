@@ -1,6 +1,5 @@
 package org.roldy.g3d.terrain
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 
 data class TerrainMaterialUV(
@@ -22,8 +21,6 @@ fun generateTerrainMaterialUVs(
     val paddedAtlasWidth = tilesPerRow * paddedTileSize   // 8 * 544 = 4352
     val paddedAtlasHeight = tilesPerCol * paddedTileSize  // 4 * 544 = 2176
 
-    Gdx.app.log("UV", "Padded atlas: ${paddedAtlasWidth}x${paddedAtlasHeight}")
-
     val list = ArrayList<TerrainMaterialUV>()
 
     for (i in 0 until materialCount) {
@@ -40,14 +37,5 @@ fun generateTerrainMaterialUVs(
 
         list += TerrainMaterialUV(Vector2(offsetX, offsetY), Vector2(scaleX, scaleY))
     }
-
-    // Debug
-    list.take(4).forEachIndexed { i, uv ->
-        Gdx.app.log(
-            "UV",
-            "materialUVs[$i] = offset(${uv.offset.x}, ${uv.offset.y}), scale(${uv.scale.x}, ${uv.scale.y})"
-        )
-    }
-
     return list
 }

@@ -11,6 +11,7 @@ class Logger(
         None(Application.LOG_NONE),
         Debug(Application.LOG_DEBUG),
         Info(Application.LOG_INFO),
+        Warn(Application.LOG_INFO),
         Error(Application.LOG_ERROR)
     }
 
@@ -54,6 +55,21 @@ class Logger(
         }
     }
 
+    fun warn(ex: Throwable, message: () -> String) {
+        Gdx.app.log(tag, warnMessage(message), ex)
+    }
+
+    fun warn(message: () -> String) {
+        Gdx.app.log(tag, warnMessage(message))
+    }
+
+    fun warn(message: String, ex: Throwable? = null) {
+        when {
+            ex != null -> Gdx.app.log(tag, warnMessage(message), ex)
+            else -> Gdx.app.log(tag, warnMessage(message))
+        }
+    }
+
     fun info(ex: Throwable, message: () -> String) {
         Gdx.app.log(tag, infoMessage(message), ex)
     }
@@ -81,6 +97,12 @@ class Logger(
     fun errorMessage(message: () -> String) =
         errorMessage(message())
 
+    fun warnMessage(message: String) =
+        "[WARN] $message"
+
+    fun warnMessage(message: () -> String) =
+        warnMessage(message())
+
     fun infoMessage(message: String) =
         "[INFO] $message"
 
@@ -96,6 +118,6 @@ fun logger(tag: String): Lazy<Logger> = lazy {
     Logger(tag)
 }
 
-inline fun <reified T:Any> T.logger(): Lazy<Logger> = lazy {
-    Logger(T::class.qualifiedName ?: "Unresolved")
+inline fun <reified T : Any> T.logger(): Lazy<Logger> = lazy {
+    logger(T::class.qualifiedName ?: "Unresolved").value
 }
