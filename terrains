@@ -1,0 +1,28 @@
+32 textures max
+7 biomes:
+each biome 2 variations:
+7*3=21 -1 (volcanic has 2) = 20
+
+2 Mountains:
+Meadow
+Snow
+Volcanic
+3 textures per biome for high levels
+3*3=9
+
+20+9=29
+
+1 Texture for beaches
+1 Texture for under water
+
+29+2=31
+
+Biomes:
+
+Jungle -
+Arctic - ok
+Desert - ok
+Savanna - ok
+Swamp - ok
+Meadow - ok
+Volcanic - ok

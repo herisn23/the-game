@@ -70,8 +70,9 @@ class Screen3D(
             add(light)
         }
     }
-
-    val mapSize = MapSize(2048, 2048)
+    val mapSizeScale = 1
+    val mapSizeLength = 1024
+    val mapSize = MapSize(mapSizeLength * mapSizeScale, mapSizeLength * mapSizeScale)
     val mapData = MapData(1, mapSize)
     var mapTerrainData = MapGenerator(mapData).generate()
     var terrainInstance = changeTerrain()

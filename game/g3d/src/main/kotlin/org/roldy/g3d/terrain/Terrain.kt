@@ -31,33 +31,32 @@ class Terrain(
     private val frustum = FrustumCuller()
     private val noiseData = mapTerrainData.noiseData
     private val splatMaps = mapTerrainData.splatMaps
-    private val textureScale = 10f
+    private val textureScale = 1f
     val width = mapSize.width
     val depth = mapSize.height
     val chunks = mutableListOf<TerrainChunk>()
     var originOffset: Vector3 = Vector3()
 
+    private val atlasAlbedo by disposable { AtlasLoader.terrainAlbedo }
+    private val atlasNormal by disposable { AtlasLoader.terrainNormal }
 
     // Load textures directly with mipmaps
-    private val texturesAlbedo: Texture by disposable {
-        AtlasLoader.terrainAlbedo.textures.first()
-    }
-
-    private val texturesNormal: Texture by disposable {
-        AtlasLoader.terrainNormal.textures.first()
-    }
+    private val texturesAlbedo: Texture by lazy { atlasAlbedo.textures.first() }
+    private val texturesNormal: Texture by lazy { atlasNormal.textures.first() }
 
     private val shader: ShaderProgram by disposable { ShaderLoader.terrainShader }
 
     // Atlas configuration
-    private val tileSize = 512
-    private val atlasWidth = 4096
-    private val atlasHeight = 2048
-    private val materialCount = 28
-    private val padding = 16
+    private val tileSize by lazy { atlasAlbedo.regions.first().regionHeight }
+    private val atlasWidth by lazy { texturesAlbedo.width }
+    private val atlasHeight by lazy { texturesAlbedo.height }
+    private val materialCount by lazy { AtlasLoader.terrainAlbedo.regions.size }
+    private val padding = 0
 
     // Pre-computed UVs
-    val materialUVs = generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
+    val materialUVs by lazy {
+        generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
+    }
 
     private inner class FrustumCuller {
         private val tmpBox = BoundingBox()
