@@ -25,17 +25,25 @@ object ClosedFloatingPointRangeSerializer : KSerializer<ClosedFloatingPointRange
             decoded.startsWith(it.char)
         }
         if (comparator != null) {
-            val value = decoded.replaceFirst(comparator.char, "").toFloat()
+            val value = decoded.replaceFirst(comparator.char, "").asFloat()
             return when (comparator) {
-                FloatComparison.FloatComparator.Lesser -> Float.MIN_VALUE..value
+                FloatComparison.FloatComparator.Lesser -> -Float.MAX_VALUE..value
                 FloatComparison.FloatComparator.Greater -> value..Float.MAX_VALUE
             }
         }
-        val (start, endInclusive) = decoded.split("..").map { it.toFloat() }
+        val (start, endInclusive) = decoded.split("..").map { it.asFloat() }
         return start..endInclusive
     }
 
+    private fun String.asFloat() =
+        when (lowercase()) {
+            "max" -> Float.MAX_VALUE
+            "min" -> -Float.MAX_VALUE
+            else -> toFloat()
+        }
+
 }
+
 
 object G2DColorSerializer : KSerializer<Color> {
     // Serial names of descriptors should be unique, this is why we advise including app package in the name.

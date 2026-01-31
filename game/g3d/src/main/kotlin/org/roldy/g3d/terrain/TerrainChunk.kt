@@ -13,6 +13,7 @@ import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.map.NoiseData
+import org.roldy.core.utils.repeat
 
 class TerrainChunk(
     val startX: Int,
@@ -28,9 +29,6 @@ class TerrainChunk(
 
     val model: Model
     val instance: ModelInstance
-
-    // Local space bounding box (never changes)
-    private val localBoundingBox = BoundingBox()
 
     // World space bounding box (updated when position changes)
     val boundingBox = BoundingBox()
@@ -53,44 +51,42 @@ class TerrainChunk(
         val vertexSize = 10
         val vertices = FloatArray(vertexCount * vertexSize)
         val indices = ShortArray(indexCount)
-
         var vIndex = 0
-        for (z in startZ until endZ) {
-            for (x in startX until endX) {
-                val clampedX = x.coerceIn(0, width - 1)
-                val clampedZ = z.coerceIn(0, depth - 1)
 
-                val data = noiseData[Vector2Int(clampedX, clampedZ)]!!
-                val height = data.elevation * heightScale
+        repeat(startZ..<endZ, startX..<endX) { z, x ->
+            val clampedX = x.coerceIn(0, width - 1)
+            val clampedZ = z.coerceIn(0, depth - 1)
 
-                // Position
-                vertices[vIndex++] = (x - width / 2f) * scale
-                vertices[vIndex++] = height
-                vertices[vIndex++] = (z - depth / 2f) * scale
+            val data = noiseData[Vector2Int(clampedX, clampedZ)]!!
+            val height = data.elevation * heightScale
 
-                // Normal
-                val left =
-                    (noiseData[Vector2Int(maxOf(0, clampedX - 1), clampedZ)]?.elevation ?: data.elevation) * heightScale
-                val right = (noiseData[Vector2Int(minOf(width - 1, clampedX + 1), clampedZ)]?.elevation
-                    ?: data.elevation) * heightScale
-                val up =
-                    (noiseData[Vector2Int(clampedX, maxOf(0, clampedZ - 1))]?.elevation ?: data.elevation) * heightScale
-                val down = (noiseData[Vector2Int(clampedX, minOf(depth - 1, clampedZ + 1))]?.elevation
-                    ?: data.elevation) * heightScale
+            // Position
+            vertices[vIndex++] = (x - width / 2f) * scale
+            vertices[vIndex++] = height
+            vertices[vIndex++] = (z - depth / 2f) * scale
 
-                val normal = Vector3(left - right, 2f * scale, up - down).nor()
-                vertices[vIndex++] = normal.x
-                vertices[vIndex++] = normal.y
-                vertices[vIndex++] = normal.z
+            // Normal
+            val left =
+                (noiseData[Vector2Int(maxOf(0, clampedX - 1), clampedZ)]?.elevation ?: data.elevation) * heightScale
+            val right = (noiseData[Vector2Int(minOf(width - 1, clampedX + 1), clampedZ)]?.elevation
+                ?: data.elevation) * heightScale
+            val up =
+                (noiseData[Vector2Int(clampedX, maxOf(0, clampedZ - 1))]?.elevation ?: data.elevation) * heightScale
+            val down = (noiseData[Vector2Int(clampedX, minOf(depth - 1, clampedZ + 1))]?.elevation
+                ?: data.elevation) * heightScale
 
-                // TexCoord0 - tiled UV for texture detail
-                vertices[vIndex++] = x * 0.1f
-                vertices[vIndex++] = z * 0.1f
+            val normal = Vector3(left - right, 2f * scale, up - down).nor()
+            vertices[vIndex++] = normal.x
+            vertices[vIndex++] = normal.y
+            vertices[vIndex++] = normal.z
 
-                // TexCoord1 - terrain UV for splatmap sampling (0-1 across entire terrain)
-                vertices[vIndex++] = x.toFloat() / (width - 1)
-                vertices[vIndex++] = z.toFloat() / (depth - 1)
-            }
+            // TexCoord0 - tiled UV for texture detail
+            vertices[vIndex++] = x * 0.1f
+            vertices[vIndex++] = z * 0.1f
+
+            // TexCoord1 - terrain UV for splatmap sampling (0-1 across entire terrain)
+            vertices[vIndex++] = x.toFloat() / (width - 1)
+            vertices[vIndex++] = z.toFloat() / (depth - 1)
         }
 
         // Indices

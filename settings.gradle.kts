@@ -13,6 +13,7 @@ include("game:g3d")
 
 
 include("game:sandbox")
+include("utils")
 
 
 //old modules just for copying existing code

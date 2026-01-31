@@ -16,6 +16,7 @@ import org.roldy.core.disposable.disposable
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.MapTerrainData
 import org.roldy.core.utils.invoke
+import org.roldy.core.utils.repeat
 
 
 class Terrain(
@@ -24,34 +25,27 @@ class Terrain(
     val ambientLight: ColorAttribute,
     val camera: Camera,
     mapSize: MapSize,
-    val scale: Float = 100f,
+    val scale: Float = 300f,
     val heightScale: Float = 150f * scale,
     val chunkSize: Int = 255,
 ) : AutoDisposableAdapter(), Renderable {
     private val frustum = FrustumCuller()
     private val noiseData = mapTerrainData.noiseData
     private val splatMaps = mapTerrainData.splatMaps
-    private val textureScale = 5f
+    private val textureScale = 10f
+    private val paddedWidth = AlternatingAtlasUV.getPaddedTileWidth()
+
     val width = mapSize.width
     val depth = mapSize.height
     val chunks = mutableListOf<TerrainChunk>()
     var originOffset: Vector3 = Vector3()
-
-    private val atlas by disposable { AtlasLoader.terrainAlbedo }
+    var normalStrength: Float = 1f
 
     // Load textures directly with mipmaps
-    private val texturesAlbedo: Texture by lazy { atlas.textures.first() }
-
+    private val texture: Texture by disposable { Texture(AtlasLoader.terrainTileSet) }
     private val shader: ShaderProgram by disposable { ShaderLoader.terrainShader }
-
-    // Atlas configuration
-    private val materialCount by lazy { AtlasLoader.terrainAlbedo.regions.size }
-
     // Pre-computed UVs
-    val materialUVs by lazy {
-//        generateTerrainMaterialUVs(tileSize, atlasWidth, atlasHeight, materialCount, padding)
-        AlternatingAtlasUV.generateAllUVs(materialCount)
-    }
+    private val materialUVs by lazy { AlternatingAtlasUV.generateAllUVs() }
 
     private inner class FrustumCuller {
         private val tmpBox = BoundingBox()
@@ -79,21 +73,18 @@ class Terrain(
     private fun createChunks() {
         val chunksX = (width - 1) / chunkSize + 1
         val chunksZ = (depth - 1) / chunkSize + 1
+        repeat(0..<chunksX, 0..<chunksZ) { cx, cz ->
+            val startX = cx * chunkSize
+            val startZ = cz * chunkSize
+            val endX = minOf(startX + chunkSize + 1, width)
+            val endZ = minOf(startZ + chunkSize + 1, depth)
 
-        for (cz in 0 until chunksZ) {
-            for (cx in 0 until chunksX) {
-                val startX = cx * chunkSize
-                val startZ = cz * chunkSize
-                val endX = minOf(startX + chunkSize + 1, width)
-                val endZ = minOf(startZ + chunkSize + 1, depth)
-
-                chunks.add(
-                    TerrainChunk(
-                        startX, startZ, endX, endZ,
-                        noiseData, width, depth, scale, heightScale
-                    ).disposable()
-                )
-            }
+            chunks.add(
+                TerrainChunk(
+                    startX, startZ, endX, endZ,
+                    noiseData, width, depth, scale, heightScale
+                ).disposable()
+            )
         }
     }
 
@@ -112,6 +103,9 @@ class Terrain(
         // Offset to moving chunks
         shader("u_renderOffset") {
             setUniformf(it, originOffset.x, originOffset.y, originOffset.z)
+        }
+        shader("u_paddedTileWidth") {
+            setUniformf(it, paddedWidth)
         }
 
         // Lighting
@@ -134,12 +128,12 @@ class Terrain(
 
         // Texture samplers
         shader("u_normalStrength") {
-            setUniformf(it, 1f)
+            setUniformf(it, normalStrength)
         }
         shader("u_textureScale") {
             setUniformf(it, textureScale)
         }
-        shader("u_albedoAtlas") {
+        shader("u_textureAtlas") {
             // Bind textures
             setUniformi(it, 0)
         }
@@ -149,14 +143,14 @@ class Terrain(
             }
 
         }
-        texturesAlbedo.bind(0)
+        texture.bind(0)
         splatMaps.forEachIndexed { index, texture ->
             texture.bind(1 + index)
         }
 
 
         // Reset active texture
-//        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
+//        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) uncomment when something is wrong with textures
 
         // Render visible chunks
         frustum.getVisibleChunks(chunks, camera).forEach { chunk ->

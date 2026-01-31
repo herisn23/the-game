@@ -10,6 +10,7 @@ varying vec3 v_viewDir;
 varying vec3 v_tangent;
 varying vec3 v_bitangent;
 
+uniform float u_paddedTileWidth;
 uniform sampler2D u_textureAtlas;
 
 uniform sampler2D u_splat0;
@@ -42,12 +43,11 @@ void sampleTexture(vec4 uvData, vec2 tiledUV, out vec3 albedo, out vec3 normalTS
     vec2 scaledUV = tiledUV * u_textureScale;
     vec2 localUV = fract(scaledUV) * uvData.zw;
 
-    // Albedo: left tile of pair
     vec2 albedoUV = uvData.xy + localUV;
     albedo = texture2D(u_textureAtlas, albedoUV).rgb;
 
-    // Normal: right tile of pair (offset by tile width)
-    vec2 normalUV = uvData.xy + vec2(uvData.z, 0.0) + localUV;
+    // Normal offset is padded tile width (includes gutters)
+    vec2 normalUV = uvData.xy + vec2(u_paddedTileWidth, 0.0) + localUV;
     normalTS = texture2D(u_textureAtlas, normalUV).rgb * 2.0 - 1.0;
 }
 

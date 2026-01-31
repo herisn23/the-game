@@ -28,6 +28,13 @@ infix fun FloatComparison.match(value: Float): Boolean =
     }
 
 infix fun HeightData.match(noiseData: NoiseData) =
-    noiseData.elevation in elevation &&
-            noiseData.temperature in temperature &&
-            noiseData.moisture in moisture
+    match(noiseData.temperature, noiseData.elevation, noiseData.moisture)
+
+fun HeightData.match(temp: Float, el: Float, moist: Float) =
+    el in elevation &&
+            temp in temperature &&
+            moist in moisture
+
+fun HeightData.match(temp: Float, moist: Float) =
+    temp in temperature &&
+            moist in moisture

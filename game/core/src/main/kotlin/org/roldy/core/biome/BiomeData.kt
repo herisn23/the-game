@@ -6,8 +6,8 @@ import org.roldy.core.configuration.ClosedFloatingPointRangeSerializer
 import org.roldy.core.configuration.G2DColorSerializer
 import org.roldy.core.configuration.HeightData
 
-const val maxValue = 1f
-const val minValue = 0f
+const val maxValue = Float.MAX_VALUE
+const val minValue = -Float.MAX_VALUE
 
 @Serializable
 data class BiomeData(

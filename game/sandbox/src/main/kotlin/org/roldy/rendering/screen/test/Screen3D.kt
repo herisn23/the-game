@@ -14,7 +14,8 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
-import org.roldy.core.Diagnostics
+import org.roldy.core.*
+import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.StrategyCameraController
 import org.roldy.core.camera.ThirdPersonCamera
@@ -40,7 +41,7 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     var loading = true
     val postProcess = PostProcessing()
-    val biomesData by lazy { loadBiomesConfiguration().biomes }
+    val biomes by lazy { loadBiomesConfiguration().toBiomes() }
     val diagnostics by disposable { Diagnostics() }
     fun createTargetMarker(): ModelInstance {
         val modelBuilder = ModelBuilder()
@@ -61,8 +62,8 @@ class Screen3D(
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
-    val light = DirectionalLight().set(hex("CF7A4F"), -1f, -0.8f, -0.2f)
-    val ambientLight = ColorAttribute.createAmbient(hex("CF7A4F"))
+    val light = DirectionalLight().set(hex("ffffff"), -1f, -0.8f, -0.2f)
+    val ambientLight = ColorAttribute.createAmbient(hex("ffffff"))
     val env by lazy {
         Environment().apply {
             set(ambientLight)
@@ -73,7 +74,7 @@ class Screen3D(
     val mapSizeLength = 1024
     val mapSize = MapSize(mapSizeLength * mapSizeScale, mapSizeLength * mapSizeScale)
     val mapData = MapData(1, mapSize)
-    var mapTerrainData = MapGenerator(mapData, biomesData).generate()
+    var mapTerrainData = MapGenerator(mapData, biomes).generate()
     var terrainInstance = changeTerrain()
     val heightSampler = TerrainHeightSampler(
         noiseData = terrainInstance.mapTerrainData.noiseData,
@@ -210,6 +211,32 @@ class Screen3D(
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
+        }
+        val step = delta * 2
+        val dir = light.direction
+        if (Gdx.input.isKeyPressed(keyLeft)) {
+            dir.x -= step
+            light.setDirection(dir)
+        }
+        if (Gdx.input.isKeyPressed(keyRight)) {
+            dir.x += step
+            light.setDirection(dir)
+        }
+        if (Gdx.input.isKeyPressed(keyUp)) {
+            dir.z -= step
+            light.setDirection(dir)
+        }
+        if (Gdx.input.isKeyPressed(keyDown)) {
+            dir.z += step
+            light.setDirection(dir)
+        }
+        if (Gdx.input.isKeyPressed(keyA)) {
+            terrainInstance.normalStrength -= delta
+            println(terrainInstance.normalStrength)
+        }
+        if (Gdx.input.isKeyPressed(keyD)) {
+            terrainInstance.normalStrength += delta
+            println(terrainInstance.normalStrength)
         }
 
         changeTerrainData()

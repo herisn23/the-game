@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 object AtlasLoader {
     val gui by lazy { load("ui/GUI.atlas") }
     val craftingIcons by lazy { load("ui/CraftingResourceIcons.atlas") }
-    val terrainAlbedo by lazy { load("terrain/TerrainAlbedo.atlas") }
-    val terrainNormal by lazy { load("terrain/TerrainNormal.atlas") }
+    val terrain by lazy { load("terrain/Terrain.atlas") }
+    val terrainTileSet by lazy { loadAsset("terrain/Tileset.png") }
 
     fun load(name: String) =
         TextureAtlas(loadAsset(name))

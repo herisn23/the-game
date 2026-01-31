@@ -19,8 +19,8 @@ class ThirdPersonCamera(
     var yaw = 90f            // Horizontal rotation (degrees)
     var pitch = 10f         // Vertical angle (degrees)
     var minDistance = 50f
-    var maxDistance = 5000f
-    var distance = maxDistance    // Distance behind target
+    var maxDistance = 100000f
+    var distance = minDistance    // Distance behind target
     fun zoom(amount: Float) {
         distance = (distance + amount).coerceIn(minDistance, maxDistance)
     }
