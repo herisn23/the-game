@@ -173,7 +173,7 @@ object AtlasBuilder {
     @JvmStatic
     fun main(args: Array<String>) {
         val inputDir = File("resources/terrain/synty/combined")   // change this
-        val outputFile = File("assets/terrain/terrain2.png")
+        val outputFile = File("assets/terrain/Tileset.png")
 
         buildAtlas(inputDir, outputFile)
     }

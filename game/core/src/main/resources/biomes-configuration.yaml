@@ -6,79 +6,120 @@ biomes:
   - type: Underwater
     color: 0b4f9c
     walkCost: -1
-    elevation: '<0.02'
+    elevation: '<0.01'
     terrains:
       - index: 31
 
   - type: Beach
     color: 9c9b79
     walkCost: 0.9
-    elevation: '<0.05'
+    temperature: '>0.7'
+    elevation: '<0.04'
     terrains:
-      - index: 3
-        temperature: '>0.25'
       - index: 4
+      - index: 3
 
   # ============================================
   # COLD BIOME (temp 0 - 0.25)
   # ============================================
 
-  - type: Alpine
+  - type: Alpine # arctic, boreal forest like
     color: a9c5c5
     walkCost: 0.75
-    temperature: '<0.21'
-    moisture: '0.1..0.32'
+    temperature: '<0.28'
+    moisture: '<0.64'
     terrains:
-      - index: 27
+      - index: 28 # snow 1
+        temperature: '<0.1'
+        moisture: '0.26..0.41'
+      - index: 27 # snow 2
+        temperature: '<0.08'
+      - index: 00 # red leaves 1
+        temperature: '0.1..0.19'
+        moisture: '0.24..0.51'
+      - index: 01 # red leaves 2
+        temperature: '>0.04'
+        moisture: '0.12..0.63'
+      - index: 02 # red leaves 3
 
-  # ============================================
-  # TEMPERATE BIOME (temp 0.25 - 0.5)
-  # ============================================
-
-  - type: Meadow
+  - type: Meadow # forest like
     color: 2d8b08
     walkCost: 1
-    temperature: '<0.31'
-    moisture: '0.1..0.5'
+    climate: '<0.2'
+    temperature: '<0.52'
+    moisture: '<0.8'
     terrains:
-      # ground
-      - index: 6
+      - index: 6 # debris
+        temperature: '0.28..0.38'
+        moisture: '0.3..0.4'
+      - index: 5 # green flowers
+        climate: '0.001..0.126'
+        temperature: '0.22..0.506'
+        moisture: '0.21..0.83'
+      - index: 9 # yellow flowers
+        climate: '-0.24..0.131'
+        temperature: '0.12..0.51'
+        moisture: '0.1..0.95'
+      - index: 8
 
-  # ============================================
-  # WARM BIOMES (temp 0.5 - 0.7)
-  # Split by moisture: dry = Savanna, wet = Swamp
-  # ============================================
-
-  - type: Swamp
+  - type: Swamp # swamp like
     color: 20cca1
     walkCost: 0.85
-    temperature: '0.1..0.43'
-    moisture: '0..1'
+    temperature: '<0.5'
+    climate: '<0.75'
     terrains:
-      - index: 30
-
-  - type: Tropical
-    color: 77cc58
-    walkCost: 0.85
-    temperature: '0.64..1'
-    moisture: '0.2..0.69'
-    terrains:
-      - index: 10
-
+      - index: 29 # moss bright
+        temperature: '0.34..0.43'
+        climate: '-0.2..0.38'
+      - index: 16 # mud bright
+        temperature: '<0.47'
+        climate: 'min..0.48'
+      - index: 15 # mud dark
+        climate: '<0.56'
+        temperature: '<0.51'
+      - index: 30 # moss dark
   - type: EnchantedForest
     color: 8446cc
     walkCost: 0.85
-    #    elevation: '<0.2'
-    temperature: '0.2..0.85'
-    moisture: '0.31..0.7'
+    climate: '<0.72'
+    moisture: '<0.64'
     terrains:
-      - index: 15
+      - index: 23
+        moisture: '0.34..0.41'
+      - index: 14
+        moisture: '0.29..0.44'
+      - index: 13
 
-  - type: Arid
+  - type: Tropical # desert, jungle like
+    color: 77cc58
+    walkCost: 0.85
+    temperature: '>0.4'
+    climate: '<0.72'
+    terrains:
+      - index: 24 # desert sand
+        temperature: '>0.7'
+        moisture: '0.71..0.83'
+        climate: '>0.1'
+      - index: 25 # desert sand
+        temperature: '>0.75'
+        moisture: '<0.83'
+        climate: '>0.1'
+      - index: 26 # desert sand
+        moisture: '<0.83'
+        climate: '>0.1'
+      - index: 10 # jungle rock
+        climate: '-0.1..0.1'
+        moisture: '<0.76'
+      - index: 7 # jungle grass
+
+  - type: Arid # volcanic, wasteland like
     color: cc717f
     walkCost: 0.85
-    #    elevation: '<0.2'
-    #    temperature: '0.2..0.85'
-    #    moisture: '0.31..0.7'
     terrains:
+      - index: 11
+        climate: '>0.95'
+      - index: 12
+        climate: '>0.91'
+      - index: 19
+        moisture: '<0.49'
       - index: 20

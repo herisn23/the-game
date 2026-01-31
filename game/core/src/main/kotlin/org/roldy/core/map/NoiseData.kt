@@ -8,5 +8,6 @@ data class NoiseData(
     val y: Int,
     val elevation: Float,
     val temperature: Float,
-    val moisture: Float
+    val moisture: Float,
+    val climate: Float
 )

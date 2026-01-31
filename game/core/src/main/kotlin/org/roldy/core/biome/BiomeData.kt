@@ -19,6 +19,8 @@ data class BiomeData(
     override val temperature: ClosedFloatingPointRange<Float> = minValue..maxValue,
     @Serializable(ClosedFloatingPointRangeSerializer::class)
     override val moisture: ClosedFloatingPointRange<Float> = minValue..maxValue,
+    @Serializable(ClosedFloatingPointRangeSerializer::class)
+    override val climate: ClosedFloatingPointRange<Float> = minValue..maxValue,
     @Serializable(G2DColorSerializer::class)
     val color: Color,
     val walkCost: Float,
@@ -37,6 +39,8 @@ data class BiomeData(
         override val temperature: ClosedFloatingPointRange<Float> = minValue..maxValue,
         @Serializable(ClosedFloatingPointRangeSerializer::class)
         override val moisture: ClosedFloatingPointRange<Float> = minValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val climate: ClosedFloatingPointRange<Float> = minValue..maxValue,
     ) : HeightData
 
     @Serializable
@@ -50,6 +54,8 @@ data class BiomeData(
         override val temperature: ClosedFloatingPointRange<Float> = minValue..maxValue,
         @Serializable(ClosedFloatingPointRangeSerializer::class)
         override val moisture: ClosedFloatingPointRange<Float> = minValue..maxValue,
+        @Serializable(ClosedFloatingPointRangeSerializer::class)
+        override val climate: ClosedFloatingPointRange<Float> = minValue..maxValue,
         val minRadius: Int = 0,
         val spawnChance: Float = 1f,
         val walkCost: Float = 1f

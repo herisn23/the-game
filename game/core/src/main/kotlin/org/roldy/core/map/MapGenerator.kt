@@ -1,12 +1,12 @@
 package org.roldy.core.map
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.IVector2Int
 import org.roldy.core.SimplexNoise
 import org.roldy.core.biome.Biome
+import org.roldy.core.biome.BiomeData
+import org.roldy.core.configuration.HeightData
 import org.roldy.core.utils.repeat
 import org.roldy.core.x
 import kotlin.math.abs
@@ -23,28 +23,31 @@ class MapGenerator(
     val mapData: MapData,
     val biomes: List<Biome>,
     // Elevation settings
-    val elevation: HeightData = HeightData(9, 1f, .3f, 0.0002f),
-    val temperature: HeightData = HeightData(9, 1f, 0.61f, 0.001f),
-    val moisture: HeightData = HeightData(9, 1f, 0.756f, 0.0008f),
+    val elevation: HeightConfiguration = HeightConfiguration(9, 1f, .3f, 0.0002f),
+    val temperature: HeightConfiguration = HeightConfiguration(9, 1f, 0.81f, 0.0008f),
+    val moisture: HeightConfiguration = HeightConfiguration(9, 1f, 0.73f, 0.0008f),
+    val climate: HeightConfiguration = HeightConfiguration(4, 1f, 0.33f, 0.001f),
     // Simple terrain variety
-    val flatness: Float = 0.72f,  // 0-1: how much of map is flat
+    val flatness: Float = 0.70f,  // 0-1: how much of map is flat
     val mountainHeight: Float = 1f,       // How tall mountains are
-    val flatHeight: Float = 0.1f         // Base height of flat regions
+    val flatHeight: Float = 0.11f         // Base height of flat regions
 ) {
     private val seed = 1L//mapData.seed - 3
     private val noiseRandom = Random(seed)
 
-    data class HeightData(
+    data class HeightConfiguration(
         val octaves: Int,
         val amplitude: Float,
         val latitude: Float,
         val frequency: Float
     )
 
+    private val heightRegionNoise = SimplexNoise(noiseRandom.nextLong())
+
     private val elevationNoise = SimplexNoise(seed)
     private val temperatureNoise = SimplexNoise(noiseRandom.nextLong())
     private val moistureNoise = SimplexNoise(noiseRandom.nextLong())
-    private val regionNoise = SimplexNoise(noiseRandom.nextLong())
+    private val climateNoise = SimplexNoise(noiseRandom.nextLong())
 
     fun generate(): MapTerrainData {
         val noiseData = mutableMapOf<IVector2Int, NoiseData>()
@@ -54,57 +57,16 @@ class MapGenerator(
             val elevation = elevation.getData(elevationNoise, x, y)
             val temperature = temperature.getData(temperatureNoise, x, y)
             val moisture = moisture.getData(moistureNoise, x, y)
+            val climate = climate.getData(climateNoise, x, y)
 
             val blendElevation = blendRegions(x, y, elevation)
-            noiseData[x x y] = NoiseData(x, y, blendElevation, temperature, moisture)
+            noiseData[x x y] = NoiseData(x, y, blendElevation, temperature, moisture, climate)
         }
-        noiseData.saveHeightMaps()
         return MapTerrainData(
             noiseData.generateSplatMaps(32),
             noiseData
         )
     }
-
-    private fun Map<IVector2Int, NoiseData>.saveHeightMaps() {
-        val width = keys.maxOf { it.x } + 1
-        val height = keys.maxOf { it.y } + 1
-        val elevationPixMap = Pixmap(width, height, Pixmap.Format.RGBA8888)
-        val moisturePixMap = Pixmap(width, height, Pixmap.Format.RGBA8888)
-        val temperaturePixMap = Pixmap(width, height, Pixmap.Format.RGBA8888)
-        val combinedPixMap = Pixmap(width, height, Pixmap.Format.RGBA8888)
-        fun Pixmap.draw(pos: IVector2Int, color: Int) {
-            drawPixel(pos.x, pos.y, color)
-        }
-
-        fun Float.color(value: Int) =
-            (value * this).toInt().coerceIn(0, value)
-
-        fun color(
-            rf: Float = 0f,
-            gf: Float = 0f,
-            bf: Float = 0f,
-            r: Int = 255,
-            g: Int = r,
-            b: Int = g
-        ): Int {
-            val r = rf.color(r)
-            val g = gf.color(g)
-            val b = bf.color(b)
-            val a = 255
-            return (r shl 24) or (g shl 16) or (b shl 8) or a
-        }
-        forEach { (pos, data) ->
-            elevationPixMap.draw(pos, color(rf = data.elevation))
-            moisturePixMap.draw(pos, color(rf = data.moisture))
-            temperaturePixMap.draw(pos, color(rf = data.temperature))
-            combinedPixMap.draw(pos, color(rf = data.temperature, gf = 0f, bf = data.moisture))
-        }
-        PixmapIO.writePNG(Gdx.files.local("resources/pixmap/elevation.png"), elevationPixMap)
-        PixmapIO.writePNG(Gdx.files.local("resources/pixmap/moisture.png"), moisturePixMap)
-        PixmapIO.writePNG(Gdx.files.local("resources/pixmap/temperature.png"), temperaturePixMap)
-        PixmapIO.writePNG(Gdx.files.local("resources/pixmap/combined.png"), combinedPixMap)
-    }
-
 
     private fun Map<IVector2Int, NoiseData>.generateSplatMaps(materialCount: Int): List<Texture> {
         val texCount = 4 // textures count per splatmap, 4 textures, 8 splatmaps (4*8=32) total 32 textures
@@ -148,28 +110,50 @@ class MapGenerator(
         val e = data.elevation
         val t = data.temperature
         val m = data.moisture
+        val c = data.climate
+        fun <T : HeightData> range(
+            biome: T,
+            terrain: T,
+            closedRange: T.() -> ClosedRange<Float>
+        ): ClosedRange<Float> =
+            maxOf(biome.closedRange().start, terrain.closedRange().start)..minOf(
+                biome.closedRange().endInclusive,
+                terrain.closedRange().endInclusive
+            )
 
+        val terrains = mutableListOf<BiomeData.TerrainData>()
         for (b in biomes) {
             val biome = b.data
             if (e !in biome.elevation) continue
             if (t !in biome.temperature) continue
             if (m !in biome.moisture) continue
+            if (c !in biome.climate) continue
             for (terrain in biome.terrains) {
-                val eMin = maxOf(biome.elevation.start, terrain.elevation.start)
-                val eMax = minOf(biome.elevation.endInclusive, terrain.elevation.endInclusive)
-                val tMin = maxOf(biome.temperature.start, terrain.temperature.start)
-                val tMax = minOf(biome.temperature.endInclusive, terrain.temperature.endInclusive)
-                val mMin = maxOf(biome.moisture.start, terrain.moisture.start)
-                val mMax = minOf(biome.moisture.endInclusive, terrain.moisture.endInclusive)
 
-                if (eMin > eMax || tMin > tMax || mMin > mMax) continue
-                if (e < eMin || e > eMax) continue
-                if (t < tMin || t > tMax) continue
-                if (m < mMin || m > mMax) continue
+                val elevation = range(biome, terrain) { elevation }
+                val moisture = range(biome, terrain) { moisture }
+                val temperature = range(biome, terrain) { temperature }
+                val climate = range(biome, terrain) { climate }
+
+                if (e !in elevation) continue
+                if (t !in temperature) continue
+                if (m !in moisture) continue
+                if (c !in climate) continue
+                terrains.add(terrain)
                 w[terrain.index] = 1f
                 return w
             }
-        }  // Fallback
+        }
+        //test blending
+        val mainTexture = terrains.first()
+        val secondaryTexture = terrains.getOrNull(1)
+        w[mainTexture.index] = 1f
+
+        if (secondaryTexture != null) {
+            w[mainTexture.index] = 0.8f
+            w[secondaryTexture.index] = 0.2f
+        }
+
         return w
     }
 
@@ -195,8 +179,8 @@ class MapGenerator(
      */
     private fun getRegionMask(x: Int, y: Int): Float {
         // Large scale noise for regions
-        var value = regionNoise(x * 0.001f, y * 0.001f)
-        value += regionNoise(x * 0.002f, y * 0.002f) * 0.5f
+        var value = heightRegionNoise(x * 0.001f, y * 0.001f)
+        value += heightRegionNoise(x * 0.002f, y * 0.002f) * 0.5f
 
         // Normalize to 0-1
         value = (value / 1.5f + 1f) / 2f
@@ -209,7 +193,7 @@ class MapGenerator(
         return smoothstep(threshold - 0.15f, threshold + 0.15f, value)
     }
 
-    private fun HeightData.getData(noise: SimplexNoise, x: Int, y: Int): Float {
+    private fun HeightConfiguration.getData(noise: SimplexNoise, x: Int, y: Int): Float {
         var total = 0.0f
         var frequency = frequency
         var amplitude = amplitude
