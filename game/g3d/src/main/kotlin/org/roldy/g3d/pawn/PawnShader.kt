@@ -183,7 +183,7 @@ class PawnShader(
     }
 
     private fun setHDRColorUniform(colorLoc: Int, intensityLoc: Int, color: ColorHDR) {
-        program.setUniformf(colorLoc, color.base.x, color.base.y, color.base.z)
+        program.setUniformf(colorLoc, color.rgb.x, color.rgb.y, color.rgb.z)
         program.setUniformf(intensityLoc, color.intensity)
     }
 }
@@ -301,3 +301,4 @@ class DefaultShaderConfig : ShaderConfig {
     override var metal2Metallic = 0.65f
     override var metal3Metallic = 0.65f
 }
+

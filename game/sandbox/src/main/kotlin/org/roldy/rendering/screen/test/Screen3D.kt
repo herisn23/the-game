@@ -19,11 +19,12 @@ import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
-import org.roldy.core.camera.StrategyCameraController
 import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.keyLeft
+import org.roldy.core.keyRight
 import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
@@ -42,6 +43,25 @@ import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainHeightSampler
 import org.roldy.g3d.terrain.TerrainRaycaster
+
+
+/**
+ * LOD HANDLING
+ *
+ * // In your render loop
+ * float distance = camera.position.dst(objectPosition);
+ *
+ * if (distance < 20f) {
+ *     currentInstance = new ModelInstance(modelHigh);
+ * } else if (distance < 50f) {
+ *     currentInstance = new ModelInstance(modelMed);
+ * } else {
+ *     currentInstance = new ModelInstance(modelLow);
+ * }
+ *
+ *
+ *
+ */
 
 
 class Screen3D(
@@ -156,7 +176,7 @@ class Screen3D(
         }
     }
 
-    val skybox by lazy { Skybox() }
+    val skybox by lazy { Skybox(dayCycle) }
     val modelBuilder by disposable(::PawnModelBuilder)
 
     val character by disposable {
@@ -189,20 +209,13 @@ class Screen3D(
             )
             camera.lookAt(charX, charY + 2f, charZ)  // Look at character's head
             camera.update()
+            cycleSets()
         }.run {
             PawnRenderer(this)
         }
     }
 
     val cameraController by lazy {
-        StrategyCameraController(camera).apply {
-            val bounds = 100000f
-            setBounds(-bounds, bounds, -bounds, bounds)
-//        setZoomLimits(5f, 40f)
-//        setAngleLimits(25f, 75f)
-            panSpeed = 1000f
-//        smoothness = 8f
-        }
         ThirdPersonCamera(camera, character.manager.instance)
 //        EditorCameraController(camera)
     }
@@ -245,13 +258,19 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
+        if (Gdx.input.isKeyPressed(keyLeft)) {
+            dayCycle.update(-delta * 100)
+        }
+        if (Gdx.input.isKeyPressed(keyRight)) {
+            dayCycle.update(delta * 100)
+        }
 
         context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
             charController.update(delta)
             cameraController.update()
             camera.update()
-            dayCycle.update(delta)
+//            dayCycle.update(delta)
 
             shadowSystem {
                 render(tropicalModel)

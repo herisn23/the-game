@@ -2,26 +2,26 @@ package org.roldy.g3d.skybox
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Vector3
 import org.roldy.core.CameraRenderable
+import org.roldy.core.DayNightCycle
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 
-class Skybox : AutoDisposableAdapter(), CameraRenderable {
-    private val cubemap: Cubemap by disposable {
-        fun load(side: String) = loadAsset("3d/skybox/CosmicCoolCloud$side.hdr")
-        Cubemap(
-            load("Left"),   // +X
-            load("Right"),    // -X
-            load("Top"),     // +Y
-            load("Bottom"),  // -Y
-            load("Front"),   // +Z
-            load("Back")     // -Z
-        )
-    }
 
+class Skybox(
+    val dayNightCycle: DayNightCycle,
+) : AutoDisposableAdapter(), CameraRenderable {
+
+    private val day: Cubemap by disposable { createCubeMap("day/FluffballDay") }
+    private val night: Cubemap by disposable { createCubeMap("night/CosmicCoolCloud") }
+    private var blend = 0f
+    private var brightness = 0f
+    private val dayTint = Vector3()
     private val shader by disposable {
         ShaderLoader.skyboxShader
     }
@@ -47,6 +47,8 @@ class Skybox : AutoDisposableAdapter(), CameraRenderable {
 
     context(_: Float, camera: Camera)
     override fun render() {
+        updateSkyParameters()
+
         val view = camera.view.cpy()
         view.`val`[Matrix4.M03] = 0f
         view.`val`[Matrix4.M13] = 0f
@@ -57,14 +59,104 @@ class Skybox : AutoDisposableAdapter(), CameraRenderable {
         Gdx.gl.glDepthMask(true)  // Changed: enable depth write
         Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)  // Added: allow writing at max depth
         Gdx.gl.glDisable(GL20.GL_CULL_FACE)
-
-        cubemap.bind(0)
         shader.bind()
+
+        // Set uniforms
         shader.setUniformMatrix("u_projView", projView)
-        shader.setUniformi("u_cubemap", 0)
+        shader.setUniformf("u_blend", blend)
+        shader.setUniformf("u_brightness", brightness)
+        shader.setUniformf("u_dayTint", dayTint)
+
+        // Bind cubemaps
+        day.bind(0);
+        shader.setUniformi("u_dayCubemap", 0)
+
+        night.bind(1);
+        shader.setUniformi("u_nightCubemap", 1)
+
+
         mesh.render(shader, GL20.GL_TRIANGLES)
 
         Gdx.gl.glEnable(GL20.GL_CULL_FACE)
         Gdx.gl.glDepthFunc(GL20.GL_LESS)  // Restore default
     }
+
+    private fun updateSkyParameters() {
+        // Time mapping:
+        // 0.00 - midnight
+        // 0.25 - sunrise (6am)
+        // 0.50 - noon
+        // 0.75 - sunset (6pm)
+        // 1.00 - midnight
+
+        if (dayNightCycle.timeOfDay < 0.20f) {
+            // Night (midnight to pre-dawn)
+            blend = 1.0f
+            brightness = 0.3f
+            dayTint.set(1f, 1f, 1f)
+        } else if (dayNightCycle.timeOfDay < 0.25f) {
+            // Dawn transition (night -> sunrise)
+            val t: Float = (dayNightCycle.timeOfDay - 0.20f) / 0.05f // 0 to 1
+            blend = 1.0f - t
+            brightness = MathUtils.lerp(0.3f, 0.7f, t)
+            // Tint goes toward orange/pink
+            dayTint.set(
+                MathUtils.lerp(1.0f, 1.0f, t),
+                MathUtils.lerp(1.0f, 0.6f, t),
+                MathUtils.lerp(1.0f, 0.4f, t)
+            )
+        } else if (dayNightCycle.timeOfDay < 0.30f) {
+            // Sunrise to morning
+            val t: Float = (dayNightCycle.timeOfDay - 0.25f) / 0.05f
+            blend = 0.0f
+            brightness = MathUtils.lerp(0.7f, 1.0f, t)
+            // Orange tint fades to normal
+            dayTint.set(
+                1.0f,
+                MathUtils.lerp(0.6f, 1.0f, t),
+                MathUtils.lerp(0.4f, 1.0f, t)
+            )
+        } else if (dayNightCycle.timeOfDay < 0.70f) {
+            // Full day
+            blend = 0.0f
+            brightness = 1.0f
+            dayTint.set(1f, 1f, 1f)
+        } else if (dayNightCycle.timeOfDay < 0.75f) {
+            // Afternoon to sunset
+            val t: Float = (dayNightCycle.timeOfDay - 0.70f) / 0.05f
+            blend = 0.0f
+            brightness = MathUtils.lerp(1.0f, 0.8f, t)
+            // Tint goes orange/red
+            dayTint.set(
+                1.0f,
+                MathUtils.lerp(1.0f, 0.5f, t),
+                MathUtils.lerp(1.0f, 0.3f, t)
+            )
+        } else if (dayNightCycle.timeOfDay < 0.80f) {
+            // Sunset transition (sunset -> night)
+            val t: Float = (dayNightCycle.timeOfDay - 0.75f) / 0.05f
+            blend = t
+            brightness = MathUtils.lerp(0.8f, 0.3f, t)
+            // Keep sunset tint while blending to night
+            dayTint.set(1.0f, 0.5f, 0.3f)
+        } else {
+            // Night
+            blend = 1.0f
+            brightness = 0.3f
+            dayTint.set(1f, 1f, 1f)
+        }
+    }
+
+
+    private fun createCubeMap(dayNight: String) =
+        Cubemap(
+            load(dayNight, "Left"),   // +X
+            load(dayNight, "Right"),    // -X
+            load(dayNight, "Top"),     // +Y
+            load(dayNight, "Bottom"),  // -Y
+            load(dayNight, "Front"),   // +Z
+            load(dayNight, "Back")     // -Z
+        )
+
+    private fun load(dayNight: String, side: String) = loadAsset("3d/skybox/$dayNight$side.hdr")
 }

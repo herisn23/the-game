@@ -7,9 +7,7 @@ varying vec2 v_diffuseUV;
 varying vec3 v_normal;
 
 // Ambient light uniform (always available when ambient is set)
-#ifdef ambientLightFlag
-uniform vec3 u_ambientLight;
-#endif
+
 
 // Directional lights for per-fragment lighting
 #if numDirectionalLights > 0
@@ -26,6 +24,10 @@ varying vec3 v_lightDiffuse;
 
 #if defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
 #define ambientFlag
+#endif
+
+#ifdef ambientFlag
+uniform vec3 u_ambientLight;
 #endif
 
 #ifdef specularFlag
@@ -285,67 +287,125 @@ void main() {
     float shadow = 1.0;
     #endif
 
-    vec3 finalColor = vec3(0.0);
-
-    #if defined(lightingFlag)
-    // Get ambient - use uniform directly
-    vec3 ambient = vec3(0.1);// fallback
-    #ifdef ambientLightFlag
-    ambient = u_ambientLight;
-    #endif
-
-    finalColor = diffuseColor * ambient;
+    //    vec3 finalColor = vec3(0.0);
+    //
+    //    #if defined(lightingFlag)
+    //    finalColor *= v_lightDiffuse;
+    //    #ifdef ambientFlag
+    //    finalColor *= v_ambientLight;
+    //    #endif
+    //
+    //    finalColor = diffuseColor;
 
     // Per-fragment directional lighting
     vec3 normal = normalize(v_normal);
     vec3 viewDir = vec3(0.0, 0.0, 1.0);
 
-    #if numDirectionalLights > 0
-    for (int i = 0; i < numDirectionalLights; i++) {
-        vec3 lightDir = normalize(-u_dirLights[i].direction);
-        vec3 lightColor = u_dirLights[i].color;
 
-        // Diffuse
-        float NdotL = max(dot(normal, lightDir), 0.0);
-        finalColor += diffuseColor * lightColor * NdotL * shadow;
-
-        // Specular
-        #ifdef specularFlag
-        if (NdotL > 0.0) {
-            vec3 halfDir = normalize(lightDir + viewDir);
-            float NdotH = max(dot(normal, halfDir), 0.0);
-            float shininess = smoothness * 256.0;
-            float spec = pow(NdotH, shininess) * smoothness;
-            finalColor += specularColor * lightColor * spec * (1.0 + metallic * 2.0) * shadow;
-        }
-        #endif
-    }
-    #else
-    // Fallback: no directional lights defined, use vertex lighting
-    // But subtract ambient since v_lightDiffuse has it baked in (when no shadowMap)
+    #if (!defined(lightingFlag))
+    gl_FragColor.rgb = diffuseColor.rgb;
+    #elif (!defined(specularFlag))
+    #if defined(ambientFlag) && defined(separateAmbientFlag)
     #ifdef shadowMapFlag
-    finalColor += diffuseColor * v_lightDiffuse * shadow;
+    gl_FragColor.rgb = (diffuseColor.rgb * (v_ambientLight + getShadow() * v_lightDiffuse));
+    //gl_FragColor.rgb = texture2D(u_shadowTexture, v_shadowMapUv.xy);
     #else
-    // v_lightDiffuse already contains ambient, so don't add ambient twice
-    finalColor = diffuseColor * v_lightDiffuse;
-    #endif
-
-    #ifdef specularFlag
-    finalColor += specularColor * v_lightSpecular * smoothness * (1.0 + metallic * 2.0) * shadow;
-    #endif
+    gl_FragColor.rgb = (diffuseColor.rgb * (v_ambientLight + v_lightDiffuse));
+    #endif//shadowMapFlag
+    #else
+    #ifdef shadowMapFlag
+    gl_FragColor.rgb = getShadow() * (diffuseColor.rgb * v_lightDiffuse);
+    #else
+    gl_FragColor.rgb = (diffuseColor.rgb * v_lightDiffuse);
+    #endif//shadowMapFlag
     #endif
     #else
-    // No lighting
-    finalColor = diffuseColor;
+    #if defined(specularTextureFlag) && defined(specularColorFlag)
+    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * u_specularColor.rgb * v_lightSpecular;
+    #elif defined(specularTextureFlag)
+    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * v_lightSpecular;
+    #elif defined(specularColorFlag)
+    vec3 specular = u_specularColor.rgb * v_lightSpecular;
+    #else
+    vec3 specular = v_lightSpecular;
     #endif
 
-    // Tone mapping
-    float exposure = 0.8;
-    finalColor *= exposure;
-    finalColor = finalColor / (1.0 + finalColor);
+    #if defined(ambientFlag) && defined(separateAmbientFlag)
+    #ifdef shadowMapFlag
+    gl_FragColor.rgb = (diffuseColor.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
+    //gl_FragColor.rgb = texture2D(u_shadowTexture, v_shadowMapUv.xy);
+    #else
+    gl_FragColor.rgb = (diffuseColor.rgb * (v_lightDiffuse + v_ambientLight)) + specular;
+    #endif//shadowMapFlag
+    #else
+    #ifdef shadowMapFlag
+    gl_FragColor.rgb = getShadow() * ((diffuseColor.rgb * v_lightDiffuse) + specular);
+    #else
+    gl_FragColor.rgb = (diffuseColor.rgb * v_lightDiffuse) + specular;
+    #endif//shadowMapFlag
+    #endif
+    #endif//lightingFlag
 
-    // Linear to sRGB
-    finalColor = pow(finalColor, vec3(1.0/2.2));
 
-    gl_FragColor = vec4(finalColor, 1.0);
+    //    #if numDirectionalLights > 0
+    //    for (int i = 0; i < numDirectionalLights; i++) {
+    //        vec3 lightDir = normalize(-u_dirLights[i].direction);
+    //        vec3 lightColor = u_dirLights[i].color;
+    //
+    //        // Diffuse
+    //        float NdotL = max(dot(normal, lightDir), 0.0);
+    //        finalColor += diffuseColor * lightColor * NdotL * shadow;
+    //
+    //        // Specular
+    //        #ifdef specularFlag
+    //        if (NdotL > 0.0) {
+    //            vec3 halfDir = normalize(lightDir + viewDir);
+    //            float NdotH = max(dot(normal, halfDir), 0.0);
+    //            float shininess = smoothness * 256.0;
+    //            float spec = pow(NdotH, shininess) * smoothness;
+    //            finalColor += specularColor * lightColor * spec * (1.0 + metallic * 2.0) * shadow;
+    //        }
+    //        #endif
+    //    }
+    //    #else
+    //    // Fallback: no directional lights defined, use vertex lighting
+    //    // But subtract ambient since v_lightDiffuse has it baked in (when no shadowMap)
+    //    #ifdef shadowMapFlag
+    //    finalColor += diffuseColor * v_lightDiffuse * shadow;
+    //    #else
+    //    // v_lightDiffuse already contains ambient, so don't add ambient twice
+    //    finalColor = diffuseColor * v_lightDiffuse;
+    //    #endif
+    //
+    //    #ifdef specularFlag
+    //    finalColor += specularColor * v_lightSpecular * smoothness * (1.0 + metallic * 2.0) * shadow;
+    //    #endif
+    //    #endif
+    //    #else
+    //    // No lighting
+    //    finalColor = diffuseColor;
+    //    #endif
+
+    #ifdef fogFlag
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, u_fogColor.rgb, v_fog);
+    #endif// end fogFlag
+
+    #ifdef blendedFlag
+    gl_FragColor.a = diffuse.a * v_opacity;
+    #ifdef alphaTestFlag
+    if (gl_FragColor.a <= v_alphaTest)
+    discard;
+    #endif
+    #else
+    gl_FragColor.a = 1.0;
+    #endif
+
+
+    //    // Tone mapping
+    //    float exposure = 0.3;
+    //    gl_FragColor.rgb *= exposure;
+    //    gl_FragColor.rgb = gl_FragColor.rgb / (1.0 + gl_FragColor.rgb);
+    //
+    //    // Linear to sRGB
+    //    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1.0/2.2));
 }
