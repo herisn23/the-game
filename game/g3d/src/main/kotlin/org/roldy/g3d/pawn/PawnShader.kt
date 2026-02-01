@@ -1,14 +1,12 @@
 package org.roldy.g3d.pawn
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import org.roldy.core.ColorHDR
 import org.roldy.core.asset.ShaderLoader
+import org.roldy.core.shader.WorldShiftingShader
 
 object PawnShaderUniforms {
     const val INTENSITY = "Intensity"
@@ -166,15 +164,10 @@ object PawnShaderUniforms {
 class PawnShader(
     val configuration: PawnManager,
     renderable: Renderable
-) : DefaultShader(renderable, Config().apply {
+) : WorldShiftingShader(renderable, Config().apply {
     fragmentShader = ShaderLoader.characterFrag
 }) {
     private val maskTextures = ArmorMaskTextures()
-
-    override fun end() {
-        // Reset texture unit after terrain rendering
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
-    }
 
     override fun render(renderable: Renderable) {
         colorize(renderable)

@@ -28,10 +28,10 @@ import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
+import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.AssetLoaders
 import org.roldy.g3d.environment.TropicalAssetManager
-import org.roldy.g3d.environment.environmentShaderProvider
 import org.roldy.g3d.environment.instance
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
@@ -109,7 +109,7 @@ class Screen3D(
             terrainInstance.originOffset = totalOffset
         }
     }
-    val envModelBatch by disposable { ModelBatch(environmentShaderProvider(offsetShiftingManager)) }
+    val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
 
 
     data class TData(
