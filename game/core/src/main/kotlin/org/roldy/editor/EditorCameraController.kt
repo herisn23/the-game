@@ -12,8 +12,8 @@ class EditorCameraController(
 ) : InputAdapter() {
 
     // Movement settings
-    var moveSpeed = 50f
-    var fastMultiplier = 5f
+    var moveSpeed = 500f
+    var fastMultiplier = 50f
     var panSpeed = 0.5f
     var orbitSpeed = 0.3f
     var zoomSpeed = 5f

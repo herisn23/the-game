@@ -20,11 +20,16 @@ varying vec3 v_viewDir;
 varying vec3 v_tangent;
 varying vec3 v_bitangent;
 
+#ifdef shiftFlag
+uniform vec3 u_shiftOffset;
+#endif
+
 void main() {
     vec4 worldPos = u_worldTrans * vec4(a_position, 1.0);
 
-    // Apply floating origin offset
-    worldPos.xyz -= u_renderOffset;
+    #ifdef shiftFlag
+    worldPos.xyz -= u_shiftOffset;
+    #endif
 
     v_worldPos = worldPos.xyz;
 

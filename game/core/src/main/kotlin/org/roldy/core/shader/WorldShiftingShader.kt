@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
+import org.roldy.core.shader.WorldShiftingShader.CreatePrefix.create
 import kotlin.reflect.KProperty
 
 open class WorldShiftingShader(
@@ -16,10 +17,21 @@ open class WorldShiftingShader(
         vertexShader = ShaderLoader.defaultVert
         fragmentShader = ShaderLoader.defaultFrag
     },
-    private val offsetProvider: OffsetProvider = object : OffsetProvider {
+    val offsetProvider: OffsetProvider = object : OffsetProvider {
         override val shiftOffset = Vector3()
     },
-) : DefaultShader(renderable, config) {
+) : DefaultShader(renderable, config.apply {
+    vertexShader = vertexShader?.create()
+    fragmentShader = fragmentShader?.create()
+}) {
+    private object CreatePrefix {
+        fun String.create() = run {
+            """
+                #define shiftFlag
+                $this
+            """.trimIndent()
+        }
+    }
     val u_shiftOffset by Delegate()
 
     inner class TextureBind(

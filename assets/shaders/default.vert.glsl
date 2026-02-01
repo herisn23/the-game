@@ -1,21 +1,3 @@
-#define positionFlag
-#define binormalFlag
-#define tangentFlag
-#define normalFlag
-#define lightingFlag
-#define ambientCubemapFlag
-#define numDirectionalLights 2
-#define numPointLights 5
-#define numSpotLights 0
-#define texCoord0Flag
-#define diffuseTextureFlag
-#define diffuseTextureCoord texCoord0
-#define emissiveTextureFlag
-#define emissiveTextureCoord texCoord0
-#define diffuseColorFlag
-#define emissiveColorFlag
-#define shiftFlag
-
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag) || defined(emissiveTextureFlag)
 #define textureFlag
 #endif
@@ -172,10 +154,6 @@ uniform vec4 u_cameraPosition;
 varying float v_fog;
 #endif// fogFlag
 
-#ifdef shiftFlag
-uniform vec3 u_shiftOffset;
-#endif
-
 
 #if numDirectionalLights > 0
 struct DirectionalLight
@@ -210,6 +188,10 @@ varying vec3 v_ambientLight;
 #endif//separateAmbientFlag
 
 #endif// lightingFlag
+
+#ifdef shiftFlag
+uniform vec3 u_shiftOffset;
+#endif
 
 void main() {
     #ifdef diffuseTextureFlag

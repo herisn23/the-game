@@ -30,7 +30,9 @@ import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.utils.sequencer
+import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.AssetManagersLoader
+import org.roldy.g3d.environment.SunBillboard
 import org.roldy.g3d.environment.TropicalAssetManager
 import org.roldy.g3d.environment.instance
 import org.roldy.g3d.pawn.*
@@ -45,7 +47,15 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     val emissive by disposable { TropicalAssetManager.emissiveTexture.get() }
     val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
+    val offsetShiftingManager = OffsetShiftingManager().apply {
+        onShift = { shiftX, shiftZ, totalOffset ->
+            // Update height sampler with total offset
+            heightSampler.originOffset = totalOffset
 
+            // Shift character controller positions
+            charController.onOriginShift(shiftX, shiftZ)
+        }
+    }
     val tropicalModel by lazy {
         TropicalAssetManager.bldGiantColumn01.instance(diffuse, emissive)
     }
@@ -74,7 +84,7 @@ class Screen3D(
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
-    val light = DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f)
+    val light = DirectionalLight().set(Color.WHITE, -0.5f, -1f, -0.3f)
     val ambientLight =
         ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f)//ColorAttribute.createAmbient(hex("ffffff"))
     val env by lazy {
@@ -83,6 +93,8 @@ class Screen3D(
             add(light)
         }
     }
+
+
     val mapSizeScale = 1
     val mapSizeLength = 1024
     val mapSize = MapSize(mapSizeLength * mapSizeScale, mapSizeLength * mapSizeScale)
@@ -99,19 +111,18 @@ class Screen3D(
     val charController by lazy {
         RTSCharacterController(character.manager.instance, heightSampler)
     }
-    val offsetShiftingManager = OffsetShiftingManager().apply {
-        onShift = { shiftX, shiftZ, totalOffset ->
-            // Update height sampler with total offset
-            heightSampler.originOffset = totalOffset
 
-            // Shift character controller positions
-            charController.onOriginShift(shiftX, shiftZ)
-            terrainInstance.originOffset = totalOffset
-        }
-    }
     val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
 
-
+    //    val // Create sun sphere
+//            sunSphere = SunSphere(light).apply {
+//        val corX = (mapSize.width / 2f)
+//        val corZ = (mapSize.height / 2f)
+//        light.setDirection(corX, -1f, corZ)
+//        updatePosition()
+//    }
+    val sun by disposable { SunBillboard(camera, light) }
+    val dayCycle = DayNightCycle(env, light)
     data class TData(
         val name: String,
         var value: Float = 0f
@@ -127,9 +138,7 @@ class Screen3D(
     }
 
     fun changeTerrain(): Terrain {
-        return Terrain(mapTerrainData, light, ambientLight, camera, mapSize).apply {
-//            setPosition(0f+(mapSize.width/2)*scale, 0f, 0f+(mapSize.height/2)*scale)
-        }
+        return Terrain(mapTerrainData, offsetShiftingManager, mapSize)
     }
 
     val sens = 0.01f
@@ -164,8 +173,8 @@ class Screen3D(
             instance.transform.idt()
             instance.transform.setTranslation(charX, charY, charZ)
             instance.transform.rotate(Vector3.Y, 90f)
-//            tropicalModel.transform.idt()
-//            tropicalModel.transform.setTranslation(charX, charY, charZ)
+            tropicalModel.transform.idt()
+            tropicalModel.transform.setTranslation(charX, charY, charZ)
 
             camera.position.set(
                 charX,  // Behind
@@ -189,6 +198,7 @@ class Screen3D(
 //        smoothness = 8f
         }
         ThirdPersonCamera(camera, character.manager.instance)
+        EditorCameraController(camera)
     }
 
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
@@ -247,29 +257,37 @@ class Screen3D(
             dir.z += step
             light.setDirection(dir)
         }
-        if (Gdx.input.isKeyPressed(keyA)) {
-            terrainInstance.normalStrength -= delta
-            println(terrainInstance.normalStrength)
+        if (Gdx.input.isKeyPressed(keyP)) {
+            dir.y -= step
+            light.setDirection(dir)
         }
-        if (Gdx.input.isKeyPressed(keyD)) {
-            terrainInstance.normalStrength += delta
-            println(terrainInstance.normalStrength)
+        if (Gdx.input.isKeyPressed(keyO)) {
+            dir.y += step
+            light.setDirection(dir)
         }
+//        if (Gdx.input.isKeyPressed(keyA)) {
+//            terrainInstance.normalStrength -= delta
+//        }
+//        if (Gdx.input.isKeyPressed(keyD)) {
+//            terrainInstance.normalStrength += delta
+//        }
 
         changeTerrainData()
 
         context(delta, env, camera) {
+            sun.updatePosition()
             offsetShiftingManager.update(character.manager.instance)
             charController.update(delta)
             cameraController.update()
             camera.update()
+            dayCycle.update(delta)
             postProcess {
-
                 skybox.render()
+                sun.render()
                 terrainInstance.render()
-//                envModelBatch.begin(camera)
-//                envModelBatch.render(tropicalModel, env)
-//                envModelBatch.end()
+                envModelBatch.begin(camera)
+                envModelBatch.render(tropicalModel, env)
+                envModelBatch.end()
                 character.render()
             }
             diagnostics.render()

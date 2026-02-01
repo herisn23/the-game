@@ -46,7 +46,10 @@ abstract class GenerateClassesTask : DefaultTask() {
 
     private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
         val files = listFiles()
-        val g3db = files.filter { it.name.endsWith("g3db") }.map {
+        fun String.onlyOneModel() =
+            contains("Bld_Giant_Column_01")
+
+        val g3db = files.filter { it.name.endsWith("g3db") && it.name.onlyOneModel() }.map {
             val name = it.nameWithoutExtension.replace("_", "").replace("SM", "").decapitalize()
             AssetData(
                 name,

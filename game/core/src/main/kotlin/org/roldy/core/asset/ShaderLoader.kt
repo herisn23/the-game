@@ -7,8 +7,8 @@ import org.roldy.core.logger
 
 object ShaderLoader {
     val characterFrag by lazy { load("shaders/characterHDR.frag.glsl") }
-    val terrainVert by lazy { loadAsset("shaders/terrain.vert.glsl") }
-    val terrainFrag by lazy { loadAsset("shaders/terrain.frag.glsl") }
+    val terrainVert by lazy { load("shaders/terrain.vert.glsl") }
+    val terrainFrag by lazy { load("shaders/terrain.frag.glsl") }
     val skyboxFrag by lazy { loadAsset("shaders/skybox.frag.glsl") }
     val skyboxVert by lazy { loadAsset("shaders/skybox.vert.glsl") }
     val envGenericFrag by lazy { load("shaders/env_generic.frag.glsl") }
@@ -16,9 +16,8 @@ object ShaderLoader {
 
     val defaultFrag by lazy { load("shaders/default.frag.glsl") }
     val defaultVert by lazy { load("shaders/default.vert.glsl") }
-    val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
-    val terrainShader by lazy { createShader(terrainVert, terrainFrag) }
 
+    val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
     fun load(name: String) =
         loadAsset(name).readString()
 

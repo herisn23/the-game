@@ -1,19 +1,3 @@
-#define positionFlag
-#define binormalFlag
-#define tangentFlag
-#define normalFlag
-#define lightingFlag
-#define ambientCubemapFlag
-#define numDirectionalLights 2
-#define numPointLights 5
-#define numSpotLights 0
-#define texCoord0Flag
-#define diffuseTextureFlag
-#define diffuseTextureCoord texCoord0
-#define emissiveTextureFlag
-#define emissiveTextureCoord texCoord0
-#define diffuseColorFlag
-#define emissiveColorFlag
 #ifdef GL_ES
 #define LOWP lowp
 #define MED mediump
