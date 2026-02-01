@@ -37,12 +37,13 @@ class TerrainShader(
     val u_uvs = materialUVs.mapIndexed { i, vec4 ->
         program.fetchUniformLocation("u_uv$i", false) to vec4
     }
+
+    val texture = terrain.texture.prepare(u_textureAtlas, 10)
+
     val u_splats = splatMaps.mapIndexed { i, tex ->
         val loc = program.fetchUniformLocation("u_splat$i", false)
-        tex.prepare(loc, i + 1)
+        tex.prepare(loc, i + 11)
     }
-
-    val texture = terrain.texture.prepare(u_textureAtlas, 0)
 
 
     override fun render(renderable: Renderable) {
@@ -62,10 +63,6 @@ class TerrainShader(
         texture.bind()
         u_splats.forEach(TextureBind::bind)
 
-        splatMaps.forEachIndexed { index, texture ->
-            texture.bind(1 + index)
-        }
         super.render(renderable)
     }
-
 }

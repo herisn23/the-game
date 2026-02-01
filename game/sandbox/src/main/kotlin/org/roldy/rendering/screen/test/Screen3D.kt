@@ -14,8 +14,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Vector3
-import org.roldy.core.*
+import com.badlogic.gdx.math.Matrix4
+import org.roldy.core.DayNightCycle
+import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.StrategyCameraController
@@ -29,8 +30,9 @@ import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.shader.shiftingShaderProvider
+import org.roldy.core.shadow.ShadowSystem
+import org.roldy.core.utils.invoke
 import org.roldy.core.utils.sequencer
-import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.AssetManagersLoader
 import org.roldy.g3d.environment.SunBillboard
 import org.roldy.g3d.environment.TropicalAssetManager
@@ -84,6 +86,11 @@ class Screen3D(
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
+
+    val shadowSystem = ShadowSystem(
+        offsetShiftingManager,
+        camera
+    )
     val light = DirectionalLight().set(Color.WHITE, -0.5f, -1f, -0.3f)
     val ambientLight =
         ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f)//ColorAttribute.createAmbient(hex("ffffff"))
@@ -114,15 +121,9 @@ class Screen3D(
 
     val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
 
-    //    val // Create sun sphere
-//            sunSphere = SunSphere(light).apply {
-//        val corX = (mapSize.width / 2f)
-//        val corZ = (mapSize.height / 2f)
-//        light.setDirection(corX, -1f, corZ)
-//        updatePosition()
-//    }
-    val sun by disposable { SunBillboard(camera, light) }
-    val dayCycle = DayNightCycle(env, light)
+    val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
+    val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
+
     data class TData(
         val name: String,
         var value: Float = 0f
@@ -161,6 +162,7 @@ class Screen3D(
     val character by disposable {
         val scale = terrainInstance.scale
         PawnManager(modelBuilder).apply {
+            val s = 0.1f
             val area = mapTerrainData.noiseData.findFlatAreas(1).first()
             val corX = (mapSize.width / 2f)
             val corZ = (mapSize.height / 2f)
@@ -169,10 +171,14 @@ class Screen3D(
             val charY = area.elevation * terrainInstance.heightScale
             val charZ = (area.center.y - corZ) * scale
             println("Starting Y: $charY")
-// Set character transform
-            instance.transform.idt()
-            instance.transform.setTranslation(charX, charY, charZ)
-            instance.transform.rotate(Vector3.Y, 90f)
+
+            val initialTransform = Matrix4()
+            initialTransform.idt()
+            initialTransform.scl(0.1f)
+            initialTransform.setTranslation(charX, charY, charZ)
+            instance.transform.set(initialTransform)
+
+
             tropicalModel.transform.idt()
             tropicalModel.transform.setTranslation(charX, charY, charZ)
 
@@ -198,7 +204,7 @@ class Screen3D(
 //        smoothness = 8f
         }
         ThirdPersonCamera(camera, character.manager.instance)
-        EditorCameraController(camera)
+//        EditorCameraController(camera)
     }
 
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
@@ -239,59 +245,35 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
-        val step = delta * 2
-        val dir = light.direction
-        if (Gdx.input.isKeyPressed(keyLeft)) {
-            dir.x -= step
-            light.setDirection(dir)
-        }
-        if (Gdx.input.isKeyPressed(keyRight)) {
-            dir.x += step
-            light.setDirection(dir)
-        }
-        if (Gdx.input.isKeyPressed(keyUp)) {
-            dir.z -= step
-            light.setDirection(dir)
-        }
-        if (Gdx.input.isKeyPressed(keyDown)) {
-            dir.z += step
-            light.setDirection(dir)
-        }
-        if (Gdx.input.isKeyPressed(keyP)) {
-            dir.y -= step
-            light.setDirection(dir)
-        }
-        if (Gdx.input.isKeyPressed(keyO)) {
-            dir.y += step
-            light.setDirection(dir)
-        }
-//        if (Gdx.input.isKeyPressed(keyA)) {
-//            terrainInstance.normalStrength -= delta
-//        }
-//        if (Gdx.input.isKeyPressed(keyD)) {
-//            terrainInstance.normalStrength += delta
-//        }
 
-        changeTerrainData()
-
-        context(delta, env, camera) {
-            sun.updatePosition()
+        context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
             charController.update(delta)
             cameraController.update()
             camera.update()
             dayCycle.update(delta)
+
+            shadowSystem {
+                render(tropicalModel)
+                render(character.manager.instance, false)
+            }
+
+// Reset GL state after shadow pass
+
             postProcess {
                 skybox.render()
                 sun.render()
-                terrainInstance.render()
-                envModelBatch.begin(camera)
-                envModelBatch.render(tropicalModel, env)
-                envModelBatch.end()
-                character.render()
+                context(shadowSystem.environment) {
+                    terrainInstance.render()
+                    envModelBatch {
+                        listOf(tropicalModel)
+                    }
+                    character.render()
+                }
             }
             diagnostics.render()
         }
     }
+
 
 }

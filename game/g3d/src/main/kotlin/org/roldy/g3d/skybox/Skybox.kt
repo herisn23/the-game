@@ -2,15 +2,14 @@ package org.roldy.g3d.skybox
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.math.Matrix4
-import org.roldy.core.EnvironmentalRenderable
+import org.roldy.core.CameraRenderable
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 
-class Skybox : AutoDisposableAdapter(), EnvironmentalRenderable {
+class Skybox : AutoDisposableAdapter(), CameraRenderable {
     private val cubemap: Cubemap by disposable {
         fun load(side: String) = loadAsset("3d/skybox/CosmicCoolCloud$side.hdr")
         Cubemap(
@@ -46,7 +45,7 @@ class Skybox : AutoDisposableAdapter(), EnvironmentalRenderable {
         }
     }
 
-    context(_: Float, environment: Environment, camera: Camera)
+    context(_: Float, camera: Camera)
     override fun render() {
         val view = camera.view.cpy()
         view.`val`[Matrix4.M03] = 0f

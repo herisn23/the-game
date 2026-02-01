@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector3
 class DayNightCycle(
     private val environment: Environment,
     private val sunLight: DirectionalLight,
-    private val dayDurationSeconds: Float = 120f // Real seconds for full day
+    private val dayDurationSeconds: Float = 30f // Real seconds for full day
 ) {
     // Time: 0.0 = midnight, 0.25 = sunrise, 0.5 = noon, 0.75 = sunset, 1.0 = midnight
     var timeOfDay: Float = 0.25f // Start at sunrise

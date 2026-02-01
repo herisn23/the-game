@@ -10,6 +10,35 @@ varying vec3 v_viewDir;
 varying vec3 v_tangent;
 varying vec3 v_bitangent;
 
+// Shadow - same as default libGDX shader
+#ifdef shadowMapFlag
+uniform sampler2D u_shadowTexture;
+uniform float u_shadowPCFOffset;
+varying vec3 v_shadowMapUv;
+#define separateAmbientFlag
+
+float getShadowness(vec2 offset) {
+    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
+    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));
+}
+
+float getShadow() {
+    // Bounds check - return fully lit if outside shadow map
+    if (v_shadowMapUv.x < 0.0 || v_shadowMapUv.x > 1.0 ||
+    v_shadowMapUv.y < 0.0 || v_shadowMapUv.y > 1.0 ||
+    v_shadowMapUv.z < 0.0 || v_shadowMapUv.z > 1.0) {
+        return 1.0;
+    }
+
+    return (
+    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))
+    ) * 0.25;
+}
+#endif//shadowMapFlag
+
 uniform float u_paddedTileWidth;
 uniform sampler2D u_textureAtlas;
 
@@ -22,8 +51,6 @@ uniform sampler2D u_splat5;
 uniform sampler2D u_splat6;
 uniform sampler2D u_splat7;
 
-// UV data: xy = albedo position, zw = tile size
-// Normal is at: xy + vec2(tileWidth, 0) (immediately to the right)
 uniform vec4 u_uv0, u_uv1, u_uv2, u_uv3;
 uniform vec4 u_uv4, u_uv5, u_uv6, u_uv7;
 uniform vec4 u_uv8, u_uv9, u_uv10, u_uv11;
@@ -46,7 +73,6 @@ void sampleTexture(vec4 uvData, vec2 tiledUV, out vec3 albedo, out vec3 normalTS
     vec2 albedoUV = uvData.xy + localUV;
     albedo = texture2D(u_textureAtlas, albedoUV).rgb;
 
-    // Normal offset is padded tile width (includes gutters)
     vec2 normalUV = uvData.xy + vec2(u_paddedTileWidth, 0.0) + localUV;
     normalTS = texture2D(u_textureAtlas, normalUV).rgb * 2.0 - 1.0;
 }
@@ -295,10 +321,19 @@ void main() {
     mat3 TBN = mat3(T, B, N);
     vec3 normal = normalize(TBN * normalTS);
 
+    // Get shadow - same as working shader
+    #ifdef shadowMapFlag
+    float shadow = getShadow();
+    #else
+    float shadow = 1.0;
+    #endif
+
     // Lighting
     vec3 lightDir = normalize(-u_lightDirection);
     float NdotL = max(dot(normal, lightDir), 0.0);
-    vec3 finalColor = albedo * u_ambientLight + albedo * u_lightColor * NdotL;
+
+    // Ambient NOT shadowed, direct light IS shadowed
+    vec3 finalColor = albedo * u_ambientLight + albedo * u_lightColor * NdotL * shadow;
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

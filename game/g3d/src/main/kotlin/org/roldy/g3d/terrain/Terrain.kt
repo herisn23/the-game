@@ -70,7 +70,6 @@ class Terrain(
             modelBatch.render(chunk.instance, environment)
         }
         modelBatch.end()
-
     }
 
     fun getVisibleCount(camera: Camera): Int =

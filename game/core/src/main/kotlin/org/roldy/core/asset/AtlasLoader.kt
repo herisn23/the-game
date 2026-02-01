@@ -7,6 +7,7 @@ object AtlasLoader {
     val craftingIcons by lazy { load("ui/CraftingResourceIcons.atlas") }
     val terrain by lazy { load("terrain/Terrain.atlas") }
     val terrainTileSet by lazy { loadAsset("terrain/Tileset.png") }
+    val sun by lazy { loadAsset("sun.png") }
 
     fun load(name: String) =
         TextureAtlas(loadAsset(name))

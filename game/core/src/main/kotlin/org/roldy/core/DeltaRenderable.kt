@@ -9,6 +9,12 @@ interface DeltaRenderable {
     fun render()
 }
 
+interface CameraRenderable {
+
+    context(delta: Float, camera: Camera)
+    fun render()
+}
+
 interface EnvironmentalRenderable {
     context(delta: Float, environment: Environment, camera: Camera)
     fun render()

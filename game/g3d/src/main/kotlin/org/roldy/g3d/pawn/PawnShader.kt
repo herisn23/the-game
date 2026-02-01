@@ -98,16 +98,15 @@ class PawnShader(
 
 
     private val maskTextures = ArmorMaskTextures()
-
-
-    val tex0 = maskTextures.texture0.prepare(u_texture0, 1)
-    val tex1 = maskTextures.texture1.prepare(u_texture1, 2)
-    val tex2 = maskTextures.texture2.prepare(u_texture2, 0)
-    val tex3 = maskTextures.texture3.prepare(u_texture3, 4)
-    val tex4 = maskTextures.texture4.prepare(u_texture4, 6)
-    val tex5 = maskTextures.texture5.prepare(u_texture5, 5)
-    val tex6 = maskTextures.texture6.prepare(u_texture6, 3)
-    val tex7 = maskTextures.texture7.prepare(u_texture7, 7)
+    var bind = 10
+    val tex2 = maskTextures.texture2.prepare(u_texture2, bind++)
+    val tex0 = maskTextures.texture0.prepare(u_texture0, bind++)
+    val tex1 = maskTextures.texture1.prepare(u_texture1, bind++)
+    val tex6 = maskTextures.texture6.prepare(u_texture6, bind++)
+    val tex5 = maskTextures.texture5.prepare(u_texture5, bind++)
+    val tex3 = maskTextures.texture3.prepare(u_texture3, bind++)
+    val tex4 = maskTextures.texture4.prepare(u_texture4, bind++)
+    val tex7 = maskTextures.texture7.prepare(u_texture7, bind++)
 
     override fun render(renderable: Renderable) {
         colorize(renderable)

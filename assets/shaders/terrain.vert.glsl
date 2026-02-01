@@ -24,6 +24,12 @@ varying vec3 v_bitangent;
 uniform vec3 u_shiftOffset;
 #endif
 
+// Shadow map
+#ifdef shadowMapFlag
+uniform mat4 u_shadowMapProjViewTrans;
+varying vec3 v_shadowMapUv;
+#endif
+
 void main() {
     vec4 worldPos = u_worldTrans * vec4(a_position, 1.0);
 
@@ -57,4 +63,10 @@ void main() {
     v_viewDir = normalize(u_cameraPosition - worldPos.xyz);
 
     gl_Position = u_projViewTrans * worldPos;
+
+    // Shadow map UV
+    #ifdef shadowMapFlag
+    vec4 spos = u_shadowMapProjViewTrans * worldPos;
+    v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+    #endif
 }
