@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
-import com.badlogic.gdx.graphics.g3d.Shader
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
-import com.badlogic.gdx.graphics.g3d.utils.BaseShaderProvider
 import org.roldy.core.ColorHDR
 import org.roldy.core.asset.ShaderLoader
 
@@ -326,15 +324,6 @@ class PawnShader(
     private fun setHDRColorUniform(name: PawnShaderUniforms.ColorUniform, color: ColorHDR) {
         program.setUniformf(name.base, color.base.x, color.base.y, color.base.z)
         program.setUniformf(name.intensity, color.intensity)
-    }
-}
-
-class PawnShaderProvider(
-    private val manager: PawnManager,
-) : BaseShaderProvider() {
-
-    override fun createShader(renderable: Renderable): Shader {
-        return PawnShader(manager, renderable)
     }
 }
 

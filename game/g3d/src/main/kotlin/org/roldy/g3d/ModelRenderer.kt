@@ -4,18 +4,17 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
-import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
 import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider
 import org.roldy.core.EnvironmentalRenderable
 import org.roldy.core.disposable.AutoDisposableAdapter
+import org.roldy.core.disposable.disposable
 
 class ModelRenderer(
-    shader: ShaderProvider = DefaultShaderProvider(),
-    batch: ModelBatch? = null,
+    shader: ShaderProvider,
     val instance: ModelInstance
 ) : AutoDisposableAdapter(), EnvironmentalRenderable {
 
-    val batch = batch ?: ModelBatch(shader).disposable()
+    val batch by disposable { ModelBatch(shader) }
 
     context(delta: Float, environment: Environment, camera: Camera)
     override fun render() {
