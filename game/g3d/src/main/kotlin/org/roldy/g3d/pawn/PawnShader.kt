@@ -2,172 +2,112 @@ package org.roldy.g3d.pawn
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
 import org.roldy.core.ColorHDR
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.shader.WorldShiftingShader
-
-object PawnShaderUniforms {
-    const val INTENSITY = "Intensity"
-
-    interface ColorUniform {
-        val base: String
-        val intensity: String
-    }
-
-    object SkinColor : ColorUniform {
-        override val base: String = "u_skinColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object EyesColor : ColorUniform {
-        override val base: String = "u_eyesColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object HairColor : ColorUniform {
-        override val base: String = "u_hairColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object ScleraColor : ColorUniform {
-        override val base: String = "u_scleraColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object LipsColor : ColorUniform {
-        override val base: String = "u_lipsColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object ScarsColor : ColorUniform {
-        override val base: String = "u_scarsColor"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // Metal colors
-    object Metal1Color : ColorUniform {
-        override val base: String = "u_metal1Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Metal2Color : ColorUniform {
-        override val base: String = "u_metal2Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Metal3Color : ColorUniform {
-        override val base: String = "u_metal3Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // Leather colors
-    object Leather1Color : ColorUniform {
-        override val base: String = "u_leather1Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Leather2Color : ColorUniform {
-        override val base: String = "u_leather2Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Leather3Color : ColorUniform {
-        override val base: String = "u_leather3Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // Cloth colors
-    object Cloth1Color : ColorUniform {
-        override val base: String = "u_cloth1Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Cloth2Color : ColorUniform {
-        override val base: String = "u_cloth2Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Cloth3Color : ColorUniform {
-        override val base: String = "u_cloth3Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // Gems colors
-    object Gem1Color : ColorUniform {
-        override val base: String = "u_gems1Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Gem2Color : ColorUniform {
-        override val base: String = "u_gems2Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Gem3Color : ColorUniform {
-        override val base: String = "u_gems3Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // Feathers colors
-    object Feather1Color : ColorUniform {
-        override val base: String = "u_feathers1Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Feather2Color : ColorUniform {
-        override val base: String = "u_feathers2Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    object Feather3Color : ColorUniform {
-        override val base: String = "u_feathers3Color"
-        override val intensity: String = "$base${INTENSITY}"
-    }
-
-    // textures
-    const val U_TEXTURE0 = "u_texture0"
-    const val U_TEXTURE1 = "u_texture1"
-    const val U_TEXTURE2 = "u_texture2"
-    const val U_TEXTURE3 = "u_texture3"
-    const val U_TEXTURE4 = "u_texture4"
-    const val U_TEXTURE5 = "u_texture5"
-    const val U_TEXTURE6 = "u_texture6"
-    const val U_TEXTURE7 = "u_texture7"
-
-    const val U_SKIN_SMOOTHNESS = "u_skinSmoothness"
-    const val U_EYES_SMOOTHNESS = "u_eyesSmoothness"
-    const val U_HAIR_SMOOTHNESS = "u_hairSmoothness"
-    const val U_SCLERA_SMOOTHNESS = "u_scleraSmoothness"
-    const val U_LIPS_SMOOTHNESS = "u_lipsSmoothness"
-    const val U_SCARS_SMOOTHNESS = "u_scarsSmoothness"
-    const val U_METAL1_SMOOTHNESS = "u_metal1Smoothness"
-    const val U_METAL2_SMOOTHNESS = "u_metal2Smoothness"
-    const val U_METAL3_SMOOTHNESS = "u_metal3Smoothness"
-    const val U_LEATHER1_SMOOTHNESS = "u_leather1Smoothness"
-    const val U_LEATHER2_SMOOTHNESS = "u_leather2Smoothness"
-    const val U_LEATHER3_SMOOTHNESS = "u_leather3Smoothness"
-    const val U_GEMS1_SMOOTHNESS = "u_gems1Smoothness"
-    const val U_GEMS2_SMOOTHNESS = "u_gems2Smoothness"
-    const val U_GEMS3_SMOOTHNESS = "u_gems3Smoothness"
-
-    const val U_METAL1_METALLIC = "u_metal1Metallic"
-    const val U_METAL2_METALLIC = "u_metal2Metallic"
-    const val U_METAL3_METALLIC = "u_metal3Metallic"
-    const val U_AMBIENT_LIGHT = "u_ambientLight"
-    const val U_DIR_LIGHT_COLOR = "u_dirLightColor"
-    const val U_DIR_LIGHT_DIR = "u_dirLightDir"
-
-}
 
 class PawnShader(
     val configuration: PawnManager,
     renderable: Renderable
 ) : WorldShiftingShader(renderable, Config().apply {
     fragmentShader = ShaderLoader.characterFrag
+    vertexShader = ShaderLoader.defaultVert
 }) {
+    // textures
+
+    val u_texture0 by Delegate()
+    val u_texture1 by Delegate()
+    val u_texture2 by Delegate()
+    val u_texture3 by Delegate()
+    val u_texture4 by Delegate()
+    val u_texture5 by Delegate()
+    val u_texture6 by Delegate()
+    val u_texture7 by Delegate()
+
+    // smoothness
+
+    val u_skinSmoothness by Delegate()
+    val u_eyesSmoothness by Delegate()
+    val u_scleraSmoothness by Delegate()
+    val u_lipsSmoothness by Delegate()
+    val u_hairSmoothness by Delegate()
+    val u_scarsSmoothness by Delegate()
+    val u_metal1Smoothness by Delegate()
+    val u_metal2Smoothness by Delegate()
+    val u_metal3Smoothness by Delegate()
+    val u_leather1Smoothness by Delegate()
+    val u_leather2Smoothness by Delegate()
+    val u_leather3Smoothness by Delegate()
+    val u_gems1Smoothness by Delegate()
+    val u_gems2Smoothness by Delegate()
+    val u_gems3Smoothness by Delegate()
+
+    // metallic
+
+    val u_metal1Metallic by Delegate()
+    val u_metal2Metallic by Delegate()
+    val u_metal3Metallic by Delegate()
+
+    // colors
+    val u_feathers1Color by Delegate()
+    val u_feathers2Color by Delegate()
+    val u_feathers3Color by Delegate()
+    val u_feathers1ColorIntensity by Delegate()
+    val u_feathers2ColorIntensity by Delegate()
+    val u_feathers3ColorIntensity by Delegate()
+
+    val u_gems1Color by Delegate()
+    val u_gems2Color by Delegate()
+    val u_gems3Color by Delegate()
+    val u_gems1ColorIntensity by Delegate()
+    val u_gems2ColorIntensity by Delegate()
+    val u_gems3ColorIntensity by Delegate()
+
+    val u_cloth1Color by Delegate()
+    val u_cloth2Color by Delegate()
+    val u_cloth3Color by Delegate()
+    val u_cloth1ColorIntensity by Delegate()
+    val u_cloth2ColorIntensity by Delegate()
+    val u_cloth3ColorIntensity by Delegate()
+
+    val u_leather1Color by Delegate()
+    val u_leather2Color by Delegate()
+    val u_leather3Color by Delegate()
+    val u_leather1ColorIntensity by Delegate()
+    val u_leather2ColorIntensity by Delegate()
+    val u_leather3ColorIntensity by Delegate()
+
+    val u_metal1Color by Delegate()
+    val u_metal2Color by Delegate()
+    val u_metal3Color by Delegate()
+    val u_metal1ColorIntensity by Delegate()
+    val u_metal2ColorIntensity by Delegate()
+    val u_metal3ColorIntensity by Delegate()
+    val u_scarsColor by Delegate()
+    val u_scarsColorIntensity by Delegate()
+    val u_lipsColor by Delegate()
+    val u_lipsColorIntensity by Delegate()
+    val u_scleraColor by Delegate()
+    val u_scleraColorIntensity by Delegate()
+    val u_hairColor by Delegate()
+    val u_hairColorIntensity by Delegate()
+    val u_eyesColor by Delegate()
+    val u_eyesColorIntensity by Delegate()
+    val u_skinColor by Delegate()
+    val u_skinColorIntensity by Delegate()
+
+
     private val maskTextures = ArmorMaskTextures()
+
+
+    val tex0 = maskTextures.texture0.prepare(u_texture0, 1)
+    val tex1 = maskTextures.texture1.prepare(u_texture1, 2)
+    val tex2 = maskTextures.texture2.prepare(u_texture2, 0)
+    val tex3 = maskTextures.texture3.prepare(u_texture3, 4)
+    val tex4 = maskTextures.texture4.prepare(u_texture4, 6)
+    val tex5 = maskTextures.texture5.prepare(u_texture5, 5)
+    val tex6 = maskTextures.texture6.prepare(u_texture6, 3)
+    val tex7 = maskTextures.texture7.prepare(u_texture7, 7)
 
     override fun render(renderable: Renderable) {
         colorize(renderable)
@@ -177,129 +117,58 @@ class PawnShader(
     fun colorize(renderable: Renderable) {
         val node =
             configuration.instance.meshMap.getValue(with(configuration.instance) { renderable.meshPart.mappingId() })
+        val config = configuration.getShaderConfig(node)
+        tex0.bind()
+        tex1.bind()
+        tex2.bind()
+        tex3.bind()
+        tex4.bind()
+        tex5.bind()
+        tex6.bind()
+        tex7.bind()
 
-        configuration.let { pawn ->
-            val config = pawn.getShaderConfig(node)
+        setHDRColorUniform(u_skinColor, u_skinColorIntensity, config.skinColor)
+        setHDRColorUniform(u_eyesColor, u_eyesColorIntensity, config.eyesColor)
+        setHDRColorUniform(u_scarsColor, u_scarsColorIntensity, config.scarsColor)
+        setHDRColorUniform(u_hairColor, u_hairColorIntensity, config.hairColor)
+        setHDRColorUniform(u_scleraColor, u_scleraColorIntensity, config.scleraColor)
+        setHDRColorUniform(u_lipsColor, u_lipsColorIntensity, config.lipsColor)
+        setHDRColorUniform(u_leather1Color, u_leather1ColorIntensity, config.leather1Color)
+        setHDRColorUniform(u_leather2Color, u_leather2ColorIntensity, config.leather2Color)
+        setHDRColorUniform(u_leather3Color, u_leather3ColorIntensity, config.leather3Color)
+        setHDRColorUniform(u_metal1Color, u_metal1ColorIntensity, config.metal1Color)
+        setHDRColorUniform(u_metal2Color, u_metal2ColorIntensity, config.metal2Color)
+        setHDRColorUniform(u_metal3Color, u_metal3ColorIntensity, config.metal3Color)
+        setHDRColorUniform(u_cloth1Color, u_cloth1ColorIntensity, config.cloth1Color)
+        setHDRColorUniform(u_cloth2Color, u_cloth2ColorIntensity, config.cloth2Color)
+        setHDRColorUniform(u_cloth3Color, u_cloth3ColorIntensity, config.cloth3Color)
+        setHDRColorUniform(u_gems1Color, u_gems1ColorIntensity, config.gems1Color)
+        setHDRColorUniform(u_gems2Color, u_gems2ColorIntensity, config.gems2Color)
+        setHDRColorUniform(u_gems3Color, u_gems3ColorIntensity, config.gems3Color)
+        setHDRColorUniform(u_feathers1Color, u_feathers1ColorIntensity, config.feathers1Color)
+        setHDRColorUniform(u_feathers2Color, u_feathers2ColorIntensity, config.feathers2Color)
+        setHDRColorUniform(u_feathers3Color, u_feathers3ColorIntensity, config.feathers3Color)
 
-            maskTextures.texture2.bind(0)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE2, 0)
+        program.setUniformf(u_skinSmoothness, config.skinSmoothness)
+        program.setUniformf(u_eyesSmoothness, config.eyesSmoothness)
+        program.setUniformf(u_hairSmoothness, config.hairSmoothness)
+        program.setUniformf(u_scleraSmoothness, config.scleraSmoothness)
+        program.setUniformf(u_lipsSmoothness, config.lipsSmoothness)
+        program.setUniformf(u_scarsSmoothness, config.scarsSmoothness)
+        program.setUniformf(u_metal1Smoothness, config.metal1Smoothness)
+        program.setUniformf(u_metal2Smoothness, config.metal2Smoothness)
+        program.setUniformf(u_metal3Smoothness, config.metal3Smoothness)
+        program.setUniformf(u_leather1Smoothness, config.leather1Smoothness)
+        program.setUniformf(u_leather2Smoothness, config.leather2Smoothness)
+        program.setUniformf(u_leather3Smoothness, config.leather3Smoothness)
+        program.setUniformf(u_gems1Smoothness, config.gems1Smoothness)
+        program.setUniformf(u_gems2Smoothness, config.gems2Smoothness)
+        program.setUniformf(u_gems3Smoothness, config.gems3Smoothness)
 
-            // Bind all mask textures
-            maskTextures.texture0.bind(1)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE0, 1)
+        program.setUniformf(u_metal1Metallic, config.metal1Metallic)
+        program.setUniformf(u_metal2Metallic, config.metal2Metallic)
+        program.setUniformf(u_metal3Metallic, config.metal3Metallic)
 
-            maskTextures.texture1.bind(2)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE1, 2)
-
-            maskTextures.texture6.bind(3)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE6, 3)
-
-            maskTextures.texture3.bind(4)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE3, 4)
-
-            maskTextures.texture5.bind(5)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE5, 5)
-
-            maskTextures.texture4.bind(6)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE4, 6)
-
-            maskTextures.texture7.bind(7)
-            program.setUniformi(PawnShaderUniforms.U_TEXTURE7, 7)
-
-            // Set all color uniforms
-            setHDRColorUniform(PawnShaderUniforms.SkinColor, config.skinColor)
-            setHDRColorUniform(PawnShaderUniforms.EyesColor, config.eyesColor)
-            setHDRColorUniform(PawnShaderUniforms.HairColor, config.hairColor)
-            setHDRColorUniform(PawnShaderUniforms.ScleraColor, config.scleraColor)
-            setHDRColorUniform(PawnShaderUniforms.LipsColor, config.lipsColor)
-            setHDRColorUniform(PawnShaderUniforms.ScarsColor, config.scarsColor)
-            setHDRColorUniform(PawnShaderUniforms.Metal1Color, config.metal1Color)
-            setHDRColorUniform(PawnShaderUniforms.Metal2Color, config.metal2Color)
-            setHDRColorUniform(PawnShaderUniforms.Metal3Color, config.metal3Color)
-            setHDRColorUniform(PawnShaderUniforms.Leather1Color, config.leather1Color)
-            setHDRColorUniform(PawnShaderUniforms.Leather2Color, config.leather2Color)
-            setHDRColorUniform(PawnShaderUniforms.Leather3Color, config.leather3Color)
-            setHDRColorUniform(PawnShaderUniforms.Cloth1Color, config.cloth1Color)
-            setHDRColorUniform(PawnShaderUniforms.Cloth2Color, config.cloth2Color)
-            setHDRColorUniform(PawnShaderUniforms.Cloth3Color, config.cloth3Color)
-            setHDRColorUniform(PawnShaderUniforms.Gem1Color, config.gems1Color)
-            setHDRColorUniform(PawnShaderUniforms.Gem2Color, config.gems2Color)
-            setHDRColorUniform(PawnShaderUniforms.Gem3Color, config.gems3Color)
-            setHDRColorUniform(PawnShaderUniforms.Feather1Color, config.feathers1Color)
-            setHDRColorUniform(PawnShaderUniforms.Feather2Color, config.feathers2Color)
-            setHDRColorUniform(PawnShaderUniforms.Feather3Color, config.feathers3Color)
-
-            // Set smoothness uniforms
-            program.setUniformf(PawnShaderUniforms.U_SKIN_SMOOTHNESS, config.skinSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_EYES_SMOOTHNESS, config.eyesSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_HAIR_SMOOTHNESS, config.hairSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_SCLERA_SMOOTHNESS, config.scleraSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_LIPS_SMOOTHNESS, config.lipsSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_SCARS_SMOOTHNESS, config.scarsSmoothness)
-            program.setUniformf(PawnShaderUniforms.U_METAL1_SMOOTHNESS, config.metal1Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_METAL2_SMOOTHNESS, config.metal2Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_METAL3_SMOOTHNESS, config.metal3Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_LEATHER1_SMOOTHNESS, config.leather1Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_LEATHER2_SMOOTHNESS, config.leather2Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_LEATHER3_SMOOTHNESS, config.leather3Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_GEMS1_SMOOTHNESS, config.gems1Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_GEMS2_SMOOTHNESS, config.gems2Smoothness)
-            program.setUniformf(PawnShaderUniforms.U_GEMS3_SMOOTHNESS, config.gems3Smoothness)
-
-            // Set metallic uniforms
-            program.setUniformf(PawnShaderUniforms.U_METAL1_METALLIC, config.metal1Metallic)
-            program.setUniformf(PawnShaderUniforms.U_METAL2_METALLIC, config.metal2Metallic)
-            program.setUniformf(PawnShaderUniforms.U_METAL3_METALLIC, config.metal3Metallic)
-        }
-
-        // Set lighting uniforms
-        program.setUniformf(PawnShaderUniforms.U_AMBIENT_LIGHT, 0.4f, 0.4f, 0.4f)
-        program.setUniformf(PawnShaderUniforms.U_DIR_LIGHT_COLOR, 0.8f, 0.8f, 0.8f)
-        program.setUniformf(PawnShaderUniforms.U_DIR_LIGHT_DIR, -1f, -0.8f, -0.2f)
-
-        //update lighting
-        // Extract lighting from Environment
-        val env = renderable.environment
-
-        // Get ambient light
-        val ambientLight = env?.get(ColorAttribute::class.java, ColorAttribute.AmbientLight)
-        if (ambientLight != null) {
-            program.setUniformf(
-                PawnShaderUniforms.U_AMBIENT_LIGHT,
-                ambientLight.color.r,
-                ambientLight.color.g,
-                ambientLight.color.b
-            )
-        } else {
-            program.setUniformf(PawnShaderUniforms.U_AMBIENT_LIGHT, 0.4f, 0.4f, 0.4f)
-        }
-
-        // Get directional light (first one)
-        if (env != null && env.has(DirectionalLightsAttribute.Type)) {
-            val dirLights = env.get(
-                DirectionalLightsAttribute::class.java,
-                DirectionalLightsAttribute.Type
-            ) as DirectionalLightsAttribute
-            if (dirLights.lights.size > 0) {
-                val light = dirLights.lights.first()
-                program.setUniformf(
-                    PawnShaderUniforms.U_DIR_LIGHT_COLOR,
-                    light.color.r,
-                    light.color.g,
-                    light.color.b
-                )
-                program.setUniformf(
-                    PawnShaderUniforms.U_DIR_LIGHT_DIR,
-                    light.direction.x,
-                    light.direction.y,
-                    light.direction.z
-                )
-            }
-        } else {
-            // Fallback
-            program.setUniformf(PawnShaderUniforms.U_DIR_LIGHT_COLOR, 0.8f, 0.8f, 0.8f)
-            program.setUniformf(PawnShaderUniforms.U_DIR_LIGHT_DIR, -1f, -0.8f, -0.2f)
-        }
     }
 
 
@@ -314,9 +183,9 @@ class PawnShader(
         val texture7: Texture = PawnAssetManager.mask7.get()
     }
 
-    private fun setHDRColorUniform(name: PawnShaderUniforms.ColorUniform, color: ColorHDR) {
-        program.setUniformf(name.base, color.base.x, color.base.y, color.base.z)
-        program.setUniformf(name.intensity, color.intensity)
+    private fun setHDRColorUniform(colorLoc: Int, intensityLoc: Int, color: ColorHDR) {
+        program.setUniformf(colorLoc, color.base.x, color.base.y, color.base.z)
+        program.setUniformf(intensityLoc, color.intensity)
     }
 }
 

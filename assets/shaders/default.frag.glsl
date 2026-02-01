@@ -137,24 +137,16 @@ void main() {
     vec3 normal = v_normal;
     #endif// normalFlag
 
-    vec2 v_diffuseUVf = v_diffuseUV;
     #if defined(diffuseTextureFlag)
-    v_diffuseUVf = vec2(v_diffuseUVf.x, 1.0 - v_diffuseUVf.y);
+    vec2 v_diffuseUVf = vec2(v_diffuseUV.x, 1.0 - v_diffuseUV.y);
     #endif
 
-    vec2 v_emissiveUVf = v_diffuseUV;
     #if defined(emissiveTextureFlag)
-    v_emissiveUVf = vec2(v_emissiveUVf.x, 1.0 - v_emissiveUVf.y);
+    vec2 v_emissiveUVf = vec2(v_emissiveUV.x, 1.0 - v_emissiveUV.y);
     #endif
 
-    vec2 v_emissiveUVf = v_diffuseUV;
-    #if defined(emissiveTextureFlag)
-    v_emissiveUVf = vec2(v_emissiveUVf.x, 1.0 - v_emissiveUVf.y);
-    #endif
-
-    vec2 v_specularUVf = v_diffuseUV;
-    #if defined(emissiveTextureFlag)
-    v_specularUVf = vec2(v_specularUVf.x, 1.0 - v_specularUVf.y);
+    #if defined(specularTextureFlag)
+    vec2 v_specularUVf = vec2(v_specularUV.x, 1.0 - v_specularUV.y);
     #endif
 
     #if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)

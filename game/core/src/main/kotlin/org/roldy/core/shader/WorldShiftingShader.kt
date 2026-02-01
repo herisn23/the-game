@@ -22,6 +22,20 @@ open class WorldShiftingShader(
 ) : DefaultShader(renderable, config) {
     val u_shiftOffset by Delegate()
 
+    inner class TextureBind(
+        val texture: Texture,
+        val uniform: Int,
+        val bind: Int
+    ) {
+        fun bind() {
+            texture.bind(bind)
+            program.setUniformi(uniform, bind)
+        }
+    }
+
+    fun Texture.prepare(uniform: Int, bind: Int) =
+        TextureBind(this, uniform, bind)
+
     override fun render(renderable: Renderable) {
         shift()
         super.render(renderable)
@@ -30,11 +44,6 @@ open class WorldShiftingShader(
     override fun end() {
         // Reset texture unit after terrain rendering
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
-    }
-
-    fun Pair<Texture, Int>.bind(unit: Int) {
-        first.bind(unit)
-        program.setUniformi(second, unit)
     }
 
     fun shift() {

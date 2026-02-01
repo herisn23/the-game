@@ -8,22 +8,6 @@ varying vec2 v_diffuseUV;
 
 varying vec3 v_normal;
 
-// Lighting from vertex shader
-varying vec3 v_lightDiffuse;
-#ifdef specularFlag
-varying vec3 v_lightSpecular;
-#endif
-#if defined(ambientFlag) && defined(separateAmbientFlag)
-varying vec3 v_ambientLight;
-#endif
-
-// Shadow map
-#ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-varying vec3 v_shadowMapUv;
-#endif
-
 // Base texture
 uniform sampler2D u_diffuseTexture;
 
@@ -105,22 +89,9 @@ uniform float u_gems1Smoothness;
 uniform float u_gems2Smoothness;
 uniform float u_gems3Smoothness;
 
-// Shadow functions
-#ifdef shadowMapFlag
-float getShadowness(vec2 offset) {
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));
-}
-
-float getShadow() {
-    return (
-    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))
-    ) * 0.25;
-}
-#endif
+uniform vec3 u_ambientLight;
+uniform vec3 u_dirLightColor;
+uniform vec3 u_dirLightDir;
 
 // Distance-based mask function (from Unity shader)
 float colorMask(float value) {
@@ -257,60 +228,45 @@ void main() {
     color = mix(color, baseColor.rgb * skinColorHDR, skinMask);
     smoothness = mix(smoothness, u_skinSmoothness, skinMask);
 
-    // PBR material response using vertex shader lighting
-    vec3 diffuseColor = color * (1.0 - metallic);
-    vec3 specularColor = mix(vec3(0.04), color, metallic);
+    // Better PBR-like lighting
+    vec3 normal = normalize(v_normal);
+    vec3 lightDir = normalize(-u_dirLightDir);
+    vec3 viewDir = vec3(0.0, 0.0, 1.0);// Camera direction (simplified)
+    vec3 halfDir = normalize(lightDir + viewDir);
 
-    #if (!defined(lightingFlag))
-    gl_FragColor.rgb = diffuseColor.rgb;
-    #elif (!defined(specularFlag))
-    #if defined(ambientFlag) && defined(separateAmbientFlag)
-    #ifdef shadowMapFlag
-    gl_FragColor.rgb = (diffuseColor.rgb * (v_ambientLight + getShadow() * v_lightDiffuse));
-    #else
-    gl_FragColor.rgb = (diffuseColor.rgb * (v_ambientLight + v_lightDiffuse));
-    #endif//shadowMapFlag
-    #else
-    #ifdef shadowMapFlag
-    gl_FragColor.rgb = getShadow() * (diffuseColor.rgb * v_lightDiffuse);
-    #else
-    gl_FragColor.rgb = (diffuseColor.rgb * v_lightDiffuse);
-    #endif//shadowMapFlag
-    #endif
-    #else
-    #if defined(specularTextureFlag) && defined(specularColorFlag)
-    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * u_specularColor.rgb;
-    specular +=specularColor * v_lightSpecular * smoothness * (1.0 + metallic * 2.0);
-    #elif defined(specularTextureFlag)
-    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * v_lightSpecular;
-    #elif defined(specularColorFlag)
-    vec3 specular = u_specularColor.rgb * v_lightSpecular;
-    #else
-    vec3 specular = v_lightSpecular;
-    #endif
+    float NdotL = max(dot(normal, lightDir), 0.0);
+    float NdotH = max(dot(normal, halfDir), 0.0);
 
-    #if defined(ambientFlag) && defined(separateAmbientFlag)
-    #ifdef shadowMapFlag
-    gl_FragColor.rgb = (diffuseColor.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
-    #else
-    gl_FragColor.rgb = (diffuseColor.rgb * (v_lightDiffuse + v_ambientLight)) + specular;
-    #endif//shadowMapFlag
-    #else
-    #ifdef shadowMapFlag
-    gl_FragColor.rgb = getShadow() * ((diffuse.rgb * v_lightDiffuse) + specular);
-    #else
-    gl_FragColor.rgb = (diffuseColor.rgb * v_lightDiffuse) + specular;
-    #endif//shadowMapFlag
-    #endif
-    #endif//lightingFlag
+    // PBR: Metals have dark diffuse, bright specular
+    // Non-metals have normal diffuse, weak specular
+    vec3 diffuse = color * (1.0 - metallic);// Metals don't have diffuse
+    vec3 specular = mix(vec3(0.04), color, metallic);// Metals use albedo as specular color
 
+    // Roughness is inverse of smoothness
+    float roughness = 1.0 - smoothness;
+    float shininess = (1.0 - roughness) * 512.0;// Convert to specular power
 
-    //    // Tone mapping
-    float exposure = 0.8;
-    gl_FragColor.rgb *= exposure;
-    gl_FragColor.rgb = gl_FragColor.rgb / (1.0 + gl_FragColor.rgb);
+    // Calculate lighting
+    vec3 diffuseLight = diffuse * u_ambientLight;
+    diffuseLight += diffuse * u_dirLightColor * NdotL;
 
-    //    // Linear to sRGB
-    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1.0/2.2));
-    gl_FragColor.a = 1.0;
+    // Strong specular for metals
+    float specPower = pow(NdotH, shininess);
+    vec3 specularLight = specular * u_dirLightColor * specPower * smoothness;
+
+    // Boost specular for metals
+    specularLight *= (1.0 + metallic * 2.0);
+
+    vec3 finalColor = diffuseLight + specularLight;
+
+    // Unity Standard shader tone mapping equivalent
+    // Simple Reinhard with exposure
+    float exposure = 0.6;// Adjust this (try 0.5-0.8)
+    finalColor *= exposure;
+    finalColor = finalColor / (1.0 + finalColor);
+
+    // Linear to sRGB (gamma correction)
+    finalColor = pow(finalColor, vec3(1.0/2.2));
+
+    gl_FragColor = vec4(finalColor, 1.0);
 }

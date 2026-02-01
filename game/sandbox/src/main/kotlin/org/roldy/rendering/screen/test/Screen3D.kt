@@ -30,7 +30,7 @@ import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.utils.sequencer
-import org.roldy.g3d.AssetLoaders
+import org.roldy.g3d.AssetManagersLoader
 import org.roldy.g3d.environment.TropicalAssetManager
 import org.roldy.g3d.environment.instance
 import org.roldy.g3d.pawn.*
@@ -164,8 +164,8 @@ class Screen3D(
             instance.transform.idt()
             instance.transform.setTranslation(charX, charY, charZ)
             instance.transform.rotate(Vector3.Y, 90f)
-            tropicalModel.transform.idt()
-            tropicalModel.transform.setTranslation(charX, charY, charZ)
+//            tropicalModel.transform.idt()
+//            tropicalModel.transform.setTranslation(charX, charY, charZ)
 
             camera.position.set(
                 charX,  // Behind
@@ -220,7 +220,7 @@ class Screen3D(
 
     override fun render(delta: Float) {
 
-        if (loading && AssetLoaders.update()) {
+        if (loading && AssetManagersLoader.update()) {
             loading = false
             adapter
         }
@@ -267,9 +267,9 @@ class Screen3D(
 
                 skybox.render()
                 terrainInstance.render()
-                envModelBatch.begin(camera)
-                envModelBatch.render(tropicalModel, env)
-                envModelBatch.end()
+//                envModelBatch.begin(camera)
+//                envModelBatch.render(tropicalModel, env)
+//                envModelBatch.end()
                 character.render()
             }
             diagnostics.render()
