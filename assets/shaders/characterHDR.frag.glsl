@@ -100,7 +100,8 @@ float colorMask(float value) {
 }
 
 void main() {
-    vec4 baseColor = texture2D(u_texture2, v_diffuseUV);
+    vec2 uv = vec2(v_diffuseUV.x, 1.0 - v_diffuseUV.y);
+    vec4 baseColor = texture2D(u_texture2, uv);
 
     // Reconstruct HDR colors by multiplying base * intensity
     vec3 skinColorHDR = u_skinColor * u_skinColorIntensity;
@@ -126,13 +127,13 @@ void main() {
     vec3 feathers3ColorHDR = u_feathers3Color * u_feathers3ColorIntensity;
 
     // Mask textures
-    vec4 mask0 = texture2D(u_texture0, v_diffuseUV);
-    vec4 mask1 = texture2D(u_texture1, v_diffuseUV);
-    vec4 mask6 = texture2D(u_texture6, v_diffuseUV);
-    vec4 mask3 = texture2D(u_texture3, v_diffuseUV);
-    vec4 mask5 = texture2D(u_texture5, v_diffuseUV);
-    vec4 mask4 = texture2D(u_texture4, v_diffuseUV);
-    vec4 mask7 = texture2D(u_texture7, v_diffuseUV);
+    vec4 mask0 = texture2D(u_texture0, uv);
+    vec4 mask1 = texture2D(u_texture1, uv);
+    vec4 mask6 = texture2D(u_texture6, uv);
+    vec4 mask3 = texture2D(u_texture3, uv);
+    vec4 mask5 = texture2D(u_texture5, uv);
+    vec4 mask4 = texture2D(u_texture4, uv);
+    vec4 mask7 = texture2D(u_texture7, uv);
 
     // Apply colors in order (matching Unity shader) - now using HDR colors
     vec3 color = baseColor.rgb;

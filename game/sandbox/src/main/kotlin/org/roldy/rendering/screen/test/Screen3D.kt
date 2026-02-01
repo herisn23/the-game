@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
@@ -27,8 +28,11 @@ import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.utils.hex
 import org.roldy.core.utils.sequencer
+import org.roldy.g3d.AssetLoaders
+import org.roldy.g3d.environment.TropicalAssetManager
+import org.roldy.g3d.environment.environmentShaderProvider
+import org.roldy.g3d.environment.instance
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
@@ -39,6 +43,14 @@ import org.roldy.g3d.terrain.TerrainRaycaster
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
+    val emissive by disposable { TropicalAssetManager.emissiveTexture.get() }
+    val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
+
+    val tropicalModel by lazy {
+        TropicalAssetManager.bldGiantColumn01.instance(diffuse, emissive)
+    }
+
+
     var loading = true
     val postProcess = PostProcessing()
     val biomes by lazy { loadBiomesConfiguration().toBiomes() }
@@ -62,8 +74,9 @@ class Screen3D(
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
-    val light = DirectionalLight().set(hex("ffffff"), -1f, -0.8f, -0.2f)
-    val ambientLight = ColorAttribute.createAmbient(hex("ffffff"))
+    val light = DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f)
+    val ambientLight =
+        ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f)//ColorAttribute.createAmbient(hex("ffffff"))
     val env by lazy {
         Environment().apply {
             set(ambientLight)
@@ -96,6 +109,8 @@ class Screen3D(
             terrainInstance.originOffset = totalOffset
         }
     }
+    val envModelBatch by disposable { ModelBatch(environmentShaderProvider(offsetShiftingManager)) }
+
 
     data class TData(
         val name: String,
@@ -149,6 +164,8 @@ class Screen3D(
             instance.transform.idt()
             instance.transform.setTranslation(charX, charY, charZ)
             instance.transform.rotate(Vector3.Y, 90f)
+            tropicalModel.transform.idt()
+            tropicalModel.transform.setTranslation(charX, charY, charZ)
 
             camera.position.set(
                 charX,  // Behind
@@ -203,7 +220,7 @@ class Screen3D(
 
     override fun render(delta: Float) {
 
-        if (loading && PawnAssetManager.assetManager.update()) {
+        if (loading && AssetLoaders.update()) {
             loading = false
             adapter
         }
@@ -245,9 +262,14 @@ class Screen3D(
             offsetShiftingManager.update(character.manager.instance)
             charController.update(delta)
             cameraController.update()
+            camera.update()
             postProcess {
+
                 skybox.render()
                 terrainInstance.render()
+                envModelBatch.begin(camera)
+                envModelBatch.render(tropicalModel, env)
+                envModelBatch.end()
                 character.render()
             }
             diagnostics.render()

@@ -1,6 +1,8 @@
 package codegen.pawn
 
+import codegen.AssetData
 import codegen.ClassInfo
+import codegen.assetTemplate
 import codegen.generateKotlinClasses
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -20,10 +22,6 @@ abstract class GenerateClassesTask : DefaultTask() {
     @TaskAction
     fun generate() {
         val outputDirectory = outputDir.get().asFile
-
-        // Clean and create output directory
-        outputDirectory.deleteRecursively()
-        outputDirectory.mkdirs()
 
         val classes = listOf(
             generateAssets(),
@@ -92,7 +90,7 @@ abstract class GenerateClassesTask : DefaultTask() {
         return ClassInfo(
             "PawnAssetManager",
             pack,
-            assetTemplate(assetData)
+            assetTemplate(pack, "Pawn", assetData)
 
         )
 
@@ -105,7 +103,7 @@ abstract class GenerateClassesTask : DefaultTask() {
             object PawnAnimations {
                   class Anim(
                     val id: String,
-                    val model: PawnAssetManager.Asset<Model>
+                    val model: PawnAssetManager.PawnAsset<Model>
                   )
                   interface IAnim {
                   ${
@@ -145,48 +143,6 @@ abstract class GenerateClassesTask : DefaultTask() {
         """.trimIndent()
 
 
-    fun assetLoadTemplate(path: String, type: String) =
-        "load($path, $type::class.java)"
-
-    fun assetTemplate(
-        asssets: List<AssetData>
-    ) =
-        """
-package $pack
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g3d.Model
-object PawnAssetManager {
-        class Asset<T>(
-         internal val path: String
-        ) {
-            fun get(): T = assetManager.get<T>(path)
-        }
-        ${
-            asssets.joinToString("\n") {
-                "val ${it.property} = Asset<${it.type}>(\"${it.path}\")"
-            }
-        }
-    val assetManager by lazy {
-        AssetManager().apply {
-            ${
-            asssets.joinToString("\n") {
-                assetLoadTemplate("${it.property}.path", it.type)
-            }
-        }
-        }
-    }
-}
-    """.trimIndent()
-
-    fun List<String>.asString() =
-        joinToString("\n")
-
-    data class AssetData(
-        val property: String,
-        val path: String,
-        val type: String
-    )
 
     private fun File.bodyType() =
         when {

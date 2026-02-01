@@ -29,5 +29,7 @@ Animations must contain body type i.e. `IdleMale.g3db`
 
 Then gradle plugin re-generates all necessary classes, so no code edit is needed
 
-Editor camera control:
-
+Convert all models in folder:
+for f in *.fbx; do
+~/Downloads/fbx-conv-mac/fbx-conv $f
+done

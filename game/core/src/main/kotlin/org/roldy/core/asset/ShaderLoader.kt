@@ -11,6 +11,8 @@ object ShaderLoader {
     val terrainFrag by lazy { loadAsset("shaders/terrain.frag.glsl") }
     val skyboxFrag by lazy { loadAsset("shaders/skybox.frag.glsl") }
     val skyboxVert by lazy { loadAsset("shaders/skybox.vert.glsl") }
+    val envGenericFrag by lazy { load("shaders/env_generic.frag.glsl") }
+    val envGenericVert by lazy { load("shaders/env_generic.vert.glsl") }
     val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
     val terrainShader by lazy { createShader(terrainVert, terrainFrag) }
 

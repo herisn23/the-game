@@ -2,13 +2,11 @@ package org.roldy.g3d.pawn
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.Shader
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.graphics.g3d.utils.BaseShaderProvider
 import org.roldy.core.ColorHDR
@@ -191,13 +189,9 @@ class PawnShader(
 
         configuration.let { pawn ->
             val config = pawn.getShaderConfig(node)
-            // Base texture - unit 0
-            val diffuse = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Diffuse)
-            diffuse?.textureDescription?.texture?.bind(0)
 
             maskTextures.texture2.bind(0)
             program.setUniformi(PawnShaderUniforms.U_TEXTURE2, 0)
-
 
             // Bind all mask textures
             maskTextures.texture0.bind(1)
@@ -319,38 +313,14 @@ class PawnShader(
 
 
     private class ArmorMaskTextures {
-        val texture0: Texture = PawnAssetManager.mask0.get().let(::setupTexture)
-        val texture1: Texture = PawnAssetManager.mask1.get().let(::setupTexture)
-        val texture2: Texture = PawnAssetManager.mask2.get().let(::setupTexture)
-        val texture3: Texture = PawnAssetManager.mask3.get().let(::setupTexture)
-        val texture4: Texture = PawnAssetManager.mask4.get().let(::setupTexture)
-        val texture5: Texture = PawnAssetManager.mask5.get().let(::setupTexture)
-        val texture6: Texture = PawnAssetManager.mask6.get().let(::setupTexture)
-        val texture7: Texture = PawnAssetManager.mask7.get().let(::setupTexture)
-
-        fun setupTexture(tex: Texture): Texture {
-            // Flip texture vertically
-            if (!tex.textureData.isPrepared) {
-                tex.textureData.prepare()
-            }
-            val pixmap = tex.textureData.consumePixmap()
-
-            // Flip Y
-            val flipped = Pixmap(pixmap.width, pixmap.height, pixmap.format)
-            for (y in 0 until pixmap.height) {
-                for (x in 0 until pixmap.width) {
-                    flipped.drawPixel(x, pixmap.height - 1 - y, pixmap.getPixel(x, y))
-                }
-            }
-
-            val flippedTex = Texture(flipped)
-            flippedTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            flippedTex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-
-            pixmap.dispose()
-            flipped.dispose()
-            return flippedTex
-        }
+        val texture0: Texture = PawnAssetManager.mask0.get()
+        val texture1: Texture = PawnAssetManager.mask1.get()
+        val texture2: Texture = PawnAssetManager.mask2.get()
+        val texture3: Texture = PawnAssetManager.mask3.get()
+        val texture4: Texture = PawnAssetManager.mask4.get()
+        val texture5: Texture = PawnAssetManager.mask5.get()
+        val texture6: Texture = PawnAssetManager.mask6.get()
+        val texture7: Texture = PawnAssetManager.mask7.get()
     }
 
     private fun setHDRColorUniform(name: PawnShaderUniforms.ColorUniform, color: ColorHDR) {

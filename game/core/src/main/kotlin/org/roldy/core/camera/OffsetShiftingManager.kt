@@ -3,7 +3,7 @@ package org.roldy.core.camera
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Vector3
 
-open class OffsetShiftingManager {
+open class OffsetShiftingManager : OffsetProvider {
 
     private val totalOffset = Vector3()  // Accumulated world offset
     private val position = Vector3()
@@ -12,7 +12,8 @@ open class OffsetShiftingManager {
 
     // Changed: provides shift amount, not total offset
     var onShift: (shiftX: Float, shiftZ: Float, totalOffset: Vector3) -> Unit = { _, _, _ -> }
-
+    override val shiftOffset: Vector3
+        get() = totalOffset
     private val Vector3.needsShift
         get() =
             x !in thresholdRange || z !in thresholdRange

@@ -71,10 +71,10 @@ class SimplexNoise(seed: Long = System.currentTimeMillis()) {
             j1 = 1
         }
 
-        val x1 = x0 - i1 + G2.toFloat()
-        val y1 = y0 - j1 + G2.toFloat()
-        val x2 = x0 - 1.0f + 2.0f * G2.toFloat()
-        val y2 = y0 - 1.0f + 2.0f * G2.toFloat()
+        val x1 = x0 - i1 + G2
+        val y1 = y0 - j1 + G2
+        val x2 = x0 - 1.0f + 2.0f * G2
+        val y2 = y0 - 1.0f + 2.0f * G2
 
         // Work out the hashed gradient indices of the three simplex corners
         val ii = i and 255

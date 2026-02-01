@@ -1,5 +1,6 @@
 package org.roldy.g3d.terrain
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
@@ -150,7 +151,7 @@ class Terrain(
 
 
         // Reset active texture
-//        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) uncomment when something is wrong with textures
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)// uncomment when something is wrong with textures
 
         // Render visible chunks
         frustum.getVisibleChunks(chunks, camera).forEach { chunk ->
