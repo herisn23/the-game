@@ -19,6 +19,8 @@ class Skybox(
 
     private val day: Cubemap by disposable { createCubeMap("day/FluffballDay") }
     private val night: Cubemap by disposable { createCubeMap("night/CosmicCoolCloud") }
+    private var nightRotation = 0f
+    private val nightRotationSpeed = 0.1f
     private var blend = 0f
     private var brightness = 0f
     private val dayTint = Vector3()
@@ -66,6 +68,7 @@ class Skybox(
         shader.setUniformf("u_blend", blend)
         shader.setUniformf("u_brightness", brightness)
         shader.setUniformf("u_dayTint", dayTint)
+        shader.setUniformf("u_nightRotation", nightRotation);
 
         // Bind cubemaps
         day.bind(0);
@@ -81,6 +84,7 @@ class Skybox(
         Gdx.gl.glDepthFunc(GL20.GL_LESS)  // Restore default
     }
 
+    context(delta: Float)
     private fun updateSkyParameters() {
         // Time mapping:
         // 0.00 - midnight
@@ -88,6 +92,16 @@ class Skybox(
         // 0.50 - noon
         // 0.75 - sunset (6pm)
         // 1.00 - midnight
+
+
+        // Rotate night sky (only when night is visible)
+        // Convert delta to "hours" (24 hour cycle)
+        val hoursElapsed: Float = (delta / dayNightCycle.dayDurationSeconds) * 24f
+        nightRotation += nightRotationSpeed * hoursElapsed * blend
+
+
+        // Keep in 0-2π range
+        nightRotation %= (Math.PI * 2).toFloat()
 
         if (dayNightCycle.timeOfDay < 0.20f) {
             // Night (midnight to pre-dawn)

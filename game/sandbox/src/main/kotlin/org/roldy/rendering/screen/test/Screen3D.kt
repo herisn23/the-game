@@ -270,7 +270,7 @@ class Screen3D(
             charController.update(delta)
             cameraController.update()
             camera.update()
-//            dayCycle.update(delta)
+            dayCycle.update(delta)
 
             shadowSystem {
                 render(tropicalModel)
