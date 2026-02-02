@@ -1,6 +1,7 @@
 package org.roldy.g3d.terrain
 
 import com.badlogic.gdx.math.Vector3
+import org.roldy.core.HeightSampler
 import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import org.roldy.core.map.NoiseData
@@ -11,7 +12,7 @@ class TerrainHeightSampler(
     private val scale: Float,
     noiseData: Map<IVector2Int, NoiseData>,
     heightScale: Float,
-) {
+) : HeightSampler {
     var originOffset = Vector3()
     private val heights = Array(depth) { FloatArray(width) { 0f } }
 
@@ -30,7 +31,7 @@ class TerrainHeightSampler(
         }
     }
 
-    fun getHeightAt(localX: Float, localZ: Float): Float {
+    override fun getHeightAt(localX: Float, localZ: Float): Float {
         val terrainX = (localX + originOffset.x) / scale + width / 2f
         val terrainZ = (localZ + originOffset.z) / scale + depth / 2f
 
@@ -53,7 +54,7 @@ class TerrainHeightSampler(
         return h0 + (h1 - h0) * fz
     }
 
-    fun isInBounds(localX: Float, localZ: Float): Boolean {
+    override fun isInBounds(localX: Float, localZ: Float): Boolean {
         val terrainX = localX / scale + width / 2f
         val terrainZ = localZ / scale + depth / 2f
         return terrainX in 0f..(width - 1).toFloat() &&

@@ -15,10 +15,13 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Vector3
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
+import org.roldy.core.camera.SimpleThirdPersonCamera
+import org.roldy.core.camera.StickyThirdPersonCamera
 import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
@@ -42,7 +45,6 @@ import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainHeightSampler
-import org.roldy.g3d.terrain.TerrainRaycaster
 
 
 /**
@@ -76,6 +78,10 @@ class Screen3D(
 
             // Shift character controller positions
             charController.onOriginShift(shiftX, shiftZ)
+//            val c = character.manager.instance.transform.getTranslation(Vector3())
+//            c.x -= shiftX
+//            c.z -= shiftZ
+//            character.manager.instance.transform.setTranslation(c)
         }
     }
     val tropicalModel by lazy {
@@ -135,9 +141,7 @@ class Screen3D(
         depth = terrainInstance.depth,
         scale = terrainInstance.scale
     )
-    val charController by lazy {
-        RTSCharacterController(character.manager.instance, heightSampler)
-    }
+
 
     val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
 
@@ -196,7 +200,7 @@ class Screen3D(
             initialTransform.idt()
             initialTransform.scl(0.1f)
             initialTransform.setTranslation(charX, charY, charZ)
-            instance.transform.set(initialTransform)
+            instance.transform.setTranslation(charX, charY, charZ)
 
 
             tropicalModel.transform.idt()
@@ -216,14 +220,20 @@ class Screen3D(
     }
 
     val cameraController by lazy {
-        ThirdPersonCamera(camera, character.manager.instance)
+        StickyThirdPersonCamera(camera, character.manager.instance)
+        ThirdPersonCamera(camera)
+        SimpleThirdPersonCamera(camera, heightSampler)
 //        EditorCameraController(camera)
+    }
+
+    val charController by lazy {
+        CharacterController(character.manager.instance, heightSampler, cameraController)
     }
 
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
     val adapter by lazy {
         InputMultiplexer().apply {
-            addProcessor(RTSInputHandler(camera, TerrainRaycaster(heightSampler, camera), charController))
+//            addProcessor(RTSInputHandler(camera, TerrainRaycaster(heightSampler, camera), charController))
             addProcessor(cameraController)
         }
             .also(Gdx.input::setInputProcessor)
@@ -247,6 +257,26 @@ class Screen3D(
         PawnAnimations[character.manager.bodyType].all.toList()
     }
 
+
+    context(delta: Float)
+    fun handleCamera() {
+        charController.update()
+//        character.manager.instance.transform.apply {
+//            setToTranslation(playerPosition.x, playerPosition.y + 1f, playerPosition.z)
+//            .rotate(Vector3.Y, cameraController.characterRotation)
+////            setTranslation(playerPosition)
+////            rotate(Vector3.Y, cameraController.characterRotation)
+//        }
+
+//        charController.setTarget(playerPosition)
+    }
+
+    private val playerVelocity = Vector3()
+    private val playerPosition by lazy { character.manager.instance.transform.getTranslation(Vector3()) }
+
+    // Temp vectors
+    private val moveSpeed = 400f
+
     override fun render(delta: Float) {
 
         if (loading && AssetManagersLoader.update()) {
@@ -267,8 +297,8 @@ class Screen3D(
 
         context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
-            charController.update(delta)
-            cameraController.update()
+//            charController.update(delta)
+            handleCamera()
             camera.update()
             dayCycle.update(delta)
 

@@ -13,7 +13,7 @@ class RTSCharacterController(
     private val direction = Vector3()
     private val currentPosition = Vector3()
 
-    var moveSpeed = 2000f
+    var moveSpeed = 1f
     var rotationSpeed = 10f
     var arrivalThreshold = 0.5f
     var heightOffset = 1f
