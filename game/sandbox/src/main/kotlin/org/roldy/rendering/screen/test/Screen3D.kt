@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
@@ -15,7 +14,8 @@ import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
-import org.roldy.core.*
+import org.roldy.core.DayNightCycle
+import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
@@ -24,6 +24,8 @@ import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.keyLeft
+import org.roldy.core.keyRight
 import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
@@ -294,23 +296,12 @@ class Screen3D(
             postProcess.toggle()
         }
         if (Gdx.input.isKeyPressed(keyLeft)) {
-//            dayCycle.update(-delta * 100)
-            noise.smallFrequency -= 0.02f
-            println(noise)
+            dayCycle.update(-delta * 100)
         }
         if (Gdx.input.isKeyPressed(keyRight)) {
-//            dayCycle.update(delta * 100)
-            noise.smallFrequency += 0.02f
-            println(noise)
+            dayCycle.update(delta * 100)
         }
-        if (Gdx.input.isKeyPressed(keyUp)) {
-            noise.largeFrequency += 0.02f
-            println(noise)
-        }
-        if (Gdx.input.isKeyPressed(keyDown)) {
-            noise.largeFrequency -= 0.02f
-            println(noise)
-        }
+
 
         context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
@@ -336,14 +327,12 @@ class Screen3D(
 
                     // Before rendering grass
                     // Enable blending and disable backface culling for grass
-                    Gdx.gl.glEnable(GL20.GL_BLEND)
-                    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                    Gdx.gl.glDisable(GL20.GL_CULL_FACE)
+//                    Gdx.gl.glDisable(GL20.GL_CULL_FACE)
                     foliageBatch {
                         listOf(bush)
                     }
                     // After rendering grass
-                    Gdx.gl.glEnable(GL20.GL_CULL_FACE)
+//                    Gdx.gl.glEnable(GL20.GL_CULL_FACE)
 
                     character.render()
                 }
