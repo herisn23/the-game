@@ -12,7 +12,7 @@ import org.roldy.core.shader.WorldShiftingShader.CreatePrefix.create
 import kotlin.reflect.KProperty
 
 open class WorldShiftingShader(
-    private val renderable: Renderable,
+    renderable: Renderable,
     config: Config = Config().apply {
         vertexShader = ShaderLoader.defaultVert
         fragmentShader = ShaderLoader.defaultFrag
@@ -32,7 +32,8 @@ open class WorldShiftingShader(
             """.trimIndent()
         }
     }
-    val u_shiftOffset by Delegate()
+
+    val u_shiftOffset by FetchUniform()
 
     inner class TextureBind(
         val texture: Texture,
@@ -63,7 +64,7 @@ open class WorldShiftingShader(
         program.setUniformf(u_shiftOffset, originOffset.x, originOffset.y, originOffset.z)
     }
 
-    inner class Delegate(
+    inner class FetchUniform(
         private val normalize: Boolean = false
     ) {
         private var cachedLocation: Int? = null

@@ -47,16 +47,24 @@ abstract class GenerateClassesTask : DefaultTask() {
     private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
         val files = listFiles()
         fun String.onlyOneModel() =
-            contains("Bld_Giant_Column_01")
+            contains("Bld_Giant_Column_01") || contains("Env_Grass_Med_Clump_01")
+
+        fun String.normalize() =
+            replace("_", "")
+                .replace(" ", "")
+                .replace("Occlusion", "")
+                .replace("occlusion", "")
+                .replace("Normals", "")
+                .replace("normals", "")
 
         val g3db = files.filter { it.name.endsWith("g3db") && it.name.onlyOneModel() }.map {
-            val name = it.nameWithoutExtension.replace("_", "").replace("SM", "").decapitalize()
+            val name = it.nameWithoutExtension.normalize().replace("SM", "").decapitalize()
             AssetData(
                 name,
                 base.resolve(biome.name.lowercase()).resolve(it.name).pathString,
                 "Model"
             )
-        }//.first().let(::listOf)
+        }
 
         fun File.createTextureData(prop: String) =
             AssetData(
@@ -64,6 +72,22 @@ abstract class GenerateClassesTask : DefaultTask() {
                 base.resolve(biome.name.lowercase()).resolve(name).pathString,
                 "Texture"
             )
+        val foliageDirectories = files.filter { it.isDirectory }
+
+        fun List<File>.createFoliageTextures() =
+            flatMap { directory ->
+                val dirName = directory.name
+                directory.listFiles().map { tex ->
+                    val propName = "$dirName${tex.nameWithoutExtension.normalize().capitalize()}"
+                    AssetData(
+                        propName,
+                        base.resolve(biome.name.lowercase()).resolve(directory.name).resolve(tex.name).pathString,
+                        "Texture"
+                    )
+                }
+            }
+
+        val foliageTextures = foliageDirectories.createFoliageTextures()
 
         val textures = files.filter { it.name.endsWith("png") }.mapNotNull {
             when {
@@ -78,9 +102,16 @@ abstract class GenerateClassesTask : DefaultTask() {
             assetTemplate(
                 pack,
                 biome.name,
-                g3db + textures,
+                g3db + textures + foliageTextures,
+                true,
                 "EnvironmentAssetManagerLoader",
-                configureAssetLoader = "configure()"
+                configureAssetLoader = """
+                    val loader = SyntyModelLoader(fileHandleResolver)
+                    setLoader(Model::class.java, ".g3db", loader)
+                """.trimIndent(),
+                imports = listOf(
+                    "import org.roldy.core.asset.SyntyModelLoader"
+                )
             ) {
                 """
                     override val modelMap by lazy {

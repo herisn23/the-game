@@ -13,7 +13,7 @@ class DayNightCycle(
     val dayDurationSeconds: Float = 120f // Real seconds for full day
 ) {
     // Time: 0.0 = midnight, 0.25 = sunrise, 0.5 = noon, 0.75 = sunset, 1.0 = midnight
-    var timeOfDay: Float = 0.25f // Start at sunrise
+    var timeOfDay: Float = 0.55f // Start at sunrise
         private set
 
     // Sun rotation axis (tilted like Earth)

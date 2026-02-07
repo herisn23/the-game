@@ -9,7 +9,8 @@ data class AssetData(
 fun assetTemplate(
     pack: String,
     prefix: String,
-    asssets: List<AssetData>,
+    assets: List<AssetData>,
+    applyLoaders: Boolean = true,
     parent: String = "AssetManagerLoader",
     imports: List<String> = listOf(),
     configureAssetLoader: String = "",
@@ -22,25 +23,32 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Model
 import org.roldy.core.asset.Asset
 import org.roldy.core.asset.AssetManagerLoader
+import kotlin.reflect.KClass
 ${imports.joinToString("\n")}
 object ${prefix}AssetManager: ${parent} {
-        class ${prefix}Asset<T>(
-         internal val path: String
+        class ${prefix}Asset<T: Any>(
+         internal val path: String,
+         val cls: KClass<T>
         ):Asset<T> {
             override fun get(): T = assetManager.get<T>(path)
+            override fun load(assetManager: AssetManager) {
+                assetManager.load(path, cls.java)
+            }
         }
         ${
-        asssets.joinToString("\n") {
-            "val ${it.property} = ${prefix}Asset<${it.type}>(\"${it.path}\")"
+        assets.joinToString("\n") {
+            "val ${it.property} = ${prefix}Asset(\"${it.path}\", ${it.type}::class)"
         }
     }
     override val assetManager by lazy {
         AssetManager().apply {
             ${configureAssetLoader}
             ${
-        asssets.joinToString("\n") {
-            assetLoadTemplate("${it.property}.path", it.type)
-        }
+        if (applyLoaders) {
+            assets.joinToString("\n") {
+                assetLoadTemplate(it.property)
+            }
+        } else ""
     }
         }
     }
@@ -48,5 +56,5 @@ object ${prefix}AssetManager: ${parent} {
 }
     """.trimIndent()
 
-fun assetLoadTemplate(path: String, type: String) =
-    "load($path, $type::class.java)"
+fun assetLoadTemplate(path: String) =
+    "${path}.load(this)"

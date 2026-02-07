@@ -4,20 +4,18 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.VertexAttributes
-import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
-import org.roldy.core.DayNightCycle
-import org.roldy.core.Diagnostics
+import org.roldy.core.*
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
@@ -26,13 +24,14 @@ import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
-import org.roldy.core.keyLeft
-import org.roldy.core.keyRight
 import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
+import org.roldy.core.shader.FoliageColors
+import org.roldy.core.shader.FoliageNoise
+import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.shadow.ShadowSystem
 import org.roldy.core.utils.invoke
@@ -40,7 +39,8 @@ import org.roldy.core.utils.sequencer
 import org.roldy.g3d.AssetManagersLoader
 import org.roldy.g3d.environment.SunBillboard
 import org.roldy.g3d.environment.TropicalAssetManager
-import org.roldy.g3d.environment.instance
+import org.roldy.g3d.environment.foliage
+import org.roldy.g3d.environment.property
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
@@ -71,6 +71,8 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     val emissive by disposable { TropicalAssetManager.emissiveTexture.get() }
     val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
+    val plantsDiffuse by disposable { TropicalAssetManager.plantsGrassMid01.get() }
+    val plantsNormal by disposable { TropicalAssetManager.normalsGrassMid01.get() }
     val offsetShiftingManager = OffsetShiftingManager().apply {
         onShift = { shiftX, shiftZ, totalOffset ->
             // Update height sampler with total offset
@@ -85,7 +87,15 @@ class Screen3D(
         }
     }
     val tropicalModel by lazy {
-        TropicalAssetManager.bldGiantColumn01.instance(diffuse, emissive)
+        TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive)
+    }
+    val bush by lazy {
+        TropicalAssetManager.envGrassMedClump01.foliage(plantsDiffuse, plantsNormal, FoliageColors.grass)
+            .apply {
+                nodes.first().children.removeAll {
+                    !it.id.contains("LOD0")
+                }
+            }
     }
 
 
@@ -117,16 +127,6 @@ class Screen3D(
         offsetShiftingManager,
         camera
     )
-    val light = DirectionalLight().set(Color.WHITE, -0.5f, -1f, -0.3f)
-    val ambientLight =
-        ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f)//ColorAttribute.createAmbient(hex("ffffff"))
-    val env by lazy {
-        Environment().apply {
-            set(ambientLight)
-            add(light)
-        }
-    }
-
 
     val mapSizeScale = 1
     val mapSizeLength = 1024
@@ -142,8 +142,9 @@ class Screen3D(
         scale = terrainInstance.scale
     )
 
-
+    val noise = FoliageNoise()
     val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
+    val foliageBatch by disposable { ModelBatch(foliageShaderProvider(offsetShiftingManager, noise)) }
 
     val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
@@ -204,7 +205,11 @@ class Screen3D(
 
 
             tropicalModel.transform.idt()
-            tropicalModel.transform.setTranslation(charX, charY, charZ)
+            tropicalModel.transform.setTranslation(charX + 500f, charY, charZ + 500f)
+
+
+            bush.transform.idt()
+            bush.transform.setTranslation(charX - 100f, charY, charZ)
 
             camera.position.set(
                 charX,  // Behind
@@ -289,18 +294,29 @@ class Screen3D(
             postProcess.toggle()
         }
         if (Gdx.input.isKeyPressed(keyLeft)) {
-            dayCycle.update(-delta * 100)
+//            dayCycle.update(-delta * 100)
+            noise.smallFrequency -= 0.02f
+            println(noise)
         }
         if (Gdx.input.isKeyPressed(keyRight)) {
-            dayCycle.update(delta * 100)
+//            dayCycle.update(delta * 100)
+            noise.smallFrequency += 0.02f
+            println(noise)
+        }
+        if (Gdx.input.isKeyPressed(keyUp)) {
+            noise.largeFrequency += 0.02f
+            println(noise)
+        }
+        if (Gdx.input.isKeyPressed(keyDown)) {
+            noise.largeFrequency -= 0.02f
+            println(noise)
         }
 
         context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
-//            charController.update(delta)
             handleCamera()
             camera.update()
-            dayCycle.update(delta)
+//            dayCycle.update(delta)
 
             shadowSystem {
                 render(tropicalModel)
@@ -317,6 +333,18 @@ class Screen3D(
                     envModelBatch {
                         listOf(tropicalModel)
                     }
+
+                    // Before rendering grass
+                    // Enable blending and disable backface culling for grass
+                    Gdx.gl.glEnable(GL20.GL_BLEND)
+                    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                    Gdx.gl.glDisable(GL20.GL_CULL_FACE)
+                    foliageBatch {
+                        listOf(bush)
+                    }
+                    // After rendering grass
+                    Gdx.gl.glEnable(GL20.GL_CULL_FACE)
+
                     character.render()
                 }
             }

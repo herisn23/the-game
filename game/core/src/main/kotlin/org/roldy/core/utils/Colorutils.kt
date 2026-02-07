@@ -57,8 +57,8 @@ fun alpha(alpha: Float): Color =
         alpha
     )
 
-fun hex(hex: String): Color =
-    Color.valueOf(hex)
+fun hex(hex: String, alpha: Float = 1f): Color =
+    Color.valueOf(hex).apply { a = alpha }
 
 fun color(red: Float, green: Float, blue: Float, alpha: Float): Color =
     Color(red, green, blue, alpha)

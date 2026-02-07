@@ -18,13 +18,13 @@ class TerrainShader(
     // Pre-computed UVs
     private val materialUVs by lazy { AlternatingAtlasUV.generateAllUVs() }
     private val splatMaps = terrain.mapTerrainData.splatMaps
-    val u_lightDirection by Delegate()
-    val u_lightColor by Delegate()
-    val u_ambientLight by Delegate()
-    val u_paddedTileWidth by Delegate()
-    val u_normalStrength by Delegate()
-    val u_textureScale by Delegate()
-    val u_textureAtlas by Delegate()
+    val u_lightDirection by FetchUniform()
+    val u_lightColor by FetchUniform()
+    val u_ambientLight by FetchUniform()
+    val u_paddedTileWidth by FetchUniform()
+    val u_normalStrength by FetchUniform()
+    val u_textureScale by FetchUniform()
+    val u_textureAtlas by FetchUniform()
 
     val light = renderable.environment.run {
         val lights = get(
