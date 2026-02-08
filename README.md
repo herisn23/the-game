@@ -31,5 +31,5 @@ Then gradle plugin re-generates all necessary classes, so no code edit is needed
 
 Convert all models in folder:
 for f in *.fbx; do
-~/Downloads/fbx-conv-mac/fbx-conv -f -s 0.01 $f
+~/Downloads/fbx-conv-mac/fbx-conv -f $f
 done

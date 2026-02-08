@@ -45,7 +45,7 @@ class PawnManager(
         }
     }
     val animationController = AnimationController(instance).apply {
-        setAnimation(instance.animations[0].id, -1)
+        setAnimation(instance.animations[1].id, -1)
     }
 
     fun setArmor(

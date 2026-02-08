@@ -18,7 +18,7 @@ class ShadowSystem(
     private val offsetProvider: OffsetProvider,
     private val camera: Camera,
     private val shadowQuality: Int = Quality.ULTRA_HIGH,
-    private val shadowDistance: Float = 2000f,
+    shadowDistance: Float = 100f,
     private val windSystem: WindAttributes
 ) : AutoDisposableAdapter() {
     object Quality {
@@ -28,16 +28,26 @@ class ShadowSystem(
         const val ULTRA_HIGH = 16
     }
 
-    val shadowMapSize: Int = 1024 * shadowQuality      // Resolution of shadow map (1024, 2048, 4096)
+    val gridSize = 0.01f  // ← Was 1f, now 0.01f
+    val shadowMapSize: Int = 1024 * shadowQuality
 
-    // Shadow light replaces regular DirectionalLight
-    // Create shadow-casting directional light
+    val minDistance = 50f
+    val maxDistance = 500f
+
+
+
     val shadowLight: DirectionalShadowLight by disposable {
         DirectionalShadowLight(
             shadowMapSize, shadowMapSize,
-            shadowDistance * 2f, shadowDistance * 2f,  // Viewport covers 2x distance (both sides)
-            1f, shadowDistance * 3f                     // Far enough to capture tall objects
+            shadowDistance * 2f, shadowDistance * 2f,
+            0.01f, shadowDistance * 3f  // ← Near plane: 1f → 0.01f for scaled models
         )
+    }
+
+    fun updateShadowDistance(factor: Float) {
+        val distance = (maxDistance * factor).coerceIn(minDistance, maxDistance)
+        shadowLight.camera.viewportWidth = distance
+        shadowLight.camera.viewportHeight = distance
     }
 
     private val shadowCenter = Vector3()
@@ -61,11 +71,10 @@ class ShadowSystem(
     }
 
     fun begin() {
-        // Shadow follows camera
         shadowCenter.set(camera.position)
 
-        // Optional: Snap to grid to reduce shadow swimming/flickering
-        val gridSize = 1f
+        // Snap to grid scaled for 0.01 world
+
         shadowCenter.x = (shadowCenter.x / gridSize).toInt() * gridSize
         shadowCenter.z = (shadowCenter.z / gridSize).toInt() * gridSize
 

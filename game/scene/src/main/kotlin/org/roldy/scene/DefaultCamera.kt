@@ -19,7 +19,7 @@ fun camera3D() =
     ).apply {
         position.set(0f, 0f, 0f)
         lookAt(0f, 0f, 0f)
-        near = 1f
-        far = 20000f
+        near = 0.1f
+        far = 300f
         update()
     }

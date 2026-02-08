@@ -14,8 +14,8 @@ class CharacterController(
     private val logger by logger()
     private val currentPosition = Vector3()
 
-    var moveSpeed = 400f
-    var heightOffset = 1f
+    var moveSpeed = 2f
+    var heightOffset = 0f
 
     private var initialized = false
 

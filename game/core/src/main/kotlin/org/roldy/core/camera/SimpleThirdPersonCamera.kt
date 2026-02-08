@@ -9,16 +9,16 @@ import org.roldy.core.HeightSampler
 
 class SimpleThirdPersonCamera(
     val camera: Camera,
-    val sampler: HeightSampler,
+    val sampler: HeightSampler
 ) : InputAdapter() {
-
-    private val offset = Vector3(0f, 90f, 0f)
-    var minCameraHeight = 2f  // Minimum height above terrain
+    var onZoomChanged: (Float) -> Unit = {}
+    private val offset = Vector3(0f, 1f, 0f)
+    var minCameraHeight = 0f  // Minimum height above terrain
     var yaw = 0f
     var pitch = 0.4f
-    var distance = 300f
-    var minDistance = 150f // 150
-    var maxDistance = 1000f // 600
+    var distance = 3f
+    var minDistance = 1f // 150
+    var maxDistance = 20f // 600
 
     // Input state
     private var wPressed = false
@@ -147,7 +147,7 @@ class SimpleThirdPersonCamera(
 
             yaw -= deltaX * 0.005f
             pitch += deltaY * 0.005f
-            pitch = MathUtils.clamp(pitch, -1.2f, 1.4f)
+            pitch = pitch.coerceIn(-1.2f, 1.4f)
 
             lastX = screenX
             lastY = screenY
@@ -156,8 +156,9 @@ class SimpleThirdPersonCamera(
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        distance += amountY
-        distance = MathUtils.clamp(distance, minDistance, maxDistance)
+        distance += amountY * 0.01f
+        distance = distance.coerceIn(minDistance, maxDistance)
+        onZoomChanged(distance / maxDistance)
         return true
     }
 }

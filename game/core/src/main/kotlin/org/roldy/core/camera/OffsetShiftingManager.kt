@@ -4,14 +4,15 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Vector3
 
 open class OffsetShiftingManager : OffsetProvider {
+    typealias OnShift = (shiftX: Float, shiftZ: Float, totalOffset: Vector3) -> Unit
+
+    val shiftListeners = mutableListOf<OnShift>()
 
     private val totalOffset = Vector3()  // Accumulated world offset
     private val position = Vector3()
     private val threshold = 1000f // Shift when player exceeds this distance
     private val thresholdRange = -threshold..threshold
 
-    // Changed: provides shift amount, not total offset
-    var onShift: (shiftX: Float, shiftZ: Float, totalOffset: Vector3) -> Unit = { _, _, _ -> }
     override val shiftOffset: Vector3
         get() = totalOffset
     private val Vector3.needsShift
@@ -35,8 +36,9 @@ open class OffsetShiftingManager : OffsetProvider {
             // ACCUMULATE offset (don't overwrite!)
             totalOffset.x += shiftX
             totalOffset.z += shiftZ
-
-            onShift(shiftX, shiftZ, totalOffset)
+            shiftListeners.forEach { onShift ->
+                onShift(shiftX, shiftZ, totalOffset)
+            }
         }
     }
 
