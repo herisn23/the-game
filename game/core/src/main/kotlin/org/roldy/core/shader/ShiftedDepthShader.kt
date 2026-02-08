@@ -2,50 +2,49 @@ package org.roldy.core.shader
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
+import org.roldy.core.system.WindAttributes
 import kotlin.reflect.KProperty
 
-open class WorldShiftingShader(
+class ShiftedDepthShader(
     renderable: Renderable,
-    config: Config = Config().apply {
-        vertexShader = ShaderLoader.defaultVert
-        fragmentShader = ShaderLoader.defaultFrag
-    },
+    private val windAttributes: WindAttributes,
     val offsetProvider: OffsetProvider = object : OffsetProvider {
         override val shiftOffset = Vector3()
     }
-) : DefaultShader(renderable, config.apply {
-    vertexShader = with(ShaderFlags) { vertexShader?.shiftFlag() }
-    fragmentShader = fragmentShader
-}) {
-
+) : DepthShader(
+    renderable, Config().apply {
+        with(ShaderFlags) {
+            vertexShader = ShaderLoader.depthVert.shiftFlag().windFlag(renderable)
+            fragmentShader = ShaderLoader.depthFrag
+        }
+    }
+) {
     val defaultOffset = Vector3()
 
     val u_shiftOffset by FetchUniform()
+
+    // Wind uniforms
+    val u_time by FetchUniform()
+    val u_windStrength by FetchUniform()
+    val u_windSpeed by FetchUniform()
+    val u_windDirection by FetchUniform()
+
     val worldShiftUserData = renderable.userData as? ShaderUserData
-    val isShifted = worldShiftUserData?.shifted ?: false
-
-    inner class TextureBind(
-        val texture: Texture,
-        val uniform: Int,
-        val bind: Int
-    ) {
-        fun bind() {
-            texture.bind(bind)
-            program.setUniformi(uniform, bind)
-        }
-    }
-
-    fun Texture.prepare(uniform: Int, bind: Int) =
-        TextureBind(this, uniform, bind)
+    val isShifted get() = worldShiftUserData?.shifted ?: false
 
     override fun render(renderable: Renderable) {
         shift()
+        // Set wind uniforms
+        program.setUniformf(u_time, windAttributes.time)
+        program.setUniformf(u_windStrength, windAttributes.windStrength)
+        program.setUniformf(u_windSpeed, windAttributes.windSpeed)
+        program.setUniformf(u_windDirection, windAttributes.windDirection.x, windAttributes.windDirection.y)
+
         super.render(renderable)
     }
 
@@ -65,7 +64,7 @@ open class WorldShiftingShader(
     ) {
         private var cachedLocation: Int? = null
 
-        operator fun getValue(thisRef: WorldShiftingShader, property: KProperty<*>): Int {
+        operator fun getValue(thisRef: ShiftedDepthShader, property: KProperty<*>): Int {
             return cachedLocation ?: program.fetchUniformLocation(
                 property.name,
                 normalize
@@ -75,7 +74,7 @@ open class WorldShiftingShader(
 }
 
 
-fun shiftingShaderProvider(offsetProvider: OffsetProvider) =
+fun shiftingDepthShaderProvider(offsetProvider: OffsetProvider, windAttributes: WindAttributes) =
     shaderProvider {
-        WorldShiftingShader(it, offsetProvider = offsetProvider)
+        ShiftedDepthShader(it, windAttributes, offsetProvider = offsetProvider)
     }

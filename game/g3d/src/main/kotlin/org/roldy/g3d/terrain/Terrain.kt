@@ -19,9 +19,8 @@ import org.roldy.core.utils.repeat
 class Terrain(
     val mapTerrainData: MapTerrainData,
     internal val offsetProvider: OffsetProvider,
-    mapSize: MapSize,
-
-    ) : AutoDisposableAdapter(), EnvironmentalRenderable {
+    mapSize: MapSize
+) : AutoDisposableAdapter(), EnvironmentalRenderable {
     private val noiseData = mapTerrainData.noiseData
     private val chunkSize: Int = 255
     private val frustum = FrustumCuller()

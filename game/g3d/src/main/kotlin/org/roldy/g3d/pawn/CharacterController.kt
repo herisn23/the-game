@@ -3,13 +3,15 @@ package org.roldy.g3d.pawn
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.camera.SimpleThirdPersonCamera
-import org.roldy.g3d.terrain.TerrainHeightSampler
+import org.roldy.core.logger
+import org.roldy.g3d.terrain.TerrainSampler
 
 class CharacterController(
     val entity: ModelInstance,
-    private val heightSampler: TerrainHeightSampler,
+    private val heightSampler: TerrainSampler,
     private val camera: SimpleThirdPersonCamera
 ) {
+    private val logger by logger()
     private val currentPosition = Vector3()
 
     var moveSpeed = 400f
@@ -21,6 +23,7 @@ class CharacterController(
         currentPosition.set(x, 0f, z)
         if (heightSampler.isInBounds(x, z)) {
             currentPosition.y = heightSampler.getHeightAt(x, z) + heightOffset
+            logger.info("Initialize at: $currentPosition")
         }
         applyTransform()
         initialized = true
@@ -28,10 +31,7 @@ class CharacterController(
 
     context(delta: Float)
     fun update() {
-        if (!initialized) {
-            initializeAt(0f, 0f)
-            return
-        }
+        if (!initialized) return
 
         // Camera handles movement input and updates position
         camera.update(currentPosition, delta, moveSpeed)

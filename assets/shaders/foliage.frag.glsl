@@ -217,9 +217,11 @@ void main() {
     vec4 diffuse = vec4(1.0);
     #endif
 
-    if (diffuse.a < 0.25) {
+    #ifdef alphaTestFlag
+    if (diffuse.a < v_alphaTest) {
         discard;
     }
+    #endif
 
     // ===== FOLIAGE COLOR LOGIC =====
     vec2 noiseUV_small = v_worldPos.xy;

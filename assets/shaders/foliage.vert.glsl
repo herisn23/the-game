@@ -113,6 +113,14 @@ attribute vec2 a_boneWeight7;
 uniform mat4 u_worldTrans;
 varying vec3 v_worldPos;
 
+// Wind uniforms
+#ifdef windFlag
+uniform float u_time;
+uniform float u_windStrength;
+uniform float u_windSpeed;
+uniform vec2 u_windDirection;
+#endif
+
 #if defined(numBones)
 #if numBones > 0
 uniform mat4 u_bones[numBones];
@@ -258,11 +266,29 @@ void main() {
     vec4 pos = u_worldTrans * vec4(a_position, 1.0);
     #endif
 
-    v_worldPos = pos.xyz;
-
     #ifdef shiftFlag
     pos.xyz -= u_shiftOffset;
     #endif
+
+    v_worldPos = pos.xyz;
+
+    #ifdef windFlag
+    // ===== WIND ANIMATION =====
+    float windInfluence = clamp(a_position.y / 50.0, 0.0, 1.0);// Divide by actual height
+
+    float windTime = u_time * u_windSpeed;
+    float variation = sin(pos.x * 0.01) * cos(pos.z * 0.01);// Lower frequency for large mesh
+
+    float sway1 = sin(windTime + pos.x * 0.05 + variation);
+    float sway2 = sin(windTime * 0.7 + pos.z * 0.03 - variation);
+
+    // Scale wind to mesh size (multiply by 5-10 for large meshes)
+    vec2 windOffset = vec2(sway1, sway2) * windInfluence * u_windStrength * 10.0;// 10x multiplier!
+
+    pos.x += windOffset.x * u_windDirection.x;
+    pos.z += windOffset.y * u_windDirection.y;
+    #endif
+    // ==========================
 
     gl_Position = u_projViewTrans * pos;
 

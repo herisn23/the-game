@@ -10,17 +10,12 @@ import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Vector3
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
-import org.roldy.core.camera.StickyThirdPersonCamera
-import org.roldy.core.camera.ThirdPersonCamera
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
@@ -32,10 +27,10 @@ import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.shader.FoliageColors
-import org.roldy.core.shader.FoliageNoise
 import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
-import org.roldy.core.shadow.ShadowSystem
+import org.roldy.core.system.ShadowSystem
+import org.roldy.core.system.WindSystem
 import org.roldy.core.utils.invoke
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.AssetManagersLoader
@@ -46,7 +41,7 @@ import org.roldy.g3d.environment.property
 import org.roldy.g3d.pawn.*
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
-import org.roldy.g3d.terrain.TerrainHeightSampler
+import org.roldy.g3d.terrain.TerrainSampler
 
 
 /**
@@ -82,14 +77,13 @@ class Screen3D(
 
             // Shift character controller positions
             charController.onOriginShift(shiftX, shiftZ)
-//            val c = character.manager.instance.transform.getTranslation(Vector3())
-//            c.x -= shiftX
-//            c.z -= shiftZ
-//            character.manager.instance.transform.setTranslation(c)
         }
     }
     val tropicalModel by lazy {
-        TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive)
+        TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive).apply {
+            transform.idt()
+            transform.setTranslation(0f, 0f, 0f)
+        }
     }
     val bush by lazy {
         TropicalAssetManager.envGrassMedClump01.foliage(plantsDiffuse, plantsNormal, FoliageColors.grass)
@@ -119,15 +113,15 @@ class Screen3D(
     val targetMarker = createTargetMarker()
 
     init {
-        camera.position.set(0f, 20f, 0f)
-        camera.update()
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
     }
 
+    val windSystem = WindSystem()
 
     val shadowSystem = ShadowSystem(
         offsetShiftingManager,
-        camera
+        camera,
+        windSystem = windSystem
     )
 
     val mapSizeScale = 1
@@ -136,7 +130,7 @@ class Screen3D(
     val mapData = MapData(1, mapSize)
     var mapTerrainData = MapGenerator(mapData, biomes).generate()
     var terrainInstance = changeTerrain()
-    val heightSampler = TerrainHeightSampler(
+    val heightSampler = TerrainSampler(
         noiseData = terrainInstance.mapTerrainData.noiseData,
         heightScale = terrainInstance.heightScale,
         width = terrainInstance.width,
@@ -144,9 +138,8 @@ class Screen3D(
         scale = terrainInstance.scale
     )
 
-    val noise = FoliageNoise()
     val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
-    val foliageBatch by disposable { ModelBatch(foliageShaderProvider(offsetShiftingManager, noise)) }
+    val foliageBatch by disposable { ModelBatch(foliageShaderProvider(offsetShiftingManager, windSystem)) }
 
     val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
@@ -187,39 +180,7 @@ class Screen3D(
     val modelBuilder by disposable(::PawnModelBuilder)
 
     val character by disposable {
-        val scale = terrainInstance.scale
         PawnManager(modelBuilder).apply {
-            val s = 0.1f
-            val area = mapTerrainData.noiseData.findFlatAreas(1).first()
-            val corX = (mapSize.width / 2f)
-            val corZ = (mapSize.height / 2f)
-// Character position
-            val charX = (area.center.x - corX) * scale// Apply terrain offset!
-            val charY = area.elevation * terrainInstance.heightScale
-            val charZ = (area.center.y - corZ) * scale
-            println("Starting Y: $charY")
-
-            val initialTransform = Matrix4()
-            initialTransform.idt()
-            initialTransform.scl(0.1f)
-            initialTransform.setTranslation(charX, charY, charZ)
-            instance.transform.setTranslation(charX, charY, charZ)
-
-
-            tropicalModel.transform.idt()
-            tropicalModel.transform.setTranslation(charX + 500f, charY, charZ + 500f)
-
-
-            bush.transform.idt()
-            bush.transform.setTranslation(charX - 100f, charY, charZ)
-
-            camera.position.set(
-                charX,  // Behind
-                charY,    // Above
-                charZ
-            )
-            camera.lookAt(charX, charY + 2f, charZ)  // Look at character's head
-            camera.update()
             cycleSets()
         }.run {
             PawnRenderer(this)
@@ -227,14 +188,39 @@ class Screen3D(
     }
 
     val cameraController by lazy {
-        StickyThirdPersonCamera(camera, character.manager.instance)
-        ThirdPersonCamera(camera)
+//        StickyThirdPersonCamera(camera, character.manager.instance)
+//        ThirdPersonCamera(camera)
         SimpleThirdPersonCamera(camera, heightSampler)
 //        EditorCameraController(camera)
     }
 
     val charController by lazy {
-        CharacterController(character.manager.instance, heightSampler, cameraController)
+        CharacterController(character.manager.instance, heightSampler, cameraController).apply {
+
+            val scale = terrainInstance.scale
+            val area = mapTerrainData.noiseData.findFlatAreas(1).first()
+            val corX = (mapSize.width / 2f)
+            val corZ = (mapSize.height / 2f)
+// Character position
+            val charX = (area.center.x - corX) * scale// Apply terrain offset!
+            val charZ = (area.center.y - corZ) * scale
+
+            initializeAt(charX, charZ)
+
+
+            tropicalModel.transform.idt()
+            val tx = charX + 500f
+            val tz = charZ + 500f
+            val ty = heightSampler.getHeightAt(tx, tz)
+            tropicalModel.transform.setTranslation(tx, ty, tz)
+
+
+            bush.transform.idt()
+            val bx = charX - 100f
+            val bz = charZ
+            val by = heightSampler.getHeightAt(bx, bz)
+            bush.transform.setTranslation(bx, by + 2f, bz)
+        }
     }
 
     //    val controller by lazy { ModelController(character.manager.instance, camera) }
@@ -244,13 +230,6 @@ class Screen3D(
             addProcessor(cameraController)
         }
             .also(Gdx.input::setInputProcessor)
-    }
-
-    fun printNodeHierarchy(node: Node, indent: String = "") {
-        println("$indent${node.id}")
-        for (child in node.children) {
-            printNodeHierarchy(child, "$indent  ")
-        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -263,26 +242,6 @@ class Screen3D(
     val anims by sequencer {
         PawnAnimations[character.manager.bodyType].all.toList()
     }
-
-
-    context(delta: Float)
-    fun handleCamera() {
-        charController.update()
-//        character.manager.instance.transform.apply {
-//            setToTranslation(playerPosition.x, playerPosition.y + 1f, playerPosition.z)
-//            .rotate(Vector3.Y, cameraController.characterRotation)
-////            setTranslation(playerPosition)
-////            rotate(Vector3.Y, cameraController.characterRotation)
-//        }
-
-//        charController.setTarget(playerPosition)
-    }
-
-    private val playerVelocity = Vector3()
-    private val playerPosition by lazy { character.manager.instance.transform.getTranslation(Vector3()) }
-
-    // Temp vectors
-    private val moveSpeed = 400f
 
     override fun render(delta: Float) {
 
@@ -305,13 +264,16 @@ class Screen3D(
 
         context(delta, camera) {
             offsetShiftingManager.update(character.manager.instance)
-            handleCamera()
+            windSystem.update()
             camera.update()
+            charController.update()
+
 //            dayCycle.update(delta)
 
             shadowSystem {
+                render(bush)
                 render(tropicalModel)
-                render(character.manager.instance, false)
+                render(character.manager.instance)
             }
 
 // Reset GL state after shadow pass
@@ -325,15 +287,9 @@ class Screen3D(
                         listOf(tropicalModel)
                     }
 
-                    // Before rendering grass
-                    // Enable blending and disable backface culling for grass
-//                    Gdx.gl.glDisable(GL20.GL_CULL_FACE)
                     foliageBatch {
                         listOf(bush)
                     }
-                    // After rendering grass
-//                    Gdx.gl.glEnable(GL20.GL_CULL_FACE)
-
                     character.render()
                 }
             }

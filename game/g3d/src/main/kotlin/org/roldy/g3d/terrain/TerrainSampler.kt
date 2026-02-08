@@ -1,12 +1,14 @@
 package org.roldy.g3d.terrain
 
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.HeightSampler
 import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import org.roldy.core.map.NoiseData
+import org.roldy.core.x
 
-class TerrainHeightSampler(
+class TerrainSampler(
     private val width: Int,
     private val depth: Int,
     private val scale: Float,
@@ -29,6 +31,12 @@ class TerrainHeightSampler(
         if (gridX in 0 until width && gridZ in 0 until depth) {
             heights[gridZ][gridX] = height
         }
+    }
+
+    fun getPosition(localX: Int, localZ: Int): Vector2 {
+        val terrainX = localX / scale + width / 2f
+        val terrainZ = localZ / scale + depth / 2f
+        return terrainX x terrainZ
     }
 
     override fun getHeightAt(localX: Float, localZ: Float): Float {

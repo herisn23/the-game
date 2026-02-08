@@ -1,4 +1,4 @@
-package org.roldy.core.shadow
+package org.roldy.core.system
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
@@ -8,18 +8,19 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.camera.OffsetProvider
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.shader.shiftingDepthShaderProvider
 
 class ShadowSystem(
     private val offsetProvider: OffsetProvider,
     private val camera: Camera,
     private val shadowQuality: Int = Quality.ULTRA_HIGH,
-    private val shadowDistance: Float = 5000f
+    private val shadowDistance: Float = 5000f,
+    private val windSystem: WindAttributes
 ) : AutoDisposableAdapter() {
     object Quality {
         const val LOW = 1
@@ -48,7 +49,9 @@ class ShadowSystem(
     val environment: Environment
 
     // Separate batch for shadow depth pass
-    private val shadowBatch: ModelBatch by disposable { ModelBatch(DepthShaderProvider()) }
+    private val shadowBatch: ModelBatch by disposable {
+        ModelBatch(shiftingDepthShaderProvider(offsetProvider, windSystem))
+    }
 
     init {
         shadowLight.set(1f, 1f, 1f, -0.5f, -1f, -0.3f) // color and direction
@@ -82,37 +85,14 @@ class ShadowSystem(
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, 0)
     }
 
-    fun render(instance: ModelInstance, isShifted: Boolean = true) {
-        renderShifted(instance, isShifted)
+    fun render(instance: ModelInstance) {
+        shadowBatch.render(instance)
     }
 
-    fun render(instances: Iterable<ModelInstance>, isShifted: Boolean = true) {
-        instances.forEach { renderShifted(it, isShifted) }
-    }
-
-    private fun renderShifted(instance: ModelInstance, isShifted: Boolean = true) {
-        if (isShifted) {
-            // Save original transform
-            tempMatrix.set(instance.transform)
-
-            // Apply shift to transform (same as shader does)
-            val offset = offsetProvider.shiftOffset
-            instance.transform.getTranslation(tempVec)
-            instance.transform.setTranslation(
-                tempVec.x - offset.x,
-                tempVec.y - offset.y,
-                tempVec.z - offset.z
-            )
-
-            // Render to shadow map
-            shadowBatch.render(instance)
-
-            // Restore original transform
-            instance.transform.set(tempMatrix)
-        } else {
-            shadowBatch.render(instance)
+    fun render(instances: Iterable<ModelInstance>) {
+        instances.forEach {
+            shadowBatch.render(it)
         }
-
     }
 
     fun end() {

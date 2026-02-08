@@ -13,6 +13,7 @@ import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.map.NoiseData
+import org.roldy.core.shader.ShaderUserData
 import org.roldy.core.utils.repeat
 
 class TerrainChunk(
@@ -35,7 +36,9 @@ class TerrainChunk(
 
     init {
         model = createChunkModel().disposable()
-        instance = ModelInstance(model)
+        instance = ModelInstance(model).apply {
+            userData = ShaderUserData()
+        }
 
         // Calculate local bounds once
         instance.calculateBoundingBox(boundingBox)

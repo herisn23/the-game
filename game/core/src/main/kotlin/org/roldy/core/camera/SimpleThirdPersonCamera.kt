@@ -12,11 +12,11 @@ class SimpleThirdPersonCamera(
     val sampler: HeightSampler,
 ) : InputAdapter() {
 
-    private val offset = Vector3(0f, 1.5f, 0f)
+    private val offset = Vector3(0f, 90f, 0f)
     var minCameraHeight = 2f  // Minimum height above terrain
     var yaw = 0f
     var pitch = 0.4f
-    var distance = 350f
+    var distance = 300f
 
     // Input state
     private var wPressed = false
@@ -81,14 +81,14 @@ class SimpleThirdPersonCamera(
         var camZ = lookAt.z + horizontalDist * MathUtils.cos(yaw)
 
         // Clamp camera Y to terrain height
-        if (sampler.isInBounds(camX, camZ)) {
-            val terrainHeight = sampler.getHeightAt(camX, camZ)
-            val minY = terrainHeight + minCameraHeight
-
-            if (camY < minY) {
-                camY = minY
-            }
-        }
+//        if (sampler.isInBounds(camX, camZ)) {
+//            val terrainHeight = sampler.getHeightAt(camX, camZ)
+//            val minY = terrainHeight + minCameraHeight
+//
+//            if (camY < minY) {
+//                camY = minY
+//            }
+//        }
         camera.position.set(camX, camY, camZ)
         camera.lookAt(lookAt)
         camera.up.set(Vector3.Y)
@@ -155,7 +155,8 @@ class SimpleThirdPersonCamera(
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         distance += amountY
-        distance = MathUtils.clamp(distance, 350f, 600f)
+        distance = MathUtils.clamp(distance, 150f, 600f)
+        println(distance)
         return true
     }
 }

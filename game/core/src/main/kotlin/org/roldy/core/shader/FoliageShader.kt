@@ -6,28 +6,23 @@ import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
+import org.roldy.core.system.WindAttributes
 import org.roldy.core.utils.hex
-
-data class FoliageNoise(
-    var smallFrequency: Float = 0.2f,
-    var largeFrequency: Float = 0.1f
-)
 
 class FoliageShader(
     renderable: Renderable,
     config: Config = Config().apply {
-        vertexShader = ShaderLoader.foliageVert
-        fragmentShader = ShaderLoader.foliageFrag
+        with(ShaderFlags) {
+            vertexShader = ShaderLoader.foliageVert.windFlag(renderable)
+            fragmentShader = ShaderLoader.foliageFrag
+        }
     },
     offsetProvider: OffsetProvider,
-    val noise: FoliageNoise
+    private val windAttributes: WindAttributes
 ) : WorldShiftingShader(renderable, config, offsetProvider) {
 
-    // Toggle flat color mode (0.0 = textured, 1.0 = flat)
-    val useFlatColor = 1f
-
-    // Toggle color noise (0.0 = off, 1.0 = on)
-    val useColorNoise = 1f
+    val smallFrequency: Float = 0.2f
+    val largeFrequency: Float = 0.1f
 
     val u_noiseSmallFrequency by FetchUniform()
     val u_noiseLargeFrequency by FetchUniform()
@@ -36,8 +31,11 @@ class FoliageShader(
     val u_noiseColor by FetchUniform()
     val u_noiseLargeColor by FetchUniform()
 
-    val u_leafFlatColor by FetchUniform()
-    val u_useColorNoise by FetchUniform()
+    // Wind uniforms
+    val u_time by FetchUniform()
+    val u_windStrength by FetchUniform()
+    val u_windSpeed by FetchUniform()
+    val u_windDirection by FetchUniform()
 
     val baseColor = renderable.material.get(FoliageColorAttribute.baseColor) as? FoliageColorAttribute
     val noiseColor = renderable.material.get(FoliageColorAttribute.noiseColor) as? FoliageColorAttribute
@@ -45,6 +43,7 @@ class FoliageShader(
 
 
     override fun render(renderable: Renderable) {
+
         baseColor?.run {
             program.setUniformf(u_baseColor, color.r, color.g, color.b)
         }
@@ -55,17 +54,14 @@ class FoliageShader(
             program.setUniformf(u_noiseLargeColor, color.r, color.g, color.b)
         }
 
-        program.setUniformf(u_noiseSmallFrequency, noise.smallFrequency)
-        program.setUniformf(u_noiseLargeFrequency, noise.largeFrequency)
+        program.setUniformf(u_noiseSmallFrequency, smallFrequency)
+        program.setUniformf(u_noiseLargeFrequency, largeFrequency)
 
-        program.setUniformf(u_leafFlatColor, useFlatColor)
-        program.setUniformf(u_useColorNoise, useColorNoise)
-
-//        program.setUniformf(u_baseColor, 1f, 1f, 1f)  // White
-//        program.setUniformf(u_noiseColor, 1f, 1f, 1f)
-//        program.setUniformf(u_noiseLargeColor, 1f, 1f, 1f)
-//        program.setUniformf(u_leafFlatColor, 0f)  // FALSE
-//        program.setUniformf(u_useColorNoise, 0f)  // FALSE - disable noise
+        // Set wind uniforms
+        program.setUniformf(u_time, windAttributes.time)
+        program.setUniformf(u_windStrength, windAttributes.windStrength)
+        program.setUniformf(u_windSpeed, windAttributes.windSpeed)
+        program.setUniformf(u_windDirection, windAttributes.windDirection.x, windAttributes.windDirection.y)
 
         super.render(renderable)
     }
@@ -112,8 +108,8 @@ object FoliageColors {
 
 fun foliageShaderProvider(
     offsetProvider: OffsetProvider,
-    noise: FoliageNoise = FoliageNoise()
+    windAttributes: WindAttributes
 ) =
     shaderProvider {
-        FoliageShader(it, offsetProvider = offsetProvider, noise = noise)
+        FoliageShader(it, offsetProvider = offsetProvider, windAttributes = windAttributes)
     }

@@ -3,11 +3,11 @@ package org.roldy.g3d.pawn
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import org.roldy.g3d.terrain.TerrainHeightSampler
+import org.roldy.g3d.terrain.TerrainSampler
 
 class RTSCharacterController(
     val entity: ModelInstance,
-    private val heightSampler: TerrainHeightSampler
+    private val heightSampler: TerrainSampler
 ) {
     private val targetPosition = Vector3()
     private val direction = Vector3()
