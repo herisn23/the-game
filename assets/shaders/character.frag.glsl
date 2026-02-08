@@ -1,4 +1,36 @@
-precision highp float;
+#ifdef GL_ES
+#define LOWP lowp
+#define MED mediump
+#define HIGH highp
+precision mediump float;
+#else
+#define MED
+#define LOWP
+#define HIGH
+#endif
+
+// Shadow - same as default libGDX shader
+#ifdef shadowMapFlag
+uniform sampler2D u_shadowTexture;
+uniform float u_shadowPCFOffset;
+varying vec3 v_shadowMapUv;
+#define separateAmbientFlag
+
+float getShadowness(vec2 offset)
+{
+    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
+    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//+(1.0/255.0));
+}
+
+float getShadow()
+{
+    return (//getShadowness(vec2(0,0)) +
+    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
+}
+#endif//shadowMapFlag
 
 #ifdef diffuseTextureFlag
 varying vec2 v_diffuseUV;
@@ -32,13 +64,6 @@ uniform vec3 u_ambientLight;
 
 #ifdef specularFlag
 varying vec3 v_lightSpecular;
-#endif
-
-#ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-varying vec3 v_shadowMapUv;
-#define separateAmbientFlag
 #endif
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
@@ -124,23 +149,6 @@ uniform float u_leather3Smoothness;
 uniform float u_gems1Smoothness;
 uniform float u_gems2Smoothness;
 uniform float u_gems3Smoothness;
-
-// Shadow functions
-#ifdef shadowMapFlag
-float getShadowness(vec2 offset) {
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));
-}
-
-float getShadow() {
-    return (
-    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))
-    ) * 0.25;
-}
-#endif
 
 // Distance-based mask function
 float colorMask(float value) {

@@ -217,7 +217,7 @@ class Screen3D(
 
             bush.transform.idt()
             val bx = charX - 100f
-            val bz = charZ
+            val bz = charZ - 1f
             val by = heightSampler.getHeightAt(bx, bz)
             bush.transform.setTranslation(bx, by + 2f, bz)
         }

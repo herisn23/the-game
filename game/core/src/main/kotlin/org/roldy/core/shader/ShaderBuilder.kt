@@ -2,7 +2,7 @@ package org.roldy.core.shader
 
 import com.badlogic.gdx.graphics.g3d.Renderable
 
-object ShaderFlags {
+object ShaderBuilder {
     fun String.shiftFlag() = run {
         """
                 #define shiftFlag

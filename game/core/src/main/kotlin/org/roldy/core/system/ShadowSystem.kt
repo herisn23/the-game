@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
-import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.camera.OffsetProvider
 import org.roldy.core.disposable.AutoDisposableAdapter
@@ -19,7 +18,7 @@ class ShadowSystem(
     private val offsetProvider: OffsetProvider,
     private val camera: Camera,
     private val shadowQuality: Int = Quality.ULTRA_HIGH,
-    private val shadowDistance: Float = 5000f,
+    private val shadowDistance: Float = 2000f,
     private val windSystem: WindAttributes
 ) : AutoDisposableAdapter() {
     object Quality {
@@ -41,8 +40,6 @@ class ShadowSystem(
         )
     }
 
-    private val tempMatrix = Matrix4()
-    private val tempVec = Vector3()
     private val shadowCenter = Vector3()
 
     // Environment with shadows
@@ -68,7 +65,7 @@ class ShadowSystem(
         shadowCenter.set(camera.position)
 
         // Optional: Snap to grid to reduce shadow swimming/flickering
-        val gridSize = 10f
+        val gridSize = 1f
         shadowCenter.x = (shadowCenter.x / gridSize).toInt() * gridSize
         shadowCenter.z = (shadowCenter.z / gridSize).toInt() * gridSize
 

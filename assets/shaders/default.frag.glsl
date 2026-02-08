@@ -9,6 +9,30 @@ precision mediump float;
 #define HIGH
 #endif
 
+// Shadow - same as default libGDX shader
+#ifdef shadowMapFlag
+uniform sampler2D u_shadowTexture;
+uniform float u_shadowPCFOffset;
+varying vec3 v_shadowMapUv;
+#define separateAmbientFlag
+
+float getShadowness(vec2 offset)
+{
+    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
+    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//+(1.0/255.0));
+}
+
+float getShadow()
+{
+    return (//getShadowness(vec2(0,0)) +
+    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
+    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
+    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
+}
+#endif//shadowMapFlag
+
+
 #if defined(specularTextureFlag) || defined(specularColorFlag)
 #define specularFlag
 #endif
@@ -82,28 +106,6 @@ varying vec3 v_lightDiffuse;
 #ifdef specularFlag
 varying vec3 v_lightSpecular;
 #endif//specularFlag
-
-#ifdef shadowMapFlag
-uniform sampler2D u_shadowTexture;
-uniform float u_shadowPCFOffset;
-varying vec3 v_shadowMapUv;
-#define separateAmbientFlag
-
-float getShadowness(vec2 offset)
-{
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//+(1.0/255.0));
-}
-
-float getShadow()
-{
-    return (//getShadowness(vec2(0,0)) +
-    getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
-    getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
-}
-#endif//shadowMapFlag
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 varying vec3 v_ambientLight;

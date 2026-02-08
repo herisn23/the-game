@@ -17,6 +17,8 @@ class SimpleThirdPersonCamera(
     var yaw = 0f
     var pitch = 0.4f
     var distance = 300f
+    var minDistance = 150f // 150
+    var maxDistance = 1000f // 600
 
     // Input state
     private var wPressed = false
@@ -76,19 +78,19 @@ class SimpleThirdPersonCamera(
         val lookAt = Vector3(playerPosition).add(offset)
         val horizontalDist = distance * MathUtils.cos(pitch)
 
-        var camX = lookAt.x + horizontalDist * MathUtils.sin(yaw)
+        val camX = lookAt.x + horizontalDist * MathUtils.sin(yaw)
         var camY = lookAt.y + distance * MathUtils.sin(pitch)
-        var camZ = lookAt.z + horizontalDist * MathUtils.cos(yaw)
+        val camZ = lookAt.z + horizontalDist * MathUtils.cos(yaw)
 
         // Clamp camera Y to terrain height
-//        if (sampler.isInBounds(camX, camZ)) {
-//            val terrainHeight = sampler.getHeightAt(camX, camZ)
-//            val minY = terrainHeight + minCameraHeight
-//
-//            if (camY < minY) {
-//                camY = minY
-//            }
-//        }
+        if (sampler.isInBounds(camX, camZ)) {
+            val terrainHeight = sampler.getHeightAt(camX, camZ)
+            val minY = terrainHeight + minCameraHeight
+
+            if (camY < minY) {
+                camY = minY
+            }
+        }
         camera.position.set(camX, camY, camZ)
         camera.lookAt(lookAt)
         camera.up.set(Vector3.Y)
@@ -155,8 +157,7 @@ class SimpleThirdPersonCamera(
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         distance += amountY
-        distance = MathUtils.clamp(distance, 150f, 600f)
-        println(distance)
+        distance = MathUtils.clamp(distance, minDistance, maxDistance)
         return true
     }
 }

@@ -90,6 +90,8 @@ uniform float u_windSpeed;
 uniform vec2 u_windDirection;
 #endif
 
+uniform float u_shadowBias;// Typically 0.001 - 0.01
+
 void main() {
     #ifdef blendedTextureFlag
     v_texCoords0 = a_texCoord0;
@@ -123,33 +125,35 @@ void main() {
     #endif//boneWeight7Flag
     #endif//skinningFlag
 
-    vec4 pos1 = vec4(a_position, 1.0);
+    vec4 pos = vec4(a_position, 1.0);
+
+    #ifdef shiftFlag
+    pos.xyz -= u_shiftOffset;
+    #endif
 
     #ifdef windFlag
+    // ===== WIND ANIMATION =====
     float windInfluence = clamp(a_position.y / 50.0, 0.0, 1.0);// Divide by actual height
 
     float windTime = u_time * u_windSpeed;
-    float variation = sin(pos1.x * 0.01) * cos(pos1.z * 0.01);// Lower frequency for large mesh
+    float variation = sin(pos.x * 0.01) * cos(pos.z * 0.01);// Lower frequency for large mesh
 
-    float sway1 = sin(windTime + pos1.x * 0.05 + variation);
-    float sway2 = sin(windTime * 0.7 + pos1.z * 0.03 - variation);
+    float sway1 = sin(windTime + pos.x * 0.05 + variation);
+    float sway2 = sin(windTime * 0.7 + pos.z * 0.03 - variation);
 
     // Scale wind to mesh size (multiply by 5-10 for large meshes)
     vec2 windOffset = vec2(sway1, sway2) * windInfluence * u_windStrength * 10.0;// 10x multiplier!
 
-    pos1.x += windOffset.x * u_windDirection.x;
-    pos1.z += windOffset.y * u_windDirection.y;
-    #endif
-
-    #ifdef shiftFlag
-    pos1.xyz -= u_shiftOffset;
+    pos.x += windOffset.x * u_windDirection.x;
+    pos.z += windOffset.y * u_windDirection.y;
     #endif
 
     #ifdef skinningFlag
-    vec4 pos = u_projViewWorldTrans * skinning * pos1;
+    pos = u_projViewWorldTrans * skinning * pos;
     #else
-    vec4 pos = u_projViewWorldTrans * pos1;
+    pos = u_projViewWorldTrans * pos;
     #endif
+
 
     #ifdef PackedDepthFlag
     v_depth = pos.z / pos.w * 0.5 + 0.5;

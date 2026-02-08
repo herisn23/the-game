@@ -208,6 +208,9 @@ varying vec3 v_ambientLight;
 uniform vec3 u_shiftOffset;
 #endif
 
+// Add this varying at the top:
+varying vec3 v_lightDirection;
+
 void main() {
     #ifdef diffuseTextureFlag
     v_diffuseUV = u_diffuseUVTransform.xy + a_texCoord0 * u_diffuseUVTransform.zw;
@@ -379,6 +382,8 @@ void main() {
     }
     #endif
 
+
+
     #if (numPointLights > 0) && defined(normalFlag)
     for (int i = 0; i < numPointLights; i++) {
         vec3 lightDir = u_pointLights[i].position - pos.xyz;
@@ -393,5 +398,10 @@ void main() {
         #endif
     }
     #endif
+    #endif
+
+    // In main(), after light calculations:
+    #if numDirectionalLights > 0
+    v_lightDirection = -u_dirLights[0].direction;
     #endif
 }

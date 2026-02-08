@@ -20,8 +20,9 @@ open class WorldShiftingShader(
         override val shiftOffset = Vector3()
     }
 ) : DefaultShader(renderable, config.apply {
-    vertexShader = with(ShaderFlags) { vertexShader?.shiftFlag() }
-    fragmentShader = fragmentShader
+    with(ShaderBuilder) {
+        vertexShader = vertexShader?.shiftFlag()
+    }
 }) {
 
     val defaultOffset = Vector3()

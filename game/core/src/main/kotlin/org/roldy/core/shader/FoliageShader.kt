@@ -12,7 +12,7 @@ import org.roldy.core.utils.hex
 class FoliageShader(
     renderable: Renderable,
     config: Config = Config().apply {
-        with(ShaderFlags) {
+        with(ShaderBuilder) {
             vertexShader = ShaderLoader.foliageVert.windFlag(renderable)
             fragmentShader = ShaderLoader.foliageFrag
         }

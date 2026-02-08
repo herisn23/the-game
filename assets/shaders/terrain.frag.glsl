@@ -1,14 +1,13 @@
 #ifdef GL_ES
+#define LOWP lowp
+#define MED mediump
+#define HIGH highp
 precision mediump float;
+#else
+#define MED
+#define LOWP
+#define HIGH
 #endif
-
-varying vec3 v_worldPos;
-varying vec3 v_normal;
-varying vec2 v_tiledUV;
-varying vec2 v_splatUV;
-varying vec3 v_viewDir;
-varying vec3 v_tangent;
-varying vec3 v_bitangent;
 
 // Shadow - same as default libGDX shader
 #ifdef shadowMapFlag
@@ -17,27 +16,29 @@ uniform float u_shadowPCFOffset;
 varying vec3 v_shadowMapUv;
 #define separateAmbientFlag
 
-float getShadowness(vec2 offset) {
+float getShadowness(vec2 offset)
+{
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));
+    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//+(1.0/255.0));
 }
 
-float getShadow() {
-    // Bounds check - return fully lit if outside shadow map
-    if (v_shadowMapUv.x < 0.0 || v_shadowMapUv.x > 1.0 ||
-    v_shadowMapUv.y < 0.0 || v_shadowMapUv.y > 1.0 ||
-    v_shadowMapUv.z < 0.0 || v_shadowMapUv.z > 1.0) {
-        return 1.0;
-    }
-
-    return (
+float getShadow()
+{
+    return (//getShadowness(vec2(0,0)) +
     getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
     getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
     getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))
-    ) * 0.25;
+    getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
 }
 #endif//shadowMapFlag
+
+varying vec3 v_worldPos;
+varying vec3 v_normal;
+varying vec2 v_tiledUV;
+varying vec2 v_splatUV;
+varying vec3 v_viewDir;
+varying vec3 v_tangent;
+varying vec3 v_bitangent;
 
 uniform float u_paddedTileWidth;
 uniform sampler2D u_textureAtlas;
