@@ -26,6 +26,9 @@ import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.AssetManagersLoader
 import org.roldy.g3d.environment.TropicalAssetManager
 import org.roldy.g3d.environment.property
+import org.roldy.g3d.pawn.PawnManager
+import org.roldy.g3d.pawn.PawnModelBuilder
+import org.roldy.g3d.pawn.PawnRenderer
 import org.roldy.g3d.skybox.Skybox
 
 class Test3D(
@@ -51,11 +54,21 @@ class Test3D(
     val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
     val tropicalModel by lazy {
         TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive).apply {
-            transform.idt()
-            transform.scl(0.01f)
-            transform.setTranslation(0f, 0f, 0f)
+            transform.setTranslation(10f, 0f, 0f)
         }
     }
+    val modelBuilder by disposable(::PawnModelBuilder)
+    val character by disposable {
+        PawnManager(modelBuilder).apply {
+            repeat(20) {
+                cycleSets()
+            }
+        }.run {
+            PawnRenderer(this)
+        }
+//        ModelInstance(PawnAssetManager.modelMale.get())
+    }
+    val batch by disposable { ModelBatch() }
 
     val groundPlate = SimplePlate.create(width = 500f, depth = 500f, color = Color.DARK_GRAY)
     val groundInstance = ModelInstance(groundPlate).apply {
@@ -91,6 +104,7 @@ class Test3D(
             cameraController.update()
 
             shadowSystem {
+                render(character.manager.instance)
                 render(tropicalModel)
             }
 
@@ -103,6 +117,7 @@ class Test3D(
                     envModelBatch {
                         listOf(tropicalModel)
                     }
+                    character.render()
                 }
             }
         }

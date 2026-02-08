@@ -6,7 +6,7 @@ import org.roldy.core.Logger
 import org.roldy.core.coroutines.DeltaProcessingLoop
 import org.roldy.core.disposable.AutoDisposableGameAdapter
 import org.roldy.core.time.TimeManager
-import org.roldy.rendering.screen.test.Screen3D
+import org.roldy.rendering.screen.test.Test3D
 
 class GameScene : AutoDisposableGameAdapter() {
 
@@ -21,7 +21,7 @@ class GameScene : AutoDisposableGameAdapter() {
     override fun create() {
         Logger.level = Logger.Level.Debug
         CursorManager.initialize()
-        screen = Screen3D(camera3D())
+        screen = Test3D(camera3D())
 
     }
 

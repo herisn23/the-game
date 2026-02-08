@@ -123,26 +123,14 @@ void main() {
     vec3 normal = v_normal;
     #endif// normalFlag
 
-    #if defined(diffuseTextureFlag)
-    vec2 v_diffuseUVf = vec2(v_diffuseUV.x, 1.0 - v_diffuseUV.y);
-    #endif
-
-    #if defined(emissiveTextureFlag)
-    vec2 v_emissiveUVf = vec2(v_emissiveUV.x, 1.0 - v_emissiveUV.y);
-    #endif
-
-    #if defined(specularTextureFlag)
-    vec2 v_specularUVf = vec2(v_specularUV.x, 1.0 - v_specularUV.y);
-    #endif
-
     #if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
-    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUVf) * u_diffuseColor * v_color;
+    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV) * u_diffuseColor * v_color;
     #elif defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUVf) * u_diffuseColor;
+    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV) * u_diffuseColor;
     #elif defined(diffuseTextureFlag) && defined(colorFlag)
-    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUVf) * v_color;
+    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV) * v_color;
     #elif defined(diffuseTextureFlag)
-    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUVf);
+    vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV);
     #elif defined(diffuseColorFlag) && defined(colorFlag)
     vec4 diffuse = u_diffuseColor * v_color;
     #elif defined(diffuseColorFlag)
@@ -154,9 +142,9 @@ void main() {
     #endif
 
     #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-    vec4 emissive = texture2D(u_emissiveTexture, v_emissiveUVf) * u_emissiveColor;
+    vec4 emissive = texture2D(u_emissiveTexture, v_emissiveUV) * u_emissiveColor;
     #elif defined(emissiveTextureFlag)
-    vec4 emissive = texture2D(u_emissiveTexture, v_emissiveUVf);
+    vec4 emissive = texture2D(u_emissiveTexture, v_emissiveUV);
     #elif defined(emissiveColorFlag)
     vec4 emissive = u_emissiveColor;
     #else
@@ -182,9 +170,9 @@ void main() {
     #endif
     #else
     #if defined(specularTextureFlag) && defined(specularColorFlag)
-    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * u_specularColor.rgb * v_lightSpecular;
+    vec3 specular = texture2D(u_specularTexture, v_specularUV).rgb * u_specularColor.rgb * v_lightSpecular;
     #elif defined(specularTextureFlag)
-    vec3 specular = texture2D(u_specularTexture, v_specularUVf).rgb * v_lightSpecular;
+    vec3 specular = texture2D(u_specularTexture, v_specularUV).rgb * v_lightSpecular;
     #elif defined(specularColorFlag)
     vec3 specular = u_specularColor.rgb * v_lightSpecular;
     #else

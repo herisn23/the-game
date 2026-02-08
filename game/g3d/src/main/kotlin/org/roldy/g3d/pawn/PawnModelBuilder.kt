@@ -18,7 +18,7 @@ class PawnModelBuilder : AutoDisposableAdapter() {
                 PawnAssetManager.modelMaleExt.get(),
                 PawnAssetManager.modelMaleExt2.get()
             )
-        ).apply(BodyType.Male)
+        ).configure(BodyType.Male)
     }
 
     private val femaleModel by disposable {
@@ -28,21 +28,23 @@ class PawnModelBuilder : AutoDisposableAdapter() {
                 PawnAssetManager.modelFemaleExt.get(),
                 PawnAssetManager.modelFemaleExt2.get()
             )
-        ).apply(BodyType.Female)
+        ).configure(BodyType.Female)
     }
 
-    private fun Data.apply(bodyType: BodyType) =
+    private fun Data.configure(bodyType: BodyType) =
         run {
             base.apply {
                 additions.forEach {
                     nodes.addAll(it.nodes)
                 }
-
+                animations.clear()
                 PawnAnimations[bodyType].all.forEach { anim ->
-                    animations.add(copyAnimation(anim.model.get().animations.first(), anim.id))
+                    val model = anim.model.get()
+                    animations.add(copyAnimation(model.animations.first(), anim.id))
                 }
             }
         }
+
 
     operator fun get(bodyType: BodyType) =
         when (bodyType) {

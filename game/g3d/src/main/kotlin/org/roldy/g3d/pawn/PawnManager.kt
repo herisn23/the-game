@@ -44,11 +44,9 @@ class PawnManager(
             setVisibility(modularParts + naked)
         }
     }
-
     val animationController = AnimationController(instance).apply {
-        setAnimation(instance.animations.first().id, -1)
+        setAnimation(instance.animations[0].id, -1)
     }
-
 
     fun setArmor(
         selection: Map<ArmorPart, String>

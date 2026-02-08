@@ -157,7 +157,7 @@ float colorMask(float value) {
 }
 
 void main() {
-    vec2 uv = vec2(v_diffuseUV.x, 1.0 - v_diffuseUV.y);
+    vec2 uv = v_diffuseUV;
     vec4 baseColor = texture2D(u_texture2, uv);
 
     // Reconstruct HDR colors
