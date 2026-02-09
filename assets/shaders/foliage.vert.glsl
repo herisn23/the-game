@@ -206,10 +206,12 @@ uniform vec3 u_shiftOffset;
 
 // Add this varying at the top:
 varying vec3 v_lightDirection;
-
+varying vec2 v_diffuseUV;
+uniform vec4 u_diffuseUVTransform;
 void main() {
 
     v_UV = u_UVTransform.xy + a_texCoord0 * u_UVTransform.zw;
+    v_diffuseUV = u_diffuseUVTransform.xy + a_texCoord0 * u_diffuseUVTransform.zw;
 
     #ifdef emissiveTextureFlag
     v_emissiveUV = u_emissiveUVTransform.xy + a_texCoord0 * u_emissiveUVTransform.zw;

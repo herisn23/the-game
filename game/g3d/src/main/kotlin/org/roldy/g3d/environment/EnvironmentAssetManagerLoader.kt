@@ -48,7 +48,7 @@ fun Asset<Model>.tree(
 
             updateTrunk(branchesDiffuse)
 
-        }.also(materials::add)
+        }//.also(materials::add)
 
         val treeMaterial = Material().apply {
             id = "tree"
@@ -62,7 +62,7 @@ fun Asset<Model>.tree(
             updateLeaf(leavesDiffuse, color)
 
 
-        }.also(materials::add)
+        }//.also(materials::add)
 
         nodes.first().children.forEach { node ->
             node.parts.forEach { part ->
@@ -124,7 +124,7 @@ private fun Material.updateTrunk(
 ) {
     set(ColorAttribute.createAmbient(Color.WHITE))
     set(TextureAttribute.createDiffuse(diffuse))
-
+//
     set(FoliageTextureAttribute.createTrunkTexture(diffuse))
     set(FoliageColorAttribute.createTrunkBaseColor(color.base))
     set(FoliageColorAttribute.createTrunkNoiseColor(color.noise))

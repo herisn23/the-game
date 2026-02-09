@@ -234,8 +234,8 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-//                render(bush)
-//                render(tree)
+                render(bush)
+                render(tree)
                 render(tropicalModel)
                 render(character.manager.instance)
             }
@@ -250,7 +250,7 @@ class Screen3D(
                     }
 
                     foliageBatch {
-                        listOf(bush)
+                        listOf(bush, tree)
                     }
                     character.render()
                 }

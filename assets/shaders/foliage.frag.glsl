@@ -18,7 +18,7 @@ varying vec3 v_shadowMapUv;
 float getShadowness(vec2 offset)
 {
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts)+(1.0/255.0));
+    return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts)+(1.0/255.0));//
 }
 
 float getShadow()
@@ -230,36 +230,36 @@ void main() {
     bool useNoiseColor = useNoiseColor();
 
     vec3 blended = diffuse.rgb;
-    //    vec3 color;
-    //
-    //    if(isLeaf()) {
-    //        color = u_leafBaseColor;
-    //    } else {
-    //        color = u_trunkBaseColor;
-    //    }
-    //
-    //    if(useNoiseColor) {
-    //        float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
-    //        if(!isLeaf()) {
-    //            color = mix(u_trunkNoiseColor, u_trunkBaseColor, smallNoise);
-    //        } else {
-    //            float largeNoise = colorNoise(v_worldPos, u_noiseLargeFrequency);
-    //            vec3 smallNoiseResult = mix(u_leafNoiseColor, u_leafBaseColor, smallNoise);
-    //            color = mix(smallNoiseResult, u_leafNoiseLargeColor, largeNoise);
-    //        }
-    ////        color *= 0.7;
-    //
-    //        // 0.7 darker result (do not know why but direct largeNoiseResult is too bright)
-    //        blended = blendMultiply(diffuse.rgb, color, 1.0);
-    //    }
+    vec3 color;
+
+    if (isLeaf()) {
+        color = u_leafBaseColor;
+    } else {
+        color = u_trunkBaseColor;
+    }
+
+    if (useNoiseColor) {
+        float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
+        if (!isLeaf()) {
+            color = mix(u_trunkNoiseColor, u_trunkBaseColor, smallNoise);
+        } else {
+            float largeNoise = colorNoise(v_worldPos, u_noiseLargeFrequency);
+            vec3 smallNoiseResult = mix(u_leafNoiseColor, u_leafBaseColor, smallNoise);
+            color = mix(smallNoiseResult, u_leafNoiseLargeColor, largeNoise);
+        }
+        //        color *= 0.7;
+
+        // 0.7 darker result (do not know why but direct largeNoiseResult is too bright)
+        blended = blendMultiply(diffuse.rgb, color, 1.0);
+    }
     vec4 baseColor = diffuse;
-    //
-    //    if(isLeaf() && useLeafFlatColor()) {
-    //        baseColor = vec4(color, diffuse.a);
-    //    }
-    //    if(!isLeaf() && useTrunkFlatColor()) {
-    //        baseColor = vec4(color, diffuse.a);
-    //    }
+
+    if (isLeaf() && useLeafFlatColor()) {
+        baseColor = vec4(color, diffuse.a);
+    }
+    if (!isLeaf() && useTrunkFlatColor()) {
+        baseColor = vec4(color, diffuse.a);
+    }
 
 
 

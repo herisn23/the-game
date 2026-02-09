@@ -67,14 +67,14 @@ class FoliageShader(
     val leafNoiseLargeColor = material.get(FoliageColorAttribute.leafNoiseLargeColor) as? FoliageColorAttribute
     val trunkBaseColor = material.get(FoliageColorAttribute.trunkBaseColor) as? FoliageColorAttribute
     val trunkNoiseColor = material.get(FoliageColorAttribute.trunkNoiseColor) as? FoliageColorAttribute
-    val useNoiseColor = (material.get(BooleanAttribute.useNoiseColor) as BooleanAttribute)
+    val useNoiseColor = (material.get(BooleanAttribute.useNoiseColor) as? BooleanAttribute)
     val leafFlatColor = material.get(BooleanAttribute.leafFlatColor) as? BooleanAttribute
     val trunkFlatColor = material.get(BooleanAttribute.trunkFlatColor) as? BooleanAttribute
     val trunkTextureAttr = material.get(FoliageTextureAttribute.trunkTexture) as? FoliageTextureAttribute
     val leafTextureAttr = material.get(FoliageTextureAttribute.leafTexture) as? FoliageTextureAttribute
 
-    val trunkTexture = (trunkTextureAttr?.texture)?.prepare(u_trunkTexture, 1)
-    val leafTexture = (leafTextureAttr?.texture)?.prepare(u_leafTexture, 0)
+    val trunkTexture = (trunkTextureAttr?.texture)?.prepare(u_trunkTexture, 20)
+    val leafTexture = (leafTextureAttr?.texture)?.prepare(u_leafTexture, 21)
 
     override fun render(renderable: Renderable) {
         program.setUniformf(u_UVTransform, 0f, 0f, 1f, 1f)
@@ -92,7 +92,7 @@ class FoliageShader(
         leafFlatColor?.set(u_leafFlatColor)
         trunkFlatColor?.set(u_trunkFlatColor)
 
-        useNoiseColor.set(u_useColorNoise)
+        useNoiseColor?.set(u_useColorNoise)
 
         program.setUniformf(u_noiseSmallFrequency, smallFrequency)
         program.setUniformf(u_noiseLargeFrequency, largeFrequency)
