@@ -1,18 +1,33 @@
-package org.roldy.g3d.pawn
+package org.roldy.core.shader
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Renderable
+import com.badlogic.gdx.graphics.g3d.model.MeshPart
+import com.badlogic.gdx.graphics.g3d.model.Node
 import org.roldy.core.ColorHDR
 import org.roldy.core.asset.ShaderLoader
-import org.roldy.core.shader.WorldShiftingShader
+
 
 class PawnShader(
-    val configuration: PawnManager,
+    val configuration: Configuration,
     renderable: Renderable
 ) : WorldShiftingShader(renderable, Config().apply {
     fragmentShader = ShaderLoader.characterFrag
     vertexShader = ShaderLoader.defaultVert
 }) {
+    interface Configuration {
+        val texture0: Texture
+        val texture1: Texture
+        val texture2: Texture
+        val texture3: Texture
+        val texture4: Texture
+        val texture5: Texture
+        val texture6: Texture
+        val texture7: Texture
+        fun attributes(node: Node): ShaderAttributes
+        fun node(meshPart: MeshPart): Node
+    }
+
     // textures
 
     val u_texture0 by FetchUniform()
@@ -96,17 +111,15 @@ class PawnShader(
     val u_skinColor by FetchUniform()
     val u_skinColorIntensity by FetchUniform()
 
-
-    private val maskTextures = ArmorMaskTextures()
     var bind = 10
-    val tex2 = maskTextures.texture2.prepare(u_texture2, bind++)
-    val tex0 = maskTextures.texture0.prepare(u_texture0, bind++)
-    val tex1 = maskTextures.texture1.prepare(u_texture1, bind++)
-    val tex6 = maskTextures.texture6.prepare(u_texture6, bind++)
-    val tex5 = maskTextures.texture5.prepare(u_texture5, bind++)
-    val tex3 = maskTextures.texture3.prepare(u_texture3, bind++)
-    val tex4 = maskTextures.texture4.prepare(u_texture4, bind++)
-    val tex7 = maskTextures.texture7.prepare(u_texture7, bind++)
+    val tex2 = configuration.texture2.prepare(u_texture2, bind++)
+    val tex0 = configuration.texture0.prepare(u_texture0, bind++)
+    val tex1 = configuration.texture1.prepare(u_texture1, bind++)
+    val tex6 = configuration.texture6.prepare(u_texture6, bind++)
+    val tex5 = configuration.texture5.prepare(u_texture5, bind++)
+    val tex3 = configuration.texture3.prepare(u_texture3, bind++)
+    val tex4 = configuration.texture4.prepare(u_texture4, bind++)
+    val tex7 = configuration.texture7.prepare(u_texture7, bind++)
 
     override fun render(renderable: Renderable) {
         colorize(renderable)
@@ -114,9 +127,9 @@ class PawnShader(
     }
 
     fun colorize(renderable: Renderable) {
-        val node =
-            configuration.instance.meshMap.getValue(with(configuration.instance) { renderable.meshPart.mappingId() })
-        val config = configuration.getShaderConfig(node)
+        val node = configuration.node(renderable.meshPart)
+        val config = configuration.attributes(node)
+
         tex0.bind()
         tex1.bind()
         tex2.bind()
@@ -171,24 +184,13 @@ class PawnShader(
     }
 
 
-    private class ArmorMaskTextures {
-        val texture0: Texture = PawnAssetManager.mask0.get()
-        val texture1: Texture = PawnAssetManager.mask1.get()
-        val texture2: Texture = PawnAssetManager.mask2.get()
-        val texture3: Texture = PawnAssetManager.mask3.get()
-        val texture4: Texture = PawnAssetManager.mask4.get()
-        val texture5: Texture = PawnAssetManager.mask5.get()
-        val texture6: Texture = PawnAssetManager.mask6.get()
-        val texture7: Texture = PawnAssetManager.mask7.get()
-    }
-
     private fun setHDRColorUniform(colorLoc: Int, intensityLoc: Int, color: ColorHDR) {
         program.setUniformf(colorLoc, color.rgb.x, color.rgb.y, color.rgb.z)
         program.setUniformf(intensityLoc, color.intensity)
     }
 }
 
-interface ShaderConfig {
+interface ShaderAttributes {
     val skinColor: ColorHDR
     val eyesColor: ColorHDR
     val hairColor: ColorHDR
@@ -245,7 +247,7 @@ interface ShaderConfig {
     val metal3Metallic: Float
 }
 
-class DefaultShaderConfig : ShaderConfig {
+class DefaultShaderAttributes : ShaderAttributes {
     override var skinColor = ColorHDR(2.02193f, 1.0081f, 0.6199315f)
     override var eyesColor = ColorHDR(0.0734529f, 0.1320755f, 0.05046281f)
     override var hairColor = ColorHDR(0.5943396f, 0.3518379f, 0.1093361f)

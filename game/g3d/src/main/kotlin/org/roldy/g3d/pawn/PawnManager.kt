@@ -2,8 +2,11 @@ package org.roldy.g3d.pawn
 
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController
+import org.roldy.core.shader.DefaultShaderAttributes
+import org.roldy.core.shader.ShaderAttributes
 import org.roldy.core.utils.sequencer
 import org.roldy.g3d.pawn.part.*
+
 
 class PawnManager(
     val builder: PawnModelBuilder,
@@ -35,7 +38,7 @@ class PawnManager(
     private val hair get() = hairs[hairIndex]
     private val beard get() = beards.getOrNull(beardIndex)
 
-    val defaultColors = DefaultShaderConfig()
+    val defaultColors = DefaultShaderAttributes()
 
     val instance by lazy {
         PawnModelInstance(builder[bodyType]).apply {
@@ -74,7 +77,7 @@ class PawnManager(
             }
         }
 
-    fun getShaderConfig(node: Node): ShaderConfig =
+    fun getShaderConfig(node: Node): ShaderAttributes =
         when (node.id) {
             else -> defaultColors
         }
