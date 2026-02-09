@@ -42,8 +42,10 @@ open class WorldShiftingShader(
         }
     }
 
-    fun Texture.prepare(uniform: Int, bind: Int) =
-        TextureBind(this, uniform, bind)
+    fun Texture.prepare(uniform: Int, bind: Int, configure: Texture.() -> Unit = {}) =
+        TextureBind(this, uniform, bind).apply {
+            texture.configure()
+        }
 
     override fun render(renderable: Renderable) {
         shift()

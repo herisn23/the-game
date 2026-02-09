@@ -48,9 +48,9 @@ varying vec4 v_color;
 
 #ifdef blendedFlag
 varying float v_opacity;
+#endif
 #ifdef alphaTestFlag
 varying float v_alphaTest;
-#endif
 #endif
 
 varying MED vec2 v_UV;
@@ -192,7 +192,7 @@ bool useTrunkFlatColor() {
 
 // Multiply blend for vec3 with opacity
 vec3 blendMultiply(vec3 base, vec3 blend, float opacity) {
-    return base * blend;
+    //    return base * blend;
     vec3 result = base * blend;
     return mix(base, result, opacity);
 }
@@ -250,8 +250,6 @@ void main() {
             color = mix(smallNoiseResult, u_leafNoiseLargeColor, largeNoise);
         }
         //        color *= 0.7;
-
-        // 0.7 darker result (do not know why but direct largeNoiseResult is too bright)
         blended = blendMultiply(diffuse.rgb, color, 1.0);
     }
     vec4 baseColor = diffuse;

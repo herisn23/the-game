@@ -132,11 +132,10 @@ const float u_shininess = 20.0;
 #ifdef blendedFlag
 uniform float u_opacity;
 varying float v_opacity;
-
+#endif
 #ifdef alphaTestFlag
 uniform float u_alphaTest;
 varying float v_alphaTest;
-#endif
 #endif
 
 #ifdef lightingFlag
@@ -227,9 +226,9 @@ void main() {
 
     #ifdef blendedFlag
     v_opacity = u_opacity;
+    #endif
     #ifdef alphaTestFlag
     v_alphaTest = u_alphaTest;
-    #endif
     #endif
 
     #ifdef skinningFlag

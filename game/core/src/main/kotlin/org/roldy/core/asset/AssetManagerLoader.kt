@@ -23,6 +23,5 @@ fun <T : Any> T.initialize() =
             }
             calculateTransforms()
         }
-
         else -> this
     }
