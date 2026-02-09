@@ -23,11 +23,13 @@ float getShadowness(vec2 offset)
 
 float getShadow()
 {
-    return (//getShadowness(vec2(0,0)) +
+    float shadow = (//getShadowness(vec2(0,0)) +
     getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
     getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
     getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
     getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
+
+    return mix(0.5, 1.0, shadow);
 }
 #endif//shadowMapFlag
 
