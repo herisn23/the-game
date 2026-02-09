@@ -15,16 +15,17 @@ data class FoliageConfiguration(
     val useColorNoise: Boolean,
     val smallNoiseFreq: Float = 0f,
     val largeNoiseFreq: Float = 0f,
-    val leaves: LeavesConfiguration?,
-    val trunk: TrunkConfiguration?,
+    val leaves: LeavesConfiguration? = null,
+    val trunk: TrunkConfiguration? = null,
 )
 
 @Serializable
 data class LeavesConfiguration(
-    val texture: String? = null,
+    val texture: String,
     val normal: String? = null,
     val metallic: Float = 0f,
     val smoothness: Float = 0f,
+    val normalStrength: Float = 0f,
     val useFlatColor: Boolean = false,
     @Serializable(G2DColorSerializer::class)
     val baseColor: Color = Color.WHITE,
@@ -36,11 +37,13 @@ data class LeavesConfiguration(
 
 @Serializable
 data class TrunkConfiguration(
-    val texture: String? = null,
+    val texture: String,
+    val normal: String? = null,
     val emissive: String? = null,
     val useFlatColor: Boolean = false,
     val metallic: Float = 0f,
     val smoothness: Float = 0f,
+    val normalStrength: Float = 0f,
     @Serializable(G2DColorSerializer::class)
     val baseColor: Color = Color.WHITE,
     @Serializable(G2DColorSerializer::class)

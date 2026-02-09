@@ -3,7 +3,8 @@ package codegen
 data class AssetData(
     val property: String,
     val path: String,
-    val type: String
+    val type: String,
+    val key: String = property
 )
 
 fun assetTemplate(

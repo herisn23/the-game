@@ -56,12 +56,13 @@ abstract class GenerateClassesTask : DefaultTask() {
             flatMap { directory ->
                 val dirName = directory.name
                 directory.listFiles().map { tex ->
-                    val propName = "$dirName${tex.nameWithoutExtension.normalize().capitalize()}"
+                    val propName = tex.nameWithoutExtension.normalize().decapitalize()
                     AssetData(
                         propName,
                         base.resolve(name).resolve(foliagePath.name).resolve(directory.name)
                             .resolve(tex.name).pathString,
-                        "Texture"
+                        "Texture",
+                        key = tex.nameWithoutExtension
                     )
                 }
             }
@@ -94,7 +95,7 @@ abstract class GenerateClassesTask : DefaultTask() {
                         ${
                     allTextures.joinToString(",\n") {
                         """
-                                "${it.property}" to ${it.property}
+                                "${it.key}" to ${it.property}
                             """.trimIndent()
                     }
                 }
@@ -155,9 +156,5 @@ abstract class GenerateClassesTask : DefaultTask() {
     fun String.normalize() =
         replace("_", "")
             .replace(" ", "")
-            .replace("Occlusion", "")
-            .replace("occlusion", "")
-            .replace("Normals", "")
-            .replace("normals", "")
 
 }

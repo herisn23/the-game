@@ -5,10 +5,10 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Attribute
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.Renderable
+import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
 import org.roldy.core.system.WindAttributes
-import org.roldy.core.utils.hex
 
 
 class FoliageShader(
@@ -22,8 +22,6 @@ class FoliageShader(
     offsetProvider: OffsetProvider,
     private val windAttributes: WindAttributes
 ) : WorldShiftingShader(renderable, config, offsetProvider) {
-    val smallFrequency: Float = 10f
-    val largeFrequency: Float = 0.1f
 
     val u_useColorNoise by FetchUniform()
     val u_noiseSmallFrequency by FetchUniform()
@@ -42,6 +40,20 @@ class FoliageShader(
     val u_trunkTexture by FetchUniform()
     val u_leafTexture by FetchUniform()
 
+    val u_trunkNormal by FetchUniform()
+    val u_trunkHasNormal by FetchUniform()
+
+    val u_leafNormal by FetchUniform()
+    val u_leafHasNormal by FetchUniform()
+
+    val u_trunkMetallic by FetchUniform()
+    val u_leafMetallic by FetchUniform()
+    val u_trunkSmoothness by FetchUniform()
+    val u_leafSmoothness by FetchUniform()
+
+    val u_leafNormalStrength by FetchUniform()
+    val u_trunkNormalStrength by FetchUniform()
+
     // Wind uniforms
     val u_time by FetchUniform()
     val u_windStrength by FetchUniform()
@@ -49,6 +61,7 @@ class FoliageShader(
     val u_windDirection by FetchUniform()
 
     val u_UVTransform by FetchUniform()
+    val u_lightDirection by FetchUniform()
 
     private fun <T : Attribute> Material.value(type: Long) =
         get(type) as? T
@@ -63,15 +76,32 @@ class FoliageShader(
         val useNoiseColor = material.value<BooleanAttribute>(BooleanAttribute.useNoiseColor)
         val leafFlatColor = material.value<BooleanAttribute>(BooleanAttribute.leafFlatColor)
         val trunkFlatColor = material.value<BooleanAttribute>(BooleanAttribute.trunkFlatColor)
+        val leafHasNormal = material.value<BooleanAttribute>(BooleanAttribute.leafHasNormal)
+        val trunkHasNormal = material.value<BooleanAttribute>(BooleanAttribute.trunkHasNormal)
+
         val trunkTexture = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.trunkTexture)
         val leafTexture = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.leafTexture)
-        val smallFreq = material.value<NoiseFreqAttribute>(NoiseFreqAttribute.smallFreq)?.freq ?: smallFrequency
-        val largeFreq = material.value<NoiseFreqAttribute>(NoiseFreqAttribute.largeFreq)?.freq ?: largeFrequency
+        val trunkNormal = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.trunkNormal)
+        val leafNormal = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.leafNormal)
+
+        val smallFreq = material.value<FloatValueAttribute>(FloatValueAttribute.smallFreq)
+        val largeFreq = material.value<FloatValueAttribute>(FloatValueAttribute.largeFreq)
+
+        val trunkMetallic = material.value<FloatValueAttribute>(FloatValueAttribute.trunkMetallic)
+        val leafMetallic = material.value<FloatValueAttribute>(FloatValueAttribute.leafMetallic)
+        val trunkSmoothness = material.value<FloatValueAttribute>(FloatValueAttribute.trunkSmoothness)
+        val leafSmoothness = material.value<FloatValueAttribute>(FloatValueAttribute.leafSmoothness)
+
+        val leafNormalStrength = material.value<FloatValueAttribute>(FloatValueAttribute.leafNormalStrength)
+        val trunkNormalStrength = material.value<FloatValueAttribute>(FloatValueAttribute.trunkNormalStrength)
 
         program.setUniformf(u_UVTransform, 0f, 0f, 1f, 1f)
 
         trunkTexture?.bind(u_trunkTexture, 20)
         leafTexture?.bind(u_leafTexture, 21)
+
+        trunkNormal?.bind(u_trunkNormal, 22)
+        leafNormal?.bind(u_leafNormal, 23)
 
         leafBaseColor?.set(u_leafBaseColor)
         leafNoiseColor?.set(u_leafNoiseColor)
@@ -85,14 +115,42 @@ class FoliageShader(
 
         useNoiseColor?.set(u_useColorNoise)
 
-        program.setUniformf(u_noiseSmallFrequency, smallFreq)
-        program.setUniformf(u_noiseLargeFrequency, largeFreq)
+
+        smallFreq?.set(u_noiseSmallFrequency)
+        largeFreq?.set(u_noiseLargeFrequency)
+
+        trunkMetallic?.set(u_trunkMetallic)
+        trunkSmoothness?.set(u_trunkSmoothness)
+
+        leafMetallic?.set(u_leafMetallic)
+        leafSmoothness?.set(u_leafSmoothness)
+
+        leafNormalStrength?.set(u_leafNormalStrength)
+        trunkNormalStrength?.set(u_trunkNormalStrength)
+
+        leafHasNormal?.set(u_leafHasNormal)
+        trunkHasNormal?.set(u_trunkHasNormal)
 
         // Set wind uniforms
         program.setUniformf(u_time, windAttributes.time)
         program.setUniformf(u_windStrength, windAttributes.windStrength)
         program.setUniformf(u_windSpeed, windAttributes.windSpeed)
         program.setUniformf(u_windDirection, windAttributes.windDirection.x, windAttributes.windDirection.y)
+
+        // Get light direction from environment
+        val environment = renderable.environment
+        val dirLight = environment?.get(
+            DirectionalLightsAttribute::class.java,
+            DirectionalLightsAttribute.Type
+        ) as? DirectionalLightsAttribute
+
+        if (dirLight != null && dirLight.lights.size > 0) {
+            val light = dirLight.lights.first()
+            program.setUniformf(u_lightDirection, light.direction.x, light.direction.y, light.direction.z)
+        } else {
+            // Fallback to default sun direction
+            program.setUniformf(u_lightDirection, 0f, -1f, 0f) // Light from above
+        }
 
         super.render(renderable)
     }
@@ -110,18 +168,30 @@ class FoliageShader(
         program.setUniformi(location, bind)
     }
 
+    private fun FloatValueAttribute.set(location: Int) {
+        program.setUniformf(location, value)
+    }
+
 }
 
 class FoliageTextureAttribute(type: Long, val texture: Texture) : Attribute(type) {
     companion object {
         val leafTexture = register("leafTexture")
+        val leafNormal = register("leafNormal")
         val trunkTexture = register("trunkTexture")
+        val trunkNormal = register("trunkNormal")
 
         fun createLeafTexture(texture: Texture) =
             FoliageTextureAttribute(leafTexture, texture)
 
         fun createTrunkTexture(texture: Texture) =
             FoliageTextureAttribute(trunkTexture, texture)
+
+        fun createLeafNormal(texture: Texture) =
+            FoliageTextureAttribute(leafNormal, texture)
+
+        fun createTrunkNormal(texture: Texture) =
+            FoliageTextureAttribute(trunkNormal, texture)
     }
 
     override fun copy() = FoliageTextureAttribute(type, texture)
@@ -133,6 +203,8 @@ class BooleanAttribute(type: Long, val enabled: Boolean) : Attribute(type) {
         val useNoiseColor = register("useNoiseColor")
         val leafFlatColor = register("leafFlatColor")
         val trunkFlatColor = register("trunkFlatColor")
+        val leafHasNormal = register("leafHasNormal")
+        val trunkHasNormal = register("trunkHasNormal")
 
         fun createUseNoiseColor(enabled: Boolean) =
             BooleanAttribute(useNoiseColor, enabled)
@@ -142,6 +214,12 @@ class BooleanAttribute(type: Long, val enabled: Boolean) : Attribute(type) {
 
         fun createTrunkFlatColor(enabled: Boolean) =
             BooleanAttribute(trunkFlatColor, enabled)
+
+        fun createLeafHasNormal(enabled: Boolean) =
+            BooleanAttribute(leafHasNormal, enabled)
+
+        fun createTrunkHasNormal(enabled: Boolean) =
+            BooleanAttribute(trunkHasNormal, enabled)
     }
 
     override fun copy() = BooleanAttribute(type, enabled)
@@ -149,17 +227,30 @@ class BooleanAttribute(type: Long, val enabled: Boolean) : Attribute(type) {
     val asFloat = if (enabled) 1.0f else 0.0f
 }
 
-class NoiseFreqAttribute(type: Long, val freq: Float) : Attribute(type) {
+
+class FloatValueAttribute(type: Long, val value: Float) : Attribute(type) {
     companion object {
         val smallFreq = register("smallFreq")
         val largeFreq = register("largeFreq")
+        val leafMetallic = register("leafMetallic")
+        val leafSmoothness = register("leafSmoothness")
+        val trunkMetallic = register("trunkMetallic")
+        val trunkSmoothness = register("trunkSmoothness")
+        val leafNormalStrength = register("leafNormalStrength")
+        val trunkNormalStrength = register("trunkNormalStrength")
 
-        fun createSmallFreq(freq: Float) = NoiseFreqAttribute(smallFreq, freq)
-        fun createLargeFreq(freq: Float) = NoiseFreqAttribute(largeFreq, freq)
+        fun createSmallFreq(freq: Float) = FloatValueAttribute(smallFreq, freq)
+        fun createLargeFreq(freq: Float) = FloatValueAttribute(largeFreq, freq)
+        fun createLeafMetallic(freq: Float) = FloatValueAttribute(leafMetallic, freq)
+        fun createLeafSmoothness(freq: Float) = FloatValueAttribute(leafSmoothness, freq)
+        fun createTrunkMetallic(freq: Float) = FloatValueAttribute(trunkMetallic, freq)
+        fun createTrunkSmoothness(freq: Float) = FloatValueAttribute(trunkSmoothness, freq)
+        fun createLeafNormalStrength(freq: Float) = FloatValueAttribute(leafNormalStrength, freq)
+        fun createTrunkNormalStrength(freq: Float) = FloatValueAttribute(trunkNormalStrength, freq)
     }
 
     override fun copy(): Attribute {
-        return NoiseFreqAttribute(type, freq)
+        return FloatValueAttribute(type, value)
     }
 
     override fun compareTo(other: Attribute): Int = 0
@@ -198,22 +289,6 @@ class FoliageColorAttribute(type: Long, val color: Color) : Attribute(type) {
 
     override fun compareTo(other: Attribute): Int = 0
 }
-
-
-data class FoliageColor(
-    val base: Color,
-    val noise: Color,
-    val noiseLarge: Color
-)
-
-object FoliageColors {
-    val grass = FoliageColor(hex("1A4800"), hex("8FA100"), hex("484400"))
-    val tree = FoliageColor(hex("4F7B02"), hex("283A05"), hex("6D7D02"))
-    val palm = FoliageColor(hex("FFFFFF"), hex("D0FFA2"), hex("FFC677"))
-    val test = FoliageColor(hex("ff0000"), hex("00ff00"), hex("0000ff"))
-    val white = FoliageColor(hex("ffffff"), hex("ffffff"), hex("ffffff"))
-}
-
 
 fun foliageShaderProvider(
     offsetProvider: OffsetProvider,

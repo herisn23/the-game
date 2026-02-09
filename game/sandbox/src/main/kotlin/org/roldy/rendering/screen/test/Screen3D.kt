@@ -23,7 +23,6 @@ import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.material.foliage.loadMaterials
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.shader.FoliageColors
 import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.system.ShadowSystem
@@ -64,13 +63,9 @@ class Screen3D(
 ) : AutoDisposableScreenAdapter() {
     val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
     val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalDiffuse01.get() }
-    val plantsDiffuse by disposable { EnvTexturesAssetAssetManager.plantsGrassMid01.get() }
-    val plantsNormal by disposable { EnvTexturesAssetAssetManager.normalsGrassMid01.get() }
-    val branchesDiffuse by disposable { EnvTexturesAssetAssetManager.plantsBranches01.get() }
-    val leafDiffuse by disposable { EnvTexturesAssetAssetManager.plantsLeafPatch02.get() }
-    val leafPalm by disposable { EnvTexturesAssetAssetManager.plantsLeafPalm01.get() }
-    val barkPalm by disposable { EnvTexturesAssetAssetManager.plantsPalmBark01.get() }
-    val materials = loadMaterials(EnvTexturesAssetAssetManager.textureMap)
+    val materials by lazy {
+        loadMaterials(EnvTexturesAssetAssetManager.textureMap)
+    }
 
 
     val windSystem = WindSystem()
@@ -155,7 +150,7 @@ class Screen3D(
         }
     }
     val grass by lazy {
-        TropicalAssetManager.envGrassMedClump01.grass(plantsDiffuse, plantsNormal, FoliageColors.grass)
+        TropicalAssetManager.envGrassMedClump01.simpleFoliage(materials.first { it.id == "Grass_Med_Mat_01" })
             .apply {
                 nodes.first().children.removeAll {
                     !it.id.contains("LOD0")
@@ -163,7 +158,9 @@ class Screen3D(
             }
     }
     val tree by lazy {
-        TropicalAssetManager.envTreeForest02.tree(branchesDiffuse, leafDiffuse, diffuse, FoliageColors.tree)
+        val b = materials.first { it.id == "Branches_01" }
+        val l = materials.first { it.id == "Tree_Mat_02" }
+        TropicalAssetManager.envTreeForest02.tree(b, l)
             .apply {
                 nodes.first().children.removeAll {
                     !it.id.contains("LOD0")
@@ -171,7 +168,7 @@ class Screen3D(
             }
     }
     val palm by lazy {
-        TropicalAssetManager.envTreePalm01.palm(leafPalm, barkPalm, FoliageColors.palm)
+        TropicalAssetManager.envTreePalm01.simpleFoliage(materials.first { it.id == "Palm_Mat_01" })
             .apply {
                 nodes.first().children.removeAll {
                     !it.id.contains("LOD0")
@@ -221,6 +218,7 @@ class Screen3D(
         if (loading && AssetManagersLoader.update()) {
             loading = false
             adapter
+            materials
         }
         if (loading) return
 

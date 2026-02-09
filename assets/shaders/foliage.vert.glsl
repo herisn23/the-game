@@ -18,18 +18,14 @@ varying vec4 v_color;
 attribute vec4 a_color;
 #endif
 
-#ifdef normalFlag
 attribute vec3 a_normal;
 uniform mat3 u_normalMatrix;
 varying vec3 v_normal;
-#endif
 
-#ifdef normalTextureFlag
 attribute vec3 a_tangent;
 attribute vec3 a_binormal;
 varying vec3 v_tangent;
 varying vec3 v_binormal;
-#endif
 
 attribute vec2 a_texCoord0;
 
@@ -295,24 +291,15 @@ void main() {
 
     gl_Position = u_projViewTrans * pos;
 
-
-    #if defined(normalFlag)
-    #if defined(skinningFlag)
-    vec3 normal = normalize((u_worldTrans * skinning * vec4(a_normal, 0.0)).xyz);
-    #else
     vec3 normal = normalize(u_normalMatrix * a_normal);
-    #endif
     v_normal = normal;
-    #endif
 
-    #ifdef normalTextureFlag
     #if defined(skinningFlag)
     v_tangent = normalize((u_worldTrans * skinning * vec4(a_tangent, 0.0)).xyz);
     v_binormal = normalize((u_worldTrans * skinning * vec4(a_binormal, 0.0)).xyz);
     #else
     v_tangent = normalize(u_normalMatrix * a_tangent);
     v_binormal = normalize(u_normalMatrix * a_binormal);
-    #endif
     #endif
 
     #ifdef fogFlag
