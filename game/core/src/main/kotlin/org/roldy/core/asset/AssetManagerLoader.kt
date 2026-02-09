@@ -1,12 +1,16 @@
 package org.roldy.core.asset
 
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Model
 
 const val modelScale: Float = 0.01f
 
 interface AssetManagerLoader {
     val assetManager: AssetManager
+}
+interface TextureAssetManagerLoader : AssetManagerLoader {
+    val textureMap: Map<String, Asset<Texture>>
 }
 
 fun <T : Any> T.initialize() =

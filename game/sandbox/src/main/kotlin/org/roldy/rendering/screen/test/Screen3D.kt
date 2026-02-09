@@ -4,13 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
-import org.roldy.core.asset.loadAsset
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
@@ -23,6 +21,7 @@ import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
+import org.roldy.core.material.foliage.loadMaterials
 import org.roldy.core.postprocess.PostProcessing
 import org.roldy.core.shader.FoliageColors
 import org.roldy.core.shader.foliageShaderProvider
@@ -63,20 +62,16 @@ import org.roldy.g3d.terrain.TerrainSampler
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
-    val emissive by disposable { TropicalAssetManager.emissiveTexture.loadTexture() }
-    val diffuse by disposable { TropicalAssetManager.diffuseTexture.loadTexture() }
-    val plantsDiffuse by disposable { TropicalAssetManager.plantsGrassMid01.loadTexture() }
-    val plantsNormal by disposable { TropicalAssetManager.normalsGrassMid01.loadTexture() }
-    val branchesDiffuse by disposable { TropicalAssetManager.plantsBranches01.loadTexture() }
-    val leafDiffuse by disposable { TropicalAssetManager.plantsLeafPatch02.loadTexture() }
-    val leafPalm by disposable { TropicalAssetManager.plantsLeafPalm01.loadTexture() }
-    val barkPalm by disposable { TropicalAssetManager.plantsPalmBark01.loadTexture() }
+    val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
+    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalDiffuse01.get() }
+    val plantsDiffuse by disposable { EnvTexturesAssetAssetManager.plantsGrassMid01.get() }
+    val plantsNormal by disposable { EnvTexturesAssetAssetManager.normalsGrassMid01.get() }
+    val branchesDiffuse by disposable { EnvTexturesAssetAssetManager.plantsBranches01.get() }
+    val leafDiffuse by disposable { EnvTexturesAssetAssetManager.plantsLeafPatch02.get() }
+    val leafPalm by disposable { EnvTexturesAssetAssetManager.plantsLeafPalm01.get() }
+    val barkPalm by disposable { EnvTexturesAssetAssetManager.plantsPalmBark01.get() }
+    val materials = loadMaterials(EnvTexturesAssetAssetManager.textureMap)
 
-    private fun TropicalAssetManager.TropicalAsset<Texture>.loadTexture() =
-        Texture(loadAsset(path), true).apply {
-            setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-            setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear)
-        }
 
     val windSystem = WindSystem()
     val mapSizeScale = 1

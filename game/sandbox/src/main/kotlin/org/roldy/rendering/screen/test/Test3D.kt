@@ -24,6 +24,7 @@ import org.roldy.core.system.WindSystem
 import org.roldy.core.utils.invoke
 import org.roldy.editor.EditorCameraController
 import org.roldy.g3d.AssetManagersLoader
+import org.roldy.g3d.environment.EnvTexturesAssetAssetManager
 import org.roldy.g3d.environment.TropicalAssetManager
 import org.roldy.g3d.environment.property
 import org.roldy.g3d.pawn.PawnManager
@@ -50,8 +51,8 @@ class Test3D(
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
     val skybox by lazy { Skybox(dayCycle) }
 
-    val emissive by disposable { TropicalAssetManager.emissiveTexture.get() }
-    val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
+    val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
+    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalDiffuse01.get() }
     val tropicalModel by lazy {
         TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive).apply {
             transform.setTranslation(10f, 0f, 0f)

@@ -3,7 +3,9 @@ package org.roldy.core.configuration
 import com.charleskorn.kaml.Yaml
 import kotlinx.serialization.decodeFromString
 import org.roldy.core.asset.loadAsset
+import org.roldy.core.biome.BiomeType
 import org.roldy.core.biome.BiomesConfiguration
+import org.roldy.core.material.foliage.FoliageMaterialConfiguration
 
 
 private fun readConfigurationFile(file: String) =
@@ -12,7 +14,13 @@ private fun readConfigurationFile(file: String) =
 inline fun <reified T> String.decode() =
     Yaml.default.decodeFromString<T>(this)
 
-fun loadBiomesConfiguration(): BiomesConfiguration {
-    val decode: BiomesConfiguration = readConfigurationFile("biomes-configuration.yaml").decode<BiomesConfiguration>()
-    return decode
-}
+fun loadBiomesConfiguration(): BiomesConfiguration =
+    readConfigurationFile("biomes-configuration.yaml").decode()
+
+
+val foliageConfiguration = mapOf(
+    BiomeType.Tropical to "tropic-material-config.yaml"
+)
+
+fun loadFoliageMaterialConfiguration(biome: BiomeType): FoliageMaterialConfiguration =
+    readConfigurationFile(foliageConfiguration.getValue(biome)).decode()

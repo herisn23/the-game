@@ -10,6 +10,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.name
 import kotlin.io.path.pathString
 
 private const val pack = "org.roldy.g3d.environment"
@@ -39,43 +40,17 @@ abstract class GenerateClassesTask : DefaultTask() {
     private fun generateAssets(): List<ClassInfo> {
         val base = Path.of("3d/environments")
         val contextDir = Path.of("assets").resolve(base)
-        return contextDir.toFile().listFiles().filter { it.isDirectory && it.listFiles().isNotEmpty() }.map {
+        val models = contextDir.resolve("models")
+        val textures = contextDir.resolve("textures")
+        return models.toFile().listFiles().filter { it.isDirectory && it.listFiles().isNotEmpty() }.map {
             it.generateBiomeAssets(base, Biome.valueOf(it.name.capitalize()))
-        }
+        } + textures.generateTextures(base)
     }
 
-    private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
-        val files = listFiles()
-        fun String.onlyOneModel() =
-            contains("Bld_Giant_Column_01") ||
-                    contains("Env_Grass_Med_Clump_01") ||
-                    contains("Env_Tree_Forest_02") ||
-                    contains("SM_Env_Tree_Palm_01")
+    private fun Path.generateTextures(base: Path): ClassInfo {
+        val foliagePath = resolve("foliage")
+        val foliageFiles = foliagePath.toFile().listFiles().toList()
 
-        fun String.normalize() =
-            replace("_", "")
-                .replace(" ", "")
-                .replace("Occlusion", "")
-                .replace("occlusion", "")
-                .replace("Normals", "")
-                .replace("normals", "")
-
-        val g3db = files.filter { it.name.endsWith("g3db") && it.name.onlyOneModel() }.map {
-            val name = it.nameWithoutExtension.normalize().replace("SM", "").decapitalize()
-            AssetData(
-                name,
-                base.resolve(biome.name.lowercase()).resolve(it.name).pathString,
-                "Model"
-            )
-        }
-
-        fun File.createTextureData(prop: String) =
-            AssetData(
-                prop,
-                base.resolve(biome.name.lowercase()).resolve(name).pathString,
-                "Texture"
-            )
-        val foliageDirectories = files.filter { it.isDirectory }
 
         fun List<File>.createFoliageTextures() =
             flatMap { directory ->
@@ -84,20 +59,63 @@ abstract class GenerateClassesTask : DefaultTask() {
                     val propName = "$dirName${tex.nameWithoutExtension.normalize().capitalize()}"
                     AssetData(
                         propName,
-                        base.resolve(biome.name.lowercase()).resolve(directory.name).resolve(tex.name).pathString,
+                        base.resolve(name).resolve(foliagePath.name).resolve(directory.name)
+                            .resolve(tex.name).pathString,
                         "Texture"
                     )
                 }
             }
 
-        val foliageTextures = foliageDirectories.createFoliageTextures()
+        val foliageTextures = foliageFiles.createFoliageTextures()
+        val biomeTextures = toFile().listFiles().filter { !it.isDirectory }.map {
+            val propName = it.nameWithoutExtension.normalize().replace("PolygonNatureBiomes", "").decapitalize()
+            AssetData(
+                propName,
+                base.resolve(name).resolve(it.name).pathString,
+                "Texture"
+            )
+        }
 
-        val textures = files.filter { it.name.endsWith("png") }.mapNotNull {
-            when {
-                it.name.contains("Diffuse") -> it.createTextureData("diffuseTexture")
-                it.name.contains("Emissive") -> it.createTextureData("emissiveTexture")
-                else -> null
+        val allTextures = foliageTextures + biomeTextures
+        return ClassInfo(
+            "EnvTexturesAssetManager",
+            pack,
+            assetTemplate(
+                pack,
+                "EnvTexturesAsset",
+                allTextures,
+                true,
+                "TextureAssetManagerLoader",
+                imports = listOf("import org.roldy.core.asset.TextureAssetManagerLoader")
+            ) {
+                """
+                    override val textureMap by lazy {
+                        mapOf(
+                        ${
+                    allTextures.joinToString(",\n") {
+                        """
+                                "${it.property}" to ${it.property}
+                            """.trimIndent()
+                    }
+                }
+                        )
+                    }
+                """.trimIndent()
             }
+
+        )
+    }
+
+    private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
+        val files = listFiles()
+
+        val g3db = files.filter { it.name.endsWith("g3db") }.map {
+            val name = it.nameWithoutExtension.normalize().replace("SM", "").decapitalize()
+            AssetData(
+                name,
+                base.resolve("models").resolve(biome.name.lowercase()).resolve(it.name).pathString,
+                "Model"
+            )
         }
         return ClassInfo(
             "${biome.name}AssetManager",
@@ -105,7 +123,7 @@ abstract class GenerateClassesTask : DefaultTask() {
             assetTemplate(
                 pack,
                 biome.name,
-                g3db + textures + foliageTextures,
+                g3db,
                 true,
                 "EnvironmentAssetManagerLoader",
                 configureAssetLoader = """
@@ -116,7 +134,7 @@ abstract class GenerateClassesTask : DefaultTask() {
                     "import org.roldy.core.asset.SyntyModelLoader"
                 )
             ) {
-                """
+                """ 
                     override val modelMap by lazy {
                         mapOf(
                          ${
@@ -133,4 +151,13 @@ abstract class GenerateClassesTask : DefaultTask() {
 
         )
     }
+
+    fun String.normalize() =
+        replace("_", "")
+            .replace(" ", "")
+            .replace("Occlusion", "")
+            .replace("occlusion", "")
+            .replace("Normals", "")
+            .replace("normals", "")
+
 }

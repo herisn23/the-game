@@ -1,0 +1,23 @@
+materials:
+  - id: Branches_01
+    useColorNoise: false
+    smallNoiseFreq: 0
+    largeNoiseFreq: 0
+    leaves:
+      texture: ""
+      normal:
+      metallic: 0.144
+      smoothness: 0.484
+      useFlatColor: false
+      baseColor: ffffff
+      noiseColor: ffffff
+      noiseLargeColor: ffffff
+    trunk:
+      texture: ""
+      emissive: ""
+      useFlatColor: false
+      metallic: 0
+      smoothness: 0.2
+      baseColor: ffffff
+      noiseColor: ffffff
+      emissiveColor: 000000
