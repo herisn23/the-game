@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
+import com.badlogic.gdx.graphics.g3d.ModelInstance
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
+import org.roldy.core.asset.loadAsset
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
@@ -60,12 +63,20 @@ import org.roldy.g3d.terrain.TerrainSampler
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
-    val emissive by disposable { TropicalAssetManager.emissiveTexture.get() }
-    val diffuse by disposable { TropicalAssetManager.diffuseTexture.get() }
-    val plantsDiffuse by disposable { TropicalAssetManager.plantsGrassMid01.get() }
-    val plantsNormal by disposable { TropicalAssetManager.normalsGrassMid01.get() }
-    val branchesDiffuse by disposable { TropicalAssetManager.plantsBranches01.get() }
-    val leafDiffuse by disposable { TropicalAssetManager.plantsLeafPatch02.get() }
+    val emissive by disposable { TropicalAssetManager.emissiveTexture.loadTexture() }
+    val diffuse by disposable { TropicalAssetManager.diffuseTexture.loadTexture() }
+    val plantsDiffuse by disposable { TropicalAssetManager.plantsGrassMid01.loadTexture() }
+    val plantsNormal by disposable { TropicalAssetManager.normalsGrassMid01.loadTexture() }
+    val branchesDiffuse by disposable { TropicalAssetManager.plantsBranches01.loadTexture() }
+    val leafDiffuse by disposable { TropicalAssetManager.plantsLeafPatch02.loadTexture() }
+    val leafPalm by disposable { TropicalAssetManager.plantsLeafPalm01.loadTexture() }
+    val barkPalm by disposable { TropicalAssetManager.plantsPalmBark01.loadTexture() }
+
+    private fun TropicalAssetManager.TropicalAsset<Texture>.loadTexture() =
+        Texture(loadAsset(path), true).apply {
+            setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
+            setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear)
+        }
 
     val windSystem = WindSystem()
     val mapSizeScale = 1
@@ -127,24 +138,18 @@ class Screen3D(
             initializeAt(charX, charZ)
 
 
-            tropicalModel.transform.idt()
-            val tx = charX + 5f
-            val tz = charZ + 5f
-            val ty = heightSampler.getHeightAt(tx, tz)
-            tropicalModel.transform.setTranslation(tx, ty, tz)
+            fun ModelInstance.position(ox: Float, oz: Float) {
+                transform.idt()
+                val tx = charX + ox
+                val tz = charZ + oz
+                val ty = heightSampler.getHeightAt(tx, tz)
+                transform.setTranslation(tx, ty, tz)
+            }
 
-
-            bush.transform.idt()
-            val bx = charX - 1f
-            val bz = charZ - 1f
-            val by = heightSampler.getHeightAt(bx, bz)
-            bush.transform.setTranslation(bx, by, bz)
-
-            tree.transform.idt()
-            val trex = charX + 10f
-            val trez = charZ - 10f
-            val trey = heightSampler.getHeightAt(trex, trez)
-            tree.transform.setTranslation(trex, trey, trez)
+            tropicalModel.position(5f, 5f)
+            grass.position(1f, 1f)
+            tree.position(10f, 10f)
+            palm.position(-2f, -2f)
         }
     }
 
@@ -154,7 +159,7 @@ class Screen3D(
             transform.setTranslation(0f, 0f, 0f)
         }
     }
-    val bush by lazy {
+    val grass by lazy {
         TropicalAssetManager.envGrassMedClump01.grass(plantsDiffuse, plantsNormal, FoliageColors.grass)
             .apply {
                 nodes.first().children.removeAll {
@@ -170,6 +175,16 @@ class Screen3D(
                 }
             }
     }
+    val palm by lazy {
+        TropicalAssetManager.envTreePalm01.palm(leafPalm, barkPalm, FoliageColors.palm)
+            .apply {
+                nodes.first().children.removeAll {
+                    !it.id.contains("LOD0")
+                }
+            }
+    }
+
+
 
 
     var loading = true
@@ -234,8 +249,9 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-                render(bush)
+                render(grass)
                 render(tree)
+                render(palm)
                 render(tropicalModel)
                 render(character.manager.instance)
             }
@@ -250,7 +266,7 @@ class Screen3D(
                     }
 
                     foliageBatch {
-                        listOf(bush, tree)
+                        listOf(grass, tree, palm)
                     }
                     character.render()
                 }

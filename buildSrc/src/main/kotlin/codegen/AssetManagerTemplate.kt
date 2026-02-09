@@ -28,7 +28,7 @@ import kotlin.reflect.KClass
 ${imports.joinToString("\n")}
 object ${prefix}AssetManager: ${parent} {
         class ${prefix}Asset<T: Any>(
-         internal val path: String,
+         val path: String,
          override val cls: KClass<T>
         ):Asset<T> {
             override fun get(): T = assetManager.get<T>(path).initialize()

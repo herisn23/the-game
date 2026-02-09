@@ -192,7 +192,7 @@ bool useTrunkFlatColor() {
 
 // Multiply blend for vec3 with opacity
 vec3 blendMultiply(vec3 base, vec3 blend, float opacity) {
-    //    return base * blend;
+    //        return base * blend;
     vec3 result = base * blend;
     return mix(base, result, opacity);
 }
@@ -207,6 +207,14 @@ vec4 getTexture() {
     }
 }
 void main() {
+    //debug code to check if trunk(black) or leaf(blue)
+    //    gl_FragColor.a = 1.0;
+    //    gl_FragColor.r = 0.0;
+    //    gl_FragColor.g = 0.0;
+    //    gl_FragColor.b = v_color.b;
+    //    return;
+
+
     #if defined(normalFlag)
     vec3 normal = v_normal;
     #endif
@@ -231,35 +239,44 @@ void main() {
 
     bool useNoiseColor = useNoiseColor();
 
-    vec3 blended = diffuse.rgb;
-    vec3 color;
+
+
+    vec3 targetColor;
 
     if (isLeaf()) {
-        color = u_leafBaseColor;
-    } else {
-        color = u_trunkBaseColor;
-    }
+        vec3 color1 = u_leafBaseColor;
+        vec3 color2 = diffuse.rgb;
 
-    if (useNoiseColor) {
-        float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
-        if (!isLeaf()) {
-            color = mix(u_trunkNoiseColor, u_trunkBaseColor, smallNoise);
-        } else {
+        if (useNoiseColor) {
+            float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
             float largeNoise = colorNoise(v_worldPos, u_noiseLargeFrequency);
             vec3 smallNoiseResult = mix(u_leafNoiseColor, u_leafBaseColor, smallNoise);
-            color = mix(smallNoiseResult, u_leafNoiseLargeColor, largeNoise);
+            vec3 largeNoiseResult = mix(smallNoiseResult, u_leafNoiseLargeColor, largeNoise);
+            color1 = largeNoiseResult;
+            color2 = blendMultiply(diffuse.rgb, color1, 1.0);
         }
-        //        color *= 0.7;
-        blended = blendMultiply(diffuse.rgb, color, 1.0);
-    }
-    vec4 baseColor = diffuse;
+        targetColor = color2;
+        if (useLeafFlatColor()) {
+            targetColor = color1;
+        }
+        //        targetColor = vec3(0.0, 1.0, 0.0);
+    } else {
+        float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
+        vec3 color1 = mix(u_trunkNoiseColor, u_trunkBaseColor, smallNoise);
+        vec3 color2 = diffuse.rgb;
 
-    if (isLeaf() && useLeafFlatColor()) {
-        baseColor = vec4(color, diffuse.a);
+        if (useNoiseColor) {
+            color2 = blendMultiply(diffuse.rgb, color1, 1.0);
+        }
+        targetColor = color2;
+        if (useTrunkFlatColor()) {
+            targetColor = color1;
+        }
+        //        targetColor = vec3(1.0, 0.0, 0.0);
     }
-    if (!isLeaf() && useTrunkFlatColor()) {
-        baseColor = vec4(color, diffuse.a);
-    }
+
+    vec4 baseColor = vec4(targetColor, diffuse.a);
+
 
 
 

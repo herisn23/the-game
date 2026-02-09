@@ -33,6 +33,35 @@ fun Asset<Model>.grass(
         updateLeaf(diffuse, color)
     }
 
+fun Asset<Model>.palm(
+    leaf: Texture,
+    bark: Texture,
+    color: FoliageColor
+): ModelInstance =
+    instance {
+        it.hasWind = true
+
+        set(TextureAttribute.createDiffuse(leaf)) // needed for alpha clipping on shadows
+
+        set(BooleanAttribute.createLeafFlatColor(false))
+        set(BooleanAttribute.createTrunkFlatColor(false))
+        set(BooleanAttribute.createUseNoiseColor(true))
+
+        set(FoliageTextureAttribute.createTrunkTexture(bark))
+        set(FoliageColorAttribute.createTrunkBaseColor(Color.WHITE.cpy()))
+        set(FoliageColorAttribute.createTrunkNoiseColor(Color.WHITE.cpy()))
+
+        set(FoliageTextureAttribute.createLeafTexture(leaf))
+        set(FoliageColorAttribute.createLeafBaseColor(color.base))
+        set(FoliageColorAttribute.createLeafNoiseColor(color.noise))
+        set(FoliageColorAttribute.createLeafNoiseLargeColor(color.noiseLarge))
+
+        set(IntAttribute.createCullFace(GL20.GL_NONE))
+
+        set(FloatAttribute.createAlphaTest(0.2f))
+    }
+
+
 fun Asset<Model>.tree(
     branchesDiffuse: Texture,
     leavesDiffuse: Texture,
@@ -51,7 +80,7 @@ fun Asset<Model>.tree(
 
             updateTrunk(branchesDiffuse)
 
-        }//.also(materials::add)
+        }
 
         val treeMaterial = Material().apply {
             id = "tree"
@@ -65,7 +94,7 @@ fun Asset<Model>.tree(
             updateLeaf(leavesDiffuse, color)
 
 
-        }//.also(materials::add)
+        }
 
         nodes.first().children.forEach { node ->
             node.parts.forEach { part ->
@@ -106,7 +135,6 @@ private fun Material.updateLeaf(
     color: FoliageColor
 ) {
     //diffuse texture for shadows
-    set(ColorAttribute.createAmbient(Color.WHITE))
     set(TextureAttribute.createDiffuse(diffuse))
 
     set(FoliageTextureAttribute.createLeafTexture(diffuse))
@@ -124,9 +152,9 @@ private fun Material.updateTrunk(
     diffuse: Texture,
     color: FoliageColor = FoliageColors.white
 ) {
-    set(ColorAttribute.createAmbient(Color.WHITE))
+
     set(TextureAttribute.createDiffuse(diffuse))
-//
+
     set(FoliageTextureAttribute.createTrunkTexture(diffuse))
     set(FoliageColorAttribute.createTrunkBaseColor(color.base))
     set(FoliageColorAttribute.createTrunkNoiseColor(color.noise))

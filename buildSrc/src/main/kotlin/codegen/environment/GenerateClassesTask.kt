@@ -47,7 +47,10 @@ abstract class GenerateClassesTask : DefaultTask() {
     private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
         val files = listFiles()
         fun String.onlyOneModel() =
-            contains("Bld_Giant_Column_01") || contains("Env_Grass_Med_Clump_01") || contains("Env_Tree_Forest_02")
+            contains("Bld_Giant_Column_01") ||
+                    contains("Env_Grass_Med_Clump_01") ||
+                    contains("Env_Tree_Forest_02") ||
+                    contains("SM_Env_Tree_Palm_01")
 
         fun String.normalize() =
             replace("_", "")
