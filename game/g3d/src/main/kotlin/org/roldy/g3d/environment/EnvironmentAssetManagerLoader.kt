@@ -9,32 +9,69 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.*
 import org.roldy.core.asset.Asset
 import org.roldy.core.asset.AssetManagerLoader
-import org.roldy.core.shader.FoliageColor
-import org.roldy.core.shader.FoliageColorAttribute
-import org.roldy.core.shader.ShaderUserData
+import org.roldy.core.shader.*
 
 interface EnvironmentAssetManagerLoader : AssetManagerLoader {
     val modelMap: Map<String, Asset<Model>>
 }
 
 
-fun Asset<Model>.foliage(
+fun Asset<Model>.grass(
     diffuse: Texture,
     normal: Texture,
     color: FoliageColor
 ): ModelInstance =
     instance {
         it.hasWind = true
-        set(ColorAttribute.createAmbient(1f, 1f, 1f, 1f))
-        set(TextureAttribute.createDiffuse(diffuse))
         set(TextureAttribute.createNormal(normal))
-        set(ColorAttribute.createDiffuse(Color.WHITE))
-        set(FoliageColorAttribute.createBaseColor(color.base))
-        set(FoliageColorAttribute.createNoiseColor(color.noise))
-        set(FoliageColorAttribute.createNoiseLargeColor(color.noiseLarge))
+        set(BooleanAttribute.createLeafFlatColor(true))
+        set(BooleanAttribute.createUseNoiseColor(true))
         set(IntAttribute.createCullFace(GL20.GL_NONE))
-        set(BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA))
-        set(FloatAttribute.createAlphaTest(0.25f))
+        updateLeaf(diffuse, color)
+    }
+
+fun Asset<Model>.tree(
+    branchesDiffuse: Texture,
+    leavesDiffuse: Texture,
+    trunkDiffuse: Texture,
+    color: FoliageColor
+): ModelInstance =
+    instance {
+        it.hasWind = true
+    }.apply {
+        materials.clear()
+        val branchMaterial = Material().apply {
+            id = "branch"
+
+            set(BooleanAttribute.createTrunkFlatColor(false))
+            set(BooleanAttribute.createUseNoiseColor(false))
+
+            updateTrunk(branchesDiffuse)
+
+        }.also(materials::add)
+
+        val treeMaterial = Material().apply {
+            id = "tree"
+
+            set(BooleanAttribute.createTrunkFlatColor(false))
+            updateTrunk(trunkDiffuse)
+
+            set(BooleanAttribute.createUseNoiseColor(true))
+            set(BooleanAttribute.createLeafFlatColor(true))
+
+            updateLeaf(leavesDiffuse, color)
+
+
+        }.also(materials::add)
+
+        nodes.first().children.forEach { node ->
+            node.parts.forEach { part ->
+                if (node.id.contains("Branches"))
+                    part.material = branchMaterial
+                else
+                    part.material = treeMaterial
+            }
+        }
     }
 
 fun Asset<Model>.property(
@@ -60,3 +97,40 @@ private fun Asset<Model>.instance(
             mat.update(udata)
         }
     }
+
+private fun Material.updateLeaf(
+    diffuse: Texture,
+    color: FoliageColor
+) {
+    //diffuse texture for shadows
+    set(ColorAttribute.createAmbient(Color.WHITE))
+    set(TextureAttribute.createDiffuse(diffuse))
+
+    set(FoliageTextureAttribute.createLeafTexture(diffuse))
+    set(FoliageColorAttribute.createLeafBaseColor(color.base))
+    set(FoliageColorAttribute.createLeafNoiseColor(color.noise))
+    set(FoliageColorAttribute.createLeafNoiseLargeColor(color.noiseLarge))
+
+    set(IntAttribute.createCullFace(GL20.GL_NONE))
+
+    set(BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA))
+    set(FloatAttribute.createAlphaTest(0.25f))
+
+}
+
+private fun Material.updateTrunk(
+    diffuse: Texture,
+    color: FoliageColor = FoliageColors.white
+) {
+    set(ColorAttribute.createAmbient(Color.WHITE))
+    set(TextureAttribute.createDiffuse(diffuse))
+
+    set(FoliageTextureAttribute.createTrunkTexture(diffuse))
+    set(FoliageColorAttribute.createTrunkBaseColor(color.base))
+    set(FoliageColorAttribute.createTrunkNoiseColor(color.noise))
+
+    set(IntAttribute.createCullFace(GL20.GL_NONE))
+
+    set(BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA))
+    set(FloatAttribute.createAlphaTest(0.25f))
+}

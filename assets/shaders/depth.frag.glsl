@@ -13,8 +13,13 @@ precision mediump float;
 #define blendedTextureFlag
 varying MED vec2 v_texCoords0;
 uniform sampler2D u_diffuseTexture;
-uniform float u_alphaTest;
+
 #endif
+
+uniform float u_alphaTest;
+
+//uniform sampler2D u_leafTexture;
+//uniform sampler2D u_trunkTexture;
 
 #ifdef PackedDepthFlag
 varying HIGH float v_depth;
@@ -26,10 +31,11 @@ void main() {
     discard;
     #endif // blendedTextureFlag
 
-    #ifdef PackedDepthFlag
-        HIGH float depth = v_depth;
-        const HIGH vec4 bias = vec4(1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0, 0.0);
-        HIGH vec4 color = vec4(depth, fract(depth * 255.0), fract(depth * 65025.0), fract(depth * 16581375.0));
-        gl_FragColor = color - (color.yzww * bias);
-    #endif //PackedDepthFlag
+	#ifdef PackedDepthFlag
+	HIGH float depth = v_depth;
+	const HIGH vec4 bias = vec4(1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0, 0.0);
+	HIGH vec4 color = vec4(depth, fract(depth * 255.0), fract(depth * 65025.0), fract(depth * 16581375.0));
+	gl_FragColor = color - (color.yzww * bias);
+	#endif //PackedDepthFlag
 }
+

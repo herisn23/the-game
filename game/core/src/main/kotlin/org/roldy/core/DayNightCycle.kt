@@ -105,12 +105,14 @@ class DayNightCycle(
         val intensity = interpolateValue(sunIntensities, timeOfDay)
 
         sunLight.color.set(currentSunColor).mul(intensity)
+        println("Sunlight ${currentSunColor}: $intensity")
 
         // Interpolate ambient color
         interpolateColor(ambientColors, timeOfDay, currentAmbientColor)
 
         val ambientAttr = environment.get(ColorAttribute.AmbientLight) as? ColorAttribute
         ambientAttr?.color?.set(currentAmbientColor)
+        println("Ambient ${ambientAttr?.color}")
     }
 
     private fun interpolateColor(colorMap: Map<Float, Color>, time: Float, out: Color): Color {

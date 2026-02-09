@@ -31,14 +31,10 @@ varying vec3 v_tangent;
 varying vec3 v_binormal;
 #endif
 
-#ifdef textureFlag
 attribute vec2 a_texCoord0;
-#endif
 
-#ifdef diffuseTextureFlag
-uniform vec4 u_diffuseUVTransform;
-varying vec2 v_diffuseUV;
-#endif
+uniform vec4 u_UVTransform;
+varying vec2 v_UV;
 
 #ifdef emissiveTextureFlag
 uniform vec4 u_emissiveUVTransform;
@@ -212,9 +208,8 @@ uniform vec3 u_shiftOffset;
 varying vec3 v_lightDirection;
 
 void main() {
-    #ifdef diffuseTextureFlag
-    v_diffuseUV = u_diffuseUVTransform.xy + a_texCoord0 * u_diffuseUVTransform.zw;
-    #endif
+
+    v_UV = u_UVTransform.xy + a_texCoord0 * u_UVTransform.zw;
 
     #ifdef emissiveTextureFlag
     v_emissiveUV = u_emissiveUVTransform.xy + a_texCoord0 * u_emissiveUVTransform.zw;
@@ -273,6 +268,11 @@ void main() {
     pos.xyz -= u_shiftOffset;
     #endif
 
+    #ifdef shadowMapFlag
+    vec4 spos = u_shadowMapProjViewTrans * pos;
+    v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+    #endif
+
     v_worldPos = pos.xyz;
 
     #ifdef windFlag
@@ -294,11 +294,6 @@ void main() {
 
     gl_Position = u_projViewTrans * pos;
 
-    #ifdef shadowMapFlag
-    vec4 spos = u_shadowMapProjViewTrans * pos;
-    v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
-    v_shadowMapUv.z = min(v_shadowMapUv.z, 0.998);
-    #endif
 
     #if defined(normalFlag)
     #if defined(skinningFlag)
