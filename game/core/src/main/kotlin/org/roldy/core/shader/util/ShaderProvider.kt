@@ -1,4 +1,4 @@
-package org.roldy.core.shader
+package org.roldy.core.shader.util
 
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.Shader

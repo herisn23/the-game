@@ -1,22 +1,16 @@
-package org.roldy.core.shader
+package org.roldy.core.shader.util
 
 import com.badlogic.gdx.graphics.g3d.Renderable
 
 object ShaderBuilder {
-    fun String.shiftFlag() = run {
-        """
-                #define shiftFlag
-                $this
-            """.trimIndent()
-    }
+    fun String.shiftFlag() = append("#define shiftFlag")
 
-    private fun String.windFlag() = run {
-        """
-                #define windFlag
-                $this
-            """.trimIndent()
-    }
 
+    fun String.append(str: String) =
+        "$str\n$this"
+
+
+    private fun String.windFlag() = append("#define windFlag")
     fun String.windFlag(renderable: Renderable) =
         let {
             val userData = renderable.userData as? ShaderUserData

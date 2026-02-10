@@ -34,7 +34,6 @@ float getShadow()
 #endif//shadowMapFlag
 
 
-uniform vec3 u_lightDirection;
 varying vec3 v_normal;
 varying vec4 v_color;
 varying float v_alphaTest;
@@ -70,15 +69,15 @@ uniform float u_trunkHasNormal;
 uniform vec3 u_leafBaseColor;
 uniform vec3 u_leafNoiseColor;
 uniform vec3 u_leafNoiseLargeColor;
-uniform float u_leafFlatColor;
+uniform bool u_leafFlatColor;
 
 // Trunk colors
 uniform vec3 u_trunkBaseColor;
 uniform vec3 u_trunkNoiseColor;
-uniform float u_trunkFlatColor;// 0 = use noise, 1 = flat base color only
+uniform bool u_trunkFlatColor;// 0 = use noise, 1 = flat base color only
 
 // Noise configuration
-uniform float u_useColorNoise;
+uniform bool u_useColorNoise;
 uniform float u_noiseSmallFrequency;// NEW
 uniform float u_noiseLargeFrequency;// NEW
 // ==================================
@@ -138,18 +137,6 @@ varying float v_fog;
 // Add this varying at the top:
 varying vec3 v_lightDirection;
 
-bool useNoiseColor() {
-	return u_useColorNoise > 0.5;
-}
-
-bool useLeafFlatColor() {
-	return u_leafFlatColor > 0.5;
-}
-
-bool useTrunkFlatColor() {
-	return u_trunkFlatColor > 0.5;
-}
-
 
 // Multiply blend for vec3 with opacity
 vec3 blendMultiply(vec3 base, vec3 blend, float opacity) {
@@ -194,7 +181,6 @@ void main() {
 	}
 	#endif
 
-	bool useNoiseColor = useNoiseColor();
 	bool isLeaf = isLeaf();
 
 
@@ -204,7 +190,7 @@ void main() {
 		vec3 color1 = u_leafBaseColor;
 		vec3 color2 = diffuse.rgb;
 
-		if (useNoiseColor) {
+		if (u_useColorNoise) {
 			float smallNoise = colorNoise(v_worldPos, u_noiseSmallFrequency);
 			float largeNoise = colorNoise(v_worldPos, u_noiseLargeFrequency);
 			vec3 smallNoiseResult = mix(u_leafNoiseColor, u_leafBaseColor, smallNoise);
@@ -213,7 +199,7 @@ void main() {
 			color2 = blendMultiply(diffuse.rgb, color1, 1.0);
 		}
 		targetColor = color2;
-		if (useLeafFlatColor()) {
+		if (u_leafFlatColor) {
 			targetColor = color1;
 		}
 		//        targetColor = vec3(0.0, 1.0, 0.0);
@@ -222,11 +208,11 @@ void main() {
 		vec3 color1 = mix(u_trunkNoiseColor, u_trunkBaseColor, smallNoise);
 		vec3 color2 = diffuse.rgb;
 
-		if (useNoiseColor) {
+		if (u_useColorNoise) {
 			color2 = blendMultiply(diffuse.rgb, color1, 1.0);
 		}
 		targetColor = color2;
-		if (useTrunkFlatColor()) {
+		if (u_trunkFlatColor) {
 			targetColor = color1;
 		}
 		//        targetColor = vec3(1.0, 0.0, 0.0);

@@ -24,6 +24,8 @@ object ShaderLoader {
     val depthFrag by lazy { load("shaders/depth.frag.glsl") }
     val depthVert by lazy { load("shaders/depth.vert.glsl") }
 
+    val windSystem by lazy { load("shaders/wind_system.glsl") }
+
     val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
     fun load(name: String) =
         loadAsset(name).readString()

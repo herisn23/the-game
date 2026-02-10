@@ -4,6 +4,11 @@ uniform mat4 u_projViewWorldTrans;
 attribute vec2 a_texCoord0;
 varying vec2 v_texCoords0;
 
+attribute vec3 a_normal;
+
+#if defined(colorFlag)
+attribute vec4 a_color;
+#endif
 
 #ifdef boneWeight0Flag
 #define boneWeightsFlag
@@ -79,15 +84,14 @@ varying float v_depth;
 uniform vec3 u_shiftOffset;
 #endif
 
+// Wind needs these separately
 #ifdef windFlag
-// Wind uniforms
-uniform float u_time;
-uniform float u_windStrength;
-uniform float u_windSpeed;
-uniform vec2 u_windDirection;
+uniform mat4 u_worldTrans;
+uniform mat4 u_projViewTrans;
+uniform mat3 u_normalMatrix;
 #endif
 
-uniform float u_shadowBias;// Typically 0.001 - 0.01
+uniform float u_shadowBias;
 
 void main() {
     v_texCoords0 = a_texCoord0;
@@ -96,52 +100,72 @@ void main() {
     mat4 skinning = mat4(0.0);
     #ifdef boneWeight0Flag
     skinning += (a_boneWeight0.y) * u_bones[int(a_boneWeight0.x)];
-    #endif//boneWeight0Flag
+    #endif
     #ifdef boneWeight1Flag
     skinning += (a_boneWeight1.y) * u_bones[int(a_boneWeight1.x)];
-    #endif//boneWeight1Flag
+    #endif
     #ifdef boneWeight2Flag
     skinning += (a_boneWeight2.y) * u_bones[int(a_boneWeight2.x)];
-    #endif//boneWeight2Flag
+    #endif
     #ifdef boneWeight3Flag
     skinning += (a_boneWeight3.y) * u_bones[int(a_boneWeight3.x)];
-    #endif//boneWeight3Flag
+    #endif
     #ifdef boneWeight4Flag
     skinning += (a_boneWeight4.y) * u_bones[int(a_boneWeight4.x)];
-    #endif//boneWeight4Flag
+    #endif
     #ifdef boneWeight5Flag
     skinning += (a_boneWeight5.y) * u_bones[int(a_boneWeight5.x)];
-    #endif//boneWeight5Flag
+    #endif
     #ifdef boneWeight6Flag
     skinning += (a_boneWeight6.y) * u_bones[int(a_boneWeight6.x)];
-    #endif//boneWeight6Flag
+    #endif
     #ifdef boneWeight7Flag
     skinning += (a_boneWeight7.y) * u_bones[int(a_boneWeight7.x)];
-    #endif//boneWeight7Flag
-    #endif//skinningFlag
+    #endif
+    #endif
 
-    vec4 pos = vec4(a_position, 1.0);
+    // ========================================================
+    // WIND PATH: needs separate world transform
+    // ========================================================
+    #ifdef windFlag
+
+    #ifdef skinningFlag
+    vec3 objectPos = (skinning * vec4(a_position, 1.0)).xyz;
+    #else
+    vec3 objectPos = a_position;
+    #endif
+
+    vec3 worldPos = (u_worldTrans * vec4(objectPos, 1.0)).xyz;
+    vec3 normal = normalize(u_normalMatrix * a_normal);
+
+    #ifdef shiftFlag
+    worldPos -= u_shiftOffset;
+    #endif
+
+    #ifdef colorFlag
+    vec4 windVertexColor = a_color;
+    #else
+    vec4 windVertexColor = vec4(1.0);
+    #endif
+
+    vec3 windPos = applyWindSystem(objectPos, worldPos, normal, windVertexColor);
+    vec4 pos = u_worldTrans * vec4(windPos, 1.0);
 
     #ifdef shiftFlag
     pos.xyz -= u_shiftOffset;
     #endif
 
+    pos = u_projViewTrans * pos;
 
-    #ifdef windFlag
-    // ===== WIND ANIMATION =====
-    float windInfluence = clamp(a_position.y, 0.0, 1.0);
+    // ========================================================
+    // NON-WIND PATH: original combined matrix
+    // ========================================================
+    #else
 
-    float windTime = u_time * u_windSpeed;
-    float variation = sin(pos.x * 0.01) * cos(pos.z * 0.01);
+    vec4 pos = vec4(a_position, 1.0);
 
-    float sway1 = sin(windTime + pos.x * 0.05 + variation);
-    float sway2 = sin(windTime * 0.7 + pos.z * 0.03 - variation);
-
-    // Multiply by 100 to compensate for 0.01 model scale
-    vec2 windOffset = vec2(sway1, sway2) * windInfluence * u_windStrength * 100.0;
-
-    pos.x += windOffset.x * u_windDirection.x;
-    pos.z += windOffset.y * u_windDirection.y;
+    #ifdef shiftFlag
+    pos.xyz -= u_shiftOffset;
     #endif
 
     #ifdef skinningFlag
@@ -150,13 +174,11 @@ void main() {
     pos = u_projViewWorldTrans * pos;
     #endif
 
-
-
-
+    #endif// windFlag
 
     #ifdef PackedDepthFlag
     v_depth = pos.z / pos.w * 0.5 + 0.5;
-    #endif//PackedDepthFlag
+    #endif
 
     gl_Position = pos;
 }

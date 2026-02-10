@@ -19,7 +19,7 @@ class ShadowSystem(
     private val camera: Camera,
     private val shadowQuality: Int = Quality.ULTRA_HIGH,
     shadowDistance: Float = 100f,
-    private val windSystem: WindAttributes
+    private val windSystem: WindSystem
 ) : AutoDisposableAdapter() {
     object Quality {
         const val LOW = 1

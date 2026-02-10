@@ -10,7 +10,7 @@ import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
 import org.roldy.core.shader.PawnShader
 import org.roldy.core.shader.ShaderAttributes
-import org.roldy.core.shader.shaderProvider
+import org.roldy.core.shader.util.shaderProvider
 import org.roldy.g3d.ModelRenderer
 
 

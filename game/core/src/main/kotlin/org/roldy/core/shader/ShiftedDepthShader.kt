@@ -9,32 +9,31 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderContext
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
-import org.roldy.core.system.WindAttributes
+import org.roldy.core.shader.util.ShaderBuilder
+import org.roldy.core.shader.util.ShaderUserData
+import org.roldy.core.shader.util.WindShaderManager
+import org.roldy.core.shader.util.shaderProvider
+import org.roldy.core.system.WindSystem
 import kotlin.reflect.KProperty
 
 class ShiftedDepthShader(
     renderable: Renderable,
-    private val windAttributes: WindAttributes,
+    private val windSystem: WindSystem,
     val offsetProvider: OffsetProvider = object : OffsetProvider {
         override val shiftOffset = Vector3()
     }
 ) : DepthShader(
     renderable, Config().apply {
         with(ShaderBuilder) {
-            vertexShader = ShaderLoader.depthVert.shiftFlag().windFlag(renderable)
+            vertexShader = ShaderLoader.depthVert.append(ShaderLoader.windSystem).shiftFlag().windFlag(renderable)
             fragmentShader = ShaderLoader.depthFrag
         }
     }
 ) {
     val defaultOffset = Vector3()
+    val windManager = WindShaderManager(windSystem, program)
 
     val u_shiftOffset by FetchUniform()
-
-    // Wind uniforms
-    val u_time by FetchUniform()
-    val u_windStrength by FetchUniform()
-    val u_windSpeed by FetchUniform()
-    val u_windDirection by FetchUniform()
 
     val worldShiftUserData = renderable.userData as? ShaderUserData
     val isShifted get() = worldShiftUserData?.shifted ?: false
@@ -49,11 +48,7 @@ class ShiftedDepthShader(
         shift()
 
         // Set wind uniforms
-        program.setUniformf(u_time, windAttributes.time)
-        program.setUniformf(u_windStrength, windAttributes.windStrength)
-        program.setUniformf(u_windSpeed, windAttributes.windSpeed)
-        program.setUniformf(u_windDirection, windAttributes.windDirection.x, windAttributes.windDirection.y)
-
+        windManager.render(renderable)
         super.render(renderable)
     }
 
@@ -83,7 +78,7 @@ class ShiftedDepthShader(
 }
 
 
-fun shiftingDepthShaderProvider(offsetProvider: OffsetProvider, windAttributes: WindAttributes) =
+fun shiftingDepthShaderProvider(offsetProvider: OffsetProvider, windSystem: WindSystem) =
     shaderProvider {
-        ShiftedDepthShader(it, windAttributes, offsetProvider = offsetProvider)
+        ShiftedDepthShader(it, windSystem, offsetProvider = offsetProvider)
     }

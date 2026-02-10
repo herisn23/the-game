@@ -1,4 +1,4 @@
-package org.roldy.core.shader
+package org.roldy.core.shader.util
 
 data class ShaderUserData(
     var shifted: Boolean = true,

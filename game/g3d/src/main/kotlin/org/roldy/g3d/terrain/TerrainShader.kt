@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.shader.WorldShiftingShader
+import org.roldy.core.shader.util.fetchUniform
 
 class TerrainShader(
     private val terrain: Terrain,
@@ -18,13 +19,13 @@ class TerrainShader(
     // Pre-computed UVs
     private val materialUVs by lazy { AlternatingAtlasUV.generateAllUVs() }
     private val splatMaps = terrain.mapTerrainData.splatMaps
-    val u_lightDirection by FetchUniform()
-    val u_lightColor by FetchUniform()
-    val u_ambientLight by FetchUniform()
-    val u_paddedTileWidth by FetchUniform()
-    val u_normalStrength by FetchUniform()
-    val u_textureScale by FetchUniform()
-    val u_textureAtlas by FetchUniform()
+    val u_lightDirection by program.fetchUniform()
+    val u_lightColor by program.fetchUniform()
+    val u_ambientLight by program.fetchUniform()
+    val u_paddedTileWidth by program.fetchUniform()
+    val u_normalStrength by program.fetchUniform()
+    val u_textureScale by program.fetchUniform()
+    val u_textureAtlas by program.fetchUniform()
 
     val light = renderable.environment.run {
         val lights = get(

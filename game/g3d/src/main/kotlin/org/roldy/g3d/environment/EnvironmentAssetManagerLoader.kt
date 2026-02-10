@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import org.roldy.core.asset.Asset
 import org.roldy.core.asset.AssetManagerLoader
-import org.roldy.core.shader.ShaderUserData
+import org.roldy.core.shader.util.ShaderUserData
 
 interface EnvironmentAssetManagerLoader : AssetManagerLoader {
     val modelMap: Map<String, Asset<Model>>

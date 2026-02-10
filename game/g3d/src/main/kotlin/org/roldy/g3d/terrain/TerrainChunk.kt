@@ -13,7 +13,7 @@ import org.roldy.core.IVector2Int
 import org.roldy.core.Vector2Int
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.map.NoiseData
-import org.roldy.core.shader.ShaderUserData
+import org.roldy.core.shader.util.ShaderUserData
 import org.roldy.core.utils.repeat
 
 class TerrainChunk(

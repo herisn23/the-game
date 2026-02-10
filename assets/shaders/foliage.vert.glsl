@@ -105,14 +105,6 @@ attribute vec2 a_boneWeight7;
 uniform mat4 u_worldTrans;
 varying vec3 v_worldPos;
 
-// Wind uniforms
-#ifdef windFlag
-uniform float u_time;
-uniform float u_windStrength;
-uniform float u_windSpeed;
-uniform vec2 u_windDirection;
-#endif
-
 #if defined(numBones)
 #if numBones > 0
 uniform mat4 u_bones[numBones];
@@ -199,10 +191,10 @@ varying vec3 v_ambientLight;
 uniform vec3 u_shiftOffset;
 #endif
 
-// Add this varying at the top:
 varying vec3 v_lightDirection;
 varying vec2 v_diffuseUV;
 uniform vec4 u_diffuseUVTransform;
+
 void main() {
 
     v_UV = u_UVTransform.xy + a_texCoord0 * u_UVTransform.zw;
@@ -255,43 +247,57 @@ void main() {
     #endif
     #endif
 
+    // ========================================================
+    // POSITION: compute object-space and world-space positions
+    // ========================================================
+
     #ifdef skinningFlag
-    vec4 pos = u_worldTrans * skinning * vec4(a_position, 1.0);
+    vec3 objectPos = (skinning * vec4(a_position, 1.0)).xyz;
     #else
-    vec4 pos = u_worldTrans * vec4(a_position, 1.0);
+    vec3 objectPos = a_position;
+    #endif
+
+    vec3 worldPos = (u_worldTrans * vec4(objectPos, 1.0)).xyz;
+
+    #ifdef shiftFlag
+    worldPos -= u_shiftOffset;
+    #endif
+
+    vec3 normal = normalize(u_normalMatrix * a_normal);
+
+    // ========================================================
+    // WIND SYSTEM
+    // ========================================================
+    vec4 pos = vec4(worldPos, 1.0);
+
+    #ifdef windFlag
+    // a_color fallback for models without vertex colors
+    #ifdef colorFlag
+    vec4 windVertexColor = a_color;
+    #else
+    vec4 windVertexColor = vec4(1.0);
+    #endif
+
+    vec3 windPos = applyWindSystem(objectPos, worldPos, normal, windVertexColor);
+    pos = u_worldTrans * vec4(windPos, 1.0);
     #endif
 
     #ifdef shiftFlag
     pos.xyz -= u_shiftOffset;
     #endif
 
+    // ========================================================
+    // FINAL POSITION
+    // ========================================================
+
+    gl_Position = u_projViewTrans * pos;
+    v_worldPos = pos.xyz;
+
     #ifdef shadowMapFlag
     vec4 spos = u_shadowMapProjViewTrans * pos;
     v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
     #endif
 
-    v_worldPos = pos.xyz;
-
-    #ifdef windFlag
-    // ===== WIND ANIMATION =====
-    float windInfluence = clamp(a_position.y /  0.5, 0.0, 1.0);// ← Back to 50.0!
-
-    float windTime = u_time * u_windSpeed;
-    float variation = sin(pos.x * 0.01) * cos(pos.z * 0.01);
-
-    float sway1 = sin(windTime + pos.x * 0.05 + variation);
-    float sway2 = sin(windTime * 0.7 + pos.z * 0.03 - variation);
-
-    vec2 windOffset = vec2(sway1, sway2) * windInfluence * u_windStrength;
-
-    pos.x += windOffset.x * u_windDirection.x;
-    pos.z += windOffset.y * u_windDirection.y;
-    #endif
-    // ==========================
-
-    gl_Position = u_projViewTrans * pos;
-
-    vec3 normal = normalize(u_normalMatrix * a_normal);
     v_normal = normal;
 
     #if defined(skinningFlag)
@@ -364,8 +370,6 @@ void main() {
     }
     #endif
 
-
-
     #if (numPointLights > 0) && defined(normalFlag)
     for (int i = 0; i < numPointLights; i++) {
         vec3 lightDir = u_pointLights[i].position - pos.xyz;
@@ -382,7 +386,6 @@ void main() {
     #endif
     #endif
 
-    // In main(), after light calculations:
     #if numDirectionalLights > 0
     v_lightDirection = -u_dirLights[0].direction;
     #endif

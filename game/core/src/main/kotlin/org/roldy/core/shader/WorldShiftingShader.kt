@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
-import kotlin.reflect.KProperty
+import org.roldy.core.shader.util.ShaderBuilder
+import org.roldy.core.shader.util.ShaderUserData
+import org.roldy.core.shader.util.fetchUniform
+import org.roldy.core.shader.util.shaderProvider
 
 open class WorldShiftingShader(
     renderable: Renderable,
@@ -27,7 +30,8 @@ open class WorldShiftingShader(
 
     val defaultOffset = Vector3()
 
-    val u_shiftOffset by FetchUniform()
+    val u_shiftOffset by program.fetchUniform()
+
     val worldShiftUserData = renderable.userData as? ShaderUserData
     val isShifted = worldShiftUserData?.shifted ?: false
 
@@ -61,18 +65,6 @@ open class WorldShiftingShader(
         program.setUniformf(u_shiftOffset, originOffset.x, originOffset.y, originOffset.z)
     }
 
-    inner class FetchUniform(
-        private val normalize: Boolean = false
-    ) {
-        private var cachedLocation: Int? = null
-
-        operator fun getValue(thisRef: WorldShiftingShader, property: KProperty<*>): Int {
-            return cachedLocation ?: program.fetchUniformLocation(
-                property.name,
-                normalize
-            ).also { cachedLocation = it }
-        }
-    }
 }
 
 

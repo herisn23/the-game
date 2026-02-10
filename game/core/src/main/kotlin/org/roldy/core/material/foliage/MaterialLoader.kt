@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import org.roldy.core.asset.Asset
 import org.roldy.core.biome.BiomeType
 import org.roldy.core.configuration.loadFoliageMaterialConfiguration
-import org.roldy.core.shader.BooleanAttribute
-import org.roldy.core.shader.FloatValueAttribute
-import org.roldy.core.shader.FoliageColorAttribute
-import org.roldy.core.shader.FoliageTextureAttribute
+import org.roldy.core.shader.attribute.BooleanAttribute
+import org.roldy.core.shader.attribute.FloatValueAttribute
+import org.roldy.core.shader.attribute.FoliageColorAttribute
+import org.roldy.core.shader.attribute.FoliageTextureAttribute
 
 fun loadMaterials(
     textures: Map<String, Asset<Texture>>
@@ -68,7 +68,7 @@ fun FoliageConfiguration.toMaterial(
         }
 
         set(IntAttribute.createCullFace(GL20.GL_NONE))
-        set(FloatAttribute.createAlphaTest(0.8f))
+        set(FloatAttribute.createAlphaTest(0.25f))
     }
 
 private fun Map<String, Asset<Texture>>.pick(name: String?, onfound: Texture.() -> Unit) {
