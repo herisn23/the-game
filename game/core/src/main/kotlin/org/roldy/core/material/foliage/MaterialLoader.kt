@@ -68,7 +68,7 @@ fun FoliageConfiguration.toMaterial(
         }
 
         set(IntAttribute.createCullFace(GL20.GL_NONE))
-        set(FloatAttribute.createAlphaTest(0.25f))
+        set(FloatAttribute.createAlphaTest(0.5f))
     }
 
 private fun Map<String, Asset<Texture>>.pick(name: String?, onfound: Texture.() -> Unit) {

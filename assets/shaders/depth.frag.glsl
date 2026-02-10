@@ -14,8 +14,7 @@ uniform sampler2D u_diffuseTexture;
 
 uniform float u_alphaTest;
 
-//uniform sampler2D u_leafTexture;
-//uniform sampler2D u_trunkTexture;
+
 
 #ifdef PackedDepthFlag
 varying HIGH float v_depth;
