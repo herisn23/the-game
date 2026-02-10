@@ -15,6 +15,7 @@ fun assetTemplate(
     parent: String = "AssetManagerLoader",
     imports: List<String> = listOf(),
     configureAssetLoader: String = "",
+    assetLoaderParameters: String = "",
     postProcess: () -> String = { "" }
 ) =
     """
@@ -34,7 +35,7 @@ object ${prefix}AssetManager: ${parent} {
         ):Asset<T> {
             override fun get(): T = assetManager.get<T>(path).initialize()
             override fun load(assetManager: AssetManager) {
-                assetManager.load(path, cls.java)
+                assetManager.load(path, cls.java$assetLoaderParameters)
             }
         }
         ${

@@ -87,7 +87,11 @@ abstract class GenerateClassesTask : DefaultTask() {
                 allTextures,
                 true,
                 "TextureAssetManagerLoader",
-                imports = listOf("import org.roldy.core.asset.TextureAssetManagerLoader")
+                assetLoaderParameters = ", params as AssetLoaderParameters<T>",
+                imports = listOf(
+                    "import org.roldy.core.asset.TextureAssetManagerLoader",
+                    "import com.badlogic.gdx.assets.AssetLoaderParameters"
+                )
             ) {
                 """
                     override val textureMap by lazy {
