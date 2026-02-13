@@ -8,7 +8,7 @@ import org.roldy.core.configuration.G2DColorSerializer
 @Serializable
 data class ModelInstancesConfiguration(
     val materials: List<MaterialData>,
-    val instances: List<ModelInstance>
+    val instances: List<ModelInstanceData>
 ) {
 
 }
@@ -69,7 +69,7 @@ data class VectorType(
 ) : Uniform
 
 @Serializable
-data class ModelInstance(
+data class ModelInstanceData(
     val modelName: String,
     val meshes: List<MeshData>
 )

@@ -120,7 +120,8 @@ abstract class GenerateClassesTask : DefaultTask() {
             AssetData(
                 name,
                 base.resolve("models").resolve(biome.name.lowercase()).resolve(it.name).pathString,
-                "Model"
+                "Model",
+                it.nameWithoutExtension
             )
         }
         return ClassInfo(
@@ -146,7 +147,7 @@ abstract class GenerateClassesTask : DefaultTask() {
                          ${
                     g3db.joinToString(",\n") {
                         """
-                                "${it.property}" to ${it.property}
+                                "${it.key}" to ${it.property}
                             """.trimIndent()
                     }
                 }

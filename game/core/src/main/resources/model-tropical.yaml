@@ -4870,13 +4870,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#283A05'
+        value: '#283A0500'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#4F7B02'
+        value: '#4F7B0200'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D02'
+        value: '#6D7D0200'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -7303,8 +7303,7 @@ instances:
       - lod: -1
         meshName: SM_Prop_Tiki_Torch_03
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o0
-    modelName: SM_Prop_Whale_Skeleton_01
+  - modelName: SM_Prop_Whale_Skeleton_01
     meshes:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_01
@@ -7318,9 +7317,6 @@ instances:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_01_Head_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o0
-  - *o0
-  - *o0
   - modelName: SM_Prop_Whale_Skeleton_Rib_01
     meshes:
       - lod: -1
@@ -7346,8 +7342,7 @@ instances:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_Shoulder_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o1
-    modelName: SM_Prop_Whale_Skeleton_Skull_01
+  - modelName: SM_Prop_Whale_Skeleton_Skull_01
     meshes:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_Skull_01
@@ -7355,7 +7350,6 @@ instances:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_Skull_01_Jaw_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o1
   - modelName: SM_Prop_Whale_Skeleton_Tail_01
     meshes:
       - lod: -1
@@ -7366,8 +7360,7 @@ instances:
       - lod: -1
         meshName: SM_Prop_Whale_Skeleton_Vertebra_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o2
-    modelName: SM_Veh_Canoe_Animated
+  - modelName: SM_Veh_Canoe_Animated
     meshes:
       - lod: -1
         meshName: SM_Veh_Outrigger_Canoe_01
@@ -7375,9 +7368,7 @@ instances:
       - lod: -1
         meshName: SM_Veh_Outrigger_Canoe_01_Canopy_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o2
-  - &o3
-    modelName: SM_Veh_Outrigger_Canoe_01
+  - modelName: SM_Veh_Outrigger_Canoe_01
     meshes:
       - lod: -1
         meshName: SM_Veh_Outrigger_Canoe_01
@@ -7385,7 +7376,6 @@ instances:
       - lod: -1
         meshName: SM_Veh_Outrigger_Canoe_01_Canopy_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o3
   - modelName: SM_Bld_Giant_Column_01
     meshes:
       - lod: -1
@@ -7436,8 +7426,7 @@ instances:
       - lod: -1
         meshName: SM_Bld_Shack_Pirate_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o4
-    modelName: SM_Env_Bush_01
+  - modelName: SM_Env_Bush_01
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_01_LOD0
@@ -7445,9 +7434,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_01_LOD1
         materialName: Tree_Mat_01
-  - *o4
-  - &o5
-    modelName: SM_Env_Bush_02
+  - modelName: SM_Env_Bush_02
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_02_Branches_LOD0
@@ -7458,10 +7445,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_02_Leaves_LOD1
         materialName: Tree_Mat_02_Small
-  - *o5
-  - *o5
-  - &o6
-    modelName: SM_Env_Bush_Palm_01
+  - modelName: SM_Env_Bush_Palm_01
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Palm_01_LOD0
@@ -7475,11 +7459,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Bush_Palm_01_LOD3
         materialName: Card_Bush_Palm_01
-  - *o6
-  - *o6
-  - *o6
-  - &o7
-    modelName: SM_Env_Bush_Palm_01_Flowers_01
+  - modelName: SM_Env_Bush_Palm_01_Flowers_01
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Palm_01_Flowers_01_LOD0
@@ -7487,9 +7467,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_Palm_01_Flowers_01_LOD1
         materialName: Flowers_Plant_Mat_01
-  - *o7
-  - &o8
-    modelName: SM_Env_Bush_Palm_02
+  - modelName: SM_Env_Bush_Palm_02
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Palm_02_LOD0
@@ -7500,10 +7478,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Bush_Palm_02_LOD2
         materialName: Palm_Mat_02
-  - *o8
-  - *o8
-  - &o9
-    modelName: SM_Env_Bush_Palm_03
+  - modelName: SM_Env_Bush_Palm_03
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Palm_03_LOD0
@@ -7514,10 +7489,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Bush_Palm_03_LOD2
         materialName: Palm_Red_Mat_01
-  - *o9
-  - *o9
-  - &o10
-    modelName: SM_Env_Bush_Palm_04
+  - modelName: SM_Env_Bush_Palm_04
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Palm_04_LOD0
@@ -7528,10 +7500,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Bush_Palm_04_LOD2
         materialName: Palm_Mat_06
-  - *o10
-  - *o10
-  - &o11
-    modelName: SM_Env_Bush_Tropical_01
+  - modelName: SM_Env_Bush_Tropical_01
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Tropical_01_LOD0
@@ -7539,9 +7508,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_Tropical_01_LOD1
         materialName: Tree_Mat_03
-  - *o11
-  - &o12
-    modelName: SM_Env_Bush_Tropical_02
+  - modelName: SM_Env_Bush_Tropical_02
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Tropical_02_LOD0
@@ -7549,9 +7516,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_Tropical_02_LOD1
         materialName: Tree_Mat_03
-  - *o12
-  - &o13
-    modelName: SM_Env_Bush_Tropical_03
+  - modelName: SM_Env_Bush_Tropical_03
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Tropical_03_LOD0
@@ -7559,9 +7524,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_Tropical_03_LOD1
         materialName: Tree_Mat_03
-  - *o13
-  - &o14
-    modelName: SM_Env_Bush_Tropical_04
+  - modelName: SM_Env_Bush_Tropical_04
     meshes:
       - lod: 0
         meshName: SM_Env_Bush_Tropical_04_Branches_LOD0
@@ -7572,8 +7535,6 @@ instances:
       - lod: 1
         meshName: SM_Env_Bush_Tropical_04_Leaves_LOD1
         materialName: Tree_Mat_03
-  - *o14
-  - *o14
   - modelName: SM_Env_Creeper_Clump_01
     meshes:
       - lod: -1
@@ -7629,8 +7590,7 @@ instances:
       - lod: -1
         meshName: SM_Env_DriftWood_05
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o15
-    modelName: SM_Env_Fern_01
+  - modelName: SM_Env_Fern_01
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_01_LOD0
@@ -7641,10 +7601,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Fern_01_LOD2
         materialName: Palm_Mat_01
-  - *o15
-  - *o15
-  - &o16
-    modelName: SM_Env_Fern_02
+  - modelName: SM_Env_Fern_02
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_02_LOD0
@@ -7655,10 +7612,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Fern_02_LOD2
         materialName: Palm_Mat_01
-  - *o16
-  - *o16
-  - &o17
-    modelName: SM_Env_Fern_03
+  - modelName: SM_Env_Fern_03
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_03_LOD0
@@ -7669,10 +7623,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Fern_03_LOD2
         materialName: Palm_Mat_01
-  - *o17
-  - *o17
-  - &o18
-    modelName: SM_Env_Fern_04
+  - modelName: SM_Env_Fern_04
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_04_LOD0
@@ -7683,10 +7634,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Fern_04_LOD2
         materialName: Palm_Mat_01
-  - *o18
-  - *o18
-  - &o19
-    modelName: SM_Env_Fern_Part_01
+  - modelName: SM_Env_Fern_Part_01
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_Part_01_LOD0
@@ -7694,9 +7642,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Fern_Part_01_LOD1
         materialName: Palm_Mat_01
-  - *o19
-  - &o20
-    modelName: SM_Env_Fern_Part_02
+  - modelName: SM_Env_Fern_Part_02
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_Part_02_LOD0
@@ -7704,9 +7650,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Fern_Part_02_LOD1
         materialName: Palm_Mat_01
-  - *o20
-  - &o21
-    modelName: SM_Env_Fern_Part_03
+  - modelName: SM_Env_Fern_Part_03
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_Part_03_LOD0
@@ -7714,9 +7658,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Fern_Part_03_LOD1
         materialName: Palm_Mat_01
-  - *o21
-  - &o22
-    modelName: SM_Env_Fern_Part_04
+  - modelName: SM_Env_Fern_Part_04
     meshes:
       - lod: 0
         meshName: SM_Env_Fern_Part_04_LOD0
@@ -7724,9 +7666,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Fern_Part_04_LOD1
         materialName: Palm_Mat_01
-  - *o22
-  - &o23
-    modelName: SM_Env_Flower_01
+  - modelName: SM_Env_Flower_01
     meshes:
       - lod: 0
         meshName: SM_Env_Flower_01_LOD0
@@ -7734,9 +7674,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Flower_01_LOD1
         materialName: Flowers_Plant_Mat_01
-  - *o23
-  - &o24
-    modelName: SM_Env_Flower_02
+  - modelName: SM_Env_Flower_02
     meshes:
       - lod: 0
         meshName: SM_Env_Flower_02_LOD0
@@ -7744,9 +7682,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Flower_02_LOD1
         materialName: Flowers_Plant_Mat_01
-  - *o24
-  - &o25
-    modelName: SM_Env_Flower_03
+  - modelName: SM_Env_Flower_03
     meshes:
       - lod: 0
         meshName: SM_Env_Flower_03_LOD0
@@ -7754,9 +7690,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Flower_03_LOD1
         materialName: Flowers_Plant_Mat_01
-  - *o25
-  - &o26
-    modelName: SM_Env_Flower_Pitcher_01
+  - modelName: SM_Env_Flower_Pitcher_01
     meshes:
       - lod: 0
         meshName: SM_Env_Flower_Pitcher_01_LOD0
@@ -7767,10 +7701,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Flower_Pitcher_01_LOD2
         materialName: BASEMat_01
-  - *o26
-  - *o26
-  - &o27
-    modelName: SM_Env_Flower_Pitcher_02
+  - modelName: SM_Env_Flower_Pitcher_02
     meshes:
       - lod: 0
         meshName: SM_Env_Flower_Pitcher_02_LOD0
@@ -7781,10 +7712,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Flower_Pitcher_02_LOD2
         materialName: BASEMat_01
-  - *o27
-  - *o27
-  - &o28
-    modelName: SM_Env_Flowers_01
+  - modelName: SM_Env_Flowers_01
     meshes:
       - lod: 0
         meshName: SM_Env_Flowers_01_LOD0
@@ -7795,10 +7723,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Flowers_01_LOD2
         materialName: BASEMat_01
-  - *o28
-  - *o28
-  - &o29
-    modelName: SM_Env_Flowers_02
+  - modelName: SM_Env_Flowers_02
     meshes:
       - lod: 0
         meshName: SM_Env_Flowers_02_LOD0
@@ -7809,10 +7734,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Flowers_02_LOD2
         materialName: BASEMat_01
-  - *o29
-  - *o29
-  - &o30
-    modelName: SM_Env_Flowers_03
+  - modelName: SM_Env_Flowers_03
     meshes:
       - lod: 0
         meshName: SM_Env_Flowers_03_LOD0
@@ -7820,9 +7742,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Flowers_03_LOD1
         materialName: BASEMat_01
-  - *o30
-  - &o31
-    modelName: SM_Env_Flowers_04
+  - modelName: SM_Env_Flowers_04
     meshes:
       - lod: 0
         meshName: SM_Env_Flowers_04_LOD0
@@ -7830,9 +7750,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Flowers_04_LOD1
         materialName: BASEMat_01
-  - *o31
-  - &o32
-    modelName: SM_Env_Flowers_05
+  - modelName: SM_Env_Flowers_05
     meshes:
       - lod: 0
         meshName: SM_Env_Flowers_05_LOD0
@@ -7843,8 +7761,6 @@ instances:
       - lod: 2
         meshName: SM_Env_Flowers_05_LOD2
         materialName: BASEMat_01
-  - *o32
-  - *o32
   - modelName: SM_Env_Flowers_Flat_01
     meshes:
       - lod: -1
@@ -7860,8 +7776,7 @@ instances:
       - lod: -1
         meshName: SM_Env_Flowers_Flat_03
         materialName: Flowers_Flat_Mat_01
-  - &o33
-    modelName: SM_Env_Grass_Bush_01
+  - modelName: SM_Env_Grass_Bush_01
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Bush_01_LOD0
@@ -7872,10 +7787,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Grass_Bush_01_LOD2
         materialName: Grass_Tall_Mat_01
-  - *o33
-  - *o33
-  - &o34
-    modelName: SM_Env_Grass_Med_Clump_01
+  - modelName: SM_Env_Grass_Med_Clump_01
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Med_Clump_01_LOD0
@@ -7883,9 +7795,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Med_Clump_01_LOD1
         materialName: Grass_Med_Mat_01
-  - *o34
-  - &o35
-    modelName: SM_Env_Grass_Med_Clump_02
+  - modelName: SM_Env_Grass_Med_Clump_02
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Med_Clump_02_LOD0
@@ -7893,9 +7803,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Med_Clump_02_LOD1
         materialName: Grass_Med_Mat_01
-  - *o35
-  - &o36
-    modelName: SM_Env_Grass_Med_Clump_03
+  - modelName: SM_Env_Grass_Med_Clump_03
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Med_Clump_03_LOD0
@@ -7906,15 +7814,12 @@ instances:
       - lod: 2
         meshName: SM_Env_Grass_Med_Clump_03_LOD2
         materialName: Grass_Med_Mat_01
-  - *o36
-  - *o36
   - modelName: SM_Env_Grass_Med_Plane_01
     meshes:
       - lod: -1
         meshName: SM_Env_Grass_Med_Plane_01
         materialName: Grass_Med_Mat_01
-  - &o37
-    modelName: SM_Env_Grass_Short_Clump_01
+  - modelName: SM_Env_Grass_Short_Clump_01
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Short_Clump_01_LOD0
@@ -7922,9 +7827,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Short_Clump_01_LOD1
         materialName: Grass_Short_Mat_01
-  - *o37
-  - &o38
-    modelName: SM_Env_Grass_Short_Clump_02
+  - modelName: SM_Env_Grass_Short_Clump_02
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Short_Clump_02_LOD0
@@ -7932,9 +7835,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Short_Clump_02_LOD1
         materialName: Grass_Short_Mat_01
-  - *o38
-  - &o39
-    modelName: SM_Env_Grass_Short_Clump_03
+  - modelName: SM_Env_Grass_Short_Clump_03
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Short_Clump_03_LOD0
@@ -7945,15 +7846,12 @@ instances:
       - lod: 2
         meshName: SM_Env_Grass_Short_Clump_03_LOD2
         materialName: Grass_Short_Mat_01
-  - *o39
-  - *o39
   - modelName: SM_Env_Grass_Short_Plane_01
     meshes:
       - lod: -1
         meshName: SM_Env_Grass_Short_Plane_01
         materialName: Grass_Short_Mat_01
-  - &o40
-    modelName: SM_Env_Grass_Tall_Clump_01
+  - modelName: SM_Env_Grass_Tall_Clump_01
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Tall_Clump_01_LOD0
@@ -7961,9 +7859,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Tall_Clump_01_LOD1
         materialName: Grass_Tall_Mat_01
-  - *o40
-  - &o41
-    modelName: SM_Env_Grass_Tall_Clump_02
+  - modelName: SM_Env_Grass_Tall_Clump_02
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Tall_Clump_02_LOD0
@@ -7971,9 +7867,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Grass_Tall_Clump_02_LOD1
         materialName: Grass_Tall_Mat_01
-  - *o41
-  - &o42
-    modelName: SM_Env_Grass_Tall_Clump_03
+  - modelName: SM_Env_Grass_Tall_Clump_03
     meshes:
       - lod: 0
         meshName: SM_Env_Grass_Tall_Clump_03_LOD0
@@ -7984,15 +7878,12 @@ instances:
       - lod: 2
         meshName: SM_Env_Grass_Tall_Clump_03_LOD2
         materialName: Grass_Tall_Mat_01
-  - *o42
-  - *o42
   - modelName: SM_Env_Grass_Tall_Plane_01
     meshes:
       - lod: -1
         meshName: SM_Env_Grass_Tall_Plane_01
         materialName: Grass_Tall_Mat_01
-  - &o43
-    modelName: SM_Env_Ground_Cover_01
+  - modelName: SM_Env_Ground_Cover_01
     meshes:
       - lod: 0
         meshName: SM_Env_Ground_Cover_01_LOD0
@@ -8000,9 +7891,7 @@ instances:
       - lod: 1
         meshName: SM_Env_Ground_Cover_01_LOD1
         materialName: Ground_Cover_Mat_01
-  - *o43
-  - &o44
-    modelName: SM_Env_Ground_Cover_02
+  - modelName: SM_Env_Ground_Cover_02
     meshes:
       - lod: 0
         meshName: SM_Env_Ground_Cover_02_LOD0
@@ -8013,10 +7902,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Ground_Cover_02_LOD2
         materialName: Ground_Cover_Mat_01
-  - *o44
-  - *o44
-  - &o45
-    modelName: SM_Env_Ground_Cover_03
+  - modelName: SM_Env_Ground_Cover_03
     meshes:
       - lod: 0
         meshName: SM_Env_Ground_Cover_03_LOD0
@@ -8027,8 +7913,6 @@ instances:
       - lod: 2
         meshName: SM_Env_Ground_Cover_03_LOD2
         materialName: Ground_Cover_Mat_01
-  - *o45
-  - *o45
   - modelName: SM_Env_Growth_Plane_01
     meshes:
       - lod: -1
@@ -8209,8 +8093,7 @@ instances:
       - lod: -1
         meshName: SM_Env_Rock_Spikes_02
         materialName: Rock_Triplanar_Tropical
-  - &o46
-    modelName: SM_Env_Seaweed_01
+  - modelName: SM_Env_Seaweed_01
     meshes:
       - lod: 0
         meshName: SM_Env_Seaweed_01_LOD0
@@ -8221,10 +8104,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Seaweed_01_LOD2
         materialName: Seaweed_Mat_01
-  - *o46
-  - *o46
-  - &o47
-    modelName: SM_Env_Seaweed_02
+  - modelName: SM_Env_Seaweed_02
     meshes:
       - lod: 0
         meshName: SM_Env_Seaweed_02_LOD0
@@ -8235,10 +8115,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Seaweed_02_LOD2
         materialName: Seaweed_Mat_01
-  - *o47
-  - *o47
-  - &o48
-    modelName: SM_Env_Seaweed_03
+  - modelName: SM_Env_Seaweed_03
     meshes:
       - lod: 0
         meshName: SM_Env_Seaweed_03_LOD0
@@ -8249,15 +8126,12 @@ instances:
       - lod: 2
         meshName: SM_Env_Seaweed_03_LOD2
         materialName: Seaweed_Mat_01
-  - *o48
-  - *o48
   - modelName: SM_Env_Seaweed_Beach_01
     meshes:
       - lod: -1
         meshName: SM_Env_Seaweed_Beach_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o49
-    modelName: SM_Env_Tree_Banana_01
+  - modelName: SM_Env_Tree_Banana_01
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Banana_01_LOD0
@@ -8268,10 +8142,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Banana_01_LOD2
         materialName: Card_Tree_Banana_01
-  - *o49
-  - *o49
-  - &o50
-    modelName: SM_Env_Tree_Banana_02
+  - modelName: SM_Env_Tree_Banana_02
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Banana_02_LOD0
@@ -8282,10 +8153,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Banana_02_LOD2
         materialName: Card_Tree_Banana_01
-  - *o50
-  - *o50
-  - &o51
-    modelName: SM_Env_Tree_Banana_03
+  - modelName: SM_Env_Tree_Banana_03
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Banana_03_LOD0
@@ -8296,10 +8164,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Banana_03_LOD2
         materialName: Card_Tree_Banana_01
-  - *o51
-  - *o51
-  - &o52
-    modelName: SM_Env_Tree_Forest_01
+  - modelName: SM_Env_Tree_Forest_01
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Forest_01_Branches_LOD0
@@ -8319,13 +8184,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Forest_01_LOD3
         materialName: Card_Tree_Forest_01
-  - *o52
-  - *o52
-  - *o52
-  - *o52
-  - *o52
-  - &o53
-    modelName: SM_Env_Tree_Forest_02
+  - modelName: SM_Env_Tree_Forest_02
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Forest_02_Branches_LOD0
@@ -8345,13 +8204,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Forest_02_LOD3
         materialName: Card_Tree_Forest_02
-  - *o53
-  - *o53
-  - *o53
-  - *o53
-  - *o53
-  - &o54
-    modelName: SM_Env_Tree_Forest_03
+  - modelName: SM_Env_Tree_Forest_03
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Forest_03_Branches_LOD0
@@ -8371,13 +8224,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Forest_03_LOD3
         materialName: Card_Tree_Forest_03
-  - *o54
-  - *o54
-  - *o54
-  - *o54
-  - *o54
-  - &o55
-    modelName: SM_Env_Tree_Palm_01
+  - modelName: SM_Env_Tree_Palm_01
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Palm_01_LOD0
@@ -8391,16 +8238,12 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Palm_01_LOD3
         materialName: Card_Tree_Palm_01
-  - *o55
-  - *o55
-  - *o55
   - modelName: SM_Env_Tree_Palm_01_Coconuts_01
     meshes:
       - lod: -1
         meshName: SM_Env_Tree_Palm_01_Coconuts_01
         materialName: BASEMat_01
-  - &o56
-    modelName: SM_Env_Tree_Palm_02
+  - modelName: SM_Env_Tree_Palm_02
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Palm_02_LOD0
@@ -8414,11 +8257,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Palm_02_LOD3
         materialName: Card_Tree_Palm_02
-  - *o56
-  - *o56
-  - *o56
-  - &o57
-    modelName: SM_Env_Tree_Palm_03
+  - modelName: SM_Env_Tree_Palm_03
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Palm_03_LOD0
@@ -8432,11 +8271,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Palm_03_LOD3
         materialName: Card_Tree_Palm_01
-  - *o57
-  - *o57
-  - *o57
-  - &o58
-    modelName: SM_Env_Tree_Palm_04
+  - modelName: SM_Env_Tree_Palm_04
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Palm_04_LOD0
@@ -8450,11 +8285,7 @@ instances:
       - lod: 3
         meshName: SM_Env_Tree_Palm_04_LOD3
         materialName: Card_Tree_Palm_01
-  - *o58
-  - *o58
-  - *o58
-  - &o59
-    modelName: SM_Env_Tree_Pohutukawa_01
+  - modelName: SM_Env_Tree_Pohutukawa_01
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Pohutukawa_01_Branches_LOD0
@@ -8471,12 +8302,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Pohutukawa_01_LOD2
         materialName: Card_Tree_Pohutukawa_01
-  - *o59
-  - *o59
-  - *o59
-  - *o59
-  - &o60
-    modelName: SM_Env_Tree_Pohutukawa_02
+  - modelName: SM_Env_Tree_Pohutukawa_02
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Pohutukawa_02_Branches_LOD0
@@ -8493,12 +8319,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Pohutukawa_02_LOD2
         materialName: Card_Tree_Pohutukawa_02
-  - *o60
-  - *o60
-  - *o60
-  - *o60
-  - &o61
-    modelName: SM_Env_Tree_Pohutukawa_03
+  - modelName: SM_Env_Tree_Pohutukawa_03
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Pohutukawa_03_LOD0
@@ -8509,10 +8330,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Pohutukawa_03_LOD2
         materialName: Card_Tree_Pohutukawa_03
-  - *o61
-  - *o61
-  - &o62
-    modelName: SM_Env_Tree_Pohutukawa_04
+  - modelName: SM_Env_Tree_Pohutukawa_04
     meshes:
       - lod: 0
         meshName: SM_Env_Tree_Pohutukawa_04_LOD0
@@ -8523,10 +8341,7 @@ instances:
       - lod: 2
         meshName: SM_Env_Tree_Pohutukawa_04_LOD2
         materialName: Card_Tree_Pohutukawa_04
-  - *o62
-  - *o62
-  - &o63
-    modelName: SM_Env_Tubes_01
+  - modelName: SM_Env_Tubes_01
     meshes:
       - lod: 0
         meshName: SM_Env_Tubes_01_LOD0
@@ -8537,8 +8352,6 @@ instances:
       - lod: 2
         meshName: SM_Env_Tubes_01_LOD2
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o63
-  - *o63
   - modelName: SM_Env_Vines_01
     meshes:
       - lod: -1
@@ -8624,8 +8437,7 @@ instances:
       - lod: -1
         meshName: SM_Prop_Coral_11
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - &o64
-    modelName: SM_Prop_GiantClam_01
+  - modelName: SM_Prop_GiantClam_01
     meshes:
       - lod: -1
         meshName: SM_Prop_GiantClam_01
@@ -8636,8 +8448,6 @@ instances:
       - lod: -1
         meshName: SM_Prop_GiantClam_01_Pearl_01
         materialName: PolygonNatureBiomesTropical_Mat_01
-  - *o64
-  - *o64
   - modelName: SM_Prop_Starfish_01
     meshes:
       - lod: -1

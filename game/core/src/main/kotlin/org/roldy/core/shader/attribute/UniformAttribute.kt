@@ -1,4 +1,4 @@
-package org.roldy.core.shader
+package org.roldy.core.shader.attribute
 
 import com.badlogic.gdx.graphics.g3d.Attribute
 import org.roldy.core.shader.uniform.UniformValue

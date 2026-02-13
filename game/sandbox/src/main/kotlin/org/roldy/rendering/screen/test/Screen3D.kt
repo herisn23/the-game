@@ -21,16 +21,17 @@ import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
-import org.roldy.core.model.loadModelInstances
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.shader.UniformAttribute
 import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.system.ShadowSystem
 import org.roldy.core.system.WindSystem
 import org.roldy.core.utils.invoke
 import org.roldy.g3d.AssetManagersLoader
-import org.roldy.g3d.environment.*
+import org.roldy.g3d.environment.EnvTexturesAssetAssetManager
+import org.roldy.g3d.environment.SunBillboard
+import org.roldy.g3d.environment.loadModelInstances
+import org.roldy.g3d.environment.loadModelInstances2
 import org.roldy.g3d.pawn.CharacterController
 import org.roldy.g3d.pawn.PawnManager
 import org.roldy.g3d.pawn.PawnModelBuilder
@@ -63,17 +64,14 @@ class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
 
-
-    val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
-    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalTexture01.get() }
-
-    //    val materials by lazy {
-//        loadMaterials(EnvTexturesAssetAssetManager.textureMap)
-//    }
     val materials by lazy {
         loadModelInstances(EnvTexturesAssetAssetManager.textureMap)
     }
-
+    val instances by lazy {
+        loadModelInstances2(EnvTexturesAssetAssetManager.textureMap).associateBy {
+            it.name
+        }
+    }
 
     val windSystem = WindSystem()
     val mapSizeScale = 1
@@ -143,48 +141,24 @@ class Screen3D(
                 transform.setTranslation(tx, ty, tz)
             }
 
-            tropicalModel.position(5f, 5f)
-            grass.position(1f, 1f)
-            tree.position(10f, 10f)
-            palm.position(-2f, -2f)
+            tropicalModel.instance.position(5f, 5f)
+            grass.instance.position(1f, 1f)
+            tree.instance.position(10f, 10f)
+            palm.instance.position(-2f, -2f)
         }
     }
 
     val tropicalModel by lazy {
-        TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive).apply {
-            transform.idt()
-            transform.setTranslation(0f, 0f, 0f)
-        }
+        instances.getValue("SM_Bld_Giant_Column_01")
     }
     val grass by lazy {
-        TropicalAssetManager.envGrassMedClump01.simpleFoliage(materials.first { it.id == "Grass_Med_Mat_01" })
-            .apply {
-                nodes.first().children.removeAll {
-                    !it.id.contains("LOD0")
-                }
-            }
+        instances.getValue("SM_Env_Tree_Banana_01")
     }
     val tree by lazy {
-        val b = materials.first { it.id == "Branches_01" }
-        val l = materials.first { it.id == "Tree_Mat_02" }
-        val u = l.get(UniformAttribute::class.java, UniformAttribute.uniformsAttr).uniforms
-        u.keys.sorted().forEach {
-            println(u.getValue(it))
-        }
-        TropicalAssetManager.envTreeForest02.tree(b, l)
-            .apply {
-                nodes.first().children.removeAll {
-                    !it.id.contains("LOD0")
-                }
-            }
+        instances.getValue("SM_Env_Tree_Forest_02")
     }
     val palm by lazy {
-        TropicalAssetManager.envTreePalm01.simpleFoliage(materials.first { it.id == "Palm_Mat_01" })
-            .apply {
-                nodes.first().children.removeAll {
-                    !it.id.contains("LOD0")
-                }
-            }
+        instances.getValue("SM_Env_Tree_Palm_01")
     }
 
 
@@ -253,10 +227,10 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-                render(grass)
-                render(tree)
-                render(palm)
-                render(tropicalModel)
+                render(grass.model(camera))
+                render(tree.model(camera))
+                render(palm.model(camera))
+                render(tropicalModel.model(camera))
                 render(character.manager.instance)
             }
 
@@ -266,11 +240,11 @@ class Screen3D(
                 context(shadowSystem.environment) {
                     terrainInstance.render()
                     envModelBatch {
-                        listOf(tropicalModel)
+                        listOf(tropicalModel.model(camera))
                     }
 
                     foliageBatch {
-                        listOf(grass, tree, palm)
+                        listOf(grass.model(camera), tree.model(camera), palm.model(camera))
                     }
                     character.render()
                 }

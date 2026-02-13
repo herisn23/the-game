@@ -3,6 +3,7 @@ package org.roldy.core.shader
 import com.badlogic.gdx.graphics.g3d.Renderable
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
+import org.roldy.core.shader.attribute.UniformAttribute
 import org.roldy.core.shader.uniform.*
 import org.roldy.core.shader.util.ShaderBuilder
 import org.roldy.core.shader.util.WindShaderManager
