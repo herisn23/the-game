@@ -62,8 +62,8 @@ uniform float u_leafSmoothness;
 uniform float u_leafNormalStrength;
 uniform float u_trunkNormalStrength;
 
-uniform float u_leafHasNormal;
-uniform float u_trunkHasNormal;
+uniform bool u_leafHasNormal;
+uniform bool u_trunkHasNormal;
 
 // Leaf colors
 uniform vec3 u_leafBaseColor;
@@ -220,18 +220,13 @@ void main() {
 
 	vec4 baseColor = vec4(targetColor, diffuse.a);
 
-
-
-	bool leafHasNormal = u_leafHasNormal > 0.5;
-	bool trunkHasNormal = u_trunkHasNormal > 0.5;
-	bool hasNormal = leafHasNormal || trunkHasNormal;
-
 	// Apply normal mapping if available
-	if (isLeaf && leafHasNormal) {
+	if (isLeaf && u_leafHasNormal) {
 		baseColor.rgb = baseColor.rgb * getNormal(u_leafNormal, u_leafNormalStrength);
-	} else if (trunkHasNormal) {
+	} else if (u_trunkHasNormal) {
 		baseColor.rgb = baseColor.rgb * getNormal(u_trunkNormal, u_trunkNormalStrength);
 	}
+
 
 	float metallic;
 	float smoothness;
@@ -276,8 +271,5 @@ void main() {
 	gl_FragColor.rgb = mix(gl_FragColor.rgb, u_fogColor.rgb, v_fog);
 	#endif
 
-
 	gl_FragColor.a = baseColor.a;
-
-
 }

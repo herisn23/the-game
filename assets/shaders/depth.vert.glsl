@@ -148,7 +148,7 @@ void main() {
     vec4 windVertexColor = vec4(1.0);
     #endif
 
-    vec3 windPos = applyWindSystem(objectPos, worldPos, normal, windVertexColor);
+    vec3 windPos = applyWindSystem(u_worldTrans, objectPos, worldPos, normal, windVertexColor);
     vec4 pos = u_worldTrans * vec4(windPos, 1.0);
 
     #ifdef shiftFlag

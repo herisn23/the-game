@@ -3,17 +3,19 @@ package org.roldy.core.shader.util
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Quaternion
+import org.roldy.core.asset.modelScale
 import org.roldy.core.system.WindSystem
 
 class WindShaderManager(
     private val windSystem: WindSystem,
     private val program: ShaderProgram
 ) {
-    val enabled = 1
+    val enabled = 0
     private val tempQuat = Quaternion()
 
     // controller uniforms
     val u_useGlobalWeatherController by program.fetchUniform()
+    val u_posScale by program.fetchUniform()
     val u_windDirection by program.fetchUniform()
     val u_galeStrength by program.fetchUniform()
     val u_windIntensity by program.fetchUniform()
@@ -51,6 +53,8 @@ class WindShaderManager(
     fun render(renderable: Renderable) {
         val yaw = renderable.worldTransform.getRotation(tempQuat).yaw
 
+        program.setUniformf(u_posScale, modelScale)
+
         program.setUniformf(u_time, windSystem.time)
 
         program.setUniformf(u_objectYRotationDeg, yaw)
@@ -58,10 +62,10 @@ class WindShaderManager(
 
         // enablers
 
-        program.setUniformi(u_enableBreeze, enabled)
-        program.setUniformi(u_enableLightWind, enabled)
-        program.setUniformi(u_enableStrongWind, enabled)
-        program.setUniformi(u_enableWindTwist, enabled)
+        program.setUniformi(u_enableBreeze, 1)
+        program.setUniformi(u_enableLightWind, 1)
+        program.setUniformi(u_enableStrongWind, 1)
+        program.setUniformi(u_enableWindTwist, 1)
 
         //breeze
         program.setUniformf(u_breezeStrength, .2f)
@@ -79,6 +83,11 @@ class WindShaderManager(
         // twist
         program.setUniformf(u_windTwistStrength, 0.15f)
         program.setUniformf(u_galeBend, 1f)
+
+        program.setUniformi(u_useGlobalWeatherController, 1)
+        program.setUniformf(u_windIntensity, windSystem.windIntensity)
+        program.setUniformf(u_galeStrength, windSystem.weatherIntensity)
+        program.setUniformf(u_windDirection, windSystem.windDirection)
 
     }
 
