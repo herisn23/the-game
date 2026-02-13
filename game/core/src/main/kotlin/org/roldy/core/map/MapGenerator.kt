@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture
 import org.roldy.core.IVector2Int
 import org.roldy.core.SimplexNoise
 import org.roldy.core.biome.Biome
-import org.roldy.core.biome.BiomeData
 import org.roldy.core.configuration.HeightData
+import org.roldy.core.configuration.data.BiomeData
 import org.roldy.core.utils.repeat
 import org.roldy.core.x
 import kotlin.math.abs

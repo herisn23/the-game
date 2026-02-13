@@ -21,8 +21,9 @@ import org.roldy.core.map.MapData
 import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
-import org.roldy.core.material.foliage.loadMaterials
+import org.roldy.core.model.loadModelInstances
 import org.roldy.core.postprocess.PostProcessing
+import org.roldy.core.shader.UniformAttribute
 import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.system.ShadowSystem
@@ -61,10 +62,16 @@ import org.roldy.g3d.terrain.TerrainSampler
 class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
+
+
     val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
-    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalDiffuse01.get() }
+    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalTexture01.get() }
+
+    //    val materials by lazy {
+//        loadMaterials(EnvTexturesAssetAssetManager.textureMap)
+//    }
     val materials by lazy {
-        loadMaterials(EnvTexturesAssetAssetManager.textureMap)
+        loadModelInstances(EnvTexturesAssetAssetManager.textureMap)
     }
 
 
@@ -160,6 +167,10 @@ class Screen3D(
     val tree by lazy {
         val b = materials.first { it.id == "Branches_01" }
         val l = materials.first { it.id == "Tree_Mat_02" }
+        val u = l.get(UniformAttribute::class.java, UniformAttribute.uniformsAttr).uniforms
+        u.keys.sorted().forEach {
+            println(u.getValue(it))
+        }
         TropicalAssetManager.envTreeForest02.tree(b, l)
             .apply {
                 nodes.first().children.removeAll {

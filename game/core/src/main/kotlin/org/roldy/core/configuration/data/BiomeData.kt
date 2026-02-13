@@ -1,7 +1,8 @@
-package org.roldy.core.biome
+package org.roldy.core.configuration.data
 
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
+import org.roldy.core.biome.BiomeType
 import org.roldy.core.configuration.ClosedFloatingPointRangeSerializer
 import org.roldy.core.configuration.G2DColorSerializer
 import org.roldy.core.configuration.HeightData

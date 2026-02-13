@@ -1,11 +1,9 @@
 package org.roldy.core.shader
 
-import com.badlogic.gdx.graphics.g3d.Attribute
-import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.Renderable
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
-import org.roldy.core.shader.attribute.*
+import org.roldy.core.shader.uniform.*
 import org.roldy.core.shader.util.ShaderBuilder
 import org.roldy.core.shader.util.WindShaderManager
 import org.roldy.core.shader.util.fetchUniform
@@ -25,7 +23,7 @@ class FoliageShader(
     windSystem: WindSystem
 ) : WorldShiftingShader(renderable, config, offsetProvider) {
     val windManager = WindShaderManager(windSystem, program)
-    val setter = AttributesSetter(program)
+    val setter = UniformSetter(program)
 
     val u_useColorNoise by program.fetchUniform()
     val u_noiseSmallFrequency by program.fetchUniform()
@@ -60,37 +58,37 @@ class FoliageShader(
 
     val u_UVTransform by program.fetchUniform()
 
-    private fun <T : Attribute> Material.value(type: Long) =
-        get(type) as? T
+    private fun <T : UniformValue> UniformAttribute.value(type: String) =
+        this.uniforms[type] as? T
 
     override fun render(renderable: Renderable) {
-        val material: Material = renderable.material
-        val leafBaseColor = material.value<FoliageColorAttribute>(FoliageColorAttribute.leafBaseColor)
-        val leafNoiseColor = material.value<FoliageColorAttribute>(FoliageColorAttribute.leafNoiseColor)
-        val leafNoiseLargeColor = material.value<FoliageColorAttribute>(FoliageColorAttribute.leafNoiseLargeColor)
-        val trunkBaseColor = material.value<FoliageColorAttribute>(FoliageColorAttribute.trunkBaseColor)
-        val trunkNoiseColor = material.value<FoliageColorAttribute>(FoliageColorAttribute.trunkNoiseColor)
-        val useNoiseColor = material.value<BooleanAttribute>(BooleanAttribute.useNoiseColor)
-        val leafFlatColor = material.value<BooleanAttribute>(BooleanAttribute.leafFlatColor)
-        val trunkFlatColor = material.value<BooleanAttribute>(BooleanAttribute.trunkFlatColor)
-        val leafHasNormal = material.value<BooleanAttribute>(BooleanAttribute.leafHasNormal)
-        val trunkHasNormal = material.value<BooleanAttribute>(BooleanAttribute.trunkHasNormal)
+        val attr = renderable.material.get(UniformAttribute.uniformsAttr) as UniformAttribute
+        val leafBaseColor = attr.value<EnvColorUniform>(EnvColorUniform.leafBaseColor)
+        val leafNoiseColor = attr.value<EnvColorUniform>(EnvColorUniform.leafNoiseColor)
+        val leafNoiseLargeColor = attr.value<EnvColorUniform>(EnvColorUniform.leafNoiseLargeColor)
+        val trunkBaseColor = attr.value<EnvColorUniform>(EnvColorUniform.trunkBaseColor)
+        val trunkNoiseColor = attr.value<EnvColorUniform>(EnvColorUniform.trunkNoiseColor)
+        val useNoiseColor = attr.value<BooleanUniform>(BooleanUniform.useNoiseColor)
+        val leafFlatColor = attr.value<BooleanUniform>(BooleanUniform.leafFlatColor)
+        val trunkFlatColor = attr.value<BooleanUniform>(BooleanUniform.trunkFlatColor)
+        val leafHasNormal = attr.value<BooleanUniform>(BooleanUniform.leafHasNormal)
+        val trunkHasNormal = attr.value<BooleanUniform>(BooleanUniform.trunkHasNormal)
 
-        val trunkTexture = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.trunkTexture)
-        val leafTexture = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.leafTexture)
-        val trunkNormal = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.trunkNormal)
-        val leafNormal = material.value<FoliageTextureAttribute>(FoliageTextureAttribute.leafNormal)
+        val trunkTexture = attr.value<EnvTextureUniform>(EnvTextureUniform.trunkTexture)
+        val leafTexture = attr.value<EnvTextureUniform>(EnvTextureUniform.leafTexture)
+        val trunkNormal = attr.value<EnvTextureUniform>(EnvTextureUniform.trunkNormal)
+        val leafNormal = attr.value<EnvTextureUniform>(EnvTextureUniform.leafNormal)
 
-        val smallFreq = material.value<FloatValueAttribute>(FloatValueAttribute.smallFreq)
-        val largeFreq = material.value<FloatValueAttribute>(FloatValueAttribute.largeFreq)
+        val smallFreq = attr.value<FloatValueUniform>(FloatValueUniform.smallFreq)
+        val largeFreq = attr.value<FloatValueUniform>(FloatValueUniform.largeFreq)
 
-        val trunkMetallic = material.value<FloatValueAttribute>(FloatValueAttribute.trunkMetallic)
-        val leafMetallic = material.value<FloatValueAttribute>(FloatValueAttribute.leafMetallic)
-        val trunkSmoothness = material.value<FloatValueAttribute>(FloatValueAttribute.trunkSmoothness)
-        val leafSmoothness = material.value<FloatValueAttribute>(FloatValueAttribute.leafSmoothness)
+        val trunkMetallic = attr.value<FloatValueUniform>(FloatValueUniform.trunkMetallic)
+        val leafMetallic = attr.value<FloatValueUniform>(FloatValueUniform.leafMetallic)
+        val trunkSmoothness = attr.value<FloatValueUniform>(FloatValueUniform.trunkSmoothness)
+        val leafSmoothness = attr.value<FloatValueUniform>(FloatValueUniform.leafSmoothness)
 
-        val leafNormalStrength = material.value<FloatValueAttribute>(FloatValueAttribute.leafNormalStrength)
-        val trunkNormalStrength = material.value<FloatValueAttribute>(FloatValueAttribute.trunkNormalStrength)
+        val leafNormalStrength = attr.value<FloatValueUniform>(FloatValueUniform.leafNormalStrength)
+        val trunkNormalStrength = attr.value<FloatValueUniform>(FloatValueUniform.trunkNormalStrength)
 
         program.setUniformf(u_UVTransform, 0f, 0f, 1f, 1f)
 

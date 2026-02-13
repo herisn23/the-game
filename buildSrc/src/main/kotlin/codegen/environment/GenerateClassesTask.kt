@@ -73,7 +73,8 @@ abstract class GenerateClassesTask : DefaultTask() {
             AssetData(
                 propName,
                 base.resolve(name).resolve(it.name).pathString,
-                "Texture"
+                "Texture",
+                key = it.nameWithoutExtension
             )
         }
 

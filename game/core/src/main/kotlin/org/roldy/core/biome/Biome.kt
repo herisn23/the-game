@@ -1,5 +1,8 @@
 package org.roldy.core.biome
 
+import org.roldy.core.configuration.data.BiomeData
+import org.roldy.core.configuration.data.BiomesConfiguration
+
 class Biome(
     val data: BiomeData
 ) {

@@ -1,4 +1,4 @@
-package org.roldy.core.material.foliage
+package org.roldy.core.configuration.data
 
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable

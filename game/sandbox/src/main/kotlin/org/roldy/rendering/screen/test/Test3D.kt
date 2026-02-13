@@ -52,7 +52,7 @@ class Test3D(
     val skybox by lazy { Skybox(dayCycle) }
 
     val emissive by disposable { EnvTexturesAssetAssetManager.tropicalEmissive01.get() }
-    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalDiffuse01.get() }
+    val diffuse by disposable { EnvTexturesAssetAssetManager.tropicalTexture01.get() }
     val tropicalModel by lazy {
         TropicalAssetManager.bldGiantColumn01.property(diffuse, emissive).apply {
             transform.setTranslation(10f, 0f, 0f)
