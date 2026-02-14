@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.math.collision.Ray
 
 class EnvModelInstance(
     val name: String,
-    val collision: Model?,
+    collision: Model?,
     val lod: Map<Int, ModelInstance>
 ) {
 
@@ -25,12 +27,86 @@ class EnvModelInstance(
     private val firstInstance = lod.values.first()
     private val position get() = firstInstance.transform.getTranslation(tmpPos)
 
+    private val collisionBoundingBox = BoundingBox()
+    private val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
+
+    private val collide get() = collisionInstance != null
+
     fun setTranslation(ox: Float, oy: Float, oz: Float) {
         lod.forEach { (_, instance) ->
             instance.transform.idt()
             instance.transform.setTranslation(ox, oy, oz)
         }
+        // Update collision instance position if it exists
+        collisionInstance?.let { ci ->
+            ci.transform.idt()
+            ci.transform.setTranslation(ox, oy, oz)
+            ci.calculateBoundingBox(collisionBoundingBox)
+        }
     }
+
+    /**
+     * Get the bounding box for this model's collision geometry
+     * @return BoundingBox if collision geometry exists, null otherwise
+     */
+    @Suppress("unused")
+    fun getCollisionBounds(): BoundingBox? {
+        return if (collide) collisionBoundingBox else null
+    }
+
+    /**
+     * Check if a point is inside the collision bounds
+     * @param point The point to check
+     * @return true if point is inside collision bounds
+     */
+    @Suppress("unused")
+    fun isPointInCollision(point: Vector3): Boolean {
+        return collide && collisionBoundingBox.contains(point)
+    }
+
+    /**
+     * Check if this model's bounding box intersects with another bounding box
+     * @param other The other bounding box to check intersection with
+     * @return true if bounding boxes intersect
+     */
+    @Suppress("unused")
+    fun intersectsCollisionBounds(other: BoundingBox): Boolean {
+        return collide && collisionBoundingBox.intersects(other)
+    }
+
+    /**
+     * Raycast against this model's collision geometry
+     * @param ray The ray to cast
+     * @return true if ray intersects collision bounds
+     */
+    @Suppress("unused")
+    fun raycastCollision(ray: Ray): Boolean {
+        if (!collide) return false
+
+        // Check if ray origin is inside bounds
+        if (collisionBoundingBox.contains(ray.origin)) return true
+
+        // Simple ray-AABB intersection test
+        val tmpVec = Vector3()
+        val stepSize = 1f
+        var distance = 0f
+        val maxDistance = 1000f
+
+        while (distance < maxDistance) {
+            tmpVec.set(ray.direction).scl(distance).add(ray.origin)
+            if (collisionBoundingBox.contains(tmpVec)) return true
+            distance += stepSize
+        }
+
+        return false
+    }
+
+    /**
+     * Get the collision instance for advanced collision operations
+     * @return ModelInstance representing collision geometry, or null if no collision model
+     */
+    @Suppress("unused")
+    fun getCollisionInstance(): ModelInstance? = collisionInstance
 
     private fun getLodLevel(dist: Float) =
         when {
