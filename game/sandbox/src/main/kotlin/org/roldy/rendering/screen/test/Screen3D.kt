@@ -30,6 +30,7 @@ import org.roldy.g3d.pawn.PawnRenderer
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainSampler
+import kotlin.random.Random
 
 class Screen3D(
     val camera: PerspectiveCamera
@@ -107,11 +108,14 @@ class Screen3D(
                 val ty = heightSampler.getHeightAt(tx, tz)
                 setTranslation(tx, ty, tz)
             }
+            val allModels = foliageModels + staticModels
+            val random = Random(1L)
 
-            tropicalModel.position(5f, 5f)
-            grass.position(1f, 1f)
-            tree.position(10f, 10f)
-            palm.position(-2f, -2f)
+            allModels.forEachIndexed { index, instance ->
+                val x = random.nextInt(1, 20)
+                val y = random.nextInt(1, 20)
+                instance.position(x.toFloat(), y.toFloat())
+            }
         }
     }
 

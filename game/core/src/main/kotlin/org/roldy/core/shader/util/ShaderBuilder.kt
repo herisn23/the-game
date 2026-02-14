@@ -14,7 +14,7 @@ object ShaderBuilder {
     fun String.windFlag(renderable: Renderable) =
         let {
             val userData = renderable.userData as? ShaderUserData
-            val hasWind = userData?.hasWind ?: false
+            val hasWind = userData?.foliage ?: false
             if (hasWind) {
                 it.windFlag()
             } else {

@@ -88,7 +88,9 @@ private fun ModelInstanceData.createInstance(
             parts.forEach { part ->
                 val material = materialsMap.first { it.second.id == data.materialName }
                 part.material = material.second
-                udata.hasWind = material.first == SyntyShaderNames.FOLIAGE
+                if (material.first == SyntyShaderNames.FOLIAGE) {
+                    udata.foliage = true
+                }
             }
         }
     }
@@ -122,6 +124,7 @@ private fun ModelInstanceData.createInstance(
     return EnvModelInstance(
         modelName,
         collision,
+        udata.foliage,
         instances.toMap()
     )
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.collision.Ray
 class EnvModelInstance(
     val name: String,
     collision: Model?,
+    val foliage: Boolean,
     val lod: Map<Int, ModelInstance>
 ) {
 
@@ -30,7 +31,8 @@ class EnvModelInstance(
     private val collisionBoundingBox = BoundingBox()
     private val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
 
-    private val collide get() = collisionInstance != null
+    private val hasCollision get() = collisionInstance != null
+
 
     fun setTranslation(ox: Float, oy: Float, oz: Float) {
         lod.forEach { (_, instance) ->
@@ -51,7 +53,7 @@ class EnvModelInstance(
      */
     @Suppress("unused")
     fun getCollisionBounds(): BoundingBox? {
-        return if (collide) collisionBoundingBox else null
+        return if (hasCollision) collisionBoundingBox else null
     }
 
     /**
@@ -61,7 +63,7 @@ class EnvModelInstance(
      */
     @Suppress("unused")
     fun isPointInCollision(point: Vector3): Boolean {
-        return collide && collisionBoundingBox.contains(point)
+        return hasCollision && collisionBoundingBox.contains(point)
     }
 
     /**
@@ -71,7 +73,7 @@ class EnvModelInstance(
      */
     @Suppress("unused")
     fun intersectsCollisionBounds(other: BoundingBox): Boolean {
-        return collide && collisionBoundingBox.intersects(other)
+        return hasCollision && collisionBoundingBox.intersects(other)
     }
 
     /**
@@ -81,7 +83,7 @@ class EnvModelInstance(
      */
     @Suppress("unused")
     fun raycastCollision(ray: Ray): Boolean {
-        if (!collide) return false
+        if (!hasCollision) return false
 
         // Check if ray origin is inside bounds
         if (collisionBoundingBox.contains(ray.origin)) return true
