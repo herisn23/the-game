@@ -3,6 +3,7 @@ package org.roldy.core.system
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
@@ -62,7 +63,9 @@ class ShadowSystem(
 
     init {
         shadowLight.set(1f, 1f, 1f, -0.5f, -1f, -0.3f) // color and direction
-
+        shadowLight.depthMap.texture.setFilter(
+            Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest
+        )
         // Setup environment
         environment = Environment()
         environment.set(ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))

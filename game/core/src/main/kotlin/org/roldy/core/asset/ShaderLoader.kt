@@ -26,7 +26,12 @@ object ShaderLoader {
 
     val windSystem by lazy { load("shaders/wind_system.glsl") }
 
+    val ssaoFrag by lazy { loadAsset("shaders/ssao.frag.glsl") }
+    val ssaoVert by lazy { loadAsset("shaders/ssao.vert.glsl") }
+
     val skyboxShader by lazy { createShader(skyboxVert, skyboxFrag) }
+
+    val ssaoShader by lazy { createShader(ssaoVert, ssaoFrag) }
     fun load(name: String) =
         loadAsset(name).readString()
 

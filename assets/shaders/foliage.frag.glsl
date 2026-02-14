@@ -13,21 +13,23 @@ precision mediump float;
 #ifdef shadowMapFlag
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
+uniform float u_shadowBias;
 varying vec3 v_shadowMapUv;
 #define separateAmbientFlag
 float getShadowness(vec2 offset)
 {
 	const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-	return step(v_shadowMapUv.z, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//
+	return step(v_shadowMapUv.z - 0.0007, dot(texture2D(u_shadowTexture, v_shadowMapUv.xy + offset), bitShifts));//
 }
 
-float getShadow()
-{
-	float shadow = (//getShadowness(vec2(0,0)) +
+float getShadow() {
+	float shadow = (
+	//	getShadowness(vec2(0.0, 0.0)) +
 	getShadowness(vec2(u_shadowPCFOffset, u_shadowPCFOffset)) +
 	getShadowness(vec2(-u_shadowPCFOffset, u_shadowPCFOffset)) +
 	getShadowness(vec2(u_shadowPCFOffset, -u_shadowPCFOffset)) +
-	getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))) * 0.25;
+	getShadowness(vec2(-u_shadowPCFOffset, -u_shadowPCFOffset))
+	) * 0.25;
 
 	return mix(0.5, 1.0, shadow);
 }
@@ -42,6 +44,8 @@ varying MED vec2 v_UV;
 
 uniform sampler2D u_leafTexture;
 uniform sampler2D u_trunkTexture;// NEW: Trunk texture
+
+//uniform mat3 v_TBN;
 
 varying vec3 v_binormal;
 varying vec3 v_tangent;
@@ -155,17 +159,24 @@ vec4 getTexture() {
 	}
 }
 
-float getNormal(sampler2D texture, float strength) {
+vec3 adjustNormalStrength(vec3 normal, float strength) {
+	normal.xy *= strength;
+	return normalize(normal);
+}
+
+vec3 getNormal(sampler2D texture, float strength, bool enabled) {
+	vec3 base = vec3(0.0, 0.0, 1.0);
+	if (!enabled) {
+		return base;
+	}
 	vec3 normalDetail = texture2D(texture, v_UV).xyz;
-	float detailIntensity = (normalDetail.x + normalDetail.y + normalDetail.z) / 3.0;
-
-	// Apply strength - blend between neutral (0.5) and the actual intensity
-	detailIntensity = mix(0.5, detailIntensity, strength);
-
-	return mix(0.8, 1.2, detailIntensity);
+	normalDetail = adjustNormalStrength(normalDetail, strength);
+	return normalDetail;
 }
 
 void main() {
+	// Debug: output shadow map depth as color
+
 	//debug code to check if trunk(black) or leaf(blue)
 	//    gl_FragColor.a = 1.0;
 	//    gl_FragColor.r = 0.0;
@@ -215,18 +226,24 @@ void main() {
 		if (u_trunkFlatColor) {
 			targetColor = color1;
 		}
-		//        targetColor = vec3(1.0, 0.0, 0.0);
 	}
 
 	vec4 baseColor = vec4(targetColor, diffuse.a);
 
-	// Apply normal mapping if available
-	if (isLeaf && u_leafHasNormal) {
-		baseColor.rgb = baseColor.rgb * getNormal(u_leafNormal, u_leafNormalStrength);
-	} else if (u_trunkHasNormal) {
-		baseColor.rgb = baseColor.rgb * getNormal(u_trunkNormal, u_trunkNormalStrength);
-	}
+	vec3 normalTS = isLeaf
+	? getNormal(u_leafNormal, u_leafNormalStrength, u_leafHasNormal)
+	: getNormal(u_trunkNormal, u_trunkNormalStrength, u_trunkHasNormal);
 
+	mat3 TBN = mat3(normalize(v_tangent), normalize(v_binormal), normalize(v_normal));
+	vec3 N = normalize(TBN * normalTS);
+
+	float mappedNdotL = max(dot(N, normalize(v_lightDirection)), 0.0);
+	float vertexNdotL = max(dot(normalize(v_normal), normalize(v_lightDirection)), 0.0);
+
+	// Ratio to adjust vertex lighting with normal map detail
+	float normalInfluence = (vertexNdotL > 0.001)
+	? mappedNdotL / vertexNdotL
+	: mappedNdotL;
 
 	float metallic;
 	float smoothness;
@@ -243,14 +260,11 @@ void main() {
 
 	vec4 emissive = vec4(0.0);
 
-	float shadow = 1.0;
-	#ifdef shadowMapFlag
-	shadow = getShadow();
-	#endif
 
+	#if defined(lightingFlag) && defined(ambientFlag) && numDirectionalLights > 0
 	vec3 normal = normalize(v_normal);
 	vec3 viewDir = normalize(u_cameraPosition.xyz - v_worldPos);
-	vec3 lightDir = normalize(v_lightDirection);// This should be a uniform, not v_lightDirection
+	vec3 lightDir = normalize(v_lightDirection);
 	vec3 halfDir = normalize(viewDir + lightDir);
 
 	float shininess = pow(512.0, smoothness);// USE smoothness variable!
@@ -259,12 +273,15 @@ void main() {
 	// Specular color
 	vec3 specularColor = mix(vec3(0.04), baseColor.rgb, metallic);// USE metallic variable!
 	vec3 specular = specularColor * specularStrength;
-
-
-	#ifdef shadowMapFlag
-	gl_FragColor.rgb = (baseColor.rgb * (v_ambientLight + shadow * v_lightDiffuse) + specular)  + emissive.rgb;
 	#else
-	gl_FragColor.rgb = (baseColor.rgb * (v_ambientLight + v_lightDiffuse) + specular)  + emissive.rgb;
+	vec3 specular = vec3(0.0);
+	#endif
+	specular = vec3(0.0);
+
+	#if defined(lightingFlag) && defined(separateAmbientFlag)
+	gl_FragColor.rgb = (baseColor.rgb * (v_ambientLight + getShadow() * v_lightDiffuse * normalInfluence)) + emissive.rgb;
+	#else
+	gl_FragColor.rgb = (baseColor.rgb + specular)  + emissive.rgb;
 	#endif
 
 	#ifdef fogFlag

@@ -34,7 +34,13 @@ class EnvModelInstance(
 
     private val hasCollision get() = collisionInstance != null
 
-
+    fun setRotation(rotX: Float, rotY: Float, rotZ: Float) {
+        lod.forEach { (_, instance) ->
+            instance.transform.rotate(Vector3.Y, rotY)
+            instance.transform.rotate(Vector3.X, rotX)
+            instance.transform.rotate(Vector3.Z, rotZ)
+        }
+    }
     fun setTranslation(ox: Float, oy: Float, oz: Float) {
         lod.forEach { (_, instance) ->
             instance.transform.idt()

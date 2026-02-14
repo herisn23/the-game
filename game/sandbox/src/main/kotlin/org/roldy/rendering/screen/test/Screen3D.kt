@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
@@ -30,6 +32,8 @@ import org.roldy.g3d.pawn.PawnRenderer
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainSampler
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
 
 class Screen3D(
@@ -38,7 +42,7 @@ class Screen3D(
 
     val instances by lazy {
         loadModelInstances(EnvTexturesAssetAssetManager.textureMap).associateBy {
-            it.name
+            it.modelName
         }
     }
 
@@ -110,34 +114,79 @@ class Screen3D(
             }
 
             val allModels = foliageModels + staticModels
-            val random = Random(1L)
+            val radius = 40f          // scatter area radius
+            val random = Random(42)   // fixed seed for reproducibility
 
-            allModels.forEachIndexed { index, instance ->
-                val s = index * 2
-                val x = random.nextInt(s, s + 40)
-                val y = random.nextInt(s, s + 40)
-                instance.position(x.toFloat(), y.toFloat())
+            val placed = mutableListOf<Vector2>()
+
+            fun List<EnvModelInstance>.place(minDistance: Float) {
+                forEach { instance ->
+                    var x: Float
+                    var z: Float
+                    var attempts = 0
+
+                    // Try to find a spot that's not too close to others
+                    do {
+                        val angle = random.nextFloat() * MathUtils.PI2
+                        val dist = random.nextFloat() * radius
+                        x = cos(angle) * dist
+                        z = sin(angle) * dist
+                        attempts++
+                    } while (attempts < 30 && placed.any { it.dst(x, z) < minDistance })
+
+                    placed.add(Vector2(x, z))
+
+                    // Random rotation and scale for variety
+                    val rotY = random.nextFloat() * 360f
+
+                    instance.position(x, z)
+                    instance.setRotation(0f, rotY, 0f)
+//                instance.scale(scale)
+                }
             }
+
+            grasses.place(0.1f)
+            trees.place(1f)
         }
     }
+    val grasses by lazy {
+        val grasses = listOf(
+            "SM_Env_Grass_Tall_Clump_01",
+            "SM_Env_Grass_Tall_Clump_02",
+            "SM_Env_Grass_Tall_Clump_03",
+            "SM_Env_Grass_Tall_Plane_01",
+            "SM_Env_Ground_Cover_01",
+            "SM_Env_Ground_Cover_02",
+            "SM_Env_Ground_Cover_03",
+            "SM_Env_Bush_Palm_04",
+            "SM_Env_Bush_Tropical_01",
 
-    val tropicalModel by lazy {
-        instances.getValue("SM_Bld_Giant_Column_01")
+            )
+        val random = Random(42)
+        (0..1000).mapNotNull {
+            instances.getValue(grasses.random(random)).createInstance()
+        }
     }
-    val grass by lazy {
-        instances.getValue("SM_Env_Tree_Banana_01")
-    }
-    val tree by lazy {
-        instances.getValue("SM_Env_Tree_Forest_02")
-    }
-    val palm by lazy {
-        instances.getValue("SM_Env_Tree_Palm_01")
+    val trees by lazy {
+        val models = listOf(
+            "SM_Env_Tree_Banana_01",
+            "SM_Env_Tree_Banana_02",
+            "SM_Env_Tree_Banana_03",
+            "SM_Env_Tree_Forest_01",
+            "SM_Env_Tree_Forest_02",
+            "SM_Env_Tree_Forest_03"
+        )
+        val random = Random(42)
+        (0..40).mapNotNull {
+            instances.getValue(models.random(random)).createInstance()
+        }
     }
 
     val foliageModels by lazy {
 //        listOf(grass, tree, palm)
 //        instances.filter { it.value.foliage }.values.toList()
-        listOf(instances.getValue("SM_Env_Bush_Tropical_03"))
+//        listOf(instances.getValue("SM_Env_Bush_Tropical_03"))
+        grasses + trees
     }
     val staticModels by lazy {
 //        listOf(tropicalModel)
@@ -212,9 +261,14 @@ class Screen3D(
                 staticModels.forEach {
                     render(it.instance())
                 }
+//                Gdx.gl.glCullFace(GL20.GL_FRONT);  // cull front faces, render back faces
+//                Gdx.gl.glEnable(GL20.GL_POLYGON_OFFSET_FILL);
+//                Gdx.gl.glPolygonOffset(2.0f, 4.0f);  // tweak these values
                 foliageModels.forEach {
                     render(it.instance())
                 }
+//                Gdx.gl.glDisable(GL20.GL_POLYGON_OFFSET_FILL);
+//                Gdx.gl.glCullFace(GL20.GL_BACK);
                 render(character.manager.instance)
             }
 

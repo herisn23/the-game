@@ -3,15 +3,12 @@ package org.roldy.g3d.environment
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Material
-import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
-import com.badlogic.gdx.graphics.g3d.model.Node
 import org.roldy.core.asset.Asset
 import org.roldy.core.biome.BiomeType
 import org.roldy.core.configuration.data.MaterialData
-import org.roldy.core.configuration.data.MeshData
 import org.roldy.core.configuration.data.ModelInstanceData
 import org.roldy.core.configuration.loadModelInstanceConfiguration
 import org.roldy.core.logger
@@ -19,9 +16,9 @@ import org.roldy.core.shader.attribute.AttributeMapper
 import org.roldy.core.shader.attribute.UniformAttribute
 import org.roldy.core.shader.uniform.EnvTextureUniform
 import org.roldy.core.shader.uniform.UniformMapper
-import org.roldy.core.shader.util.ShaderUserData
 
 val mLogger by logger("ModelLoader")
+
 object SyntyShaderNames {
     const val FOLIAGE = "Synty/Foliage"
     const val GENERIC = "Synty/Generic_Basic"
@@ -58,7 +55,7 @@ private fun MaterialData.toMaterial(
                 }
                 set(UniformAttribute.create(uniforms))
                 set(IntAttribute.createCullFace(GL20.GL_NONE))
-                set(FloatAttribute.createAlphaTest(0.5f))
+                set(FloatAttribute.createAlphaTest(0.9f))
             }
 
             SyntyShaderNames.GENERIC -> {
@@ -80,25 +77,7 @@ private fun MaterialData.toMaterial(
 private fun ModelInstanceData.createInstance(
     materialsMap: List<Pair<String, Material>>,
     asset: EnvironmentAssetManagerLoader
-): EnvModelInstance? {
-    val meshes = meshes.groupBy { it.lod }
-    val udata = ShaderUserData()
-    fun List<MeshData>.find(name: String) =
-        find { it.meshName == name }
-    fun Node.assignMaterial(parent: Node, data: List<MeshData>) {
-        val data = data.find(id)
-        if (data == null) {
-            parent.removeChild(this)
-        } else {
-            parts.forEach { part ->
-                val material = materialsMap.first { it.second.id == data.materialName }
-                part.material = material.second
-                if (material.first == SyntyShaderNames.FOLIAGE) {
-                    udata.foliage = true
-                }
-            }
-        }
-    }
+): EnvModelConfiguration? {
 
     val model = asset.modelMap[modelName]?.get()
     if (model == null) {
@@ -106,55 +85,10 @@ private fun ModelInstanceData.createInstance(
         return null
     }
 
-    val instances = meshes.map { (lod, meshes) ->
-        ModelInstance(model).apply {
-            userData = udata
-            this.materials.clear()
-            val node = nodes.first()
-            node.assignMaterial(node, meshes)
-            node.children.removeAll { meshes.none { m -> m.meshName == it.id } }
-            when (node.children.count()) {
-                0 -> node.assignMaterial(node, meshes)
-                else -> {
-                    node.children.forEach {
-                        it.assignMaterial(node, meshes)
-                    }
-                }
-            }
-        }.let { instance ->
-            fun List<Node>.collect(): List<Node> =
-                this + flatMap { it.children.toList().collect() }
-            //temporary code to skip unknown shaders
-            val hashKnownShder = instance.nodes.toList().collect().any { node ->
-                node.parts.any { p ->
-                    val shaderName = materialsMap.find { it.second.id == p.material.id }?.first
-                    shaderName == SyntyShaderNames.FOLIAGE || shaderName == SyntyShaderNames.GENERIC
-                }
-
-            }
-            if (hashKnownShder) {
-                lod to instance
-            } else {
-                null
-            }
-        }
-    }.filterNotNull()
-
     val collision = asset.collisionMap.keys.find { it.contains(modelName) }?.let {
         asset.collisionMap[it]?.get()
     }
-    return if (instances.isNotEmpty()) {
-        EnvModelInstance(
-            modelName,
-            collision,
-            udata.foliage,
-            instances.toMap()
-        ).apply {
-            udata.instance = this
-        }
-    } else {
-        null
-    }
+    return EnvModelConfiguration(modelName, materialsMap, model, collision, meshes)
 }
 
 

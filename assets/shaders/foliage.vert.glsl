@@ -382,9 +382,8 @@ void main() {
         #endif
     }
     #endif
-    #endif
-
     #if numDirectionalLights > 0
     v_lightDirection = -u_dirLights[0].direction;
+    #endif
     #endif
 }

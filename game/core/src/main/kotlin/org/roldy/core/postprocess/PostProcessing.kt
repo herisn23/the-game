@@ -49,6 +49,11 @@ class PostProcessing(
         setDistortion(0.3f)    // Distortion amount (-1.0 to 1.0)
         setZoom(1.0f)          // Zoom level (0.5-2.0)
     }
+    val ssao = SSAO().apply {
+        radius = 0.5f
+        bias = 0.001f
+        power = 2f
+    }
     val vfxManager by disposable {
         VfxManager(Pixmap.Format.RGBA8888, width(), height()).apply {
 //            addEffect(radialDistortion)
@@ -56,6 +61,7 @@ class PostProcessing(
 //            addEffect(filmGrain)
 //            addEffect(vignette)
             addEffect(antialiasing)
+            addEffect(ssao)
         }
     }
 
@@ -90,8 +96,8 @@ class PostProcessing(
         if (enabled) {
             sceneFBO.begin()
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-            Gdx.gl.glDepthMask(true)
-            Gdx.gl.glDisable(GL20.GL_BLEND)
+//            Gdx.gl.glDepthMask(true)
+//            Gdx.gl.glDisable(GL20.GL_BLEND)
             render(render)
             sceneFBO.end()
 
@@ -101,6 +107,7 @@ class PostProcessing(
 
             // Begin capturing
             vfxManager.beginInputCapture()
+
             // Disable depth test for 2D post-processing
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
