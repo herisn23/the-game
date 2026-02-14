@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
-import com.badlogic.gdx.graphics.g3d.ModelInstance
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
@@ -28,10 +27,10 @@ import org.roldy.core.system.ShadowSystem
 import org.roldy.core.system.WindSystem
 import org.roldy.core.utils.invoke
 import org.roldy.g3d.AssetManagersLoader
+import org.roldy.g3d.environment.EnvModelInstance
 import org.roldy.g3d.environment.EnvTexturesAssetAssetManager
 import org.roldy.g3d.environment.SunBillboard
 import org.roldy.g3d.environment.loadModelInstances
-import org.roldy.g3d.environment.loadModelInstances2
 import org.roldy.g3d.pawn.CharacterController
 import org.roldy.g3d.pawn.PawnManager
 import org.roldy.g3d.pawn.PawnModelBuilder
@@ -64,11 +63,8 @@ class Screen3D(
     val camera: PerspectiveCamera
 ) : AutoDisposableScreenAdapter() {
 
-    val materials by lazy {
-        loadModelInstances(EnvTexturesAssetAssetManager.textureMap)
-    }
     val instances by lazy {
-        loadModelInstances2(EnvTexturesAssetAssetManager.textureMap).associateBy {
+        loadModelInstances(EnvTexturesAssetAssetManager.textureMap).associateBy {
             it.name
         }
     }
@@ -133,18 +129,17 @@ class Screen3D(
             initializeAt(charX, charZ)
 
 
-            fun ModelInstance.position(ox: Float, oz: Float) {
-                transform.idt()
+            fun EnvModelInstance.position(ox: Float, oz: Float) {
                 val tx = charX + ox
                 val tz = charZ + oz
                 val ty = heightSampler.getHeightAt(tx, tz)
-                transform.setTranslation(tx, ty, tz)
+                setTranslation(tx, ty, tz)
             }
 
-            tropicalModel.instance.position(5f, 5f)
-            grass.instance.position(1f, 1f)
-            tree.instance.position(10f, 10f)
-            palm.instance.position(-2f, -2f)
+            tropicalModel.position(5f, 5f)
+            grass.position(1f, 1f)
+            tree.position(10f, 10f)
+            palm.position(-2f, -2f)
         }
     }
 
@@ -160,8 +155,6 @@ class Screen3D(
     val palm by lazy {
         instances.getValue("SM_Env_Tree_Palm_01")
     }
-
-
 
 
     var loading = true
@@ -197,13 +190,13 @@ class Screen3D(
         camera.viewportHeight = height.toFloat()
         camera.update()
     }
+
     val spriteBatch: SpriteBatch = SpriteBatch()
     override fun render(delta: Float) {
 
         if (loading && AssetManagersLoader.update()) {
             loading = false
             adapter
-            materials
         }
         if (loading) return
 
@@ -227,10 +220,10 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-                render(grass.model(camera))
-                render(tree.model(camera))
-                render(palm.model(camera))
-                render(tropicalModel.model(camera))
+                render(grass.instance())
+                render(tree.instance())
+                render(palm.instance())
+                render(tropicalModel.instance())
                 render(character.manager.instance)
             }
 
@@ -240,11 +233,11 @@ class Screen3D(
                 context(shadowSystem.environment) {
                     terrainInstance.render()
                     envModelBatch {
-                        listOf(tropicalModel.model(camera))
+                        listOf(tropicalModel.instance())
                     }
 
                     foliageBatch {
-                        listOf(grass.model(camera), tree.model(camera), palm.model(camera))
+                        listOf(palm.instance(), grass.instance(), tree.instance())
                     }
                     character.render()
                 }

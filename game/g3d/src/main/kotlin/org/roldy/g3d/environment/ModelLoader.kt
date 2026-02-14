@@ -30,14 +30,6 @@ object SyntyShaderNames {
 }
 
 fun loadModelInstances(
-    textures: Map<String, Asset<Texture>>
-) =
-    loadModelInstanceConfiguration(BiomeType.Tropical)
-        .run {
-            materials.map { it.toMaterial(textures) }
-        }
-
-fun loadModelInstances2(
     textures: Map<String, Asset<Texture>>,
 ) =
     loadModelInstanceConfiguration(BiomeType.Tropical)
@@ -83,56 +75,52 @@ private fun ModelInstanceData.createInstance(
     materialsMap: List<Pair<String, Material>>,
     asset: EnvironmentAssetManagerLoader
 ): EnvModelInstance? {
-
-    val hasLod = meshes.groupBy { it.lod }[-1] == null
-    var hasWind = false
-
+    val meshes = meshes.groupBy { it.lod }
+    val udata = ShaderUserData()
     fun List<MeshData>.find(name: String) =
         find { it.meshName == name }
 
-    fun Node.assignMaterial(parent: Node) {
-        val data = meshes.find(id)
+    fun Node.assignMaterial(parent: Node, data: List<MeshData>) {
+        val data = data.find(id)
         if (data == null) {
             parent.removeChild(this)
         } else {
             parts.forEach { part ->
                 val material = materialsMap.first { it.second.id == data.materialName }
                 part.material = material.second
-                hasWind = material.first == SyntyShaderNames.FOLIAGE
+                udata.hasWind = material.first == SyntyShaderNames.FOLIAGE
             }
         }
     }
 
-    val model = asset.modelMap[modelName]
+    val model = asset.modelMap[modelName]?.get()
     if (model == null) {
         mLogger.warn("Model not found: $modelName")
+        return null
     }
-    return model?.let { model ->
-        EnvModelInstance(
-            modelName,
-            ModelInstance(model.get()).apply {
-                val udata = ShaderUserData()
-                userData = udata
-                this.materials.clear()
-                val node = nodes.first()
-                when (node.children.count()) {
-                    0 -> node.assignMaterial(node)
-                    else -> {
-                        node.children.toList().forEach {
-                            it.assignMaterial(node)
-                        }
+
+    val instances = meshes.map { (lod, meshes) ->
+        lod to ModelInstance(model).apply {
+            userData = udata
+            this.materials.clear()
+            val node = nodes.first()
+            node.children.removeAll { meshes.none { m -> m.meshName == it.id } }
+            when (node.children.count()) {
+                0 -> node.assignMaterial(node, meshes)
+                else -> {
+                    node.children.forEach {
+                        it.assignMaterial(node, meshes)
                     }
                 }
-                udata.hasWind = hasWind
             }
-        ).apply {
-            //temporary code
-            if (hasLod)
-                instance.nodes.first().children.removeAll {
-                    !it.id.contains("LOD0")
-                }
         }
     }
+
+
+    return EnvModelInstance(
+        modelName,
+        instances.toMap()
+    )
 }
 
 

@@ -7,7 +7,7 @@ materials:
         value: 0
       - !ColorType
         name: _BaseColor
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Albedo_Map
         value: PolygonNatureBiomes_Tropical_Texture_01
@@ -16,7 +16,7 @@ materials:
         value: 0
       - !ColorType
         name: _Emission_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emission_Map
         value: PolygonNatureBiomes_Tropical_Emissive_01
@@ -37,7 +37,7 @@ materials:
     uniforms:
       - !ColorType
         name: _Color_Tint
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !RangeType
         name: _Metallic
         value: 0.2
@@ -130,7 +130,7 @@ materials:
         value: (0.00, 0.00, 0.00, 0.00)
       - !ColorType
         name: _Emission_Color_Tint
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Enable_Snow
         value: 0
@@ -139,7 +139,7 @@ materials:
         value: 1
       - !ColorType
         name: _Snow_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !RangeType
         name: _Snow_Metallic
         value: 0
@@ -214,13 +214,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -262,16 +262,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#5C00FF00'
+        value: '#5C00FF'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -292,7 +292,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -307,10 +307,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#7F00FF00'
+        value: '#7F00FF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#7900FF00'
+        value: '#7900FF'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -430,13 +430,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#2B410000'
+        value: '#2B4100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#39931400'
+        value: '#399314'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -478,16 +478,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -508,7 +508,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -523,10 +523,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -646,13 +646,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -694,16 +694,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -724,7 +724,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -739,10 +739,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -862,13 +862,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#2B410000'
+        value: '#2B4100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#65931400'
+        value: '#659314'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -910,16 +910,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -940,7 +940,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -955,10 +955,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -1078,13 +1078,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#BDFF8800'
+        value: '#BDFF88'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FF1F0000'
+        value: '#FF1F00'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -1126,16 +1126,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -1156,7 +1156,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -1171,10 +1171,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00B9FF00'
+        value: '#00B9FF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Leaf_Palm_Biolumin_Final_04
@@ -1294,13 +1294,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -1342,16 +1342,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -1372,7 +1372,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -1387,10 +1387,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#C400FF00'
+        value: '#C400FF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient 4
@@ -1510,13 +1510,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FF1D0000'
+        value: '#FF1D00'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FF000000'
+        value: '#FF0000'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#14050000'
+        value: '#140500'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -1558,16 +1558,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -1588,7 +1588,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -1603,10 +1603,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient 2
@@ -1726,13 +1726,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#D7FDB200'
+        value: '#D7FDB2'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFB08600'
+        value: '#FFB086'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -1774,16 +1774,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -1804,7 +1804,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -1819,10 +1819,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -1942,13 +1942,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FF555500'
+        value: '#FF5555'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFBFBF00'
+        value: '#FFBFBF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -1990,16 +1990,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -2020,7 +2020,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -2035,10 +2035,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#009EFF00'
+        value: '#009EFF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -2158,13 +2158,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#D7FDB200'
+        value: '#D7FDB2'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FF9A6400'
+        value: '#FF9A64'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -2206,16 +2206,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -2236,7 +2236,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -2251,10 +2251,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00A4FF00'
+        value: '#00A4FF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient_Biolumin_01
@@ -2374,13 +2374,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#4F781800'
+        value: '#4F7818'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#3C541BFF'
+        value: '#3C541B'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#606E0000'
+        value: '#606E00'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -2422,16 +2422,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -2452,7 +2452,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Frosting_Falloff
         value: 1
@@ -2467,10 +2467,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#EE5FFF00'
+        value: '#EE5FFF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient_Biolumin_01
@@ -2554,7 +2554,7 @@ materials:
         value: 0.25
       - !ColorType
         name: _BaseColor
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Albedo_Map
         value: Creeper_01
@@ -2563,7 +2563,7 @@ materials:
         value: 0
       - !ColorType
         name: _Emission_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Emission_Map
         value: null
@@ -2623,13 +2623,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#D0FFA200'
+        value: '#D0FFA2'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFC67700'
+        value: '#FFC677'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -2671,16 +2671,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00764F00'
+        value: '#00764F'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: Gradient 2
@@ -2701,7 +2701,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -2716,10 +2716,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#48006A00'
+        value: '#48006A'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -2755,7 +2755,7 @@ materials:
         value: (0.00, 0.00, 0.00, 0.00)
       - !FloatType
         name: _Use_Global_Weather_Controller
-        value: 0
+        value: 1
       - !FloatType
         name: _Enable_Breeze
         value: 1
@@ -2764,7 +2764,7 @@ materials:
         value: 0.2
       - !FloatType
         name: _Enable_Light_Wind
-        value: 0
+        value: 1
       - !RangeType
         name: _Light_Wind_Strength
         value: 0.5
@@ -2779,7 +2779,7 @@ materials:
         value: 1
       - !FloatType
         name: _Enable_Strong_Wind
-        value: 0
+        value: 1
       - !RangeType
         name: _Strong_Wind_Strength
         value: 0.5
@@ -2788,7 +2788,7 @@ materials:
         value: 0.5
       - !FloatType
         name: _Enable_Wind_Twist
-        value: 0
+        value: 1
       - !RangeType
         name: _Wind_Twist_Strength
         value: 0.15
@@ -2839,13 +2839,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#8FA10000'
+        value: '#8FA100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -2887,16 +2887,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -2917,7 +2917,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -2932,10 +2932,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -3055,13 +3055,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#8FA10000'
+        value: '#8FA100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#1A480000'
+        value: '#1A4800'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#48440000'
+        value: '#484400'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -3103,16 +3103,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -3133,7 +3133,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -3148,10 +3148,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00B6FA00'
+        value: '#00B6FA'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -3271,13 +3271,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#8FA10000'
+        value: '#8FA100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#1A480000'
+        value: '#1A4800'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#48440000'
+        value: '#484400'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -3319,16 +3319,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -3349,7 +3349,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -3364,10 +3364,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00D0FF00'
+        value: '#00D0FF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient 5
@@ -3487,13 +3487,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#8FA10000'
+        value: '#8FA100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#1A480000'
+        value: '#1A4800'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#48440000'
+        value: '#484400'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -3535,16 +3535,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -3565,7 +3565,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -3580,10 +3580,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00FA8000'
+        value: '#00FA80'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient 5
@@ -3703,13 +3703,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#AFC50000'
+        value: '#AFC500'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#1A480000'
+        value: '#1A4800'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -3751,16 +3751,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -3781,7 +3781,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -3796,10 +3796,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#FF009C00'
+        value: '#FF009C'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient_Biolumin_01
@@ -3883,7 +3883,7 @@ materials:
         value: 0.25
       - !ColorType
         name: _BaseColor
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Albedo_Map
         value: cloverMat_01
@@ -3892,7 +3892,7 @@ materials:
         value: 0
       - !ColorType
         name: _Emission_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Emission_Map
         value: null
@@ -3916,7 +3916,7 @@ materials:
         value: 0
       - !ColorType
         name: _BaseColor
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !TexEnvType
         name: _Albedo_Map
         value: Sand_Texture_02
@@ -3925,7 +3925,7 @@ materials:
         value: 0
       - !ColorType
         name: _Emission_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emission_Map
         value: null
@@ -3946,7 +3946,7 @@ materials:
     uniforms:
       - !ColorType
         name: _Color_Tint
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !RangeType
         name: _Metallic
         value: 0
@@ -4126,7 +4126,7 @@ materials:
         value: 1
       - !ColorType
         name: _Triplanar_Emission_Color_Tint
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Enable_Emission_Texture
         value: 0
@@ -4141,7 +4141,7 @@ materials:
         value: (0.00, 0.00, 0.00, 0.00)
       - !ColorType
         name: _Emission_Color_Tint
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Enable_Snow
         value: 0
@@ -4150,7 +4150,7 @@ materials:
         value: 1
       - !ColorType
         name: _Snow_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !RangeType
         name: _Snow_Metallic
         value: 0
@@ -4222,13 +4222,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#C6D44F00'
+        value: '#C6D44F'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#97BE0000'
+        value: '#97BE00'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -4270,16 +4270,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#14050000'
+        value: '#140500'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -4300,7 +4300,7 @@ materials:
         value: 1
       - !ColorType
         name: _Frosting_Color
-        value: '#9CB23F00'
+        value: '#9CB23F'
       - !FloatType
         name: _Frosting_Falloff
         value: 2.25
@@ -4315,10 +4315,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00FA8000'
+        value: '#00FA80'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: Gradient_Biolumin_01
@@ -4438,13 +4438,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#D3FF5D00'
+        value: '#D3FF5D'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#BE473C00'
+        value: '#BE473C'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -4486,16 +4486,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -4516,7 +4516,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -4531,10 +4531,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#009EFF00'
+        value: '#009EFF'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -4654,13 +4654,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#14050000'
+        value: '#140500'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -4702,16 +4702,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -4732,7 +4732,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -4747,10 +4747,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -4870,13 +4870,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#283A0500'
+        value: '#283A05'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#4F7B0200'
+        value: '#4F7B02'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -4918,16 +4918,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -4948,7 +4948,7 @@ materials:
         value: 1
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -4963,10 +4963,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -5086,13 +5086,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#2B410000'
+        value: '#2B4100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#637B3900'
+        value: '#637B39'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -5134,16 +5134,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -5164,7 +5164,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -5179,10 +5179,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -5302,13 +5302,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#2B410000'
+        value: '#2B4100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#637B3900'
+        value: '#637B39'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 1
@@ -5350,16 +5350,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -5380,7 +5380,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -5395,10 +5395,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -5518,13 +5518,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#2B410000'
+        value: '#2B4100'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#65931400'
+        value: '#659314'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#6D7D0200'
+        value: '#6D7D02'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -5566,16 +5566,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -5596,7 +5596,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -5611,10 +5611,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -5734,13 +5734,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#E5FFA500'
+        value: '#E5FFA5'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -5782,16 +5782,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -5812,7 +5812,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -5827,10 +5827,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -5950,13 +5950,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#E5FFA500'
+        value: '#E5FFA5'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -5998,16 +5998,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -6028,7 +6028,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -6043,10 +6043,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -6166,13 +6166,13 @@ materials:
         value: 1
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#CAFFA200'
+        value: '#CAFFA2'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFA0A000'
+        value: '#FFA0A0'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -6214,16 +6214,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -6244,7 +6244,7 @@ materials:
         value: 1
       - !ColorType
         name: _Frosting_Color
-        value: '#87000000'
+        value: '#870000'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.4
@@ -6259,10 +6259,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -6382,13 +6382,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -6430,16 +6430,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -6460,7 +6460,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -6475,10 +6475,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -6598,13 +6598,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#FFFFFF00'
+        value: '#FFFFFF'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -6646,16 +6646,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -6676,7 +6676,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -6691,10 +6691,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -6814,13 +6814,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -6862,16 +6862,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -6892,7 +6892,7 @@ materials:
         value: 1
       - !ColorType
         name: _Frosting_Color
-        value: '#FF000000'
+        value: '#FF0000'
       - !FloatType
         name: _Frosting_Falloff
         value: 0.32
@@ -6907,10 +6907,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null
@@ -7030,13 +7030,13 @@ materials:
         value: 0.5
       - !ColorType
         name: _Leaf_Noise_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Base_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Leaf_Noise_Large_Color
-        value: '#00000000'
+        value: '#000000'
       - !FloatType
         name: _Leaf_Flat_Color
         value: 0
@@ -7078,16 +7078,16 @@ materials:
         value: 0.5
       - !ColorType
         name: _Trunk_Base_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !ColorType
         name: _Trunk_Noise_Color
-        value: '#FFFFFFFF'
+        value: '#FFFFFF'
       - !FloatType
         name: _Trunk_Flat_Color_Switch
         value: 0
       - !ColorType
         name: _Trunk_Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Trunk_Emissive_Mask
         value: null
@@ -7108,7 +7108,7 @@ materials:
         value: 0
       - !ColorType
         name: _Frosting_Color
-        value: '#749A1400'
+        value: '#749A14'
       - !FloatType
         name: _Frosting_Falloff
         value: 1.02
@@ -7123,10 +7123,10 @@ materials:
         value: 0
       - !ColorType
         name: _Emissive_Color
-        value: '#00000000'
+        value: '#000000'
       - !ColorType
         name: _Emissive_2_Color
-        value: '#00000000'
+        value: '#000000'
       - !TexEnvType
         name: _Emissive_Mask
         value: null

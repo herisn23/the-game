@@ -13,10 +13,8 @@
 attribute vec3 a_position;
 uniform mat4 u_projViewTrans;
 
-#if defined(colorFlag)
 varying vec4 v_color;
 attribute vec4 a_color;
-#endif
 
 attribute vec3 a_normal;
 uniform mat3 u_normalMatrix;
