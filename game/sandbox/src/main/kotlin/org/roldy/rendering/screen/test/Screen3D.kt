@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.badlogic.gdx.graphics.g3d.ModelBatch
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
@@ -20,16 +19,10 @@ import org.roldy.core.map.MapGenerator
 import org.roldy.core.map.MapSize
 import org.roldy.core.map.findFlatAreas
 import org.roldy.core.postprocess.PostProcessing
-import org.roldy.core.shader.foliageShaderProvider
-import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.system.ShadowSystem
 import org.roldy.core.system.WindSystem
-import org.roldy.core.utils.invoke
 import org.roldy.g3d.AssetManagersLoader
-import org.roldy.g3d.environment.EnvModelInstance
-import org.roldy.g3d.environment.EnvTexturesAssetAssetManager
-import org.roldy.g3d.environment.SunBillboard
-import org.roldy.g3d.environment.loadModelInstances
+import org.roldy.g3d.environment.*
 import org.roldy.g3d.pawn.CharacterController
 import org.roldy.g3d.pawn.PawnManager
 import org.roldy.g3d.pawn.PawnModelBuilder
@@ -135,6 +128,13 @@ class Screen3D(
         instances.getValue("SM_Env_Tree_Palm_01")
     }
 
+    val foliageModels by lazy {
+        listOf(grass, tree, palm)
+    }
+    val staticModels by lazy {
+        listOf(tropicalModel)
+    }
+
 
     var loading = true
     val postProcess = PostProcessing()
@@ -145,8 +145,8 @@ class Screen3D(
     }
 
 
-    val envModelBatch by disposable { ModelBatch(shiftingShaderProvider(offsetShiftingManager)) }
-    val foliageBatch by disposable { ModelBatch(foliageShaderProvider(offsetShiftingManager, windSystem)) }
+    val envModelBatch by disposable { staticModelBatch(offsetShiftingManager) }
+    val foliageBatch by disposable { foliageModelBatch(windSystem, offsetShiftingManager) }
 
     val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
@@ -198,10 +198,8 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-                render(grass.instance())
-                render(tree.instance())
-                render(palm.instance())
-                render(tropicalModel.instance())
+                foliageModels.forEach { render(it.instance()) }
+                staticModels.forEach { render(it.instance()) }
                 render(character.manager.instance)
             }
 
@@ -210,13 +208,8 @@ class Screen3D(
                 sun.render()
                 context(shadowSystem.environment) {
                     terrainInstance.render()
-                    envModelBatch {
-                        listOf(tropicalModel.instance())
-                    }
-
-                    foliageBatch {
-                        listOf(palm.instance(), grass.instance(), tree.instance())
-                    }
+                    envModelBatch.render(staticModels)
+                    foliageBatch.render(foliageModels)
                     character.render()
                 }
             }
