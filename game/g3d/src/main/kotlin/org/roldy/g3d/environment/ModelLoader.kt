@@ -116,9 +116,12 @@ private fun ModelInstanceData.createInstance(
         }
     }
 
-
+    val collision = asset.collisionMap.keys.find { it.contains(modelName) }?.let {
+        asset.collisionMap[it]?.get()
+    }
     return EnvModelInstance(
         modelName,
+        collision,
         instances.toMap()
     )
 }

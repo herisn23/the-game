@@ -115,22 +115,43 @@ abstract class GenerateClassesTask : DefaultTask() {
     private fun File.generateBiomeAssets(base: Path, biome: Biome): ClassInfo {
         val files = listFiles()
 
-        val g3db = files.filter { it.name.endsWith("g3db") }.map {
-            val name = it.nameWithoutExtension.normalize().replace("SM", "").decapitalize()
-            AssetData(
-                name,
-                base.resolve("models").resolve(biome.name.lowercase()).resolve(it.name).pathString,
-                "Model",
-                it.nameWithoutExtension
-            )
-        }
+        fun List<File>.collectModels(relPath: Path) =
+            filter { it.name.endsWith("g3db") }.map {
+                val name = it.nameWithoutExtension.normalize().replace("SM", "").decapitalize()
+                AssetData(
+                    name,
+                    base.resolve("models").resolve(biome.name.lowercase()).resolve(relPath).resolve(it.name).pathString,
+                    "Model",
+                    it.nameWithoutExtension
+                )
+            }
+
+        val collisionPath = Path.of("collision")
+
+        val g3db = listFiles().filter { !it.isDirectory }.collectModels(Path.of(""))
+        val collisions = toPath().resolve(collisionPath).toFile().listFiles().toList().collectModels(collisionPath)
+
+        fun List<AssetData>.toCollectionMap(name: String) =
+            """ 
+                    override val $name by lazy {
+                        mapOf(
+                            ${
+                joinToString(",\n") {
+                    """
+                                        "${it.key}" to ${it.property}
+                                    """.trimIndent()
+                }
+            }
+                        )
+                    }
+                """.trimIndent()
         return ClassInfo(
             "${biome.name}AssetManager",
             pack,
             assetTemplate(
                 pack,
                 biome.name,
-                g3db,
+                g3db + collisions,
                 true,
                 "EnvironmentAssetManagerLoader",
                 configureAssetLoader = """
@@ -141,19 +162,9 @@ abstract class GenerateClassesTask : DefaultTask() {
                     "import org.roldy.core.asset.SyntyModelLoader"
                 )
             ) {
-                """ 
-                    override val modelMap by lazy {
-                        mapOf(
-                         ${
-                    g3db.joinToString(",\n") {
-                        """
-                                "${it.key}" to ${it.property}
-                            """.trimIndent()
-                    }
-                }
-                        )
-                    }
-                """.trimIndent()
+
+
+                g3db.toCollectionMap("modelMap") + "\n\n" + collisions.toCollectionMap("collisionMap")
             }
 
         )

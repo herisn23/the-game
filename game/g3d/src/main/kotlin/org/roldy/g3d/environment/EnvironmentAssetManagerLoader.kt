@@ -6,4 +6,5 @@ import org.roldy.core.asset.AssetManagerLoader
 
 interface EnvironmentAssetManagerLoader : AssetManagerLoader {
     val modelMap: Map<String, Asset<Model>>
+    val collisionMap: Map<String, Asset<Model>>
 }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
@@ -38,26 +37,6 @@ import org.roldy.g3d.pawn.PawnRenderer
 import org.roldy.g3d.skybox.Skybox
 import org.roldy.g3d.terrain.Terrain
 import org.roldy.g3d.terrain.TerrainSampler
-
-
-/**
- * LOD HANDLING
- *
- * // In your render loop
- * float distance = camera.position.dst(objectPosition);
- *
- * if (distance < 20f) {
- *     currentInstance = new ModelInstance(modelHigh);
- * } else if (distance < 50f) {
- *     currentInstance = new ModelInstance(modelMed);
- * } else {
- *     currentInstance = new ModelInstance(modelLow);
- * }
- *
- *
- *
- */
-
 
 class Screen3D(
     val camera: PerspectiveCamera
@@ -191,7 +170,6 @@ class Screen3D(
         camera.update()
     }
 
-    val spriteBatch: SpriteBatch = SpriteBatch()
     override fun render(delta: Float) {
 
         if (loading && AssetManagersLoader.update()) {

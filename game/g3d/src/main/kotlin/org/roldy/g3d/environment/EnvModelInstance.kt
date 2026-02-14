@@ -1,11 +1,13 @@
 package org.roldy.g3d.environment
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.Vector3
 
 class EnvModelInstance(
     val name: String,
+    val collision: Model?,
     val lod: Map<Int, ModelInstance>
 ) {
 
@@ -57,7 +59,6 @@ class EnvModelInstance(
     fun instance() =
         if (hasLod) {
             getLodInstance()
-//            lod.getValue(1)
         } else {
             lod.getValue(-1)
         }
