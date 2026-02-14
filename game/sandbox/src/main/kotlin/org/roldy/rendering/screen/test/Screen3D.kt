@@ -108,12 +108,14 @@ class Screen3D(
                 val ty = heightSampler.getHeightAt(tx, tz)
                 setTranslation(tx, ty, tz)
             }
+
             val allModels = foliageModels + staticModels
             val random = Random(1L)
 
             allModels.forEachIndexed { index, instance ->
-                val x = random.nextInt(1, 20)
-                val y = random.nextInt(1, 20)
+                val s = index * 2
+                val x = random.nextInt(s, s + 40)
+                val y = random.nextInt(s, s + 40)
                 instance.position(x.toFloat(), y.toFloat())
             }
         }
@@ -149,8 +151,8 @@ class Screen3D(
     }
 
 
-    val envModelBatch by disposable { staticModelBatch(offsetShiftingManager) }
-    val foliageBatch by disposable { foliageModelBatch(windSystem, offsetShiftingManager) }
+    val staticBatch by disposable { staticModelRenderer(offsetShiftingManager) }
+    val foliageBatch by disposable { foliageModelRenderer(windSystem, offsetShiftingManager) }
 
     val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
@@ -202,8 +204,12 @@ class Screen3D(
 //            dayCycle.update(delta)
 
             shadowSystem {
-                foliageModels.forEach { render(it.instance()) }
-                staticModels.forEach { render(it.instance()) }
+                staticModels.forEach {
+                    render(it.instance())
+                }
+                foliageModels.forEach {
+                    render(it.instance())
+                }
                 render(character.manager.instance)
             }
 
@@ -212,7 +218,7 @@ class Screen3D(
                 sun.render()
                 context(shadowSystem.environment) {
                     terrainInstance.render()
-                    envModelBatch.render(staticModels)
+                    staticBatch.render(staticModels)
                     foliageBatch.render(foliageModels)
                     character.render()
                 }

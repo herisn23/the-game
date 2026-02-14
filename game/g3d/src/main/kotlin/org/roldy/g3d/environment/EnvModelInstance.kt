@@ -26,6 +26,7 @@ class EnvModelInstance(
     private val tmpPos = Vector3()
     private val hasLod = lod.size > 1
     private val firstInstance = lod.values.first()
+    private var lastInstance = firstInstance
     private val position get() = firstInstance.transform.getTranslation(tmpPos)
 
     private val collisionBoundingBox = BoundingBox()
@@ -132,14 +133,14 @@ class EnvModelInstance(
         return lod.getValue(lodLevel)
     }
 
-
     context(camera: Camera)
-    fun instance() =
+    fun instance(): ModelInstance =
         if (hasLod) {
             getLodInstance()
         } else {
             lod.getValue(-1)
         }
+
 
 }
 

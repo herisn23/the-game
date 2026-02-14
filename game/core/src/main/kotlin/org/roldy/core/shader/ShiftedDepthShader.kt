@@ -9,12 +9,8 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderContext
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
-import org.roldy.core.shader.util.ShaderBuilder
-import org.roldy.core.shader.util.ShaderUserData
-import org.roldy.core.shader.util.WindShaderManager
-import org.roldy.core.shader.util.shaderProvider
+import org.roldy.core.shader.util.*
 import org.roldy.core.system.WindSystem
-import kotlin.reflect.KProperty
 
 class ShiftedDepthShader(
     renderable: Renderable,
@@ -23,17 +19,24 @@ class ShiftedDepthShader(
         override val shiftOffset = Vector3()
     }
 ) : DepthShader(
-    renderable, Config().apply {
+    renderable, DepthConfig().apply {
         with(ShaderBuilder) {
+            hasWind = hasWind(renderable)
             vertexShader = ShaderLoader.depthVert.append(ShaderLoader.windSystem).shiftFlag().windFlag(renderable)
             fragmentShader = ShaderLoader.depthFrag
         }
     }
 ) {
+
+    class DepthConfig : Config() {
+        var hasWind: Boolean = false
+    }
+
+
     val defaultOffset = Vector3()
     val windManager = WindShaderManager(windSystem, program)
 
-    val u_shiftOffset by FetchUniform()
+    val u_shiftOffset by program.fetchUniform()
 
     val worldShiftUserData = renderable.userData as? ShaderUserData
     val isShifted get() = worldShiftUserData?.shifted ?: false
@@ -63,17 +66,8 @@ class ShiftedDepthShader(
         program.setUniformf(u_shiftOffset, originOffset.x, originOffset.y, originOffset.z)
     }
 
-    inner class FetchUniform(
-        private val normalize: Boolean = false
-    ) {
-        private var cachedLocation: Int? = null
-
-        operator fun getValue(thisRef: ShiftedDepthShader, property: KProperty<*>): Int {
-            return cachedLocation ?: program.fetchUniformLocation(
-                property.name,
-                normalize
-            ).also { cachedLocation = it }
-        }
+    override fun canRender(renderable: Renderable): Boolean {
+        return super.canRender(renderable) && ShaderBuilder.hasWind(renderable) == (config as DepthConfig).hasWind
     }
 }
 

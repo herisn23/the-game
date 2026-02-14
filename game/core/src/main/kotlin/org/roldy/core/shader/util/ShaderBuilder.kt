@@ -13,12 +13,13 @@ object ShaderBuilder {
     private fun String.windFlag() = append("#define windFlag")
     fun String.windFlag(renderable: Renderable) =
         let {
-            val userData = renderable.userData as? ShaderUserData
-            val hasWind = userData?.foliage ?: false
-            if (hasWind) {
+            if (hasWind(renderable)) {
                 it.windFlag()
             } else {
                 it
             }
         }
+
+    fun hasWind(renderable: Renderable): Boolean =
+        (renderable.userData as? ShaderUserData)?.foliage ?: false
 }

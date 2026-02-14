@@ -1,6 +1,7 @@
 package org.roldy.g3d.environment
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider
 import org.roldy.core.camera.OffsetProvider
@@ -10,28 +11,30 @@ import org.roldy.core.shader.foliageShaderProvider
 import org.roldy.core.shader.shiftingShaderProvider
 import org.roldy.core.system.WindSystem
 
-class EnvironmentModelBatch(
+class EnvironmentRenderer(
     shaderProvider: ShaderProvider
 ) : AutoDisposableAdapter() {
 
-    val foliageBatch by disposable { ModelBatch(shaderProvider) }
+    private val batch by disposable { ModelBatch(shaderProvider) }
 
 
-    context(camera: Camera)
+    context(camera: Camera, environment: Environment)
     fun render(instances: List<EnvModelInstance>) {
+        batch.begin(camera)
         instances.forEach {
-            foliageBatch.render(it.instance())
+            batch.render(it.instance(), environment)
         }
+        batch.end()
     }
 }
 
-fun foliageModelBatch(
+fun foliageModelRenderer(
     windSystem: WindSystem,
     offsetProvider: OffsetProvider,
 ) =
-    EnvironmentModelBatch(foliageShaderProvider(offsetProvider, windSystem))
+    EnvironmentRenderer(foliageShaderProvider(offsetProvider, windSystem))
 
-fun staticModelBatch(
+fun staticModelRenderer(
     offsetProvider: OffsetProvider,
 ) =
-    EnvironmentModelBatch(shiftingShaderProvider(offsetProvider))
+    EnvironmentRenderer(shiftingShaderProvider(offsetProvider))
