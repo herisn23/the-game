@@ -135,10 +135,14 @@ class Screen3D(
     }
 
     val foliageModels by lazy {
-        listOf(grass, tree, palm)
+//        listOf(grass, tree, palm)
+//        instances.filter { it.value.foliage }.values.toList()
+        listOf(instances.getValue("SM_Env_Bush_Tropical_03"))
     }
     val staticModels by lazy {
-        listOf(tropicalModel)
+//        listOf(tropicalModel)
+//        instances.filter { !it.value.foliage }.values.toList()
+        emptyList<EnvModelInstance>()
     }
 
 
@@ -148,6 +152,7 @@ class Screen3D(
 
     init {
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
+        Diagnostics.addProvider { "Instances: ${staticModels.size} / ${foliageModels.size}" }
     }
 
 

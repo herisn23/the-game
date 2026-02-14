@@ -66,6 +66,12 @@ private fun MaterialData.toMaterial(
                     AttributeMapper.Generic.map(it, textures)?.let(::set)
                 }
             }
+
+            SyntyShaderNames.TRANSPARENT -> {
+                uniforms.forEach {
+                    AttributeMapper.Transparent.map(it, textures)?.let(::set)
+                }
+            }
         }
         shaderName to this
     }
@@ -79,7 +85,6 @@ private fun ModelInstanceData.createInstance(
     val udata = ShaderUserData()
     fun List<MeshData>.find(name: String) =
         find { it.meshName == name }
-
     fun Node.assignMaterial(parent: Node, data: List<MeshData>) {
         val data = data.find(id)
         if (data == null) {
@@ -102,10 +107,11 @@ private fun ModelInstanceData.createInstance(
     }
 
     val instances = meshes.map { (lod, meshes) ->
-        lod to ModelInstance(model).apply {
+        ModelInstance(model).apply {
             userData = udata
             this.materials.clear()
             val node = nodes.first()
+            node.assignMaterial(node, meshes)
             node.children.removeAll { meshes.none { m -> m.meshName == it.id } }
             when (node.children.count()) {
                 0 -> node.assignMaterial(node, meshes)
@@ -115,18 +121,41 @@ private fun ModelInstanceData.createInstance(
                     }
                 }
             }
+        }.let { instance ->
+            fun List<Node>.collect(): List<Node> =
+                this + flatMap { it.children.toList().collect() }
+            //temporary code to skip unknown shaders
+            val hashKnownShder = instance.nodes.toList().collect().any { node ->
+                node.parts.any { p ->
+                    val shaderName = materialsMap.find { it.second.id == p.material.id }?.first
+                    shaderName == SyntyShaderNames.FOLIAGE || shaderName == SyntyShaderNames.GENERIC
+                }
+
+            }
+            if (hashKnownShder) {
+                lod to instance
+            } else {
+                null
+            }
         }
-    }
+    }.filterNotNull()
 
     val collision = asset.collisionMap.keys.find { it.contains(modelName) }?.let {
         asset.collisionMap[it]?.get()
     }
-    return EnvModelInstance(
-        modelName,
-        collision,
-        udata.foliage,
-        instances.toMap()
-    )
+    return if (instances.isNotEmpty()) {
+        EnvModelInstance(
+            modelName,
+            collision,
+            udata.foliage,
+            instances.toMap()
+        ).apply {
+            udata.instance = this
+        }
+    } else {
+        null
+    }
 }
+
 
 

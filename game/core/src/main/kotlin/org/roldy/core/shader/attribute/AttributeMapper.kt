@@ -94,6 +94,19 @@ object AttributeMapper {
             }
     }
 
+    object Transparent {
+        fun map(uniform: Uniform, textures: Map<String, Asset<Texture>>): Attribute? =
+            when (uniform.name) {
+                "_Base_Texture" -> if (uniform is TexEnvType && uniform.value != null) {
+                    textures.pick(uniform.value) {
+                        TextureAttribute(TextureAttribute.Diffuse, this)
+                    }
+                } else null
+
+                else -> null
+            }
+    }
+
     fun Map<String, Asset<Texture>>.pick(name: String?, onfound: Texture.() -> Attribute?): Attribute? =
         this[name]?.get()?.let { onfound(it) }
 }
