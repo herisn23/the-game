@@ -6,21 +6,21 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.CameraRenderable
-import org.roldy.core.DayNightCycle
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.asset.loadAsset
 import org.roldy.core.disposable.AutoDisposableAdapter
 import org.roldy.core.disposable.disposable
+import org.roldy.core.system.DayNightSystem
 
 
 class Skybox(
-    val dayNightCycle: DayNightCycle,
+    val dayNightSystem: DayNightSystem,
 ) : AutoDisposableAdapter(), CameraRenderable {
 
     private val day: Cubemap by disposable { createCubeMap("day/FluffballDay") }
     private val night: Cubemap by disposable { createCubeMap("night/CosmicCoolCloud") }
     private var nightRotation = 0f
-    private val nightRotationSpeed = 0.1f
+    private val nightRotationSpeed = 0.02f
     private var blend = 0f
     private var brightness = 0f
     private val dayTint = Vector3()
@@ -96,21 +96,21 @@ class Skybox(
 
         // Rotate night sky (only when night is visible)
         // Convert delta to "hours" (24 hour cycle)
-        val hoursElapsed: Float = (delta / dayNightCycle.dayDurationSeconds) * 24f
+        val hoursElapsed: Float = (delta / dayNightSystem.dayDurationSeconds) * 24f
         nightRotation += nightRotationSpeed * hoursElapsed * blend
 
 
         // Keep in 0-2π range
         nightRotation %= (Math.PI * 2).toFloat()
 
-        if (dayNightCycle.timeOfDay < 0.20f) {
+        if (dayNightSystem.timeOfDay < 0.20f) {
             // Night (midnight to pre-dawn)
             blend = 1.0f
             brightness = 0.3f
             dayTint.set(1f, 1f, 1f)
-        } else if (dayNightCycle.timeOfDay < 0.25f) {
+        } else if (dayNightSystem.timeOfDay < 0.25f) {
             // Dawn transition (night -> sunrise)
-            val t: Float = (dayNightCycle.timeOfDay - 0.20f) / 0.05f // 0 to 1
+            val t: Float = (dayNightSystem.timeOfDay - 0.20f) / 0.05f // 0 to 1
             blend = 1.0f - t
             brightness = MathUtils.lerp(0.3f, 0.7f, t)
             // Tint goes toward orange/pink
@@ -119,9 +119,9 @@ class Skybox(
                 MathUtils.lerp(1.0f, 0.6f, t),
                 MathUtils.lerp(1.0f, 0.4f, t)
             )
-        } else if (dayNightCycle.timeOfDay < 0.30f) {
+        } else if (dayNightSystem.timeOfDay < 0.30f) {
             // Sunrise to morning
-            val t: Float = (dayNightCycle.timeOfDay - 0.25f) / 0.05f
+            val t: Float = (dayNightSystem.timeOfDay - 0.25f) / 0.05f
             blend = 0.0f
             brightness = MathUtils.lerp(0.7f, 1.0f, t)
             // Orange tint fades to normal
@@ -130,14 +130,14 @@ class Skybox(
                 MathUtils.lerp(0.6f, 1.0f, t),
                 MathUtils.lerp(0.4f, 1.0f, t)
             )
-        } else if (dayNightCycle.timeOfDay < 0.70f) {
+        } else if (dayNightSystem.timeOfDay < 0.70f) {
             // Full day
             blend = 0.0f
             brightness = 1.0f
             dayTint.set(1f, 1f, 1f)
-        } else if (dayNightCycle.timeOfDay < 0.75f) {
+        } else if (dayNightSystem.timeOfDay < 0.75f) {
             // Afternoon to sunset
-            val t: Float = (dayNightCycle.timeOfDay - 0.70f) / 0.05f
+            val t: Float = (dayNightSystem.timeOfDay - 0.70f) / 0.05f
             blend = 0.0f
             brightness = MathUtils.lerp(1.0f, 0.8f, t)
             // Tint goes orange/red
@@ -146,9 +146,9 @@ class Skybox(
                 MathUtils.lerp(1.0f, 0.5f, t),
                 MathUtils.lerp(1.0f, 0.3f, t)
             )
-        } else if (dayNightCycle.timeOfDay < 0.80f) {
+        } else if (dayNightSystem.timeOfDay < 0.80f) {
             // Sunset transition (sunset -> night)
-            val t: Float = (dayNightCycle.timeOfDay - 0.75f) / 0.05f
+            val t: Float = (dayNightSystem.timeOfDay - 0.75f) / 0.05f
             blend = t
             brightness = MathUtils.lerp(0.8f, 0.3f, t)
             // Keep sunset tint while blending to night

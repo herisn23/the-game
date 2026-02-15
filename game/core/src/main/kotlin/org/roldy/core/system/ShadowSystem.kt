@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
 import com.badlogic.gdx.math.Vector3
 import org.roldy.core.camera.OffsetProvider
@@ -36,7 +37,7 @@ class ShadowSystem(
     val maxDistance = 500f
 
 
-    val shadowLight: DirectionalShadowLight by disposable {
+    val sunLight: DirectionalShadowLight by disposable {
         DirectionalShadowLight(
             shadowMapSize, shadowMapSize,
             shadowDistance * 2f, shadowDistance * 2f,
@@ -44,10 +45,15 @@ class ShadowSystem(
         )
     }
 
+    val moonLight: DirectionalLight = DirectionalLight().apply {
+        // Start dark, DayNightSystem will control color/intensity
+        set(0f, 0f, 0f, 0.5f, 1f, 0.3f) // color=black (off), direction opposite sun
+    }
+
     fun updateShadowDistance(factor: Float) {
         val distance = (maxDistance * factor).coerceIn(minDistance, maxDistance)
-        shadowLight.camera.viewportWidth = distance
-        shadowLight.camera.viewportHeight = distance
+        sunLight.camera.viewportWidth = distance
+        sunLight.camera.viewportHeight = distance
     }
 
     private val shadowCenter = Vector3()
@@ -63,15 +69,16 @@ class ShadowSystem(
     }
 
     init {
-        shadowLight.set(1f, 1f, 1f, -0.5f, -1f, -0.3f) // color and direction
-        shadowLight.depthMap.texture.setFilter(
+        sunLight.set(1f, 1f, 1f, -0.5f, -1f, -0.3f)
+        sunLight.depthMap.texture.setFilter(
             Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest
         )
-        // Setup environment
+
         environment = Environment()
         environment.set(ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
-        environment.add(shadowLight)
-        environment.shadowMap = shadowLight
+        environment.add(sunLight)
+        environment.add(moonLight)  // ADD moonLight to environment
+        environment.shadowMap = sunLight
     }
 
     fun begin() {
@@ -82,8 +89,8 @@ class ShadowSystem(
         shadowCenter.x = (shadowCenter.x / gridSize).toInt() * gridSize
         shadowCenter.z = (shadowCenter.z / gridSize).toInt() * gridSize
 
-        shadowLight.begin(shadowCenter, shadowLight.direction)
-        shadowBatch.begin(shadowLight.camera)
+        sunLight.begin(shadowCenter, sunLight.direction)
+        shadowBatch.begin(sunLight.camera)
     }
 
     operator fun invoke(
@@ -115,6 +122,6 @@ class ShadowSystem(
 
     fun end() {
         shadowBatch.end()
-        shadowLight.end()
+        sunLight.end()
     }
 }

@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import org.roldy.core.DayNightCycle
 import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
@@ -26,6 +25,7 @@ import org.roldy.core.system.ShadowSystem
 import org.roldy.core.system.WindSystem
 import org.roldy.g3d.AssetManagersLoader
 import org.roldy.g3d.environment.*
+import org.roldy.g3d.environment.decal.createPlanetsBillboards
 import org.roldy.g3d.pawn.CharacterController
 import org.roldy.g3d.pawn.PawnManager
 import org.roldy.g3d.pawn.PawnModelBuilder
@@ -165,7 +165,7 @@ class Screen3D(
             "SM_Env_Bush_Tropical_03"
         )
         val random = Random(42)
-        (0..0).mapNotNull {
+        (0..1000).mapNotNull {
             instances.getValue(grasses.random(random)).createInstance()
         }
     }
@@ -183,7 +183,7 @@ class Screen3D(
             "SM_Env_Tree_Pohutukawa_04"
         )
         val random = Random(42)
-        (0..0).mapNotNull {
+        (0..20).mapNotNull {
             instances.getValue(models.random(random)).createInstance()
         }
 
@@ -218,8 +218,13 @@ class Screen3D(
     val staticBatch by disposable { staticModelRenderer(camera, offsetShiftingManager) { staticModels } }
     val foliageBatch by disposable { foliageModelRenderer(camera, windSystem, offsetShiftingManager) { foliageModels } }
 
-    val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
-    val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
+
+    val dayCycle = createDayNightSystemInstance(
+        shadowSystem.environment,
+        shadowSystem.sunLight,
+        shadowSystem.moonLight
+    )
+    val planets by disposable { createPlanetsBillboards(camera, dayCycle) }
 
     val skybox by lazy { Skybox(dayCycle) }
 
@@ -255,10 +260,15 @@ class Screen3D(
             charController.checkCollision = !charController.checkCollision
         }
         if (Gdx.input.isKeyPressed(keyLeft)) {
-            dayCycle.update(-delta * 100)
+            context(-delta * 100) {
+                dayCycle.update()
+            }
+
         }
         if (Gdx.input.isKeyPressed(keyRight)) {
-            dayCycle.update(delta * 100)
+            context(delta * 100) {
+                dayCycle.update()
+            }
         }
 
 
@@ -268,7 +278,7 @@ class Screen3D(
             charController.update()
             offsetShiftingManager.update(character.manager.instance)
 
-//            dayCycle.update(delta)
+            dayCycle.update()
 
             shadowSystem(
                 {
@@ -283,7 +293,7 @@ class Screen3D(
             ) {
                 postProcess {
                     skybox.render()
-                    sun.render()
+                    planets.render()
                     terrainInstance.render()
                     staticBatch.render()
                     foliageBatch.render()
