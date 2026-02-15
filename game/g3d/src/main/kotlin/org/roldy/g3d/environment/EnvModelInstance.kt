@@ -3,24 +3,61 @@ package org.roldy.g3d.environment
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.math.collision.Ray
+import org.roldy.core.collision.MeshCollider
 
 class EnvModelInstance(
     val name: String,
     collision: Model?,
     val foliage: Boolean,
     lod: Map<Int, ModelInstance>
-) {
+) : MeshCollider {
     private val lod = lod.map { (key, instance) ->
-        key to instance.wrapper()
+        key to instance.wrapper(this)
     }.toMap()
 
     class ModelInstanceWrapper(
+        val model: EnvModelInstance,
         val instance: ModelInstance,
         val boundingBox: BoundingBox
     )
+
+    inner class Transform {
+        internal val tmpPos = Vector3()
+        internal val tmpRot = Quaternion()
+
+        fun setTranslation(ox: Float, oy: Float, oz: Float) {
+            tmpPos.set(ox, oy, oz)
+        }
+
+        fun setRotation(rotX: Float, rotY: Float, rotZ: Float) {
+            tmpRot.set(Vector3.Y, rotY)
+            tmpRot.set(Vector3.X, rotX)
+            tmpRot.set(Vector3.Z, rotZ)
+        }
+
+        fun apply() {
+            lod.forEach { (_, wrapper) ->
+                wrapper.instance.transform.idt()
+                wrapper.instance.transform.rotate(tmpRot)
+                wrapper.instance.transform.setTranslation(tmpPos)
+            }
+            collisionInstance?.let { ci ->
+                ci.transform.idt()
+                ci.transform.setTranslation(tmpPos)
+                ci.transform.rotate(tmpRot)
+                // Calculate in local space first
+                ci.calculateBoundingBox(collisionBoundingBox)
+                // Then transform to world space
+                collisionBoundingBox.mul(ci.transform)
+            }
+        }
+    }
+
+    val transform = Transform()
 
     companion object {
         const val LOD0_THRESHOLD = 30//50f
@@ -28,48 +65,18 @@ class EnvModelInstance(
         const val LOD2_THRESHOLD = 90//200f
         const val LOD3_THRESHOLD = 120//300f
     }
+
     private val lodLevels = lod.keys.toList()
     private val maxLod = lodLevels.max()
-    private val tmpPos = Vector3()
+
     private val hasLod = lod.size > 1
 
-    val position get() = tmpPos
+    override val position get() = transform.tmpPos
 
-    private val collisionBoundingBox = BoundingBox()
-    private val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
+    override val collisionBoundingBox = BoundingBox()
+    val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
 
     private val hasCollision get() = collisionInstance != null
-
-    fun setRotation(rotX: Float, rotY: Float, rotZ: Float) {
-        lod.forEach { (_, wraper) ->
-            wraper.instance.transform.rotate(Vector3.Y, rotY)
-            wraper.instance.transform.rotate(Vector3.X, rotX)
-            wraper.instance.transform.rotate(Vector3.Z, rotZ)
-        }
-    }
-
-    fun setTranslation(ox: Float, oy: Float, oz: Float) {
-        tmpPos.set(ox, oy, oz)
-        lod.forEach { (_, wrapper) ->
-            wrapper.instance.transform.idt()
-            wrapper.instance.transform.setTranslation(ox, oy, oz)
-        }
-        // Update collision instance position if it exists
-        collisionInstance?.let { ci ->
-            ci.transform.idt()
-            ci.transform.setTranslation(ox, oy, oz)
-            ci.calculateBoundingBox(collisionBoundingBox)
-        }
-    }
-
-    /**
-     * Get the bounding box for this model's collision geometry
-     * @return BoundingBox if collision geometry exists, null otherwise
-     */
-    @Suppress("unused")
-    fun getCollisionBounds(): BoundingBox? {
-        return if (hasCollision) collisionBoundingBox else null
-    }
 
     /**
      * Check if a point is inside the collision bounds
@@ -77,7 +84,7 @@ class EnvModelInstance(
      * @return true if point is inside collision bounds
      */
     @Suppress("unused")
-    fun isPointInCollision(point: Vector3): Boolean {
+    override fun isPointInCollision(point: Vector3): Boolean {
         return hasCollision && collisionBoundingBox.contains(point)
     }
 
@@ -87,17 +94,17 @@ class EnvModelInstance(
      * @return true if bounding boxes intersect
      */
     @Suppress("unused")
-    fun intersectsCollisionBounds(other: BoundingBox): Boolean {
+    override fun intersectsCollisionBounds(other: BoundingBox): Boolean {
         return hasCollision && collisionBoundingBox.intersects(other)
     }
 
     /**
      * Raycast against this model's collision geometry
      * @param ray The ray to cast
-     * @return true if ray intersects collision bounds
+     * @return true if a ray intersects collision bounds
      */
     @Suppress("unused")
-    fun raycastCollision(ray: Ray): Boolean {
+    override fun rayCastCollision(ray: Ray): Boolean {
         if (!hasCollision) return false
 
         // Check if ray origin is inside bounds
@@ -118,15 +125,9 @@ class EnvModelInstance(
         return false
     }
 
-    /**
-     * Get the collision instance for advanced collision operations
-     * @return ModelInstance representing collision geometry, or null if no collision model
-     */
-    @Suppress("unused")
-    fun getCollisionInstance(): ModelInstance? = collisionInstance
-
-    private fun ModelInstance.wrapper() =
+    private fun ModelInstance.wrapper(envModelInstance: EnvModelInstance) =
         ModelInstanceWrapper(
+            envModelInstance,
             this,
             this.calculateBoundingBox(BoundingBox())
         )

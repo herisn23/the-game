@@ -26,20 +26,20 @@ class EnvironmentRenderer(
     private val eventTask = ConcurrentLoop(emitter = ::process)
 
     private val batch by disposable { ModelBatch(shaderProvider) }
+    private val colliderBatch by disposable { ModelBatch() }
 
     private val instancesCache = mutableListOf<EnvModelInstance.ModelInstanceWrapper>()
+    private var visibleInstances: List<EnvModelInstance.ModelInstanceWrapper> = emptyList()
 
-    val currentRenderedModels get() = instancesCache.size
+    val currentRenderedModels get() = visibleInstances.size
 
     init {
         eventTask.start()
     }
 
-    val visibleInstances: List<EnvModelInstance.ModelInstanceWrapper>
-        get() = synchronized(instancesCache) { instancesCache.toList() }
-
     context(environment: Environment)
     fun render() {
+//        renderColliders()
         batch.begin(camera)
         visibleInstances.forEach {
             batch.render(it.instance, environment)
@@ -47,6 +47,16 @@ class EnvironmentRenderer(
         batch.end()
         Gdx.gl.glDepthMask(true)
         Gdx.gl.glDepthFunc(GL20.GL_LESS)
+    }
+
+    private fun renderColliders() {
+        colliderBatch.begin(camera)
+        visibleInstances.forEach {
+            it.model.collisionInstance?.let {
+                colliderBatch.render(it)
+            }
+        }
+        colliderBatch.end()
     }
 
     fun ShadowSystem.renderShadows() {
@@ -84,6 +94,7 @@ class EnvironmentRenderer(
                     }
                 }
             }
+            visibleInstances = instancesCache.toList()
         }
     }
 

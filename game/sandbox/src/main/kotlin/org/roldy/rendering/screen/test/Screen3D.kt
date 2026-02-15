@@ -11,6 +11,7 @@ import org.roldy.core.Diagnostics
 import org.roldy.core.biome.toBiomes
 import org.roldy.core.camera.OffsetShiftingManager
 import org.roldy.core.camera.SimpleThirdPersonCamera
+import org.roldy.core.collision.CollisionSystem
 import org.roldy.core.configuration.loadBiomesConfiguration
 import org.roldy.core.disposable.AutoDisposableScreenAdapter
 import org.roldy.core.disposable.disposable
@@ -91,7 +92,7 @@ class Screen3D(
         }
     }
     val charController by lazy {
-        CharacterController(character.manager.instance, heightSampler, cameraController).apply {
+        CharacterController(character.manager.instance, heightSampler, cameraController, collisionSystem).apply {
             offsetShiftingManager.shiftListeners.add { shiftX, shiftZ, _ ->
                 onOriginShift(shiftX, shiftZ)
             }
@@ -110,7 +111,7 @@ class Screen3D(
                 val tx = charX + ox
                 val tz = charZ + oz
                 val ty = heightSampler.getHeightAt(tx, tz)
-                setTranslation(tx, ty, tz)
+                transform.setTranslation(tx, ty, tz)
             }
 
             val allModels = foliageModels + staticModels
@@ -140,7 +141,8 @@ class Screen3D(
                     val rotY = random.nextFloat() * 360f
 
                     instance.position(x, z)
-                    instance.setRotation(0f, rotY, 0f)
+                    instance.transform.setRotation(0f, rotY, 0f)
+                    instance.transform.apply()
 //                instance.scale(scale)
                 }
             }
@@ -199,6 +201,8 @@ class Screen3D(
     }
 
 
+    val collisionSystem = CollisionSystem { foliageModels + staticModels }
+
     var loading = true
     val postProcess = PostProcessing()
     val diagnostics by disposable { Diagnostics() }
@@ -206,6 +210,7 @@ class Screen3D(
     init {
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
         Diagnostics.addProvider { "Foliage: ${foliageBatch.currentRenderedModels} / ${foliageModels.size}" }
+        Diagnostics.addProvider { "Collisions enabled: ${charController.checkCollision}" }
     }
 
 
@@ -245,6 +250,9 @@ class Screen3D(
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             postProcess.toggle()
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            charController.checkCollision = !charController.checkCollision
+        }
         if (Gdx.input.isKeyPressed(keyLeft)) {
             dayCycle.update(-delta * 100)
         }
@@ -254,16 +262,16 @@ class Screen3D(
 
 
         context(delta, camera) {
-            offsetShiftingManager.update(character.manager.instance)
             windSystem.update()
             camera.update()
             charController.update()
+            offsetShiftingManager.update(character.manager.instance)
 
 //            dayCycle.update(delta)
 
             shadowSystem {
-                staticModels.forEach {
-                    render(it.get().instance)
+                with(staticBatch) {
+                    renderShadows()
                 }
                 with(foliageBatch) {
                     renderShadows()
@@ -274,6 +282,7 @@ class Screen3D(
             postProcess {
                 skybox.render()
                 sun.render()
+
                 context(shadowSystem.environment) {
                     terrainInstance.render()
                     staticBatch.render()
