@@ -1,7 +1,10 @@
 package org.roldy.core.coroutines
 
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 fun interface ChannelLoopConsumer<D> {
     context(data: D)
@@ -10,6 +13,7 @@ fun interface ChannelLoopConsumer<D> {
 
 class ChannelLoop<D>(
     val emitter: suspend () -> D,
+    val delayDuration: Duration = 100.milliseconds
 ) : Loop() {
     private val dataChannel = Channel<D>(Channel.UNLIMITED)
     private val consumers = mutableListOf<ChannelLoopConsumer<D>>()
@@ -28,7 +32,7 @@ class ChannelLoop<D>(
 
     private fun listen() {
         scope.launch {
-            delay(100)
+            delay(delayDuration)
             // Consumer: actively receives and processes events
             for (event in dataChannel) {
                 synchronized(consumers) {

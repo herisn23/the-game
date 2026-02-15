@@ -161,7 +161,7 @@ class Screen3D(
             "SM_Env_Bush_Palm_04",
             "SM_Env_Bush_Tropical_01",
             "SM_Env_Bush_Tropical_03"
-            )
+        )
         val random = Random(42)
         (0..2000).mapNotNull {
             instances.getValue(grasses.random(random)).createInstance()
@@ -209,8 +209,8 @@ class Screen3D(
     }
 
 
-    val staticBatch by disposable { staticModelRenderer(offsetShiftingManager) }
-    val foliageBatch by disposable { foliageModelRenderer(windSystem, offsetShiftingManager) }
+    val staticBatch by disposable { staticModelRenderer(camera, offsetShiftingManager) { staticModels } }
+    val foliageBatch by disposable { foliageModelRenderer(camera, windSystem, offsetShiftingManager) { foliageModels } }
 
     val sun by disposable { SunBillboard(camera, shadowSystem.shadowLight) }
     val dayCycle = DayNightCycle(shadowSystem.environment, shadowSystem.shadowLight)
@@ -266,7 +266,7 @@ class Screen3D(
                     render(it.get().instance)
                 }
                 with(foliageBatch) {
-                    renderShadows(foliageModels)
+                    renderShadows()
                 }
                 render(character.manager.instance)
             }
@@ -276,8 +276,8 @@ class Screen3D(
                 sun.render()
                 context(shadowSystem.environment) {
                     terrainInstance.render()
-                    staticBatch.render(staticModels)
-                    foliageBatch.render(foliageModels)
+                    staticBatch.render()
+                    foliageBatch.render()
                     character.render()
                 }
             }
