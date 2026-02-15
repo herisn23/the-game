@@ -18,8 +18,8 @@ import org.roldy.core.shader.shiftingDepthShaderProvider
 class ShadowSystem(
     private val offsetProvider: OffsetProvider,
     private val camera: Camera,
-    private val shadowQuality: Int = Quality.ULTRA_HIGH,
-    shadowDistance: Float = 100f,
+    private val shadowQuality: Int = Quality.HIGH,
+    shadowDistance: Float = 50f,
     private val windSystem: WindSystem
 ) : AutoDisposableAdapter() {
     object Quality {

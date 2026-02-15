@@ -114,7 +114,7 @@ class Screen3D(
             }
 
             val allModels = foliageModels + staticModels
-            val radius = 40f          // scatter area radius
+            val radius = 80f          // scatter area radius
             val random = Random(42)   // fixed seed for reproducibility
 
             val placed = mutableListOf<Vector2>()
@@ -160,10 +160,10 @@ class Screen3D(
             "SM_Env_Ground_Cover_03",
             "SM_Env_Bush_Palm_04",
             "SM_Env_Bush_Tropical_01",
-
+            "SM_Env_Bush_Tropical_03"
             )
         val random = Random(42)
-        (0..1000).mapNotNull {
+        (0..2000).mapNotNull {
             instances.getValue(grasses.random(random)).createInstance()
         }
     }
@@ -174,10 +174,14 @@ class Screen3D(
             "SM_Env_Tree_Banana_03",
             "SM_Env_Tree_Forest_01",
             "SM_Env_Tree_Forest_02",
-            "SM_Env_Tree_Forest_03"
+            "SM_Env_Tree_Forest_03",
+            "SM_Env_Tree_Pohutukawa_01",
+            "SM_Env_Tree_Pohutukawa_02",
+            "SM_Env_Tree_Pohutukawa_03",
+            "SM_Env_Tree_Pohutukawa_04"
         )
         val random = Random(42)
-        (0..40).mapNotNull {
+        (0..80).mapNotNull {
             instances.getValue(models.random(random)).createInstance()
         }
     }
@@ -186,7 +190,7 @@ class Screen3D(
 //        listOf(grass, tree, palm)
 //        instances.filter { it.value.foliage }.values.toList()
 //        listOf(instances.getValue("SM_Env_Bush_Tropical_03"))
-        grasses + trees
+        trees + grasses
     }
     val staticModels by lazy {
 //        listOf(tropicalModel)
@@ -201,7 +205,7 @@ class Screen3D(
 
     init {
         Diagnostics.addProvider { "Chunks: ${terrainInstance.getVisibleCount(camera)} / ${terrainInstance.getTotalCount()}" }
-        Diagnostics.addProvider { "Instances: ${staticModels.size} / ${foliageModels.size}" }
+        Diagnostics.addProvider { "Foliage: ${foliageBatch.currentRenderedModels} / ${foliageModels.size}" }
     }
 
 
@@ -259,16 +263,11 @@ class Screen3D(
 
             shadowSystem {
                 staticModels.forEach {
-                    render(it.instance())
+                    render(it.get().instance)
                 }
-//                Gdx.gl.glCullFace(GL20.GL_FRONT);  // cull front faces, render back faces
-//                Gdx.gl.glEnable(GL20.GL_POLYGON_OFFSET_FILL);
-//                Gdx.gl.glPolygonOffset(2.0f, 4.0f);  // tweak these values
-                foliageModels.forEach {
-                    render(it.instance())
+                with(foliageBatch) {
+                    renderShadows(foliageModels)
                 }
-//                Gdx.gl.glDisable(GL20.GL_POLYGON_OFFSET_FILL);
-//                Gdx.gl.glCullFace(GL20.GL_BACK);
                 render(character.manager.instance)
             }
 

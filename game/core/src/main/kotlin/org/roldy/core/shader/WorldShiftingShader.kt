@@ -72,3 +72,5 @@ fun shiftingShaderProvider(offsetProvider: OffsetProvider) =
     shaderProvider {
         WorldShiftingShader(it, offsetProvider = offsetProvider)
     }
+
+

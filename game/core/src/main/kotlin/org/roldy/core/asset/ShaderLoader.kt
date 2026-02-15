@@ -18,6 +18,7 @@ object ShaderLoader {
     val defaultVert by lazy { load("shaders/default.vert.glsl") }
 
     val foliageFrag by lazy { load("shaders/foliage.frag.glsl") }
+    val foliageDepthFrag by lazy { load("shaders/foliage_depth.frag.glsl") }
     val foliageVert by lazy { load("shaders/foliage.vert.glsl") }
 
 

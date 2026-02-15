@@ -139,7 +139,6 @@ class FoliageShader(
 
 }
 
-
 fun foliageShaderProvider(
     offsetProvider: OffsetProvider,
     windSystem: WindSystem

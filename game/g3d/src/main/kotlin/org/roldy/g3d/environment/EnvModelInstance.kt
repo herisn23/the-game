@@ -11,23 +11,29 @@ class EnvModelInstance(
     val name: String,
     collision: Model?,
     val foliage: Boolean,
-    val lod: Map<Int, ModelInstance>
+    lod: Map<Int, ModelInstance>
 ) {
+    private val lod = lod.map { (key, instance) ->
+        key to instance.wrapper()
+    }.toMap()
+
+    class ModelInstanceWrapper(
+        val instance: ModelInstance,
+        val boundingBox: BoundingBox
+    )
 
     companion object {
-        const val LOD0_THRESHOLD = 50f
-        const val LOD1_THRESHOLD = 100f
-        const val LOD2_THRESHOLD = 200f
-        const val LOD3_THRESHOLD = 300f
+        const val LOD0_THRESHOLD = 30//50f
+        const val LOD1_THRESHOLD = 60//100f
+        const val LOD2_THRESHOLD = 90//200f
+        const val LOD3_THRESHOLD = 120//300f
     }
-
     private val lodLevels = lod.keys.toList()
     private val maxLod = lodLevels.max()
     private val tmpPos = Vector3()
     private val hasLod = lod.size > 1
-    private val firstInstance = lod.values.first()
-    private var lastInstance = firstInstance
-    private val position get() = firstInstance.transform.getTranslation(tmpPos)
+
+    val position get() = tmpPos
 
     private val collisionBoundingBox = BoundingBox()
     private val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
@@ -35,16 +41,18 @@ class EnvModelInstance(
     private val hasCollision get() = collisionInstance != null
 
     fun setRotation(rotX: Float, rotY: Float, rotZ: Float) {
-        lod.forEach { (_, instance) ->
-            instance.transform.rotate(Vector3.Y, rotY)
-            instance.transform.rotate(Vector3.X, rotX)
-            instance.transform.rotate(Vector3.Z, rotZ)
+        lod.forEach { (_, wraper) ->
+            wraper.instance.transform.rotate(Vector3.Y, rotY)
+            wraper.instance.transform.rotate(Vector3.X, rotX)
+            wraper.instance.transform.rotate(Vector3.Z, rotZ)
         }
     }
+
     fun setTranslation(ox: Float, oy: Float, oz: Float) {
-        lod.forEach { (_, instance) ->
-            instance.transform.idt()
-            instance.transform.setTranslation(ox, oy, oz)
+        tmpPos.set(ox, oy, oz)
+        lod.forEach { (_, wrapper) ->
+            wrapper.instance.transform.idt()
+            wrapper.instance.transform.setTranslation(ox, oy, oz)
         }
         // Update collision instance position if it exists
         collisionInstance?.let { ci ->
@@ -117,6 +125,12 @@ class EnvModelInstance(
     @Suppress("unused")
     fun getCollisionInstance(): ModelInstance? = collisionInstance
 
+    private fun ModelInstance.wrapper() =
+        ModelInstanceWrapper(
+            this,
+            this.calculateBoundingBox(BoundingBox())
+        )
+
     private fun getLodLevel(dist: Float) =
         when {
             dist < LOD0_THRESHOLD -> 0
@@ -133,14 +147,14 @@ class EnvModelInstance(
     }
 
     context(camera: Camera)
-    private fun getLodInstance(): ModelInstance {
+    private fun getLodInstance(): ModelInstanceWrapper {
         val dist = camera.position.dst(position)
         val lodLevel = getLodLevel(dist)
         return lod.getValue(lodLevel)
     }
 
     context(camera: Camera)
-    fun instance(): ModelInstance =
+    fun get(): ModelInstanceWrapper =
         if (hasLod) {
             getLodInstance()
         } else {

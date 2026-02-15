@@ -9,6 +9,7 @@ precision mediump float;
 #define HIGH
 #endif
 
+varying vec4 v_color;
 varying MED vec2 v_texCoords0;
 uniform sampler2D u_diffuseTexture;
 
@@ -21,9 +22,10 @@ varying HIGH float v_depth;
 #endif //PackedDepthFlag
 
 void main() {
+
     #ifdef alphaTestFlag
-    if (texture2D(u_diffuseTexture, v_texCoords0).a < u_alphaTest)
-    discard;
+	if (texture2D(u_diffuseTexture, v_texCoords0).a < u_alphaTest)
+		discard;
     #endif // blendedTextureFlag
 
 	#ifdef PackedDepthFlag

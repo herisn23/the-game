@@ -8,6 +8,7 @@ attribute vec3 a_normal;
 
 #if defined(colorFlag)
 attribute vec4 a_color;
+varying vec4 v_color;
 #endif
 
 #ifdef boneWeight0Flag
@@ -144,9 +145,11 @@ void main() {
 
     #ifdef colorFlag
     vec4 windVertexColor = a_color;
+    v_color = windVertexColor;
     #else
     vec4 windVertexColor = vec4(1.0);
     #endif
+
 
     vec3 windPos = applyWindSystem(u_worldTrans, objectPos, worldPos, normal, windVertexColor);
     vec4 pos = u_worldTrans * vec4(windPos, 1.0);

@@ -241,8 +241,8 @@ void main() {
 	float vertexNdotL = max(dot(normalize(v_normal), normalize(v_lightDirection)), 0.0);
 
 	// Ratio to adjust vertex lighting with normal map detail
-	float normalInfluence = (vertexNdotL > 0.001)
-	? mappedNdotL / vertexNdotL
+	float normalInfluence = (vertexNdotL > 0.01)
+	? min(mappedNdotL / vertexNdotL, 1.5)// clamp max boost
 	: mappedNdotL;
 
 	float metallic;
@@ -276,7 +276,6 @@ void main() {
 	#else
 	vec3 specular = vec3(0.0);
 	#endif
-	specular = vec3(0.0);
 
 	#if defined(lightingFlag) && defined(separateAmbientFlag)
 	gl_FragColor.rgb = (baseColor.rgb * (v_ambientLight + getShadow() * v_lightDiffuse * normalInfluence)) + emissive.rgb;

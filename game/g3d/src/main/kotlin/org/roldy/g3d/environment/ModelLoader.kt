@@ -55,7 +55,7 @@ private fun MaterialData.toMaterial(
                 }
                 set(UniformAttribute.create(uniforms))
                 set(IntAttribute.createCullFace(GL20.GL_NONE))
-                set(FloatAttribute.createAlphaTest(0.9f))
+                set(FloatAttribute.createAlphaTest(0.8f))
             }
 
             SyntyShaderNames.GENERIC -> {
