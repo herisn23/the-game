@@ -7,11 +7,14 @@ import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.math.collision.Ray
+import org.roldy.core.collision.CollisionUtils
 import org.roldy.core.collision.MeshCollider
+import org.roldy.core.collision.MeshCollisionData
+import org.roldy.core.collision.MeshCollisionData.Triangle
 
 class EnvModelInstance(
     val name: String,
-    collision: Model?,
+    collisionModel: Model?,
     val foliage: Boolean,
     lod: Map<Int, ModelInstance>
 ) : MeshCollider {
@@ -24,6 +27,8 @@ class EnvModelInstance(
         val instance: ModelInstance,
         val boundingBox: BoundingBox
     )
+
+    private var collisionData: List<Triangle> = emptyList()
 
     inner class Transform {
         internal val tmpPos = Vector3()
@@ -53,6 +58,7 @@ class EnvModelInstance(
                 ci.calculateBoundingBox(collisionBoundingBox)
                 // Then transform to world space
                 collisionBoundingBox.mul(ci.transform)
+                collisionData = MeshCollisionData.extractTriangles(ci)
             }
         }
     }
@@ -74,7 +80,7 @@ class EnvModelInstance(
     override val position get() = transform.tmpPos
 
     override val collisionBoundingBox = BoundingBox()
-    val collisionInstance: ModelInstance? = collision?.let { ModelInstance(it) }
+    val collisionInstance: ModelInstance? = collisionModel?.let { ModelInstance(it) }
 
     private val hasCollision get() = collisionInstance != null
 
@@ -93,9 +99,15 @@ class EnvModelInstance(
      * @param other The other bounding box to check intersection with
      * @return true if bounding boxes intersect
      */
-    @Suppress("unused")
     override fun intersectsCollisionBounds(other: BoundingBox): Boolean {
-        return hasCollision && collisionBoundingBox.intersects(other)
+        if (!hasCollision) return false
+        // Broad phase: AABB check first (cheap)
+        if (!collisionBoundingBox.intersects(other)) return false
+        if (collisionData.isEmpty()) return false
+        // Narrow phase: triangle check (accurate)
+        return collisionData.any { tri ->
+            CollisionUtils.aabbIntersectsTriangle(other.min, other.max, tri)
+        }
     }
 
     /**
@@ -161,7 +173,5 @@ class EnvModelInstance(
         } else {
             lod.getValue(-1)
         }
-
-
 }
 

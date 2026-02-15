@@ -114,7 +114,6 @@ class Screen3D(
                 transform.setTranslation(tx, ty, tz)
             }
 
-            val allModels = foliageModels + staticModels
             val radius = 80f          // scatter area radius
             val random = Random(42)   // fixed seed for reproducibility
 
@@ -149,6 +148,10 @@ class Screen3D(
 
             grasses.place(0.1f)
             trees.place(1f)
+            staticModels.forEach {
+                it.position(0f, 0f)
+                it.transform.apply()
+            }
         }
     }
     val grasses by lazy {
@@ -165,7 +168,7 @@ class Screen3D(
             "SM_Env_Bush_Tropical_03"
         )
         val random = Random(42)
-        (0..2000).mapNotNull {
+        (0..0).mapNotNull {
             instances.getValue(grasses.random(random)).createInstance()
         }
     }
@@ -183,9 +186,10 @@ class Screen3D(
             "SM_Env_Tree_Pohutukawa_04"
         )
         val random = Random(42)
-        (0..80).mapNotNull {
+        (0..0).mapNotNull {
             instances.getValue(models.random(random)).createInstance()
         }
+
     }
 
     val foliageModels by lazy {
@@ -196,8 +200,8 @@ class Screen3D(
     }
     val staticModels by lazy {
 //        listOf(tropicalModel)
-//        instances.filter { !it.value.foliage }.values.toList()
-        emptyList<EnvModelInstance>()
+        listOfNotNull(instances.getValue("SM_Bld_Ruins_Archway_02").createInstance())
+//        emptyList<EnvModelInstance>()
     }
 
 
@@ -238,7 +242,6 @@ class Screen3D(
         camera.viewportHeight = height.toFloat()
         camera.update()
     }
-
     override fun render(delta: Float) {
 
         if (loading && AssetManagersLoader.update()) {
@@ -282,7 +285,6 @@ class Screen3D(
             postProcess {
                 skybox.render()
                 sun.render()
-
                 context(shadowSystem.environment) {
                     terrainInstance.render()
                     staticBatch.render()

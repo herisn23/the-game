@@ -14,7 +14,7 @@ data class CollisionResult(
 class CollisionSystem(
     val colliders: () -> List<MeshCollider>
 ) {
-    private val radius = 1f
+    private val radius = 5f
     private val tmpBox = BoundingBox()
     private val tmpVec = Vector3()
 
