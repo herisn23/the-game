@@ -18,7 +18,7 @@ import org.roldy.core.shader.shiftingDepthShaderProvider
 class ShadowSystem(
     private val offsetProvider: OffsetProvider,
     private val camera: Camera,
-    private val shadowQuality: Int = Quality.HIGH,
+    shadowQuality: Int = Quality.HIGH,
     shadowDistance: Float = 50f,
     private val windSystem: WindSystem
 ) : AutoDisposableAdapter() {
@@ -34,7 +34,6 @@ class ShadowSystem(
 
     val minDistance = 50f
     val maxDistance = 500f
-
 
 
     val shadowLight: DirectionalShadowLight by disposable {
@@ -58,7 +57,9 @@ class ShadowSystem(
 
     // Separate batch for shadow depth pass
     private val shadowBatch: ModelBatch by disposable {
-        ModelBatch(shiftingDepthShaderProvider(offsetProvider, windSystem))
+        ModelBatch(
+            shiftingDepthShaderProvider(offsetProvider, windSystem)
+        )
     }
 
     init {
@@ -85,13 +86,21 @@ class ShadowSystem(
         shadowBatch.begin(shadowLight.camera)
     }
 
-    operator fun invoke(render: ShadowSystem.() -> Unit) {
+    operator fun invoke(
+        renderShadows: ShadowSystem.() -> Unit,
+        renderScene: context (Environment) () -> Unit
+    ) {
         begin()
-        render()
+        renderShadows()
         end()
+
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, 0)
+
+        context(environment) {
+            renderScene()
+        }
     }
 
     fun render(instance: ModelInstance) {

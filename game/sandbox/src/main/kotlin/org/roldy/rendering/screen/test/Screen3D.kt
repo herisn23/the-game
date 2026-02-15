@@ -119,16 +119,15 @@ class Screen3D(
 
             val placed = mutableListOf<Vector2>()
 
-            fun List<EnvModelInstance>.place(minDistance: Float) {
+            fun List<EnvModelInstance>.place(minDistance: Float, minRadius: Float = 2f) {
                 forEach { instance ->
                     var x: Float
                     var z: Float
                     var attempts = 0
 
-                    // Try to find a spot that's not too close to others
                     do {
                         val angle = random.nextFloat() * MathUtils.PI2
-                        val dist = random.nextFloat() * radius
+                        val dist = minRadius + random.nextFloat() * (radius - minRadius)
                         x = cos(angle) * dist
                         z = sin(angle) * dist
                         attempts++
@@ -136,13 +135,11 @@ class Screen3D(
 
                     placed.add(Vector2(x, z))
 
-                    // Random rotation and scale for variety
                     val rotY = random.nextFloat() * 360f
 
                     instance.position(x, z)
                     instance.transform.setRotation(0f, rotY, 0f)
                     instance.transform.apply()
-//                instance.scale(scale)
                 }
             }
 
@@ -205,7 +202,7 @@ class Screen3D(
     }
 
 
-    val collisionSystem = CollisionSystem { foliageModels + staticModels }
+    val collisionSystem = CollisionSystem(offsetShiftingManager) { foliageModels + staticModels }
 
     var loading = true
     val postProcess = PostProcessing()
@@ -242,6 +239,7 @@ class Screen3D(
         camera.viewportHeight = height.toFloat()
         camera.update()
     }
+
     override fun render(delta: Float) {
 
         if (loading && AssetManagersLoader.update()) {
@@ -272,26 +270,28 @@ class Screen3D(
 
 //            dayCycle.update(delta)
 
-            shadowSystem {
-                with(staticBatch) {
-                    renderShadows()
+            shadowSystem(
+                {
+                    with(staticBatch) {
+                        renderShadows()
+                    }
+                    with(foliageBatch) {
+                        renderShadows()
+                    }
+                    render(character.manager.instance)
                 }
-                with(foliageBatch) {
-                    renderShadows()
-                }
-                render(character.manager.instance)
-            }
-
-            postProcess {
-                skybox.render()
-                sun.render()
-                context(shadowSystem.environment) {
+            ) {
+                postProcess {
+                    skybox.render()
+                    sun.render()
                     terrainInstance.render()
                     staticBatch.render()
                     foliageBatch.render()
                     character.render()
                 }
             }
+
+
             diagnostics.render()
         }
     }

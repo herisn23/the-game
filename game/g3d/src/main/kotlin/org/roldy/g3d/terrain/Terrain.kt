@@ -26,7 +26,7 @@ class Terrain(
     private val frustum = FrustumCuller()
 
     val texture: Texture by disposable { Texture(AtlasLoader.terrainTileSet) }
-    val scale: Float = 1f
+    val scale: Float = 10f
     val heightScale: Float = 150f * scale
     val width = mapSize.width
     val depth = mapSize.height

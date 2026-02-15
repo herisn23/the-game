@@ -12,7 +12,7 @@ import org.roldy.core.shader.util.fetchUniform
 class PawnShader(
     val configuration: Configuration,
     renderable: Renderable
-) : WorldShiftingShader(renderable, Config().apply {
+) : ShiftingShader(renderable, Config().apply {
     fragmentShader = ShaderLoader.characterFrag
     vertexShader = ShaderLoader.defaultVert
 }) {

@@ -34,8 +34,8 @@ class CollisionManager(
         z: Float,
         apply: (x: Float, z: Float) -> Unit
     ) {
-        tmpX.set(position)
-        tmpZ.set(position)
+        tmpX.set(position).add(collisionSystem.offsetProvider.shiftOffset)
+        tmpZ.set(position).add(collisionSystem.offsetProvider.shiftOffset)
 
         tmpX.x += x
         tmpZ.z += z

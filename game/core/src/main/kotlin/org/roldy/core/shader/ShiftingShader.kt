@@ -9,17 +9,16 @@ import com.badlogic.gdx.math.Vector3
 import org.roldy.core.asset.ShaderLoader
 import org.roldy.core.camera.OffsetProvider
 import org.roldy.core.shader.util.ShaderBuilder
-import org.roldy.core.shader.util.ShaderUserData
-import org.roldy.core.shader.util.fetchUniform
+import org.roldy.core.shader.util.ShiftingManager
 import org.roldy.core.shader.util.shaderProvider
 
-open class WorldShiftingShader(
+open class ShiftingShader(
     renderable: Renderable,
     config: Config = Config().apply {
         vertexShader = ShaderLoader.defaultVert
         fragmentShader = ShaderLoader.defaultFrag
     },
-    val offsetProvider: OffsetProvider = object : OffsetProvider {
+    offsetProvider: OffsetProvider = object : OffsetProvider {
         override val shiftOffset = Vector3()
     }
 ) : DefaultShader(renderable, config.apply {
@@ -28,12 +27,8 @@ open class WorldShiftingShader(
     }
 }) {
 
-    val defaultOffset = Vector3()
+    private val shiftingManager = ShiftingManager(program, offsetProvider)
 
-    val u_shiftOffset by program.fetchUniform()
-
-    val worldShiftUserData = renderable.userData as? ShaderUserData
-    val isShifted = worldShiftUserData?.shifted ?: false
 
     inner class TextureBind(
         val texture: Texture,
@@ -50,7 +45,7 @@ open class WorldShiftingShader(
         TextureBind(this, uniform, bind)
 
     override fun render(renderable: Renderable) {
-        shift()
+        shiftingManager.shift(renderable)
         super.render(renderable)
     }
 
@@ -60,17 +55,14 @@ open class WorldShiftingShader(
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
     }
 
-    fun shift() {
-        val originOffset = offsetProvider.shiftOffset.takeIf { isShifted } ?: defaultOffset
-        program.setUniformf(u_shiftOffset, originOffset.x, originOffset.y, originOffset.z)
-    }
+
 
 }
 
 
 fun shiftingShaderProvider(offsetProvider: OffsetProvider) =
     shaderProvider {
-        WorldShiftingShader(it, offsetProvider = offsetProvider)
+        ShiftingShader(it, offsetProvider = offsetProvider)
     }
 
 

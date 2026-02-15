@@ -22,7 +22,7 @@ class FoliageShader(
     },
     offsetProvider: OffsetProvider,
     windSystem: WindSystem
-) : WorldShiftingShader(renderable, config, offsetProvider) {
+) : ShiftingShader(renderable, config, offsetProvider) {
     val windManager = WindShaderManager(windSystem, program)
     val setter = UniformSetter(program)
 

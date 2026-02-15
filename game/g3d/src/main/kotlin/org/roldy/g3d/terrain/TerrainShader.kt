@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute
 import org.roldy.core.asset.ShaderLoader
-import org.roldy.core.shader.WorldShiftingShader
+import org.roldy.core.shader.ShiftingShader
 import org.roldy.core.shader.util.fetchUniform
 
 class TerrainShader(
     private val terrain: Terrain,
     renderable: Renderable,
-) : WorldShiftingShader(renderable, Config().apply {
+) : ShiftingShader(renderable, Config().apply {
     vertexShader = ShaderLoader.terrainVert
     fragmentShader = ShaderLoader.terrainFrag
 }, terrain.offsetProvider) {

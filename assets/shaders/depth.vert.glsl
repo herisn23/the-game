@@ -1,5 +1,6 @@
 attribute vec3 a_position;
 uniform mat4 u_projViewWorldTrans;
+uniform mat4 u_projViewTrans;
 
 attribute vec2 a_texCoord0;
 varying vec2 v_texCoords0;
@@ -86,11 +87,8 @@ uniform vec3 u_shiftOffset;
 #endif
 
 // Wind needs these separately
-#ifdef windFlag
 uniform mat4 u_worldTrans;
-uniform mat4 u_projViewTrans;
 uniform mat3 u_normalMatrix;
-#endif
 
 uniform float u_shadowBias;
 
@@ -125,23 +123,19 @@ void main() {
     #endif
     #endif
 
-    // ========================================================
-    // WIND PATH: needs separate world transform
-    // ========================================================
-    #ifdef windFlag
-
     #ifdef skinningFlag
     vec3 objectPos = (skinning * vec4(a_position, 1.0)).xyz;
     #else
     vec3 objectPos = a_position;
     #endif
 
+
+    // ========================================================
+    // WIND PATH: needs separate world transform
+    // ========================================================
+    #ifdef windFlag
     vec3 worldPos = (u_worldTrans * vec4(objectPos, 1.0)).xyz;
     vec3 normal = normalize(u_normalMatrix * a_normal);
-
-    #ifdef shiftFlag
-    worldPos -= u_shiftOffset;
-    #endif
 
     #ifdef colorFlag
     vec4 windVertexColor = a_color;
@@ -153,11 +147,9 @@ void main() {
 
     vec3 windPos = applyWindSystem(u_worldTrans, objectPos, worldPos, normal, windVertexColor);
     vec4 pos = u_worldTrans * vec4(windPos, 1.0);
-
     #ifdef shiftFlag
     pos.xyz -= u_shiftOffset;
     #endif
-
     pos = u_projViewTrans * pos;
 
     // ========================================================
@@ -165,16 +157,17 @@ void main() {
     // ========================================================
     #else
 
-    vec4 pos = vec4(a_position, 1.0);
+    vec4 pos = u_worldTrans * vec4(objectPos, 1.0);
 
     #ifdef shiftFlag
     pos.xyz -= u_shiftOffset;
     #endif
 
+
     #ifdef skinningFlag
-    pos = u_projViewWorldTrans * skinning * pos;
+    pos = u_projViewTrans * skinning * pos;
     #else
-    pos = u_projViewWorldTrans * pos;
+    pos = u_projViewTrans * pos;
     #endif
 
     #endif// windFlag

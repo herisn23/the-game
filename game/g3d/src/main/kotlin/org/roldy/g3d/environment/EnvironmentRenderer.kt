@@ -1,8 +1,6 @@
 package org.roldy.g3d.environment
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider
@@ -45,8 +43,12 @@ class EnvironmentRenderer(
             batch.render(it.instance, environment)
         }
         batch.end()
-        Gdx.gl.glDepthMask(true)
-        Gdx.gl.glDepthFunc(GL20.GL_LESS)
+    }
+
+    fun ShadowSystem.renderShadows() {
+        visibleInstances.forEach {
+            render(it.instance)
+        }
     }
 
     private fun renderColliders() {
@@ -59,11 +61,7 @@ class EnvironmentRenderer(
         colliderBatch.end()
     }
 
-    fun ShadowSystem.renderShadows() {
-        visibleInstances.forEach {
-            render(it.instance)
-        }
-    }
+
 
     private val tmpBox = BoundingBox()
 
@@ -88,7 +86,7 @@ class EnvironmentRenderer(
             val instances = instancesProvider()
             context(camera) {
                 instances.forEach {
-                    val model = it.get()
+                    val model = it.get(offsetProvider)
                     if (isVisible(it, model)) {
                         instancesCache.add(model)
                     }

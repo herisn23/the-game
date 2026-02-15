@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.math.collision.Ray
+import org.roldy.core.camera.OffsetProvider
 import org.roldy.core.collision.CollisionUtils
 import org.roldy.core.collision.MeshCollider
 import org.roldy.core.collision.MeshCollisionData
@@ -64,6 +65,7 @@ class EnvModelInstance(
     }
 
     val transform = Transform()
+    val shiftedPosition = Vector3()
 
     companion object {
         const val LOD0_THRESHOLD = 30//50f
@@ -160,16 +162,17 @@ class EnvModelInstance(
     }
 
     context(camera: Camera)
-    private fun getLodInstance(): ModelInstanceWrapper {
-        val dist = camera.position.dst(position)
+    private fun getLodInstance(offsetProvider: OffsetProvider): ModelInstanceWrapper {
+        val pos = shiftedPosition.set(position).sub(offsetProvider.shiftOffset)
+        val dist = camera.position.dst(pos)
         val lodLevel = getLodLevel(dist)
         return lod.getValue(lodLevel)
     }
 
     context(camera: Camera)
-    fun get(): ModelInstanceWrapper =
+    fun get(offsetProvider: OffsetProvider): ModelInstanceWrapper =
         if (hasLod) {
-            getLodInstance()
+            getLodInstance(offsetProvider)
         } else {
             lod.getValue(-1)
         }

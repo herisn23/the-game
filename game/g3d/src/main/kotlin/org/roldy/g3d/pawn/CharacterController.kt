@@ -24,7 +24,7 @@ class CharacterController(
 
     var moveSpeed = 2f
     var heightOffset = 0f
-    var checkCollision = false
+    var checkCollision = true
     private var initialized = false
     val position: Vector3 get() = currentPosition
 
@@ -75,6 +75,9 @@ class CharacterController(
                 currentPosition.x += x
                 currentPosition.z += z
             }
+        } else {
+            currentPosition.x += dx
+            currentPosition.z += dz
         }
 
         // Apply terrain height (Y is driven by terrain, not physics)

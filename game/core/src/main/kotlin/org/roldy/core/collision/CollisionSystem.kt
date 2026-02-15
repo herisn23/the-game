@@ -2,7 +2,7 @@ package org.roldy.core.collision
 
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
-import org.roldy.core.coroutines.SingleTaskAsync
+import org.roldy.core.camera.OffsetProvider
 
 data class CollisionResult(
     val collided: Boolean,
@@ -12,13 +12,11 @@ data class CollisionResult(
 )
 
 class CollisionSystem(
+    val offsetProvider: OffsetProvider,
     val colliders: () -> List<MeshCollider>
 ) {
     private val radius = 5f
     private val tmpBox = BoundingBox()
-    private val tmpVec = Vector3()
-
-    val singleTask = SingleTaskAsync()
 
     /**
      * Check collision and return the deepest penetrating result.
@@ -96,6 +94,9 @@ class CollisionSystem(
         target: Vector3
     ): List<MeshCollider> {
         val radiusSq = radius * radius // avoid sqrt
-        return colliders().filter { it.position.dst2(target) <= radiusSq }
+        val pos = Vector3()
+        return colliders().filter {
+            pos.set(it.position).sub(offsetProvider.shiftOffset).dst2(target) <= radiusSq
+        }
     }
 }

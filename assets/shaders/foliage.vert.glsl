@@ -294,7 +294,8 @@ void main() {
     #ifdef shadowMapFlag
     vec4 spos = u_shadowMapProjViewTrans * pos;
     v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
-    #endif
+    v_shadowMapUv.z = min(v_shadowMapUv.z, 0.998);
+    #endif//shadowMapFlag
 
     v_normal = normal;
 
